@@ -44,6 +44,23 @@ public class CharacterAbilitiesCombatGuiScreen extends AbstractContainerScreen<C
 	private ImageButton imagebutton_floodofanger;
 	private ImageButton imagebutton_razorfocus;
 	private ImageButton imagebutton_undying;
+	private static final ResourceLocation BACKGROUND = ResourceLocation.parse("witchercraft:textures/screens/character_abilities_combat_gui.png");
+	private static final ResourceLocation IMAGE_0 = ResourceLocation.parse("witchercraft:textures/screens/muslemomorybought.png");
+	private static final ResourceLocation IMAGE_1 = ResourceLocation.parse("witchercraft:textures/screens/strengtraingbought.png");
+	private static final ResourceLocation IMAGE_2 = ResourceLocation.parse("witchercraft:textures/screens/fleetfootedbougth.png");
+	private static final ResourceLocation IMAGE_3 = ResourceLocation.parse("witchercraft:textures/screens/coldbloodbought.png");
+	private static final ResourceLocation IMAGE_4 = ResourceLocation.parse("witchercraft:textures/screens/floodofangerbought.png");
+	private static final ResourceLocation IMAGE_5 = ResourceLocation.parse("witchercraft:textures/screens/precoseblowsbought.png");
+	private static final ResourceLocation IMAGE_6 = ResourceLocation.parse("witchercraft:textures/screens/crushingblowsbought.png");
+	private static final ResourceLocation IMAGE_7 = ResourceLocation.parse("witchercraft:textures/screens/defensebought.png");
+	private static final ResourceLocation IMAGE_8 = ResourceLocation.parse("witchercraft:textures/screens/anatomicalknowledgebought.png");
+	private static final ResourceLocation IMAGE_9 = ResourceLocation.parse("witchercraft:textures/screens/razorfocusbought.png");
+	private static final ResourceLocation IMAGE_10 = ResourceLocation.parse("witchercraft:textures/screens/cripplingstrikesbought.png");
+	private static final ResourceLocation IMAGE_11 = ResourceLocation.parse("witchercraft:textures/screens/sunderarmorbought.png");
+	private static final ResourceLocation IMAGE_12 = ResourceLocation.parse("witchercraft:textures/screens/deadlyprecisonbought.png");
+	private static final ResourceLocation IMAGE_13 = ResourceLocation.parse("witchercraft:textures/screens/cripplingshotbought.png");
+	private static final ResourceLocation IMAGE_14 = ResourceLocation.parse("witchercraft:textures/screens/undyingbought.png");
+	private static final ResourceLocation IMAGE_15 = ResourceLocation.parse("witchercraft:textures/screens/skillpoint.png");
 
 	public CharacterAbilitiesCombatGuiScreen(CharacterAbilitiesCombatGuiMenu container, Inventory inventory, Component text) {
 		super(container, inventory, text);
@@ -61,8 +78,6 @@ public class CharacterAbilitiesCombatGuiScreen extends AbstractContainerScreen<C
 		menuStateUpdateActive = true;
 		menuStateUpdateActive = false;
 	}
-
-	private static final ResourceLocation texture = ResourceLocation.parse("witchercraft:textures/screens/character_abilities_combat_gui.png");
 
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
@@ -134,23 +149,23 @@ public class CharacterAbilitiesCombatGuiScreen extends AbstractContainerScreen<C
 
 	@Override
 	protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, texture, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/muslemomorybought.png"), this.leftPos + 4, this.topPos + 16, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/strengtraingbought.png"), this.leftPos + 40, this.topPos + 16, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/fleetfootedbougth.png"), this.leftPos + 76, this.topPos + 16, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/coldbloodbought.png"), this.leftPos + 112, this.topPos + 16, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/floodofangerbought.png"), this.leftPos + 148, this.topPos + 16, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/precoseblowsbought.png"), this.leftPos + 4, this.topPos + 70, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/crushingblowsbought.png"), this.leftPos + 40, this.topPos + 70, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/defensebought.png"), this.leftPos + 76, this.topPos + 70, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/anatomicalknowledgebought.png"), this.leftPos + 112, this.topPos + 70, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/razorfocusbought.png"), this.leftPos + 148, this.topPos + 70, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/cripplingstrikesbought.png"), this.leftPos + 4, this.topPos + 115, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/sunderarmorbought.png"), this.leftPos + 40, this.topPos + 115, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/deadlyprecisonbought.png"), this.leftPos + 76, this.topPos + 115, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/cripplingshotbought.png"), this.leftPos + 112, this.topPos + 115, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/undyingbought.png"), this.leftPos + 148, this.topPos + 115, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/skillpoint.png"), this.leftPos + 193, this.topPos + 16, 0, 0, 50, 25, 50, 25);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BACKGROUND, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_0, this.leftPos + 4, this.topPos + 16, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_1, this.leftPos + 40, this.topPos + 16, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_2, this.leftPos + 76, this.topPos + 16, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_3, this.leftPos + 112, this.topPos + 16, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_4, this.leftPos + 148, this.topPos + 16, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_5, this.leftPos + 4, this.topPos + 70, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_6, this.leftPos + 40, this.topPos + 70, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_7, this.leftPos + 76, this.topPos + 70, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_8, this.leftPos + 112, this.topPos + 70, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_9, this.leftPos + 148, this.topPos + 70, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_10, this.leftPos + 4, this.topPos + 115, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_11, this.leftPos + 40, this.topPos + 115, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_12, this.leftPos + 76, this.topPos + 115, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_13, this.leftPos + 112, this.topPos + 115, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_14, this.leftPos + 148, this.topPos + 115, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_15, this.leftPos + 193, this.topPos + 16, 0, 0, 50, 25, 50, 25);
 	}
 
 	@Override

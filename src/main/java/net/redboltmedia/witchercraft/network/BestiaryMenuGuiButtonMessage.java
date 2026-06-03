@@ -17,11 +17,10 @@ import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
 
 @EventBusSubscriber
 public record BestiaryMenuGuiButtonMessage(int buttonID, int x, int y, int z) implements CustomPacketPayload {
-
 	public static final Type<BestiaryMenuGuiButtonMessage> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(WitchercraftMod.MODID, "bestiary_menu_gui_buttons"));
 	public static final StreamCodec<RegistryFriendlyByteBuf, BestiaryMenuGuiButtonMessage> STREAM_CODEC = StreamCodec.of((RegistryFriendlyByteBuf buffer, BestiaryMenuGuiButtonMessage message) -> {
 		buffer.writeInt(message.buttonID);
@@ -29,6 +28,7 @@ public record BestiaryMenuGuiButtonMessage(int buttonID, int x, int y, int z) im
 		buffer.writeInt(message.y);
 		buffer.writeInt(message.z);
 	}, (RegistryFriendlyByteBuf buffer) -> new BestiaryMenuGuiButtonMessage(buffer.readInt(), buffer.readInt(), buffer.readInt(), buffer.readInt()));
+
 	@Override
 	public Type<BestiaryMenuGuiButtonMessage> type() {
 		return TYPE;
@@ -46,7 +46,7 @@ public record BestiaryMenuGuiButtonMessage(int buttonID, int x, int y, int z) im
 	public static void handleButtonAction(Player entity, int buttonID, int x, int y, int z) {
 		Level world = entity.level();
 		// security measure to prevent arbitrary chunk generation
-		if (!world.hasChunkAt(new BlockPos(x, y, z)))
+		if (!world.getChunkSource().hasChunk(SectionPos.blockToSectionCoord(x), SectionPos.blockToSectionCoord(z)))
 			return;
 		if (buttonID == 0) {
 

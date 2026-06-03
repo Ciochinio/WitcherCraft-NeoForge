@@ -28,6 +28,9 @@ public class FogletScreen extends AbstractContainerScreen<FogletMenu> implements
 	private ImageButton imagebutton_drownerfacesmall;
 	private ImageButton imagebutton_bookmarkerleftbought;
 	private ImageButton imagebutton_arrowback;
+	private static final ResourceLocation IMAGE_0 = ResourceLocation.parse("witchercraft:textures/screens/book.png");
+	private static final ResourceLocation IMAGE_1 = ResourceLocation
+			.parse("witchercraft:textures/screens/68747470733a2f2f726564626f6c746d656469612e6769746875622e696f2f73746f726167652f6d6f64732f7769746368657263726166742f64726f776e657262672e706e67.png");
 
 	public FogletScreen(FogletMenu container, Inventory inventory, Component text) {
 		super(container, inventory, text);
@@ -54,10 +57,8 @@ public class FogletScreen extends AbstractContainerScreen<FogletMenu> implements
 
 	@Override
 	protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/book.png"), this.leftPos + -37, this.topPos + -38, 0, 0, 319, 222, 319, 222);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED,
-				ResourceLocation.parse("witchercraft:textures/screens/68747470733a2f2f726564626f6c746d656469612e6769746875622e696f2f73746f726167652f6d6f64732f7769746368657263726166742f64726f776e657262672e706e67.png"), this.leftPos + 139,
-				this.topPos + 7, 0, 0, 91, 106, 91, 106);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_0, this.leftPos + -37, this.topPos + -38, 0, 0, 319, 222, 319, 222);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_1, this.leftPos + 139, this.topPos + 7, 0, 0, 91, 106, 91, 106);
 	}
 
 	@Override

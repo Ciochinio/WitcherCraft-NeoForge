@@ -38,6 +38,14 @@ public class CharactersAbilietesGeneralGuiScreen extends AbstractContainerScreen
 	private ImageButton imagebutton_catschooltechniques;
 	private ImageButton imagebutton_griffinschool;
 	private ImageButton imagebutton_bearschool;
+	private static final ResourceLocation BACKGROUND = ResourceLocation.parse("witchercraft:textures/screens/characters_abilietes_general_gui.png");
+	private static final ResourceLocation IMAGE_0 = ResourceLocation.parse("witchercraft:textures/screens/sunandstarsbought.png");
+	private static final ResourceLocation IMAGE_1 = ResourceLocation.parse("witchercraft:textures/screens/survivalinstinctsbought.png");
+	private static final ResourceLocation IMAGE_2 = ResourceLocation.parse("witchercraft:textures/screens/gourmentbought.png");
+	private static final ResourceLocation IMAGE_3 = ResourceLocation.parse("witchercraft:textures/screens/catschooltechniquesbought.png");
+	private static final ResourceLocation IMAGE_4 = ResourceLocation.parse("witchercraft:textures/screens/griffinschoolbought.png");
+	private static final ResourceLocation IMAGE_5 = ResourceLocation.parse("witchercraft:textures/screens/bearschoolbought.png");
+	private static final ResourceLocation IMAGE_6 = ResourceLocation.parse("witchercraft:textures/screens/skillpoint.png");
 
 	public CharactersAbilietesGeneralGuiScreen(CharactersAbilietesGeneralGuiMenu container, Inventory inventory, Component text) {
 		super(container, inventory, text);
@@ -55,8 +63,6 @@ public class CharactersAbilietesGeneralGuiScreen extends AbstractContainerScreen
 		menuStateUpdateActive = true;
 		menuStateUpdateActive = false;
 	}
-
-	private static final ResourceLocation texture = ResourceLocation.parse("witchercraft:textures/screens/characters_abilietes_general_gui.png");
 
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
@@ -95,14 +101,14 @@ public class CharactersAbilietesGeneralGuiScreen extends AbstractContainerScreen
 
 	@Override
 	protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, texture, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/sunandstarsbought.png"), this.leftPos + 6, this.topPos + 25, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/survivalinstinctsbought.png"), this.leftPos + 69, this.topPos + 25, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/gourmentbought.png"), this.leftPos + 123, this.topPos + 25, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/catschooltechniquesbought.png"), this.leftPos + 6, this.topPos + 70, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/griffinschoolbought.png"), this.leftPos + 69, this.topPos + 70, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/bearschoolbought.png"), this.leftPos + 123, this.topPos + 70, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/skillpoint.png"), this.leftPos + 186, this.topPos + -2, 0, 0, 50, 25, 50, 25);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BACKGROUND, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_0, this.leftPos + 6, this.topPos + 25, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_1, this.leftPos + 69, this.topPos + 25, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_2, this.leftPos + 123, this.topPos + 25, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_3, this.leftPos + 6, this.topPos + 70, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_4, this.leftPos + 69, this.topPos + 70, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_5, this.leftPos + 123, this.topPos + 70, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_6, this.leftPos + 186, this.topPos + -2, 0, 0, 50, 25, 50, 25);
 	}
 
 	@Override

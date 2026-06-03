@@ -16,11 +16,10 @@ import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
 
 @EventBusSubscriber
 public record CharacterAbilitiesSignsGuiButtonMessage(int buttonID, int x, int y, int z) implements CustomPacketPayload {
-
 	public static final Type<CharacterAbilitiesSignsGuiButtonMessage> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(WitchercraftMod.MODID, "character_abilities_signs_gui_buttons"));
 	public static final StreamCodec<RegistryFriendlyByteBuf, CharacterAbilitiesSignsGuiButtonMessage> STREAM_CODEC = StreamCodec.of((RegistryFriendlyByteBuf buffer, CharacterAbilitiesSignsGuiButtonMessage message) -> {
 		buffer.writeInt(message.buttonID);
@@ -28,6 +27,7 @@ public record CharacterAbilitiesSignsGuiButtonMessage(int buttonID, int x, int y
 		buffer.writeInt(message.y);
 		buffer.writeInt(message.z);
 	}, (RegistryFriendlyByteBuf buffer) -> new CharacterAbilitiesSignsGuiButtonMessage(buffer.readInt(), buffer.readInt(), buffer.readInt(), buffer.readInt()));
+
 	@Override
 	public Type<CharacterAbilitiesSignsGuiButtonMessage> type() {
 		return TYPE;
@@ -45,7 +45,7 @@ public record CharacterAbilitiesSignsGuiButtonMessage(int buttonID, int x, int y
 	public static void handleButtonAction(Player entity, int buttonID, int x, int y, int z) {
 		Level world = entity.level();
 		// security measure to prevent arbitrary chunk generation
-		if (!world.hasChunkAt(new BlockPos(x, y, z)))
+		if (!world.getChunkSource().hasChunk(SectionPos.blockToSectionCoord(x), SectionPos.blockToSectionCoord(z)))
 			return;
 		if (buttonID == 0) {
 

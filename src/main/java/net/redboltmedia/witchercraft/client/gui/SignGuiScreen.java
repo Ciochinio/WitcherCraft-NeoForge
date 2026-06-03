@@ -26,6 +26,11 @@ public class SignGuiScreen extends AbstractContainerScreen<SignGuiMenu> implemen
 	private Button button_igni;
 	private Button button_axii;
 	private Button button_aard;
+	private static final ResourceLocation IMAGE_0 = ResourceLocation.parse("witchercraft:textures/screens/axii.png");
+	private static final ResourceLocation IMAGE_1 = ResourceLocation.parse("witchercraft:textures/screens/aard.png");
+	private static final ResourceLocation IMAGE_2 = ResourceLocation.parse("witchercraft:textures/screens/quen.png");
+	private static final ResourceLocation IMAGE_3 = ResourceLocation.parse("witchercraft:textures/screens/yrden.png");
+	private static final ResourceLocation IMAGE_4 = ResourceLocation.parse("witchercraft:textures/screens/igni.png");
 
 	public SignGuiScreen(SignGuiMenu container, Inventory inventory, Component text) {
 		super(container, inventory, text);
@@ -52,11 +57,11 @@ public class SignGuiScreen extends AbstractContainerScreen<SignGuiMenu> implemen
 
 	@Override
 	protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/axii.png"), this.leftPos + 112, this.topPos + -14, 0, 0, 64, 64, 64, 64);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/aard.png"), this.leftPos + 172, this.topPos + 23, 0, 0, 64, 64, 64, 64);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/quen.png"), this.leftPos + -9, this.topPos + -7, 0, 0, 64, 64, 64, 64);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/yrden.png"), this.leftPos + -62, this.topPos + 31, 0, 0, 64, 64, 64, 64);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/igni.png"), this.leftPos + 52, this.topPos + -36, 0, 0, 64, 64, 64, 64);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_0, this.leftPos + 112, this.topPos + -14, 0, 0, 64, 64, 64, 64);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_1, this.leftPos + 172, this.topPos + 23, 0, 0, 64, 64, 64, 64);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_2, this.leftPos + -9, this.topPos + -7, 0, 0, 64, 64, 64, 64);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_3, this.leftPos + -62, this.topPos + 31, 0, 0, 64, 64, 64, 64);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_4, this.leftPos + 52, this.topPos + -36, 0, 0, 64, 64, 64, 64);
 	}
 
 	@Override

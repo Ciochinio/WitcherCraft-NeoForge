@@ -1,11 +1,11 @@
-[28Apr2026 14:36:07.623] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher running: args [--launchTarget, neoforgeclientdev, --version, 21.8.31, --assetIndex, 26, --assetsDir, C:\\Users\\Ciochu\\.mcreator\\gradle\\caches\\neoformruntime\\assets, --fml.fmlVersion, 9.0.16, --fml.mcVersion, 1.21.8, --fml.neoForgeVersion, 21.8.31, --fml.neoFormVersion, 20250717.133445]
-[28Apr2026 14:36:07.629] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: JVM identified as Eclipse Adoptium OpenJDK 64-Bit Server VM 21.0.8+9-LTS
-[28Apr2026 14:36:07.631] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher 9.0 starting: java version 21.0.8 by Eclipse Adoptium; OS Windows 11 arch amd64 version 10.0
-[28Apr2026 14:36:07.814] [main/INFO] [net.neoforged.fml.loading.ImmediateWindowHandler/]: Loading ImmediateWindowProvider fmlearlywindow
-[28Apr2026 14:36:08.779] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.7 Source=union:/C:/Users/Ciochu/.mcreator/gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.15.2+mixin.0.8.7/2af2f021d8e02a0220dc27a7a72b4666d66d44ca/sponge-mixin-0.15.2+mixin.0.8.7.jar%23157!/ Service=ModLauncher Env=CLIENT
-[28Apr2026 14:36:09.230] [fml-loadingscreen/INFO] [net.neoforged.fml.earlydisplay.render.LoadingScreenRenderer/]: GL info: NVIDIA GeForce RTX 3070 Laptop GPU/PCIe/SSE2 GL version 3.2.0 NVIDIA 591.86, NVIDIA Corporation
-[28Apr2026 14:36:09.574] [main/INFO] [net.neoforged.fml.loading.moddiscovery.locators.JarInJarDependencyLocator/]: Found 2 dependencies adding them to mods collection
-[28Apr2026 14:36:09.577] [main/INFO] [net.neoforged.fml.loading.moddiscovery.ModDiscoverer/]: 
+[03Jun2026 18:46:15.847] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher running: args [--launchTarget, neoforgeclientdev, --version, 21.8.31, --assetIndex, 26, --assetsDir, C:\\Users\\cioch\\.mcreator\\gradle\\caches\\neoformruntime\\assets, --fml.fmlVersion, 9.0.16, --fml.mcVersion, 1.21.8, --fml.neoForgeVersion, 21.8.31, --fml.neoFormVersion, 20250717.133445]
+[03Jun2026 18:46:15.849] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: JVM identified as JetBrains s.r.o. OpenJDK 64-Bit Server VM 21.0.10+1-b1163.105
+[03Jun2026 18:46:15.850] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher 9.0 starting: java version 21.0.10 by JetBrains s.r.o.; OS Windows 11 arch amd64 version 10.0
+[03Jun2026 18:46:15.900] [main/INFO] [net.neoforged.fml.loading.ImmediateWindowHandler/]: Loading ImmediateWindowProvider fmlearlywindow
+[03Jun2026 18:46:16.300] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.7 Source=union:/C:/Users/cioch/.mcreator/gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.15.2+mixin.0.8.7/2af2f021d8e02a0220dc27a7a72b4666d66d44ca/sponge-mixin-0.15.2+mixin.0.8.7.jar%23157!/ Service=ModLauncher Env=CLIENT
+[03Jun2026 18:46:16.426] [fml-loadingscreen/INFO] [net.neoforged.fml.earlydisplay.render.LoadingScreenRenderer/]: GL info: NVIDIA GeForce RTX 5080/PCIe/SSE2 GL version 3.2.0 NVIDIA 581.29, NVIDIA Corporation
+[03Jun2026 18:46:16.537] [main/INFO] [net.neoforged.fml.loading.moddiscovery.locators.JarInJarDependencyLocator/]: Found 2 dependencies adding them to mods collection
+[03Jun2026 18:46:16.538] [main/INFO] [net.neoforged.fml.loading.moddiscovery.ModDiscoverer/]: 
      Mod List:
 		Name Version (Mod Id)
 
@@ -13,373 +13,100 @@
 		NeoForge 21.8.31 (neoforge)
 		WitcherCraft 1.0.0 (witchercraft)
 		YDM's Mob Health Bar 1.0.0 (mobhealthbar)
-[28Apr2026 14:36:12.359] [main/INFO] [mixin/]: Compatibility level set to JAVA_17
-[28Apr2026 14:36:12.390] [main/INFO] [cpw.mods.modlauncher.LaunchServiceHandler/MODLAUNCHER]: Launching target 'neoforgeclientdev' with arguments [--version, 21.8.31, --assetsDir, C:\Users\Ciochu\.mcreator\gradle\caches\neoformruntime\assets, --assetIndex, 26]
-[28Apr2026 14:36:15.774] [Datafixer Bootstrap/INFO] [com.mojang.datafixers.DataFixerBuilder/]: 272 Datafixer optimizations took 970 milliseconds
-[28Apr2026 14:36:16.140] [pool-7-thread-1/INFO] [MixinExtras|Service/]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.5.0).
-[28Apr2026 14:36:25.867] [main/WARN] [net.minecraft.commands.Commands/]: Ambiguity between arguments [teleport, location] and [teleport, destination] with inputs: [0.1 -0.5 .9, 0 0 0]
-[28Apr2026 14:36:25.869] [main/WARN] [net.minecraft.commands.Commands/]: Ambiguity between arguments [teleport, location] and [teleport, targets] with inputs: [0.1 -0.5 .9, 0 0 0]
-[28Apr2026 14:36:25.873] [main/WARN] [net.minecraft.commands.Commands/]: Ambiguity between arguments [teleport, destination] and [teleport, targets] with inputs: [Player, 0123, @e, dd12be42-52a9-4a91-a8a1-11c01849e498]
-[28Apr2026 14:36:25.875] [main/WARN] [net.minecraft.commands.Commands/]: Ambiguity between arguments [teleport, targets] and [teleport, destination] with inputs: [Player, 0123, dd12be42-52a9-4a91-a8a1-11c01849e498]
-[28Apr2026 14:36:25.877] [main/WARN] [net.minecraft.commands.Commands/]: Ambiguity between arguments [teleport, targets, location] and [teleport, targets, destination] with inputs: [0.1 -0.5 .9, 0 0 0]
-[28Apr2026 14:36:25.882] [main/WARN] [net.minecraft.commands.Commands/]: Ambiguity between arguments [waypoint, modify, waypoint, color, reset] and [waypoint, modify, waypoint, color, color] with inputs: [reset]
-[28Apr2026 14:36:26.020] [modloading-worker-0/INFO] [net.neoforged.neoforge.common.NeoForgeMod/NEOFORGE-MOD]: NeoForge mod loading, version 21.8.31, for MC 1.21.8
-[28Apr2026 14:36:27.106] [Render thread/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/C:/Users/Ciochu/Documents/GitHub/WitcherCraft-1.21/build/moddev/artifacts/neoforge-21.8.31.jar%23213!/assets/.mcassetsroot' uses unexpected schema
-[28Apr2026 14:36:27.108] [Render thread/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/C:/Users/Ciochu/Documents/GitHub/WitcherCraft-1.21/build/moddev/artifacts/neoforge-21.8.31.jar%23213!/data/.mcassetsroot' uses unexpected schema
-[28Apr2026 14:36:27.201] [Render thread/INFO] [com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService/]: Environment: Environment[sessionHost=https://sessionserver.mojang.com, servicesHost=https://api.minecraftservices.com, name=PROD]
-[28Apr2026 14:36:27.216] [Render thread/INFO] [net.minecraft.client.Minecraft/]: Setting user: Dev
-[28Apr2026 14:36:27.444] [Render thread/INFO] [net.minecraft.client.Minecraft/]: Backend library: LWJGL version 3.3.3+5
-[28Apr2026 14:36:27.717] [Render thread/INFO] [net.minecraft.client.Minecraft/]: Using optional rendering extensions: GL_ARB_buffer_storage, GL_KHR_debug, GL_ARB_vertex_attrib_binding, GL_ARB_direct_state_access
-[28Apr2026 14:36:29.677] [Render thread/INFO] [net.minecraft.server.packs.resources.ReloadableResourceManager/]: Reloading ResourceManager: vanilla, mod_resources, mod/neoforge, mod/witchercraft, mod/mobhealthbar
-[28Apr2026 14:36:30.006] [resourceLoad/INFO] [net.minecraft.client.gui.font.providers.UnihexProvider/]: Found unifont_all_no_pua-16.0.03.hex, loading
-[28Apr2026 14:36:30.006] [resourceLoad/INFO] [net.minecraft.client.gui.font.providers.UnihexProvider/]: Found unifont_pua-16.0.03.hex, loading
-[28Apr2026 14:36:30.012] [resourceLoad/INFO] [net.minecraft.client.gui.font.providers.UnihexProvider/]: Found unifont_jp_patch-16.0.03.hex, loading
-[28Apr2026 14:36:30.312] [resourceLoad/ERROR] [net.minecraft.Util/]: Invalid path in pack: witchercraft:textures/particle/output-onlinepngtools (1).png, ignoring
-[28Apr2026 14:36:32.593] [Render thread/INFO] [com.mojang.blaze3d.audio.Library/]: OpenAL initialized on device OpenAL Soft on Słuchawki (Arctis Pro Wireless Game)
-[28Apr2026 14:36:32.594] [Render thread/INFO] [net.minecraft.client.sounds.SoundEngine/SOUNDS]: Sound engine started
-[28Apr2026 14:36:32.794] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 1024x1024x2 minecraft:textures/atlas/blocks.png-atlas
-[28Apr2026 14:36:32.816] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 256x256x2 minecraft:textures/atlas/signs.png-atlas
-[28Apr2026 14:36:32.817] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 512x512x2 minecraft:textures/atlas/shield_patterns.png-atlas
-[28Apr2026 14:36:32.818] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 512x512x2 minecraft:textures/atlas/banner_patterns.png-atlas
-[28Apr2026 14:36:32.820] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 2048x1024x2 minecraft:textures/atlas/armor_trims.png-atlas
-[28Apr2026 14:36:32.830] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 256x256x2 minecraft:textures/atlas/chest.png-atlas
-[28Apr2026 14:36:32.830] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 128x64x2 minecraft:textures/atlas/decorated_pot.png-atlas
-[28Apr2026 14:36:32.831] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 512x256x2 minecraft:textures/atlas/beds.png-atlas
-[28Apr2026 14:36:32.832] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 512x256x2 minecraft:textures/atlas/shulker_boxes.png-atlas
-[28Apr2026 14:36:32.838] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 64x64x0 minecraft:textures/atlas/map_decorations.png-atlas
-[28Apr2026 14:36:32.976] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 4096x2048x0 minecraft:textures/atlas/particles.png-atlas
-[28Apr2026 14:36:32.992] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 512x256x0 minecraft:textures/atlas/paintings.png-atlas
-[28Apr2026 14:36:32.994] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 1024x1024x0 minecraft:textures/atlas/gui.png-atlas
-[28Apr2026 14:36:33.007] [Render thread/INFO] [net.neoforged.neoforge.client.entity.animation.json.AnimationLoader/]: Loaded 0 entity animations
-[28Apr2026 14:37:33.092] [Render thread/INFO] [net.minecraft.world.item.crafting.RecipeManager/]: Loaded 1407 recipes
-[28Apr2026 14:37:33.109] [Render thread/INFO] [net.minecraft.advancements.AdvancementTree/]: Loaded 1520 advancements
-[28Apr2026 14:37:33.111] [Render thread/INFO] [net.neoforged.neoforge.common.crafting.RecipePriorityManager/]: Loaded 0 recipe priority overrides
-[28Apr2026 14:37:33.420] [Server thread/INFO] [net.minecraft.client.server.IntegratedServer/]: Starting integrated minecraft server version 1.21.8
-[28Apr2026 14:37:33.422] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Generating keypair
-[28Apr2026 14:37:34.228] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Preparing start region for dimension minecraft:overworld
-[28Apr2026 14:37:34.999] [progressListener/INFO] [net.minecraft.server.level.progress.LoggerChunkProgressListener/]: Preparing spawn area: 0%
-[28Apr2026 14:37:35.000] [progressListener/INFO] [net.minecraft.server.level.progress.LoggerChunkProgressListener/]: Preparing spawn area: 0%
-[28Apr2026 14:37:35.502] [progressListener/INFO] [net.minecraft.server.level.progress.LoggerChunkProgressListener/]: Preparing spawn area: 0%
-[28Apr2026 14:37:36.082] [progressListener/INFO] [net.minecraft.server.level.progress.LoggerChunkProgressListener/]: Preparing spawn area: 0%
-[28Apr2026 14:37:36.266] [progressListener/INFO] [net.minecraft.server.level.progress.LoggerChunkProgressListener/]: Preparing spawn area: 6%
-[28Apr2026 14:37:36.541] [Server thread/INFO] [net.neoforged.neoforge.server.permission.PermissionAPI/]: Successfully initialized permission handler neoforge:default_handler
-[28Apr2026 14:37:36.548] [progressListener/INFO] [net.minecraft.server.level.progress.LoggerChunkProgressListener/]: Time elapsed: 2295 ms
-[28Apr2026 14:37:36.704] [Server thread/INFO] [net.minecraft.client.server.IntegratedServer/]: Changing view distance to 28, from 10
-[28Apr2026 14:37:36.704] [Server thread/INFO] [net.minecraft.client.server.IntegratedServer/]: Changing simulation distance to 12, from 0
-[28Apr2026 14:37:38.050] [Server thread/INFO] [net.minecraft.server.players.PlayerList/]: Dev[local:E:0b36a06f] logged in with entity id 1 at (1.0, 3.0, 1.0)
-[28Apr2026 14:37:38.185] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Dev joined the game
-[28Apr2026 14:37:38.688] [Render thread/INFO] [net.minecraft.client.renderer.DynamicUniformStorage/]: Resizing Dynamic Transforms UBO, capacity limit of 2 reached during a single frame. New capacity will be 4.
-[28Apr2026 14:37:38.741] [Render thread/INFO] [net.minecraft.client.gui.components.ChatComponent/]: [System] [CHAT] xp  0.0
-[28Apr2026 14:37:38.758] [Render thread/INFO] [net.minecraft.client.gui.components.ChatComponent/]: [System] [CHAT] poziom  1.0
-[28Apr2026 14:37:38.758] [Render thread/INFO] [net.minecraft.advancements.AdvancementTree/]: Loaded 2 advancements
-[28Apr2026 14:37:38.980] [Render thread/INFO] [net.minecraft.client.renderer.DynamicUniformStorage/]: Resizing Dynamic Transforms UBO, capacity limit of 4 reached during a single frame. New capacity will be 8.
-[28Apr2026 14:37:39.187] [Render thread/INFO] [net.minecraft.client.renderer.DynamicUniformStorage/]: Resizing Dynamic Transforms UBO, capacity limit of 8 reached during a single frame. New capacity will be 16.
-[28Apr2026 14:37:39.319] [Render thread/INFO] [net.minecraft.client.renderer.DynamicUniformStorage/]: Resizing Dynamic Transforms UBO, capacity limit of 16 reached during a single frame. New capacity will be 32.
-[28Apr2026 14:37:39.475] [Render thread/INFO] [net.minecraft.client.renderer.DynamicUniformStorage/]: Resizing Dynamic Transforms UBO, capacity limit of 32 reached during a single frame. New capacity will be 64.
-[28Apr2026 14:37:39.632] [Render thread/INFO] [net.minecraft.client.renderer.DynamicUniformStorage/]: Resizing Dynamic Transforms UBO, capacity limit of 64 reached during a single frame. New capacity will be 128.
-[28Apr2026 14:37:39.749] [Render thread/INFO] [net.minecraft.client.renderer.DynamicUniformStorage/]: Resizing Dynamic Transforms UBO, capacity limit of 128 reached during a single frame. New capacity will be 256.
-[28Apr2026 14:37:40.282] [Render thread/INFO] [net.minecraft.client.renderer.DynamicUniformStorage/]: Resizing Dynamic Transforms UBO, capacity limit of 256 reached during a single frame. New capacity will be 512.
-[28Apr2026 14:37:41.588] [Render thread/INFO] [net.minecraft.client.renderer.DynamicUniformStorage/]: Resizing Dynamic Transforms UBO, capacity limit of 512 reached during a single frame. New capacity will be 1024.
-[28Apr2026 14:37:44.146] [Render thread/INFO] [net.minecraft.client.renderer.DynamicUniformStorage/]: Resizing Dynamic Transforms UBO, capacity limit of 1024 reached during a single frame. New capacity will be 2048.
-[28Apr2026 14:37:47.598] [Render thread/INFO] [net.minecraft.client.renderer.DynamicUniformStorage/]: Resizing Dynamic Transforms UBO, capacity limit of 2048 reached during a single frame. New capacity will be 4096.
-[28Apr2026 14:37:50.524] [Render thread/INFO] [net.minecraft.client.renderer.DynamicUniformStorage/]: Resizing Dynamic Transforms UBO, capacity limit of 4096 reached during a single frame. New capacity will be 8192.
-[28Apr2026 14:38:15.229] [Server thread/ERROR] [net.minecraft.world.level.block.entity.BlockEntity/]: Failed to create block entity net.minecraft.world.level.block.entity.BlockEntityType@68913080 for block BlockPos{x=904, y=-55, z=170} at position Block{minecraft:nether_bricks} 
-java.lang.IllegalStateException: Invalid block entity minecraft:barrel // net.minecraft.world.level.block.entity.BarrelBlockEntity state at BlockPos{x=904, y=-55, z=170}, got Block{minecraft:nether_bricks}
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BlockEntity.validateBlockState(BlockEntity.java:60) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BlockEntity.<init>(BlockEntity.java:54) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BaseContainerBlockEntity.<init>(BaseContainerBlockEntity.java:33) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity.<init>(RandomizableContainerBlockEntity.java:25) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BarrelBlockEntity.<init>(BarrelBlockEntity.java:54) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BlockEntityType.create(BlockEntityType.java:283) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BlockEntity.loadStatic(BlockEntity.java:194) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.storage.SerializableChunkData.lambda$postLoadChunk$12(SerializableChunkData.java:585) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.LevelChunk.runPostLoad(LevelChunk.java:524) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.status.ChunkStatusTasks.lambda$full$2(ChunkStatusTasks.java:222) ~[neoforge-21.8.31.jar%23213!/:?]
-	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1768) ~[?:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.doRunTask(BlockableEventLoop.java:152) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache$MainThreadExecutor.doRunTask(ServerChunkCache.java:622) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.pollTask(BlockableEventLoop.java:126) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache$MainThreadExecutor.pollTask(ServerChunkCache.java:631) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache.pollTask(ServerChunkCache.java:296) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.pollTaskInternal(MinecraftServer.java:880) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.pollTask(MinecraftServer.java:869) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.managedBlock(BlockableEventLoop.java:136) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.managedBlock(MinecraftServer.java:834) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.waitUntilNextTick(MinecraftServer.java:842) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.runServer(MinecraftServer.java:722) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.lambda$spin$2(MinecraftServer.java:277) ~[neoforge-21.8.31.jar%23213!/:?]
-	at java.base/java.lang.Thread.run(Thread.java:1583) [?:?]
-[28Apr2026 14:38:25.646] [Server thread/INFO] [net.minecraft.client.server.IntegratedServer/]: Saving and pausing game...
-[28Apr2026 14:38:25.719] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:overworld
-[28Apr2026 14:38:25.845] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:the_end
-[28Apr2026 14:38:25.848] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:the_nether
-[28Apr2026 14:38:41.497] [Server thread/INFO] [net.minecraft.client.server.IntegratedServer/]: Saving and pausing game...
-[28Apr2026 14:38:41.512] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:overworld
-[28Apr2026 14:38:41.551] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:the_end
-[28Apr2026 14:38:41.552] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:the_nether
-[28Apr2026 14:38:45.796] [Server thread/INFO] [net.minecraft.client.server.IntegratedServer/]: Saving and pausing game...
-[28Apr2026 14:38:45.812] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:overworld
-[28Apr2026 14:38:45.824] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:the_end
-[28Apr2026 14:38:45.825] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:the_nether
-[28Apr2026 14:38:47.047] [Server thread/INFO] [net.minecraft.client.server.IntegratedServer/]: Saving and pausing game...
-[28Apr2026 14:38:47.060] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:overworld
-[28Apr2026 14:38:47.073] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:the_end
-[28Apr2026 14:38:47.074] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:the_nether
-[28Apr2026 14:39:07.345] [Server thread/ERROR] [net.minecraft.world.level.block.entity.BlockEntity/]: Failed to create block entity net.minecraft.world.level.block.entity.BlockEntityType@24571234 for block BlockPos{x=1347, y=-39, z=623} at position Block{minecraft:polished_diorite} 
-java.lang.ClassCastException: class net.minecraft.world.level.block.Block cannot be cast to class net.minecraft.world.level.block.AbstractBannerBlock (net.minecraft.world.level.block.Block and net.minecraft.world.level.block.AbstractBannerBlock are in module minecraft@1.21.8 of loader 'TRANSFORMER' @30501e60)
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BannerBlockEntity.<init>(BannerBlockEntity.java:31) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BlockEntityType.create(BlockEntityType.java:283) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BlockEntity.loadStatic(BlockEntity.java:194) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.storage.SerializableChunkData.lambda$postLoadChunk$12(SerializableChunkData.java:585) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.LevelChunk.runPostLoad(LevelChunk.java:524) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.status.ChunkStatusTasks.lambda$full$2(ChunkStatusTasks.java:222) ~[neoforge-21.8.31.jar%23213!/:?]
-	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1768) ~[?:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.doRunTask(BlockableEventLoop.java:152) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache$MainThreadExecutor.doRunTask(ServerChunkCache.java:622) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.pollTask(BlockableEventLoop.java:126) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache$MainThreadExecutor.pollTask(ServerChunkCache.java:631) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache.pollTask(ServerChunkCache.java:296) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.pollTaskInternal(MinecraftServer.java:880) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.pollTask(MinecraftServer.java:869) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.managedBlock(BlockableEventLoop.java:136) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.managedBlock(MinecraftServer.java:834) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.waitUntilNextTick(MinecraftServer.java:842) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.runServer(MinecraftServer.java:722) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.lambda$spin$2(MinecraftServer.java:277) ~[neoforge-21.8.31.jar%23213!/:?]
-	at java.base/java.lang.Thread.run(Thread.java:1583) [?:?]
-[28Apr2026 14:39:11.100] [Server thread/ERROR] [net.minecraft.world.level.block.entity.BlockEntity/]: Failed to create block entity net.minecraft.world.level.block.entity.BlockEntityType@24571234 for block BlockPos{x=1437, y=-40, z=669} at position Block{minecraft:chiseled_stone_bricks} 
-java.lang.ClassCastException: class net.minecraft.world.level.block.Block cannot be cast to class net.minecraft.world.level.block.AbstractBannerBlock (net.minecraft.world.level.block.Block and net.minecraft.world.level.block.AbstractBannerBlock are in module minecraft@1.21.8 of loader 'TRANSFORMER' @30501e60)
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BannerBlockEntity.<init>(BannerBlockEntity.java:31) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BlockEntityType.create(BlockEntityType.java:283) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BlockEntity.loadStatic(BlockEntity.java:194) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.storage.SerializableChunkData.lambda$postLoadChunk$12(SerializableChunkData.java:585) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.LevelChunk.runPostLoad(LevelChunk.java:524) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.status.ChunkStatusTasks.lambda$full$2(ChunkStatusTasks.java:222) ~[neoforge-21.8.31.jar%23213!/:?]
-	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1768) ~[?:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.doRunTask(BlockableEventLoop.java:152) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache$MainThreadExecutor.doRunTask(ServerChunkCache.java:622) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.pollTask(BlockableEventLoop.java:126) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache$MainThreadExecutor.pollTask(ServerChunkCache.java:631) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache.pollTask(ServerChunkCache.java:296) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.pollTaskInternal(MinecraftServer.java:880) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.pollTask(MinecraftServer.java:869) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.runAllTasks(BlockableEventLoop.java:115) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.waitUntilNextTick(MinecraftServer.java:838) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.runServer(MinecraftServer.java:722) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.lambda$spin$2(MinecraftServer.java:277) ~[neoforge-21.8.31.jar%23213!/:?]
-	at java.base/java.lang.Thread.run(Thread.java:1583) [?:?]
-[28Apr2026 14:39:11.102] [Server thread/ERROR] [net.minecraft.world.level.block.entity.BlockEntity/]: Failed to create block entity net.minecraft.world.level.block.entity.BlockEntityType@24571234 for block BlockPos{x=1435, y=-39, z=668} at position Block{minecraft:white_concrete} 
-java.lang.ClassCastException: class net.minecraft.world.level.block.Block cannot be cast to class net.minecraft.world.level.block.AbstractBannerBlock (net.minecraft.world.level.block.Block and net.minecraft.world.level.block.AbstractBannerBlock are in module minecraft@1.21.8 of loader 'TRANSFORMER' @30501e60)
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BannerBlockEntity.<init>(BannerBlockEntity.java:31) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BlockEntityType.create(BlockEntityType.java:283) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BlockEntity.loadStatic(BlockEntity.java:194) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.storage.SerializableChunkData.lambda$postLoadChunk$12(SerializableChunkData.java:585) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.LevelChunk.runPostLoad(LevelChunk.java:524) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.status.ChunkStatusTasks.lambda$full$2(ChunkStatusTasks.java:222) ~[neoforge-21.8.31.jar%23213!/:?]
-	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1768) ~[?:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.doRunTask(BlockableEventLoop.java:152) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache$MainThreadExecutor.doRunTask(ServerChunkCache.java:622) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.pollTask(BlockableEventLoop.java:126) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache$MainThreadExecutor.pollTask(ServerChunkCache.java:631) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache.pollTask(ServerChunkCache.java:296) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.pollTaskInternal(MinecraftServer.java:880) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.pollTask(MinecraftServer.java:869) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.runAllTasks(BlockableEventLoop.java:115) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.waitUntilNextTick(MinecraftServer.java:838) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.runServer(MinecraftServer.java:722) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.lambda$spin$2(MinecraftServer.java:277) ~[neoforge-21.8.31.jar%23213!/:?]
-	at java.base/java.lang.Thread.run(Thread.java:1583) [?:?]
-[28Apr2026 14:39:24.581] [Server thread/ERROR] [net.minecraft.world.level.block.entity.BlockEntity/]: Failed to create block entity net.minecraft.world.level.block.entity.BlockEntityType@24571234 for block BlockPos{x=1724, y=-42, z=644} at position Block{minecraft:chiseled_stone_bricks} 
-java.lang.ClassCastException: class net.minecraft.world.level.block.Block cannot be cast to class net.minecraft.world.level.block.AbstractBannerBlock (net.minecraft.world.level.block.Block and net.minecraft.world.level.block.AbstractBannerBlock are in module minecraft@1.21.8 of loader 'TRANSFORMER' @30501e60)
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BannerBlockEntity.<init>(BannerBlockEntity.java:31) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BlockEntityType.create(BlockEntityType.java:283) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BlockEntity.loadStatic(BlockEntity.java:194) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.storage.SerializableChunkData.lambda$postLoadChunk$12(SerializableChunkData.java:585) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.LevelChunk.runPostLoad(LevelChunk.java:524) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.status.ChunkStatusTasks.lambda$full$2(ChunkStatusTasks.java:222) ~[neoforge-21.8.31.jar%23213!/:?]
-	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1768) ~[?:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.doRunTask(BlockableEventLoop.java:152) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache$MainThreadExecutor.doRunTask(ServerChunkCache.java:622) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.pollTask(BlockableEventLoop.java:126) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache$MainThreadExecutor.pollTask(ServerChunkCache.java:631) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache.pollTask(ServerChunkCache.java:296) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.pollTaskInternal(MinecraftServer.java:880) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.pollTask(MinecraftServer.java:869) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.managedBlock(BlockableEventLoop.java:136) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.managedBlock(MinecraftServer.java:834) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.waitUntilNextTick(MinecraftServer.java:842) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.runServer(MinecraftServer.java:722) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.lambda$spin$2(MinecraftServer.java:277) ~[neoforge-21.8.31.jar%23213!/:?]
-	at java.base/java.lang.Thread.run(Thread.java:1583) [?:?]
-[28Apr2026 14:39:32.154] [Server thread/ERROR] [net.minecraft.world.level.block.entity.BlockEntity/]: Failed to create block entity net.minecraft.world.level.block.entity.BlockEntityType@24571234 for block BlockPos{x=1880, y=-39, z=548} at position Block{minecraft:stone_bricks} 
-java.lang.ClassCastException: class net.minecraft.world.level.block.Block cannot be cast to class net.minecraft.world.level.block.AbstractBannerBlock (net.minecraft.world.level.block.Block and net.minecraft.world.level.block.AbstractBannerBlock are in module minecraft@1.21.8 of loader 'TRANSFORMER' @30501e60)
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BannerBlockEntity.<init>(BannerBlockEntity.java:31) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BlockEntityType.create(BlockEntityType.java:283) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BlockEntity.loadStatic(BlockEntity.java:194) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.storage.SerializableChunkData.lambda$postLoadChunk$12(SerializableChunkData.java:585) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.LevelChunk.runPostLoad(LevelChunk.java:524) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.status.ChunkStatusTasks.lambda$full$2(ChunkStatusTasks.java:222) ~[neoforge-21.8.31.jar%23213!/:?]
-	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1768) ~[?:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.doRunTask(BlockableEventLoop.java:152) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache$MainThreadExecutor.doRunTask(ServerChunkCache.java:622) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.pollTask(BlockableEventLoop.java:126) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache$MainThreadExecutor.pollTask(ServerChunkCache.java:631) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache.pollTask(ServerChunkCache.java:296) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.pollTaskInternal(MinecraftServer.java:880) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.pollTask(MinecraftServer.java:869) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.managedBlock(BlockableEventLoop.java:136) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.managedBlock(MinecraftServer.java:834) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.waitUntilNextTick(MinecraftServer.java:842) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.runServer(MinecraftServer.java:722) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.lambda$spin$2(MinecraftServer.java:277) ~[neoforge-21.8.31.jar%23213!/:?]
-	at java.base/java.lang.Thread.run(Thread.java:1583) [?:?]
-[28Apr2026 14:39:32.158] [Server thread/ERROR] [net.minecraft.world.level.block.entity.BlockEntity/]: Failed to create block entity net.minecraft.world.level.block.entity.BlockEntityType@24571234 for block BlockPos{x=1881, y=-39, z=548} at position Block{minecraft:stone_bricks} 
-java.lang.ClassCastException: class net.minecraft.world.level.block.Block cannot be cast to class net.minecraft.world.level.block.AbstractBannerBlock (net.minecraft.world.level.block.Block and net.minecraft.world.level.block.AbstractBannerBlock are in module minecraft@1.21.8 of loader 'TRANSFORMER' @30501e60)
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BannerBlockEntity.<init>(BannerBlockEntity.java:31) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BlockEntityType.create(BlockEntityType.java:283) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BlockEntity.loadStatic(BlockEntity.java:194) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.storage.SerializableChunkData.lambda$postLoadChunk$12(SerializableChunkData.java:585) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.LevelChunk.runPostLoad(LevelChunk.java:524) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.status.ChunkStatusTasks.lambda$full$2(ChunkStatusTasks.java:222) ~[neoforge-21.8.31.jar%23213!/:?]
-	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1768) ~[?:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.doRunTask(BlockableEventLoop.java:152) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache$MainThreadExecutor.doRunTask(ServerChunkCache.java:622) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.pollTask(BlockableEventLoop.java:126) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache$MainThreadExecutor.pollTask(ServerChunkCache.java:631) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache.pollTask(ServerChunkCache.java:296) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.pollTaskInternal(MinecraftServer.java:880) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.pollTask(MinecraftServer.java:869) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.managedBlock(BlockableEventLoop.java:136) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.managedBlock(MinecraftServer.java:834) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.waitUntilNextTick(MinecraftServer.java:842) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.runServer(MinecraftServer.java:722) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.lambda$spin$2(MinecraftServer.java:277) ~[neoforge-21.8.31.jar%23213!/:?]
-	at java.base/java.lang.Thread.run(Thread.java:1583) [?:?]
-[28Apr2026 14:39:32.159] [Server thread/ERROR] [net.minecraft.world.level.block.entity.BlockEntity/]: Failed to create block entity net.minecraft.world.level.block.entity.BlockEntityType@24571234 for block BlockPos{x=1880, y=-39, z=549} at position Block{minecraft:oak_planks} 
-java.lang.ClassCastException: class net.minecraft.world.level.block.Block cannot be cast to class net.minecraft.world.level.block.AbstractBannerBlock (net.minecraft.world.level.block.Block and net.minecraft.world.level.block.AbstractBannerBlock are in module minecraft@1.21.8 of loader 'TRANSFORMER' @30501e60)
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BannerBlockEntity.<init>(BannerBlockEntity.java:31) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BlockEntityType.create(BlockEntityType.java:283) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BlockEntity.loadStatic(BlockEntity.java:194) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.storage.SerializableChunkData.lambda$postLoadChunk$12(SerializableChunkData.java:585) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.LevelChunk.runPostLoad(LevelChunk.java:524) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.status.ChunkStatusTasks.lambda$full$2(ChunkStatusTasks.java:222) ~[neoforge-21.8.31.jar%23213!/:?]
-	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1768) ~[?:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.doRunTask(BlockableEventLoop.java:152) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache$MainThreadExecutor.doRunTask(ServerChunkCache.java:622) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.pollTask(BlockableEventLoop.java:126) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache$MainThreadExecutor.pollTask(ServerChunkCache.java:631) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache.pollTask(ServerChunkCache.java:296) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.pollTaskInternal(MinecraftServer.java:880) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.pollTask(MinecraftServer.java:869) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.managedBlock(BlockableEventLoop.java:136) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.managedBlock(MinecraftServer.java:834) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.waitUntilNextTick(MinecraftServer.java:842) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.runServer(MinecraftServer.java:722) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.lambda$spin$2(MinecraftServer.java:277) ~[neoforge-21.8.31.jar%23213!/:?]
-	at java.base/java.lang.Thread.run(Thread.java:1583) [?:?]
-[28Apr2026 14:39:32.160] [Server thread/ERROR] [net.minecraft.world.level.block.entity.BlockEntity/]: Failed to create block entity net.minecraft.world.level.block.entity.BlockEntityType@24571234 for block BlockPos{x=1882, y=-39, z=548} at position Block{minecraft:stone_bricks} 
-java.lang.ClassCastException: class net.minecraft.world.level.block.Block cannot be cast to class net.minecraft.world.level.block.AbstractBannerBlock (net.minecraft.world.level.block.Block and net.minecraft.world.level.block.AbstractBannerBlock are in module minecraft@1.21.8 of loader 'TRANSFORMER' @30501e60)
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BannerBlockEntity.<init>(BannerBlockEntity.java:31) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BlockEntityType.create(BlockEntityType.java:283) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BlockEntity.loadStatic(BlockEntity.java:194) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.storage.SerializableChunkData.lambda$postLoadChunk$12(SerializableChunkData.java:585) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.LevelChunk.runPostLoad(LevelChunk.java:524) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.status.ChunkStatusTasks.lambda$full$2(ChunkStatusTasks.java:222) ~[neoforge-21.8.31.jar%23213!/:?]
-	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1768) ~[?:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.doRunTask(BlockableEventLoop.java:152) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache$MainThreadExecutor.doRunTask(ServerChunkCache.java:622) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.pollTask(BlockableEventLoop.java:126) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache$MainThreadExecutor.pollTask(ServerChunkCache.java:631) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache.pollTask(ServerChunkCache.java:296) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.pollTaskInternal(MinecraftServer.java:880) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.pollTask(MinecraftServer.java:869) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.managedBlock(BlockableEventLoop.java:136) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.managedBlock(MinecraftServer.java:834) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.waitUntilNextTick(MinecraftServer.java:842) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.runServer(MinecraftServer.java:722) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.lambda$spin$2(MinecraftServer.java:277) ~[neoforge-21.8.31.jar%23213!/:?]
-	at java.base/java.lang.Thread.run(Thread.java:1583) [?:?]
-[28Apr2026 14:39:33.795] [Server thread/ERROR] [net.minecraft.world.level.block.entity.BlockEntity/]: Failed to create block entity net.minecraft.world.level.block.entity.BlockEntityType@24571234 for block BlockPos{x=1913, y=-38, z=533} at position Block{minecraft:stone_bricks} 
-java.lang.ClassCastException: class net.minecraft.world.level.block.Block cannot be cast to class net.minecraft.world.level.block.AbstractBannerBlock (net.minecraft.world.level.block.Block and net.minecraft.world.level.block.AbstractBannerBlock are in module minecraft@1.21.8 of loader 'TRANSFORMER' @30501e60)
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BannerBlockEntity.<init>(BannerBlockEntity.java:31) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BlockEntityType.create(BlockEntityType.java:283) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BlockEntity.loadStatic(BlockEntity.java:194) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.storage.SerializableChunkData.lambda$postLoadChunk$12(SerializableChunkData.java:585) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.LevelChunk.runPostLoad(LevelChunk.java:524) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.status.ChunkStatusTasks.lambda$full$2(ChunkStatusTasks.java:222) ~[neoforge-21.8.31.jar%23213!/:?]
-	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1768) ~[?:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.doRunTask(BlockableEventLoop.java:152) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache$MainThreadExecutor.doRunTask(ServerChunkCache.java:622) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.pollTask(BlockableEventLoop.java:126) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache$MainThreadExecutor.pollTask(ServerChunkCache.java:631) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache.pollTask(ServerChunkCache.java:296) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.pollTaskInternal(MinecraftServer.java:880) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.pollTask(MinecraftServer.java:869) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.managedBlock(BlockableEventLoop.java:136) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.managedBlock(MinecraftServer.java:834) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.waitUntilNextTick(MinecraftServer.java:842) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.runServer(MinecraftServer.java:722) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.lambda$spin$2(MinecraftServer.java:277) ~[neoforge-21.8.31.jar%23213!/:?]
-	at java.base/java.lang.Thread.run(Thread.java:1583) [?:?]
-[28Apr2026 14:39:48.036] [Server thread/ERROR] [net.minecraft.world.level.block.entity.BlockEntity/]: Failed to create block entity net.minecraft.world.level.block.entity.BlockEntityType@24571234 for block BlockPos{x=2220, y=-32, z=766} at position Block{minecraft:black_terracotta} 
-java.lang.ClassCastException: class net.minecraft.world.level.block.Block cannot be cast to class net.minecraft.world.level.block.AbstractBannerBlock (net.minecraft.world.level.block.Block and net.minecraft.world.level.block.AbstractBannerBlock are in module minecraft@1.21.8 of loader 'TRANSFORMER' @30501e60)
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BannerBlockEntity.<init>(BannerBlockEntity.java:31) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BlockEntityType.create(BlockEntityType.java:283) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.block.entity.BlockEntity.loadStatic(BlockEntity.java:194) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.storage.SerializableChunkData.lambda$postLoadChunk$12(SerializableChunkData.java:585) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.LevelChunk.runPostLoad(LevelChunk.java:524) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.world.level.chunk.status.ChunkStatusTasks.lambda$full$2(ChunkStatusTasks.java:222) ~[neoforge-21.8.31.jar%23213!/:?]
-	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1768) ~[?:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.doRunTask(BlockableEventLoop.java:152) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache$MainThreadExecutor.doRunTask(ServerChunkCache.java:622) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.pollTask(BlockableEventLoop.java:126) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache$MainThreadExecutor.pollTask(ServerChunkCache.java:631) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.level.ServerChunkCache.pollTask(ServerChunkCache.java:296) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.pollTaskInternal(MinecraftServer.java:880) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.pollTask(MinecraftServer.java:869) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.util.thread.BlockableEventLoop.managedBlock(BlockableEventLoop.java:136) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.managedBlock(MinecraftServer.java:834) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.waitUntilNextTick(MinecraftServer.java:842) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.runServer(MinecraftServer.java:722) ~[neoforge-21.8.31.jar%23213!/:?]
-	at TRANSFORMER/minecraft@1.21.8/net.minecraft.server.MinecraftServer.lambda$spin$2(MinecraftServer.java:277) ~[neoforge-21.8.31.jar%23213!/:?]
-	at java.base/java.lang.Thread.run(Thread.java:1583) [?:?]
-[28Apr2026 14:40:49.696] [Server thread/INFO] [net.minecraft.client.server.IntegratedServer/]: Saving and pausing game...
-[28Apr2026 14:40:49.716] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:overworld
-[28Apr2026 14:40:49.734] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:the_end
-[28Apr2026 14:40:49.734] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:the_nether
-[28Apr2026 14:41:40.149] [Render thread/INFO] [net.minecraft.client.gui.components.ChatComponent/]: [System] [CHAT] xp  0.0
-[28Apr2026 14:41:40.156] [Render thread/INFO] [net.minecraft.advancements.AdvancementTree/]: Loaded 3 advancements
-[28Apr2026 14:41:47.246] [Server thread/INFO] [net.minecraft.client.server.IntegratedServer/]: Saving and pausing game...
-[28Apr2026 14:41:47.259] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:overworld
-[28Apr2026 14:41:47.280] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:the_end
-[28Apr2026 14:41:47.280] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:the_nether
-[28Apr2026 14:48:05.297] [Server thread/INFO] [net.minecraft.client.server.IntegratedServer/]: Saving and pausing game...
-[28Apr2026 14:48:05.309] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:overworld
-[28Apr2026 14:48:05.326] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:the_end
-[28Apr2026 14:48:05.327] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:the_nether
-[28Apr2026 14:49:36.046] [Server thread/INFO] [net.minecraft.client.server.IntegratedServer/]: Saving and pausing game...
-[28Apr2026 14:49:36.061] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:overworld
-[28Apr2026 14:49:36.096] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:the_end
-[28Apr2026 14:49:36.099] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:the_nether
-[28Apr2026 14:49:58.397] [Server thread/INFO] [net.minecraft.client.server.IntegratedServer/]: Saving and pausing game...
-[28Apr2026 14:49:58.417] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:overworld
-[28Apr2026 14:49:58.437] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:the_end
-[28Apr2026 14:49:58.438] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:the_nether
-[28Apr2026 14:51:01.097] [Server thread/INFO] [net.minecraft.client.server.IntegratedServer/]: Saving and pausing game...
-[28Apr2026 14:51:01.109] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:overworld
-[28Apr2026 14:51:01.122] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:the_end
-[28Apr2026 14:51:01.122] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:the_nether
-[28Apr2026 14:51:01.730] [Render thread/INFO] [net.minecraft.client.Minecraft/]: Stopping!
-[28Apr2026 14:51:01.749] [Server thread/INFO] [net.minecraft.server.network.ServerGamePacketListenerImpl/]: Dev lost connection: Disconnected
-[28Apr2026 14:51:01.751] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Dev left the game
-[28Apr2026 14:51:01.766] [Server thread/INFO] [net.minecraft.server.network.ServerCommonPacketListenerImpl/]: Stopping singleplayer server as player logged out
-[28Apr2026 14:51:01.817] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Stopping server
-[28Apr2026 14:51:01.819] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving players
-[28Apr2026 14:51:01.819] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving worlds
-[28Apr2026 14:51:03.645] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:overworld
-[28Apr2026 14:51:03.821] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:the_end
-[28Apr2026 14:51:03.832] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[Arnis World 1: Jelenia Góra]'/minecraft:the_nether
-[28Apr2026 14:51:03.860] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: ThreadedAnvilChunkStorage (Arnis World 1): All chunks are saved
-[28Apr2026 14:51:03.860] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved
-[28Apr2026 14:51:03.861] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
-[28Apr2026 14:51:03.861] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: ThreadedAnvilChunkStorage: All dimensions are saved
+[03Jun2026 18:46:16.953] [main/INFO] [mixin/]: Compatibility level set to JAVA_17
+[03Jun2026 18:46:16.959] [main/INFO] [cpw.mods.modlauncher.LaunchServiceHandler/MODLAUNCHER]: Launching target 'neoforgeclientdev' with arguments [--version, 21.8.31, --assetsDir, C:\Users\cioch\.mcreator\gradle\caches\neoformruntime\assets, --assetIndex, 26]
+[03Jun2026 18:46:17.732] [Datafixer Bootstrap/INFO] [com.mojang.datafixers.DataFixerBuilder/]: 272 Datafixer optimizations took 190 milliseconds
+[03Jun2026 18:46:17.765] [pool-7-thread-1/INFO] [MixinExtras|Service/]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.5.0).
+[03Jun2026 18:46:20.482] [main/WARN] [net.minecraft.commands.Commands/]: Ambiguity between arguments [teleport, location] and [teleport, destination] with inputs: [0.1 -0.5 .9, 0 0 0]
+[03Jun2026 18:46:20.482] [main/WARN] [net.minecraft.commands.Commands/]: Ambiguity between arguments [teleport, location] and [teleport, targets] with inputs: [0.1 -0.5 .9, 0 0 0]
+[03Jun2026 18:46:20.484] [main/WARN] [net.minecraft.commands.Commands/]: Ambiguity between arguments [teleport, destination] and [teleport, targets] with inputs: [Player, 0123, @e, dd12be42-52a9-4a91-a8a1-11c01849e498]
+[03Jun2026 18:46:20.484] [main/WARN] [net.minecraft.commands.Commands/]: Ambiguity between arguments [teleport, targets] and [teleport, destination] with inputs: [Player, 0123, dd12be42-52a9-4a91-a8a1-11c01849e498]
+[03Jun2026 18:46:20.485] [main/WARN] [net.minecraft.commands.Commands/]: Ambiguity between arguments [teleport, targets, location] and [teleport, targets, destination] with inputs: [0.1 -0.5 .9, 0 0 0]
+[03Jun2026 18:46:20.485] [main/WARN] [net.minecraft.commands.Commands/]: Ambiguity between arguments [waypoint, modify, waypoint, color, reset] and [waypoint, modify, waypoint, color, color] with inputs: [reset]
+[03Jun2026 18:46:20.525] [modloading-worker-0/INFO] [net.neoforged.neoforge.common.NeoForgeMod/NEOFORGE-MOD]: NeoForge mod loading, version 21.8.31, for MC 1.21.8
+[03Jun2026 18:46:20.849] [Render thread/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/C:/Users/cioch/Documents/GitHub/WitcherCraft-1.21/build/moddev/artifacts/neoforge-21.8.31.jar%23213!/assets/.mcassetsroot' uses unexpected schema
+[03Jun2026 18:46:20.849] [Render thread/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/C:/Users/cioch/Documents/GitHub/WitcherCraft-1.21/build/moddev/artifacts/neoforge-21.8.31.jar%23213!/data/.mcassetsroot' uses unexpected schema
+[03Jun2026 18:46:20.867] [Render thread/INFO] [com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService/]: Environment: Environment[sessionHost=https://sessionserver.mojang.com, servicesHost=https://api.minecraftservices.com, name=PROD]
+[03Jun2026 18:46:20.870] [Render thread/INFO] [net.minecraft.client.Minecraft/]: Setting user: Dev
+[03Jun2026 18:46:20.929] [Render thread/INFO] [net.minecraft.client.Minecraft/]: Backend library: LWJGL version 3.3.3+5
+[03Jun2026 18:46:20.987] [Render thread/INFO] [net.minecraft.client.Minecraft/]: Using optional rendering extensions: GL_ARB_buffer_storage, GL_KHR_debug, GL_ARB_vertex_attrib_binding, GL_ARB_direct_state_access
+[03Jun2026 18:46:21.467] [Render thread/INFO] [net.minecraft.server.packs.resources.ReloadableResourceManager/]: Reloading ResourceManager: vanilla, mod_resources, mod/neoforge, mod/witchercraft, mod/mobhealthbar
+[03Jun2026 18:46:21.513] [resourceLoad/INFO] [net.minecraft.client.gui.font.providers.UnihexProvider/]: Found unifont_pua-16.0.03.hex, loading
+[03Jun2026 18:46:21.552] [resourceLoad/INFO] [net.minecraft.client.gui.font.providers.UnihexProvider/]: Found unifont_all_no_pua-16.0.03.hex, loading
+[03Jun2026 18:46:21.588] [resourceLoad/ERROR] [net.minecraft.Util/]: Invalid path in pack: witchercraft:textures/particle/output-onlinepngtools (1).png, ignoring
+[03Jun2026 18:46:21.682] [resourceLoad/INFO] [net.minecraft.client.gui.font.providers.UnihexProvider/]: Found unifont_jp_patch-16.0.03.hex, loading
+[03Jun2026 18:46:22.244] [Render thread/INFO] [com.mojang.blaze3d.audio.Library/]: OpenAL initialized on device OpenAL Soft on SteelSeries Sonar - Gaming (SteelSeries Sonar Virtual Audio Device)
+[03Jun2026 18:46:22.245] [Render thread/INFO] [net.minecraft.client.sounds.SoundEngine/SOUNDS]: Sound engine started
+[03Jun2026 18:46:22.302] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 1024x1024x2 minecraft:textures/atlas/blocks.png-atlas
+[03Jun2026 18:46:22.307] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 256x256x2 minecraft:textures/atlas/signs.png-atlas
+[03Jun2026 18:46:22.307] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 512x512x2 minecraft:textures/atlas/shield_patterns.png-atlas
+[03Jun2026 18:46:22.308] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 512x512x2 minecraft:textures/atlas/banner_patterns.png-atlas
+[03Jun2026 18:46:22.308] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 2048x1024x2 minecraft:textures/atlas/armor_trims.png-atlas
+[03Jun2026 18:46:22.310] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 128x64x2 minecraft:textures/atlas/decorated_pot.png-atlas
+[03Jun2026 18:46:22.312] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 256x256x2 minecraft:textures/atlas/chest.png-atlas
+[03Jun2026 18:46:22.312] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 512x256x2 minecraft:textures/atlas/shulker_boxes.png-atlas
+[03Jun2026 18:46:22.312] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 512x256x2 minecraft:textures/atlas/beds.png-atlas
+[03Jun2026 18:46:22.315] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 64x64x0 minecraft:textures/atlas/map_decorations.png-atlas
+[03Jun2026 18:46:22.356] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 4096x2048x0 minecraft:textures/atlas/particles.png-atlas
+[03Jun2026 18:46:22.362] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 512x256x0 minecraft:textures/atlas/paintings.png-atlas
+[03Jun2026 18:46:22.362] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 1024x1024x0 minecraft:textures/atlas/gui.png-atlas
+[03Jun2026 18:46:22.365] [Render thread/INFO] [net.neoforged.neoforge.client.entity.animation.json.AnimationLoader/]: Loaded 0 entity animations
+[03Jun2026 18:46:27.516] [Render thread/INFO] [net.minecraft.world.item.crafting.RecipeManager/]: Loaded 1407 recipes
+[03Jun2026 18:46:27.524] [Render thread/INFO] [net.minecraft.advancements.AdvancementTree/]: Loaded 1520 advancements
+[03Jun2026 18:46:27.525] [Render thread/INFO] [net.neoforged.neoforge.common.crafting.RecipePriorityManager/]: Loaded 0 recipe priority overrides
+[03Jun2026 18:46:27.620] [Server thread/INFO] [net.minecraft.client.server.IntegratedServer/]: Starting integrated minecraft server version 1.21.8
+[03Jun2026 18:46:27.620] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Generating keypair
+[03Jun2026 18:46:28.054] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Preparing start region for dimension minecraft:overworld
+[03Jun2026 18:46:28.263] [progressListener/INFO] [net.minecraft.server.level.progress.LoggerChunkProgressListener/]: Preparing spawn area: 0%
+[03Jun2026 18:46:28.291] [Server thread/INFO] [net.neoforged.neoforge.server.permission.PermissionAPI/]: Successfully initialized permission handler neoforge:default_handler
+[03Jun2026 18:46:28.304] [progressListener/INFO] [net.minecraft.server.level.progress.LoggerChunkProgressListener/]: Time elapsed: 249 ms
+[03Jun2026 18:46:28.335] [Server thread/INFO] [net.minecraft.client.server.IntegratedServer/]: Changing view distance to 25, from 10
+[03Jun2026 18:46:28.335] [Server thread/INFO] [net.minecraft.client.server.IntegratedServer/]: Changing simulation distance to 12, from 0
+[03Jun2026 18:46:28.790] [Server thread/INFO] [net.minecraft.server.players.PlayerList/]: Dev[local:E:f21c526c] logged in with entity id 9 at (92.85824425569255, 69.11797070515877, -29.225853363696093)
+[03Jun2026 18:46:28.817] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Dev joined the game
+[03Jun2026 18:46:28.885] [Render thread/INFO] [net.minecraft.advancements.AdvancementTree/]: Loaded 254 advancements
+[03Jun2026 18:46:28.968] [Render thread/INFO] [net.minecraft.client.renderer.DynamicUniformStorage/]: Resizing Dynamic Transforms UBO, capacity limit of 2 reached during a single frame. New capacity will be 4.
+[03Jun2026 18:46:29.042] [Render thread/INFO] [net.minecraft.client.renderer.DynamicUniformStorage/]: Resizing Dynamic Transforms UBO, capacity limit of 4 reached during a single frame. New capacity will be 8.
+[03Jun2026 18:46:29.084] [Render thread/INFO] [net.minecraft.client.renderer.DynamicUniformStorage/]: Resizing Dynamic Transforms UBO, capacity limit of 8 reached during a single frame. New capacity will be 16.
+[03Jun2026 18:46:29.113] [Render thread/INFO] [net.minecraft.client.renderer.DynamicUniformStorage/]: Resizing Dynamic Transforms UBO, capacity limit of 16 reached during a single frame. New capacity will be 64.
+[03Jun2026 18:46:29.132] [Render thread/INFO] [net.minecraft.client.renderer.DynamicUniformStorage/]: Resizing Dynamic Transforms UBO, capacity limit of 64 reached during a single frame. New capacity will be 128.
+[03Jun2026 18:46:29.179] [Render thread/INFO] [net.minecraft.client.renderer.DynamicUniformStorage/]: Resizing Dynamic Transforms UBO, capacity limit of 128 reached during a single frame. New capacity will be 256.
+[03Jun2026 18:46:29.302] [Render thread/INFO] [net.minecraft.client.renderer.DynamicUniformStorage/]: Resizing Dynamic Transforms UBO, capacity limit of 256 reached during a single frame. New capacity will be 512.
+[03Jun2026 18:46:29.439] [Render thread/INFO] [net.minecraft.client.renderer.DynamicUniformStorage/]: Resizing Dynamic Transforms UBO, capacity limit of 512 reached during a single frame. New capacity will be 1024.
+[03Jun2026 18:46:29.753] [Render thread/INFO] [net.minecraft.client.renderer.DynamicUniformStorage/]: Resizing Dynamic Transforms UBO, capacity limit of 1024 reached during a single frame. New capacity will be 2048.
+[03Jun2026 18:46:30.985] [Render thread/INFO] [net.minecraft.client.renderer.DynamicUniformStorage/]: Resizing Dynamic Transforms UBO, capacity limit of 2048 reached during a single frame. New capacity will be 4096.
+[03Jun2026 18:46:32.314] [Render thread/INFO] [net.minecraft.client.renderer.DynamicUniformStorage/]: Resizing Dynamic Transforms UBO, capacity limit of 4096 reached during a single frame. New capacity will be 8192.
+[03Jun2026 18:46:36.084] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: [Dev: Summoned new Cockatrice]
+[03Jun2026 18:46:36.087] [Render thread/INFO] [net.minecraft.client.gui.components.ChatComponent/]: [System] [CHAT] Summoned new Cockatrice
+[03Jun2026 18:46:37.877] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: [Dev: Set own game mode to Survival Mode]
+[03Jun2026 18:46:37.884] [Render thread/INFO] [net.minecraft.client.gui.components.ChatComponent/]: [System] [CHAT] Set own game mode to Survival Mode
+[03Jun2026 18:46:40.703] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Dev was slain by Cockatrice
+[03Jun2026 18:46:40.713] [Render thread/INFO] [net.minecraft.client.gui.components.ChatComponent/]: [System] [CHAT] Dev was slain by Cockatrice
+[03Jun2026 18:46:43.570] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: [Dev: Set own game mode to Spectator Mode]
+[03Jun2026 18:46:43.575] [Render thread/INFO] [net.minecraft.client.gui.components.ChatComponent/]: [System] [CHAT] Set own game mode to Spectator Mode
+[03Jun2026 18:46:54.169] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: [Dev: Set own game mode to Survival Mode]
+[03Jun2026 18:46:54.170] [Render thread/INFO] [net.minecraft.client.gui.components.ChatComponent/]: [System] [CHAT] Set own game mode to Survival Mode
+[03Jun2026 18:47:02.050] [Render thread/INFO] [net.minecraft.client.gui.components.ChatComponent/]: [System] [CHAT] xp  17.0
+[03Jun2026 18:47:02.150] [Render thread/INFO] [net.minecraft.client.gui.components.ChatComponent/]: [System] [CHAT] xp  73.0
+[03Jun2026 18:47:02.250] [Render thread/INFO] [net.minecraft.client.gui.components.ChatComponent/]: [System] [CHAT] xp  3.0
+[03Jun2026 18:47:02.502] [Render thread/INFO] [net.minecraft.client.gui.components.ChatComponent/]: [System] [CHAT] xp  7.0
+[03Jun2026 18:47:11.269] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: [Dev: Summoned new Cockatrice]
+[03Jun2026 18:47:11.272] [Render thread/INFO] [net.minecraft.client.gui.components.ChatComponent/]: [System] [CHAT] Summoned new Cockatrice
+[03Jun2026 18:48:18.393] [Server thread/INFO] [net.minecraft.client.server.IntegratedServer/]: Saving and pausing game...
+[03Jun2026 18:48:18.410] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[New World]'/minecraft:overworld
+[03Jun2026 18:48:18.428] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[New World]'/minecraft:the_end
+[03Jun2026 18:48:18.429] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[New World]'/minecraft:the_nether
+[03Jun2026 18:48:19.448] [Server thread/INFO] [net.minecraft.server.network.ServerGamePacketListenerImpl/]: Dev lost connection: Disconnected
+[03Jun2026 18:48:19.448] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Dev left the game
+[03Jun2026 18:48:19.460] [Server thread/INFO] [net.minecraft.server.network.ServerCommonPacketListenerImpl/]: Stopping singleplayer server as player logged out
+[03Jun2026 18:48:19.512] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Stopping server
+[03Jun2026 18:48:19.513] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving players
+[03Jun2026 18:48:19.513] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving worlds
+[03Jun2026 18:48:19.765] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[New World]'/minecraft:overworld
+[03Jun2026 18:48:19.907] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[New World]'/minecraft:the_end
+[03Jun2026 18:48:19.913] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[New World]'/minecraft:the_nether
+[03Jun2026 18:48:19.921] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: ThreadedAnvilChunkStorage (New World): All chunks are saved
+[03Jun2026 18:48:19.922] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[03Jun2026 18:48:19.922] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[03Jun2026 18:48:19.923] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: ThreadedAnvilChunkStorage: All dimensions are saved
+[03Jun2026 18:48:21.108] [Render thread/INFO] [net.minecraft.client.Minecraft/]: Stopping!

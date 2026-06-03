@@ -26,6 +26,59 @@ public class MeditationGuiScreen extends AbstractContainerScreen<MeditationGuiMe
 	private Button button_back;
 	private Button button_meditate;
 	private ExtendedSlider MeditationTime;
+	private static final ResourceLocation IMAGE_0 = ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow24.png");
+	private static final ResourceLocation IMAGE_1 = ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow23.png");
+	private static final ResourceLocation IMAGE_2 = ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow22.png");
+	private static final ResourceLocation IMAGE_3 = ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow21.png");
+	private static final ResourceLocation IMAGE_4 = ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow20.png");
+	private static final ResourceLocation IMAGE_5 = ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow19.png");
+	private static final ResourceLocation IMAGE_6 = ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow18.png");
+	private static final ResourceLocation IMAGE_7 = ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow17.png");
+	private static final ResourceLocation IMAGE_8 = ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow16.png");
+	private static final ResourceLocation IMAGE_9 = ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow15.png");
+	private static final ResourceLocation IMAGE_10 = ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow14.png");
+	private static final ResourceLocation IMAGE_11 = ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow13.png");
+	private static final ResourceLocation IMAGE_12 = ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow12.png");
+	private static final ResourceLocation IMAGE_13 = ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow11.png");
+	private static final ResourceLocation IMAGE_14 = ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow10.png");
+	private static final ResourceLocation IMAGE_15 = ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow9.png");
+	private static final ResourceLocation IMAGE_16 = ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow8.png");
+	private static final ResourceLocation IMAGE_17 = ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow7.png");
+	private static final ResourceLocation IMAGE_18 = ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow6.png");
+	private static final ResourceLocation IMAGE_19 = ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow5.png");
+	private static final ResourceLocation IMAGE_20 = ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow4.png");
+	private static final ResourceLocation IMAGE_21 = ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow3.png");
+	private static final ResourceLocation IMAGE_22 = ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow2.png");
+	private static final ResourceLocation IMAGE_23 = ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow1.png");
+	private static final ResourceLocation IMAGE_24 = ResourceLocation.parse("witchercraft:textures/screens/meditationhandmiddle.png");
+	private static final ResourceLocation IMAGE_25 = ResourceLocation.parse("witchercraft:textures/screens/meditationhand24.png");
+	private static final ResourceLocation IMAGE_26 = ResourceLocation.parse("witchercraft:textures/screens/meditationhand23.png");
+	private static final ResourceLocation IMAGE_27 = ResourceLocation.parse("witchercraft:textures/screens/meditationhand22.png");
+	private static final ResourceLocation IMAGE_28 = ResourceLocation.parse("witchercraft:textures/screens/meditationhand21.png");
+	private static final ResourceLocation IMAGE_29 = ResourceLocation.parse("witchercraft:textures/screens/meditationhand20.png");
+	private static final ResourceLocation IMAGE_30 = ResourceLocation.parse("witchercraft:textures/screens/meditationhand19.png");
+	private static final ResourceLocation IMAGE_31 = ResourceLocation.parse("witchercraft:textures/screens/meditationhand18.png");
+	private static final ResourceLocation IMAGE_32 = ResourceLocation.parse("witchercraft:textures/screens/meditationhand17.png");
+	private static final ResourceLocation IMAGE_33 = ResourceLocation.parse("witchercraft:textures/screens/meditationhand16.png");
+	private static final ResourceLocation IMAGE_34 = ResourceLocation.parse("witchercraft:textures/screens/meditationhand15.png");
+	private static final ResourceLocation IMAGE_35 = ResourceLocation.parse("witchercraft:textures/screens/meditationhand14.png");
+	private static final ResourceLocation IMAGE_36 = ResourceLocation.parse("witchercraft:textures/screens/meditationhand13.png");
+	private static final ResourceLocation IMAGE_37 = ResourceLocation.parse("witchercraft:textures/screens/meditationhand12.png");
+	private static final ResourceLocation IMAGE_38 = ResourceLocation.parse("witchercraft:textures/screens/meditationhand11.png");
+	private static final ResourceLocation IMAGE_39 = ResourceLocation.parse("witchercraft:textures/screens/meditationhand10.png");
+	private static final ResourceLocation IMAGE_40 = ResourceLocation.parse("witchercraft:textures/screens/meditationhand9.png");
+	private static final ResourceLocation IMAGE_41 = ResourceLocation.parse("witchercraft:textures/screens/meditationhand8.png");
+	private static final ResourceLocation IMAGE_42 = ResourceLocation.parse("witchercraft:textures/screens/meditationhand7.png");
+	private static final ResourceLocation IMAGE_43 = ResourceLocation.parse("witchercraft:textures/screens/meditationhand6.png");
+	private static final ResourceLocation IMAGE_44 = ResourceLocation.parse("witchercraft:textures/screens/meditationhand5.png");
+	private static final ResourceLocation IMAGE_45 = ResourceLocation.parse("witchercraft:textures/screens/meditationhand4.png");
+	private static final ResourceLocation IMAGE_46 = ResourceLocation.parse("witchercraft:textures/screens/meditationhand3.png");
+	private static final ResourceLocation IMAGE_47 = ResourceLocation.parse("witchercraft:textures/screens/meditationhand2.png");
+	private static final ResourceLocation IMAGE_48 = ResourceLocation.parse("witchercraft:textures/screens/meditationhand1.png");
+	private static final ResourceLocation IMAGE_49 = ResourceLocation.parse("witchercraft:textures/screens/meditationguitimenight.png");
+	private static final ResourceLocation IMAGE_50 = ResourceLocation.parse("witchercraft:textures/screens/meditationguitimenoon.png");
+	private static final ResourceLocation IMAGE_51 = ResourceLocation.parse("witchercraft:textures/screens/meditationguitimedawn.png");
+	private static final ResourceLocation IMAGE_52 = ResourceLocation.parse("witchercraft:textures/screens/meditationguitimedusk.png");
 
 	public MeditationGuiScreen(MeditationGuiMenu container, Inventory inventory, Component text) {
 		super(container, inventory, text);
@@ -57,154 +110,154 @@ public class MeditationGuiScreen extends AbstractContainerScreen<MeditationGuiMe
 	@Override
 	protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
 		if (MeditationGuiTimeNow24Procedure.execute(world)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow24.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_0, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTimeNow23Procedure.execute(world)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow23.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_1, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTimeNow22Procedure.execute(world)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow22.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_2, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTimeNow21Procedure.execute(world)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow21.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_3, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTimeNow20Procedure.execute(world)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow20.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_4, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTimeNow19Procedure.execute(world)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow19.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_5, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTimeNow18Procedure.execute(world)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow18.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_6, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTimeNow17Procedure.execute(world)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow17.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_7, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTimeNow16Procedure.execute(world)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow16.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_8, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTimeNow15Procedure.execute(world)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow15.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_9, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTimeNow14Procedure.execute(world)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow14.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_10, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTimeNow13Procedure.execute(world)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow13.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_11, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTimeNow12Procedure.execute(world)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow12.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_12, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTimeNow11Procedure.execute(world)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow11.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_13, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTimeNow10Procedure.execute(world)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow10.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_14, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTimeNow9Procedure.execute(world)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow9.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_15, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTimeNow8Procedure.execute(world)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow8.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_16, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTimeNow7Procedure.execute(world)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow7.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_17, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTimeNow6Procedure.execute(world)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow6.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_18, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTimeNow5Procedure.execute(world)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow5.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_19, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTimeNow4Procedure.execute(world)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow4.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_20, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTimeNow3Procedure.execute(world)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow3.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_21, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTimeNow2Procedure.execute(world)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow2.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_22, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTimeNow1Procedure.execute(world)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhandnow1.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_23, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhandmiddle.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_24, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		if (MeditationGuiTime24Procedure.execute(entity)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhand24.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_25, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTime23Procedure.execute(entity)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhand23.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_26, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTime22Procedure.execute(entity)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhand22.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_27, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTime21Procedure.execute(entity)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhand21.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_28, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTime20Procedure.execute(entity)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhand20.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_29, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTime19Procedure.execute(entity)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhand19.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_30, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTime18Procedure.execute(entity)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhand18.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_31, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTime17Procedure.execute(entity)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhand17.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_32, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTime16Procedure.execute(entity)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhand16.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_33, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTime15Procedure.execute(entity)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhand15.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_34, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTime14Procedure.execute(entity)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhand14.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_35, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTime13Procedure.execute(entity)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhand13.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_36, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTime12Procedure.execute(entity)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhand12.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_37, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTime11Procedure.execute(entity)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhand11.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_38, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTime10Procedure.execute(entity)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhand10.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_39, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTime9Procedure.execute(entity)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhand9.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_40, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTime8Procedure.execute(entity)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhand8.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_41, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTime7Procedure.execute(entity)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhand7.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_42, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTime6Procedure.execute(entity)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhand6.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_43, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTime5Procedure.execute(entity)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhand5.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_44, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTime4Procedure.execute(entity)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhand4.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_45, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTime3Procedure.execute(entity)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhand3.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_46, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTime2Procedure.execute(entity)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhand2.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_47, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
 		if (MeditationGuiTime1Procedure.execute(entity)) {
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationhand1.png"), this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_48, this.leftPos + 22, this.topPos + 17, 0, 0, 131, 131, 131, 131);
 		}
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationguitimenight.png"), this.leftPos + 71, this.topPos + 143, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationguitimenoon.png"), this.leftPos + 72, this.topPos + -11, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationguitimedawn.png"), this.leftPos + -5, this.topPos + 67, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/meditationguitimedusk.png"), this.leftPos + 149, this.topPos + 66, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_49, this.leftPos + 71, this.topPos + 143, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_50, this.leftPos + 72, this.topPos + -11, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_51, this.leftPos + -5, this.topPos + 67, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_52, this.leftPos + 149, this.topPos + 66, 0, 0, 32, 32, 32, 32);
 	}
 
 	@Override

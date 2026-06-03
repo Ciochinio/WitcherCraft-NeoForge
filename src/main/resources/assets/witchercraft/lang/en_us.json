@@ -296,5 +296,7 @@
   "effect.witchercraft.quen_effect": "Quen Effect",
   "gui.witchercraft.drowner_gui.label_weak_to_igni": "Weak to: Igni",
   "gui.witchercraft.drowner_gui.label_spawning_swamp": "Spawning: Swamp",
-  "gui.witchercraft.drowner_gui.label_loot_monster_brain_monster_too": "Loot: Monster Brain"
+  "gui.witchercraft.drowner_gui.label_loot_monster_brain_monster_too": "Loot: Monster Brain",
+  "item.witchercraft.cockatrice_spawn_egg": "Cockatrice Spawn Egg",
+  "entity.witchercraft.cockatrice": "Cockatrice"
 }

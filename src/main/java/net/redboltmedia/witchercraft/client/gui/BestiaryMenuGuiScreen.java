@@ -25,6 +25,7 @@ public class BestiaryMenuGuiScreen extends AbstractContainerScreen<BestiaryMenuG
 	private boolean menuStateUpdateActive = false;
 	private Button button_back;
 	private ImageButton imagebutton_drownerface;
+	private static final ResourceLocation IMAGE_0 = ResourceLocation.parse("witchercraft:textures/screens/book.png");
 
 	public BestiaryMenuGuiScreen(BestiaryMenuGuiMenu container, Inventory inventory, Component text) {
 		super(container, inventory, text);
@@ -62,7 +63,7 @@ public class BestiaryMenuGuiScreen extends AbstractContainerScreen<BestiaryMenuG
 
 	@Override
 	protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/book.png"), this.leftPos + -84, this.topPos + -38, 0, 0, 319, 222, 319, 222);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_0, this.leftPos + -84, this.topPos + -38, 0, 0, 319, 222, 319, 222);
 	}
 
 	@Override

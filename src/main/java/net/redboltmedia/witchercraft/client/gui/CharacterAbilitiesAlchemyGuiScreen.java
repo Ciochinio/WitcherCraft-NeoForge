@@ -38,6 +38,17 @@ public class CharacterAbilitiesAlchemyGuiScreen extends AbstractContainerScreen<
 	private ImageButton imagebutton_pyrotechnics;
 	private ImageButton imagebutton_efficency;
 	private ImageButton imagebutton_clusterbombs;
+	private static final ResourceLocation BACKGROUND = ResourceLocation.parse("witchercraft:textures/screens/character_abilities_alchemy_gui.png");
+	private static final ResourceLocation IMAGE_0 = ResourceLocation.parse("witchercraft:textures/screens/refreshmentbought.png");
+	private static final ResourceLocation IMAGE_1 = ResourceLocation.parse("witchercraft:textures/screens/delayedrecoverybought.png");
+	private static final ResourceLocation IMAGE_2 = ResourceLocation.parse("witchercraft:textures/screens/sideeffectsbought.png");
+	private static final ResourceLocation IMAGE_3 = ResourceLocation.parse("witchercraft:textures/screens/poisonedbladesbought.png");
+	private static final ResourceLocation IMAGE_4 = ResourceLocation.parse("witchercraft:textures/screens/protectivecoatingbought.png");
+	private static final ResourceLocation IMAGE_5 = ResourceLocation.parse("witchercraft:textures/screens/hunterinstinctsbought.png");
+	private static final ResourceLocation IMAGE_6 = ResourceLocation.parse("witchercraft:textures/screens/pyrotechnicsbought.png");
+	private static final ResourceLocation IMAGE_7 = ResourceLocation.parse("witchercraft:textures/screens/efficencybought.png");
+	private static final ResourceLocation IMAGE_8 = ResourceLocation.parse("witchercraft:textures/screens/clusterbombsbought.png");
+	private static final ResourceLocation IMAGE_9 = ResourceLocation.parse("witchercraft:textures/screens/skillpoint.png");
 
 	public CharacterAbilitiesAlchemyGuiScreen(CharacterAbilitiesAlchemyGuiMenu container, Inventory inventory, Component text) {
 		super(container, inventory, text);
@@ -55,8 +66,6 @@ public class CharacterAbilitiesAlchemyGuiScreen extends AbstractContainerScreen<
 		menuStateUpdateActive = true;
 		menuStateUpdateActive = false;
 	}
-
-	private static final ResourceLocation texture = ResourceLocation.parse("witchercraft:textures/screens/character_abilities_alchemy_gui.png");
 
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
@@ -104,17 +113,17 @@ public class CharacterAbilitiesAlchemyGuiScreen extends AbstractContainerScreen<
 
 	@Override
 	protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, texture, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/refreshmentbought.png"), this.leftPos + 6, this.topPos + 16, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/delayedrecoverybought.png"), this.leftPos + 6, this.topPos + 52, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/sideeffectsbought.png"), this.leftPos + 6, this.topPos + 88, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/poisonedbladesbought.png"), this.leftPos + 42, this.topPos + 16, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/protectivecoatingbought.png"), this.leftPos + 42, this.topPos + 52, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/hunterinstinctsbought.png"), this.leftPos + 42, this.topPos + 88, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/pyrotechnicsbought.png"), this.leftPos + 78, this.topPos + 16, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/efficencybought.png"), this.leftPos + 78, this.topPos + 52, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/clusterbombsbought.png"), this.leftPos + 78, this.topPos + 88, 0, 0, 32, 32, 32, 32);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/skillpoint.png"), this.leftPos + 195, this.topPos + 7, 0, 0, 50, 25, 50, 25);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BACKGROUND, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_0, this.leftPos + 6, this.topPos + 16, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_1, this.leftPos + 6, this.topPos + 52, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_2, this.leftPos + 6, this.topPos + 88, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_3, this.leftPos + 42, this.topPos + 16, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_4, this.leftPos + 42, this.topPos + 52, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_5, this.leftPos + 42, this.topPos + 88, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_6, this.leftPos + 78, this.topPos + 16, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_7, this.leftPos + 78, this.topPos + 52, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_8, this.leftPos + 78, this.topPos + 88, 0, 0, 32, 32, 32, 32);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_9, this.leftPos + 195, this.topPos + 7, 0, 0, 50, 25, 50, 25);
 	}
 
 	@Override

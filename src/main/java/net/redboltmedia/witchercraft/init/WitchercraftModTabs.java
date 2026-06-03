@@ -7,12 +7,17 @@ import net.redboltmedia.witchercraft.WitchercraftMod;
 
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.bus.api.SubscribeEvent;
 
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.network.chat.Component;
 import net.minecraft.core.registries.Registries;
 
+@EventBusSubscriber
 public class WitchercraftModTabs {
 	public static final DeferredRegister<CreativeModeTab> REGISTRY = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, WitchercraftMod.MODID);
 	public static final DeferredHolder<CreativeModeTab, CreativeModeTab> WITCHER_CRAFT = REGISTRY.register("witcher_craft",
@@ -91,4 +96,11 @@ public class WitchercraftModTabs {
 				tabData.accept(WitchercraftModItems.SUCCUBUS_DECOCTION.get());
 				tabData.accept(WitchercraftModItems.GRAVE_HAG_DECOCTION.get());
 			}).build());
+
+	@SubscribeEvent
+	public static void buildTabContentsVanilla(BuildCreativeModeTabContentsEvent tabData) {
+		if (tabData.getTabKey() == CreativeModeTabs.SPAWN_EGGS) {
+			tabData.accept(WitchercraftModItems.COCKATRICE_SPAWN_EGG.get());
+		}
+	}
 }

@@ -22,6 +22,7 @@ public class GlossaryMenuGuiScreen extends AbstractContainerScreen<GlossaryMenuG
 	private final Player entity;
 	private boolean menuStateUpdateActive = false;
 	private Button button_back;
+	private static final ResourceLocation BACKGROUND = ResourceLocation.parse("witchercraft:textures/screens/glossary_menu_gui.png");
 
 	public GlossaryMenuGuiScreen(GlossaryMenuGuiMenu container, Inventory inventory, Component text) {
 		super(container, inventory, text);
@@ -45,8 +46,6 @@ public class GlossaryMenuGuiScreen extends AbstractContainerScreen<GlossaryMenuG
 		return true;
 	}
 
-	private static final ResourceLocation texture = ResourceLocation.parse("witchercraft:textures/screens/glossary_menu_gui.png");
-
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
 		super.render(guiGraphics, mouseX, mouseY, partialTicks);
@@ -55,7 +54,7 @@ public class GlossaryMenuGuiScreen extends AbstractContainerScreen<GlossaryMenuG
 
 	@Override
 	protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, texture, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BACKGROUND, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
 	}
 
 	@Override

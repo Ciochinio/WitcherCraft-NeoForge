@@ -25,6 +25,11 @@ public class RotfiendGuiScreen extends AbstractContainerScreen<RotfiendGuiMenu> 
 	private ImageButton imagebutton_bookmark;
 	private ImageButton imagebutton_arrowback;
 	private ImageButton imagebutton_arrowforword;
+	private static final ResourceLocation IMAGE_0 = ResourceLocation.parse("witchercraft:textures/screens/book.png");
+	private static final ResourceLocation IMAGE_1 = ResourceLocation
+			.parse("witchercraft:textures/screens/68747470733a2f2f726564626f6c746d656469612e6769746875622e696f2f73746f726167652f6d6f64732f7769746368657263726166742f726f746669656e6462672e706e67.png");
+	private static final ResourceLocation IMAGE_2 = ResourceLocation.parse("witchercraft:textures/screens/bookmarkleft.png");
+	private static final ResourceLocation IMAGE_3 = ResourceLocation.parse("witchercraft:textures/screens/drownerface.png");
 
 	public RotfiendGuiScreen(RotfiendGuiMenu container, Inventory inventory, Component text) {
 		super(container, inventory, text);
@@ -51,12 +56,10 @@ public class RotfiendGuiScreen extends AbstractContainerScreen<RotfiendGuiMenu> 
 
 	@Override
 	protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/book.png"), this.leftPos + -37, this.topPos + -38, 0, 0, 319, 222, 319, 222);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED,
-				ResourceLocation.parse("witchercraft:textures/screens/68747470733a2f2f726564626f6c746d656469612e6769746875622e696f2f73746f726167652f6d6f64732f7769746368657263726166742f726f746669656e6462672e706e67.png"), this.leftPos + 152,
-				this.topPos + 7, 0, 0, 91, 106, 91, 106);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/bookmarkleft.png"), this.leftPos + -28, this.topPos + -11, 0, 0, 60, 23, 60, 23);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ResourceLocation.parse("witchercraft:textures/screens/drownerface.png"), this.leftPos + -15, this.topPos + -8, 0, 0, 16, 16, 16, 16);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_0, this.leftPos + -37, this.topPos + -38, 0, 0, 319, 222, 319, 222);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_1, this.leftPos + 152, this.topPos + 7, 0, 0, 91, 106, 91, 106);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_2, this.leftPos + -28, this.topPos + -11, 0, 0, 60, 23, 60, 23);
+		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, IMAGE_3, this.leftPos + -15, this.topPos + -8, 0, 0, 16, 16, 16, 16);
 	}
 
 	@Override

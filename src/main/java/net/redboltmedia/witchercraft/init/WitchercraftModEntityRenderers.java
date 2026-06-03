@@ -3,6 +3,8 @@
  */
 package net.redboltmedia.witchercraft.init;
 
+import net.redboltmedia.witchercraft.client.renderer.CockatriceRenderer;
+
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -22,5 +24,6 @@ public class WitchercraftModEntityRenderers {
 		event.registerEntityRenderer(WitchercraftModEntities.DIMERITIUM_BOMB_PROJECTILE.get(), ThrownItemRenderer::new);
 		event.registerEntityRenderer(WitchercraftModEntities.IGNI_PARTICLES.get(), ThrownItemRenderer::new);
 		event.registerEntityRenderer(WitchercraftModEntities.AARD_PARTICLES.get(), ThrownItemRenderer::new);
+		event.registerEntityRenderer(WitchercraftModEntities.COCKATRICE.get(), CockatriceRenderer::new);
 	}
 }

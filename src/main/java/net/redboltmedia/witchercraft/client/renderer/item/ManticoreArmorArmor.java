@@ -17,27 +17,35 @@ public class ManticoreArmorArmor {
 	@SubscribeEvent
 	public static void registerItemExtensions(RegisterClientExtensionsEvent event) {
 		event.registerItem(new IClientItemExtensions() {
+			private final ResourceLocation armorTexture = ResourceLocation.parse("witchercraft:textures/models/armor/mantikora._layer_1.png");
+
 			@Override
-			public ResourceLocation getArmorTexture(ItemStack stack, EquipmentClientInfo.LayerType type, EquipmentClientInfo.Layer layer, ResourceLocation _default) {
-				return ResourceLocation.parse("witchercraft:textures/models/armor/mantikora._layer_1.png");
+			public ResourceLocation getArmorTexture(ItemStack stack, EquipmentClientInfo.LayerType type, EquipmentClientInfo.Layer layer, ResourceLocation original) {
+				return armorTexture;
 			}
 		}, WitchercraftModItems.MANTICORE_ARMOR_HELMET.get());
 		event.registerItem(new IClientItemExtensions() {
+			private final ResourceLocation armorTexture = ResourceLocation.parse("witchercraft:textures/models/armor/mantikora._layer_1.png");
+
 			@Override
-			public ResourceLocation getArmorTexture(ItemStack stack, EquipmentClientInfo.LayerType type, EquipmentClientInfo.Layer layer, ResourceLocation _default) {
-				return ResourceLocation.parse("witchercraft:textures/models/armor/mantikora._layer_1.png");
+			public ResourceLocation getArmorTexture(ItemStack stack, EquipmentClientInfo.LayerType type, EquipmentClientInfo.Layer layer, ResourceLocation original) {
+				return armorTexture;
 			}
 		}, WitchercraftModItems.MANTICORE_ARMOR_CHESTPLATE.get());
 		event.registerItem(new IClientItemExtensions() {
+			private final ResourceLocation armorTexture = ResourceLocation.parse("witchercraft:textures/models/armor/mantikora._layer_2.png");
+
 			@Override
-			public ResourceLocation getArmorTexture(ItemStack stack, EquipmentClientInfo.LayerType type, EquipmentClientInfo.Layer layer, ResourceLocation _default) {
-				return ResourceLocation.parse("witchercraft:textures/models/armor/mantikora._layer_2.png");
+			public ResourceLocation getArmorTexture(ItemStack stack, EquipmentClientInfo.LayerType type, EquipmentClientInfo.Layer layer, ResourceLocation original) {
+				return armorTexture;
 			}
 		}, WitchercraftModItems.MANTICORE_ARMOR_LEGGINGS.get());
 		event.registerItem(new IClientItemExtensions() {
+			private final ResourceLocation armorTexture = ResourceLocation.parse("witchercraft:textures/models/armor/mantikora._layer_1.png");
+
 			@Override
-			public ResourceLocation getArmorTexture(ItemStack stack, EquipmentClientInfo.LayerType type, EquipmentClientInfo.Layer layer, ResourceLocation _default) {
-				return ResourceLocation.parse("witchercraft:textures/models/armor/mantikora._layer_1.png");
+			public ResourceLocation getArmorTexture(ItemStack stack, EquipmentClientInfo.LayerType type, EquipmentClientInfo.Layer layer, ResourceLocation original) {
+				return armorTexture;
 			}
 		}, WitchercraftModItems.MANTICORE_ARMOR_BOOTS.get());
 	}

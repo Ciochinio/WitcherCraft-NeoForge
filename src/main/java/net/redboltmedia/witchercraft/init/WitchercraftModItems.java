@@ -9,6 +9,7 @@ import net.redboltmedia.witchercraft.WitchercraftMod;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.DeferredItem;
 
+import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.Item;
 
 import java.util.function.Function;
@@ -88,6 +89,7 @@ public class WitchercraftModItems {
 	public static final DeferredItem<Item> WYVERN_DECOCTION;
 	public static final DeferredItem<Item> SUCCUBUS_DECOCTION;
 	public static final DeferredItem<Item> GRAVE_HAG_DECOCTION;
+	public static final DeferredItem<Item> COCKATRICE_SPAWN_EGG;
 	static {
 		WHITE_HONEY = register("white_honey", WhiteHoneyItem::new);
 		BLIZZARD = register("blizzard", BlizzardItem::new);
@@ -162,6 +164,7 @@ public class WitchercraftModItems {
 		WYVERN_DECOCTION = register("wyvern_decoction", WyvernDecoctionItem::new);
 		SUCCUBUS_DECOCTION = register("succubus_decoction", SuccubusDecoctionItem::new);
 		GRAVE_HAG_DECOCTION = register("grave_hag_decoction", GraveHagDecoctionItem::new);
+		COCKATRICE_SPAWN_EGG = register("cockatrice_spawn_egg", properties -> new SpawnEggItem(WitchercraftModEntities.COCKATRICE.get(), properties));
 	}
 
 	// Start of user code block custom items

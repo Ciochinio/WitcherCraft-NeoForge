@@ -1,10 +1,4 @@
 {
-  "minecraft:recipes/decorations/cyan_glazed_terracotta": {
-    "criteria": {
-      "has_cyan_terracotta": "2026-04-28 14:41:40 +0200"
-    },
-    "done": true
-  },
   "minecraft:recipes/decorations/crafting_table": {
     "criteria": {
       "unlock_right_away": "2026-04-28 14:37:38 +0200"
@@ -16,6 +10,12 @@
       "minecraft:plains": "2026-04-28 14:37:38 +0200"
     },
     "done": false
+  },
+  "minecraft:recipes/decorations/cyan_glazed_terracotta": {
+    "criteria": {
+      "has_cyan_terracotta": "2026-04-28 14:41:40 +0200"
+    },
+    "done": true
   },
   "DataVersion": 4440
 }

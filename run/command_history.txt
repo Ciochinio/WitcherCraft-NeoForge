@@ -1,50 +1,50 @@
-/lvlfix
-/effect clear Dev minecraft:saturation
-/xp add Dev 1000 points
-/lvlfix
-/devtool
-/xp add Dev 1000 points
-/lvlfix
-/devtool
-/xp add Dev 1000 points
-/lvlfix
-/xp add Dev 1000 points
-/lvlfix
-/effect give Dev witchercraft:sign_cooldown infinite
-/effect clear Dev witchercraft:sign_cooldown
-/devtool
-/xp add Dev 1000 points
-/lvlfix
-/devtool
-/xp add Dev 1000 points
-/lvlfix
-/xp add Dev 1000 points
-/lvlfix
-/xp add Dev 1000 points
-/lvlfix
+/effect give @a minecraft:slow_falling 2
+/tp ~ ~10000 ~
+/attribute Dev minecraft:max_health get
+/attribute Dev minecraft:fall_damage_multiplier get
+/attribute Dev minecraft:scale base
+/attribute Dev minecraft:scale get
+/attribute Dev minecraft:scale base set 0.1
+/attribute Dev minecraft:scale base set 155
+/attribute Dev minecraft:camera_distance get
+/attribute Dev minecraft:camera_distance base set 1
+/attribute Dev minecraft:camera_distance base set 100
+/attribute Dev minecraft:scale base set 0.00001
+/attribute Dev minecraft:scale base set 0.00000001
+/attribute Dev minecraft:scale base set 0.000000000000001
+/time set 0
+/time set 3000
 /weather clear
-/kill
-/kill @a
-/kill @e
-/summon minecraft:zombie -83.53 71.00 6.24
-/summon minecraft:zombie -83.48 71.00 0.23
-/effect give Dev minecraft:saturation infinite
+/attribute Dev minecraft:scale base set 1
+/attribute Dev minecraft:camera_distance base set 4
+/summon witchercraft:cockatrice
+/summon witchercraft:cockatrice -41.93 68.00 12.98
+/summon witchercraft:cockatrice -41.93 67.00 12.98
+/summon witchercraft:cockatrice
+/effect clear
+/attribute Dev minecraft:max_health base reset
+/summon witchercraft:cockatrice
+/summon minecraft:ender_dragon
+/tick freeze
+/kill 4893ea7c-3bef-48bc-80e1-6cd9ce21566f
+/tick unfreeze
+/kill 4893ea7c-3bef-48bc-80e1-6cd9ce21566f
+/tick unfreeze
 /tick freeze
 /tick unfreeze
-/data
-/weather clear
-/effect clear Dev minecraft:saturation
-/effect clear
-/xp add Dev 100000 levels
-/lvlfix
-/xp add Dev 100000 points
-/lvlfix
-/xp add Dev 100000 points
-/lvlfix
-/devtool
-/witchercraftstats
-/effect clear
-/xp set Dev 6 levels
-/effect give @a minecraft:speed infinite 255
-/effect clear
-/time set day
+/tick freeze
+/tick unfreeze
+/summon witchercraft:cockatrice
+/tick freeze
+/attribute 101af698-ab20-4ac0-ad77-88728b1ebc32 minecraft:flying_speed get
+/attribute 101af698-ab20-4ac0-ad77-88728b1ebc32 minecraft:flying_speed base set 0.8
+/tick unfreeze
+/attribute 101af698-ab20-4ac0-ad77-88728b1ebc32 minecraft:flying_speed base set 0.2
+/attribute 101af698-ab20-4ac0-ad77-88728b1ebc32 minecraft:flying_speed base set 0.4
+/attribute 101af698-ab20-4ac0-ad77-88728b1ebc32 minecraft:flying_speed base set 0.6
+/summon witchercraft:cockatrice
+/tick freeze
+/attribute 787e19c9-b876-44c6-83d9-762984e2680d minecraft:flying_speed base set 0.6
+/tick unfreeze
+/attribute 787e19c9-b876-44c6-83d9-762984e2680d minecraft:flying_speed base set 0.9
+/summon witchercraft:cockatrice
