@@ -1,16 +1,13 @@
 {
-  "_fv": 79,
+  "_fv": 89,
   "_type": "projectile",
   "definition": {
-    "projectileItem": {
-      "value": "Blocks.AIR"
-    },
+    "projectileItem": "Blocks.AIR",
     "showParticles": false,
-    "actionSound": {
-      "value": ""
-    },
+    "actionSound": "",
     "igniteFire": true,
     "disableGravity": false,
+    "disableDiscarding": false,
     "power": 0.0,
     "damage": 0.0,
     "knockback": 0,
@@ -18,8 +15,6 @@
     "customModelTexture": "",
     "modelWidth": 0.5,
     "modelHeight": 0.5,
-    "onFlyingTick": {
-      "name": "IgniParticlesTick"
-    }
+    "onFlyingTick": "IgniParticlesTick"
   }
 }

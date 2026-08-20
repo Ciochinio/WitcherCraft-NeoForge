@@ -4,12 +4,12 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.ClipContext;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.network.chat.Component;
 
 import java.util.Comparator;
@@ -29,11 +29,11 @@ public class AxiiCastProcedure {
 					(entity.level().clip(new ClipContext(entity.getEyePosition(1f), entity.getEyePosition(1f).add(entity.getViewVector(1f).scale(50)), ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, entity)).getBlockPos().getZ()),
 					5)) instanceof LivingEntity _entity && !_entity.level().isClientSide())
 				_entity.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 60, 255, false, false));
-			if (entity instanceof Player _player && !_player.level().isClientSide())
-				_player.displayClientMessage(Component.literal("AXII"), false);
+			if (entity instanceof ServerPlayer _player)
+				_player.sendSystemMessage(Component.literal("AXII"), false);
 		} else {
-			if (entity instanceof Player _player && !_player.level().isClientSide())
-				_player.displayClientMessage(Component.literal("NO ENEMIES DETECTED"), false);
+			if (entity instanceof ServerPlayer _player)
+				_player.sendSystemMessage(Component.literal("NO ENEMIES DETECTED"), false);
 			AxiiRefundProcedure.execute(world, entity);
 		}
 	}

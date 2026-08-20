@@ -10,7 +10,7 @@ import net.neoforged.bus.api.Event;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.entity.animal.WaterAnimal;
+import net.minecraft.world.entity.animal.fish.WaterAnimal;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.Entity;
 

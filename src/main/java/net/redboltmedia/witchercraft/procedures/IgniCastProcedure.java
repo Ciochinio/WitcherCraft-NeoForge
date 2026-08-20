@@ -7,10 +7,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.core.registries.Registries;
 
@@ -18,7 +18,7 @@ public class IgniCastProcedure {
 	public static void execute(Entity entity) {
 		if (entity == null)
 			return;
-		for (int index0 = 0; index0 < 50; index0++) {
+		for (int _i1 = 0; _i1 < 50; _i1++) {
 			{
 				Entity _shootFrom = entity;
 				Level projectileLevel = _shootFrom.level();
@@ -31,8 +31,8 @@ public class IgniCastProcedure {
 				}
 			}
 		}
-		if (entity instanceof Player _player && !_player.level().isClientSide())
-			_player.displayClientMessage(Component.literal("IGNI"), false);
+		if (entity instanceof ServerPlayer _player)
+			_player.sendSystemMessage(Component.literal("IGNI"), false);
 	}
 
 	private static AbstractArrow initArrowProjectile(AbstractArrow entityToSpawn, Entity shooter, float damage, boolean silent, boolean fire, boolean particles, AbstractArrow.Pickup pickup) {

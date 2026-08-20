@@ -20,14 +20,14 @@ authors="Ciochu, RedBoltMedia"
 [[dependencies.witchercraft]]
     modId="neoforge"
     type="required"
-    versionRange="[21.8.31,)"
+    versionRange="[26.1.2.95,)"
     ordering="AFTER"
     side="BOTH"
 
 [[dependencies.witchercraft]]
     modId="minecraft"
     type="required"
-    versionRange="[1.21.8]"
+    versionRange="[26.1.2]"
     ordering="AFTER"
     side="BOTH"
 

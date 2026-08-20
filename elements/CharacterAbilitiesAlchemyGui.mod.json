@@ -1,5 +1,5 @@
 {
-  "_fv": 79,
+  "_fv": 89,
   "_type": "gui",
   "definition": {
     "type": 0,
@@ -16,9 +16,7 @@
           "name": "button_back",
           "text": "Back",
           "isUndecorated": false,
-          "onClick": {
-            "name": "PauseMenuGuiOpen"
-          },
+          "onClick": "PauseMenuGuiOpen",
           "width": 46,
           "height": 20,
           "x": 375,
@@ -32,12 +30,8 @@
           "name": "imagebutton_refreshment",
           "image": "refreshment.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "RefreshmentEffect"
-          },
-          "displayCondition": {
-            "name": "RefreshmentShow"
-          },
+          "onClick": "RefreshmentEffect",
+          "displayCondition": "RefreshmentShow",
           "x": 132,
           "y": 53,
           "locked": false
@@ -49,12 +43,8 @@
           "name": "imagebutton_delayedrecovery",
           "image": "delayedrecovery.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "DelayedRecoveryEffect"
-          },
-          "displayCondition": {
-            "name": "DelayedRecoveryShow"
-          },
+          "onClick": "DelayedRecoveryEffect",
+          "displayCondition": "DelayedRecoveryShow",
           "x": 132,
           "y": 89,
           "locked": false
@@ -66,12 +56,8 @@
           "name": "imagebutton_sideeffects",
           "image": "sideeffects.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "SideEffectsEffect"
-          },
-          "displayCondition": {
-            "name": "SideEffectsShow"
-          },
+          "onClick": "SideEffectsEffect",
+          "displayCondition": "SideEffectsShow",
           "x": 132,
           "y": 125,
           "locked": false
@@ -83,12 +69,8 @@
           "name": "imagebutton_poisonedblade",
           "image": "poisonedblade.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "PoisonedBladesEffect"
-          },
-          "displayCondition": {
-            "name": "PoisonedBladesShow"
-          },
+          "onClick": "PoisonedBladesEffect",
+          "displayCondition": "PoisonedBladesShow",
           "x": 168,
           "y": 53,
           "locked": false
@@ -100,12 +82,8 @@
           "name": "imagebutton_protectivecoating",
           "image": "protectivecoating.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "ProtectiveCoatingEffect"
-          },
-          "displayCondition": {
-            "name": "ProtectiveCoatingShow"
-          },
+          "onClick": "ProtectiveCoatingEffect",
+          "displayCondition": "ProtectiveCoatingShow",
           "x": 168,
           "y": 89,
           "locked": false
@@ -117,12 +95,8 @@
           "name": "imagebutton_hunterinstincts",
           "image": "hunterinstincts.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "HunterInstinctEffect"
-          },
-          "displayCondition": {
-            "name": "HunterInstinctShow"
-          },
+          "onClick": "HunterInstinctEffect",
+          "displayCondition": "HunterInstinctShow",
           "x": 168,
           "y": 125,
           "locked": false
@@ -134,12 +108,8 @@
           "name": "imagebutton_pyrotechnics",
           "image": "pyrotechnics.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "PyrotechnicsEffect"
-          },
-          "displayCondition": {
-            "name": "PyrotechnicsShow"
-          },
+          "onClick": "PyrotechnicsEffect",
+          "displayCondition": "PyrotechnicsShow",
           "x": 204,
           "y": 53,
           "locked": false
@@ -151,12 +121,8 @@
           "name": "imagebutton_efficency",
           "image": "efficency.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "EfficiencyEffect"
-          },
-          "displayCondition": {
-            "name": "EfficiencyShow"
-          },
+          "onClick": "EfficiencyEffect",
+          "displayCondition": "EfficiencyShow",
           "x": 204,
           "y": 89,
           "locked": false
@@ -168,12 +134,8 @@
           "name": "imagebutton_clusterbombs",
           "image": "clusterbombs.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "ClusterBombsEffect"
-          },
-          "displayCondition": {
-            "name": "ClusterBombsShow"
-          },
+          "onClick": "ClusterBombsEffect",
+          "displayCondition": "ClusterBombsShow",
           "x": 204,
           "y": 125,
           "locked": false
@@ -185,9 +147,7 @@
           "name": "button_general",
           "text": "General",
           "isUndecorated": false,
-          "onClick": {
-            "name": "CharaterAbilitesGeneralGuiOpen"
-          },
+          "onClick": "CharaterAbilitesGeneralGuiOpen",
           "width": 61,
           "height": 20,
           "x": 60,
@@ -201,9 +161,7 @@
           "name": "button_combat",
           "text": " Combat",
           "isUndecorated": false,
-          "onClick": {
-            "name": "CharacterAbilitiesCombatGuiOpen"
-          },
+          "onClick": "CharacterAbilitiesCombatGuiOpen",
           "width": 61,
           "height": 20,
           "x": 60,
@@ -217,9 +175,7 @@
           "name": "button_alchemy",
           "text": "Alchemy",
           "isUndecorated": false,
-          "onClick": {
-            "name": "CharacterAbilitiesAlchemyGuiOpen"
-          },
+          "onClick": "CharacterAbilitiesAlchemyGuiOpen",
           "width": 61,
           "height": 20,
           "x": 60,
@@ -233,9 +189,7 @@
           "name": "button_signs",
           "text": " Signs ",
           "isUndecorated": false,
-          "onClick": {
-            "name": "CharacterAbilitiesSignsGuiOpen"
-          },
+          "onClick": "CharacterAbilitiesSignsGuiOpen",
           "width": 61,
           "height": 20,
           "x": 60,
@@ -481,6 +435,7 @@
             "value": -12829636,
             "falpha": 0.0
           },
+          "hasShadow": false,
           "x": 312,
           "y": 44,
           "locked": false
@@ -498,6 +453,7 @@
             "value": -12829636,
             "falpha": 0.0
           },
+          "hasShadow": false,
           "x": 312,
           "y": 53,
           "locked": false

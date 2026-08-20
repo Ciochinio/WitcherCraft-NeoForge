@@ -1,12 +1,10 @@
 {
-  "_fv": 79,
+  "_fv": 89,
   "_type": "keybind",
   "definition": {
     "triggerKey": "TAB",
     "keyBindingName": "Sign Gui Keybind",
     "keyBindingCategoryKey": "witchercraft",
-    "onKeyPressed": {
-      "name": "SignGuiKeyOpen"
-    }
+    "onKeyPressed": "SignGuiKeyOpen"
   }
 }

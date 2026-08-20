@@ -9,6 +9,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.bus.api.Event;
 
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
 
@@ -32,7 +33,7 @@ public class SignIntensityProcedure {
 		if (entity instanceof LivingEntity _livEnt0 && _livEnt0.hasEffect(WitchercraftModMobEffects.PETRIS_PHILTER_EFFECT)) {
 			sumSignIntensity = sumSignIntensity + 20;
 		}
-		if (world.getLevelData().isRaining() && entity instanceof LivingEntity _livEnt2 && _livEnt2.hasEffect(WitchercraftModMobEffects.FOGLET_DECOCTION_EFFECT)) {
+		if (world instanceof Level _lvl1 && _lvl1.isRaining() && entity instanceof LivingEntity _livEnt2 && _livEnt2.hasEffect(WitchercraftModMobEffects.FOGLET_DECOCTION_EFFECT)) {
 			sumSignIntensity = sumSignIntensity + 25;
 		}
 		{

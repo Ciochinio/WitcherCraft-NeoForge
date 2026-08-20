@@ -5,7 +5,7 @@ import net.redboltmedia.witchercraft.init.WitchercraftModMobEffects;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.entity.animal.WaterAnimal;
+import net.minecraft.world.entity.animal.fish.WaterAnimal;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;

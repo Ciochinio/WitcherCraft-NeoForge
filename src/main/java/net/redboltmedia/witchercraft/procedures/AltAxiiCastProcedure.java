@@ -4,9 +4,9 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.ClipContext;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.network.chat.Component;
 
 import java.util.Comparator;
@@ -30,11 +30,11 @@ public class AltAxiiCastProcedure {
 						(entity.level().clip(new ClipContext(entity.getEyePosition(1f), entity.getEyePosition(1f).add(entity.getViewVector(1f).scale(50)), ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, entity)).getBlockPos().getY()),
 						(entity.level().clip(new ClipContext(entity.getEyePosition(1f), entity.getEyePosition(1f).add(entity.getViewVector(1f).scale(50)), ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, entity)).getBlockPos().getZ()), 5))
 						.discard();
-			if (entity instanceof Player _player && !_player.level().isClientSide())
-				_player.displayClientMessage(Component.literal("ALT AXII"), false);
+			if (entity instanceof ServerPlayer _player)
+				_player.sendSystemMessage(Component.literal("ALT AXII"), false);
 		} else {
-			if (entity instanceof Player _player && !_player.level().isClientSide())
-				_player.displayClientMessage(Component.literal("NO ENEMIES DETECTED"), false);
+			if (entity instanceof ServerPlayer _player)
+				_player.sendSystemMessage(Component.literal("NO ENEMIES DETECTED"), false);
 			AltAxiiRefundProcedure.execute(entity);
 			AltAxiiRefundProcedure.execute(entity);
 		}

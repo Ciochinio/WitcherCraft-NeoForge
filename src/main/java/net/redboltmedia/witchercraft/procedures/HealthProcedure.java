@@ -12,7 +12,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import javax.annotation.Nullable;
 
@@ -33,38 +33,38 @@ public class HealthProcedure {
 		double sumHealth = 0;
 		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesSurvivalInstinct == true) {
 			if (entity instanceof LivingEntity _entity) {
-				AttributeModifier modifier = new AttributeModifier(ResourceLocation.parse("witchercraft:survivalinstinct"), 0.15, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+				AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:survivalinstinct"), 0.15, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
 				if (!_entity.getAttribute(Attributes.MAX_HEALTH).hasModifier(modifier.id())) {
 					_entity.getAttribute(Attributes.MAX_HEALTH).addTransientModifier(modifier);
 				}
 			}
 		} else {
 			if (entity instanceof LivingEntity _entity) {
-				_entity.getAttribute(Attributes.MAX_HEALTH).removeModifier(ResourceLocation.parse("witchercraft:survivalinstinct"));
+				_entity.getAttribute(Attributes.MAX_HEALTH).removeModifier(Identifier.parse("witchercraft:survivalinstinct"));
 			}
 		}
 		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesDefence == true) {
 			if (entity instanceof LivingEntity _entity) {
-				AttributeModifier modifier = new AttributeModifier(ResourceLocation.parse("witchercraft:defence"), 4, AttributeModifier.Operation.ADD_VALUE);
+				AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:defence"), 4, AttributeModifier.Operation.ADD_VALUE);
 				if (!_entity.getAttribute(Attributes.MAX_HEALTH).hasModifier(modifier.id())) {
 					_entity.getAttribute(Attributes.MAX_HEALTH).addTransientModifier(modifier);
 				}
 			}
 		} else {
 			if (entity instanceof LivingEntity _entity) {
-				_entity.getAttribute(Attributes.MAX_HEALTH).removeModifier(ResourceLocation.parse("witchercraft:defence"));
+				_entity.getAttribute(Attributes.MAX_HEALTH).removeModifier(Identifier.parse("witchercraft:defence"));
 			}
 		}
 		if (entity instanceof LivingEntity _livEnt4 && _livEnt4.hasEffect(WitchercraftModMobEffects.FULL_MOON_EFFECT)) {
 			if (entity instanceof LivingEntity _entity) {
-				AttributeModifier modifier = new AttributeModifier(ResourceLocation.parse("witchercraft:fullmoon"), 4, AttributeModifier.Operation.ADD_VALUE);
+				AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:fullmoon"), 4, AttributeModifier.Operation.ADD_VALUE);
 				if (!_entity.getAttribute(Attributes.MAX_HEALTH).hasModifier(modifier.id())) {
 					_entity.getAttribute(Attributes.MAX_HEALTH).addTransientModifier(modifier);
 				}
 			}
 		} else {
 			if (entity instanceof LivingEntity _entity) {
-				_entity.getAttribute(Attributes.MAX_HEALTH).removeModifier(ResourceLocation.parse("witchercraft:fullmoon"));
+				_entity.getAttribute(Attributes.MAX_HEALTH).removeModifier(Identifier.parse("witchercraft:fullmoon"));
 			}
 		}
 		{

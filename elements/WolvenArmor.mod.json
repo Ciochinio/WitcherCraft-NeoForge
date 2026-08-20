@@ -1,5 +1,5 @@
 {
-  "_fv": 79,
+  "_fv": 89,
   "_type": "armor",
   "definition": {
     "enableHelmet": true,
@@ -10,22 +10,12 @@
     "textureLeggings": "wolven_trousers",
     "enableBoots": true,
     "textureBoots": "wolven_boots",
-    "onHelmetTick": {
-      "name": "WolvenArmorEffect"
-    },
-    "onBodyTick": {
-      "name": "WolvenArmorEffect"
-    },
-    "onLeggingsTick": {
-      "name": "WolvenArmorEffect"
-    },
-    "onBootsTick": {
-      "name": "WolvenArmorEffect"
-    },
+    "onHelmetTick": "WolvenArmorEffect",
+    "onBodyTick": "WolvenArmorEffect",
+    "onLeggingsTick": "WolvenArmorEffect",
+    "onBootsTick": "WolvenArmorEffect",
     "creativeTabs": [
-      {
-        "value": "CUSTOM:WitcherCraft"
-      }
+      "CUSTOM:WitcherCraft"
     ],
     "armorTextureFile": "wolven.",
     "helmetName": "Wolven Armor Helmet",
@@ -68,6 +58,10 @@
     "leggingsItemCustomModelName": "Normal",
     "bootsItemRenderType": 0,
     "bootsItemCustomModelName": "Normal",
+    "helmetTranslucency": false,
+    "bodyTranslucency": false,
+    "leggingsTranslucency": false,
+    "bootsTranslucency": false,
     "helmetImmuneToFire": false,
     "bodyImmuneToFire": false,
     "leggingsImmuneToFire": false,
@@ -104,9 +98,9 @@
     "enchantability": 9,
     "toughness": 0.0,
     "knockbackResistance": 0.0,
-    "equipSound": {
-      "value": ""
-    },
-    "repairItems": []
+    "equipSound": "",
+    "repairItems": [],
+    "rarity": "COMMON",
+    "attributeModifiers": []
   }
 }

@@ -1,5 +1,5 @@
 {
-  "_fv": 79,
+  "_fv": 89,
   "_type": "gui",
   "definition": {
     "type": 0,
@@ -16,9 +16,7 @@
           "name": "button_back",
           "text": "Back",
           "isUndecorated": false,
-          "onClick": {
-            "name": "PauseMenuGuiOpen"
-          },
+          "onClick": "PauseMenuGuiOpen",
           "width": 46,
           "height": 20,
           "x": 375,
@@ -32,12 +30,8 @@
           "name": "imagebutton_sunandstars",
           "image": "sunandstars.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "SunAndStarsEffect"
-          },
-          "displayCondition": {
-            "name": "SunAndStarsShow"
-          },
+          "onClick": "SunAndStarsEffect",
+          "displayCondition": "SunAndStarsShow",
           "x": 132,
           "y": 62,
           "locked": false
@@ -49,12 +43,8 @@
           "name": "imagebutton_survivalinstict",
           "image": "survivalinstict.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "SurvivalInstinctEffect"
-          },
-          "displayCondition": {
-            "name": "SurvivalInstinctShow"
-          },
+          "onClick": "SurvivalInstinctEffect",
+          "displayCondition": "SurvivalInstinctShow",
           "x": 195,
           "y": 62,
           "locked": false
@@ -80,12 +70,8 @@
           "name": "imagebutton_gourment",
           "image": "gourment.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "GourmetEffect"
-          },
-          "displayCondition": {
-            "name": "GourmetShowIcon"
-          },
+          "onClick": "GourmetEffect",
+          "displayCondition": "GourmetShowIcon",
           "x": 249,
           "y": 62,
           "locked": false
@@ -111,12 +97,8 @@
           "name": "imagebutton_catschooltechniques",
           "image": "catschool.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "CatSchoolEffect"
-          },
-          "displayCondition": {
-            "name": "CatSchoolShow"
-          },
+          "onClick": "CatSchoolEffect",
+          "displayCondition": "CatSchoolShow",
           "x": 132,
           "y": 107,
           "locked": false
@@ -142,12 +124,8 @@
           "name": "imagebutton_griffinschool",
           "image": "griffinschool.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "GriffinSchoolEffect"
-          },
-          "displayCondition": {
-            "name": "GriffinSchoolShow"
-          },
+          "onClick": "GriffinSchoolEffect",
+          "displayCondition": "GriffinSchoolShow",
           "x": 195,
           "y": 107,
           "locked": false
@@ -173,12 +151,8 @@
           "name": "imagebutton_bearschool",
           "image": "bearschool.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "BearSchoolEffect"
-          },
-          "displayCondition": {
-            "name": "BearSchoolShow"
-          },
+          "onClick": "BearSchoolEffect",
+          "displayCondition": "BearSchoolShow",
           "x": 249,
           "y": 107,
           "locked": false
@@ -204,9 +178,7 @@
           "name": "button_general",
           "text": "General",
           "isUndecorated": false,
-          "onClick": {
-            "name": "CharaterAbilitesGeneralGuiOpen"
-          },
+          "onClick": "CharaterAbilitesGeneralGuiOpen",
           "width": 61,
           "height": 20,
           "x": 60,
@@ -220,9 +192,7 @@
           "name": "button_alchemy",
           "text": "Alchemy",
           "isUndecorated": false,
-          "onClick": {
-            "name": "CharacterAbilitiesAlchemyGuiOpen"
-          },
+          "onClick": "CharacterAbilitiesAlchemyGuiOpen",
           "width": 61,
           "height": 20,
           "x": 60,
@@ -236,9 +206,7 @@
           "name": "button_combat",
           "text": " Combat",
           "isUndecorated": false,
-          "onClick": {
-            "name": "CharacterAbilitiesCombatGuiOpen"
-          },
+          "onClick": "CharacterAbilitiesCombatGuiOpen",
           "width": 61,
           "height": 20,
           "x": 60,
@@ -252,9 +220,7 @@
           "name": "button_signs",
           "text": " Signs ",
           "isUndecorated": false,
-          "onClick": {
-            "name": "CharacterAbilitiesSignsGuiOpen"
-          },
+          "onClick": "CharacterAbilitiesSignsGuiOpen",
           "width": 61,
           "height": 20,
           "x": 60,
@@ -344,6 +310,7 @@
             "value": -12829636,
             "falpha": 0.0
           },
+          "hasShadow": false,
           "x": 313,
           "y": 42,
           "locked": false

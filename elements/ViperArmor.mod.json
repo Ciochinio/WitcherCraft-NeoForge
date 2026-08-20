@@ -1,5 +1,5 @@
 {
-  "_fv": 79,
+  "_fv": 89,
   "_type": "armor",
   "definition": {
     "enableHelmet": true,
@@ -10,22 +10,12 @@
     "textureLeggings": "viper_trousers",
     "enableBoots": true,
     "textureBoots": "viper_boots",
-    "onHelmetTick": {
-      "name": "ViperArmorEffect"
-    },
-    "onBodyTick": {
-      "name": "ViperArmorEffect"
-    },
-    "onLeggingsTick": {
-      "name": "ViperArmorEffect"
-    },
-    "onBootsTick": {
-      "name": "ViperArmorEffect"
-    },
+    "onHelmetTick": "ViperArmorEffect",
+    "onBodyTick": "ViperArmorEffect",
+    "onLeggingsTick": "ViperArmorEffect",
+    "onBootsTick": "ViperArmorEffect",
     "creativeTabs": [
-      {
-        "value": "CUSTOM:WitcherCraft"
-      }
+      "CUSTOM:WitcherCraft"
     ],
     "armorTextureFile": "viperarmor.",
     "helmetName": "Viper Armor Helmet",
@@ -68,6 +58,10 @@
     "leggingsItemCustomModelName": "Normal",
     "bootsItemRenderType": 0,
     "bootsItemCustomModelName": "Normal",
+    "helmetTranslucency": false,
+    "bodyTranslucency": false,
+    "leggingsTranslucency": false,
+    "bootsTranslucency": false,
     "helmetImmuneToFire": false,
     "bodyImmuneToFire": false,
     "leggingsImmuneToFire": false,
@@ -104,9 +98,9 @@
     "enchantability": 9,
     "toughness": 0.0,
     "knockbackResistance": 0.0,
-    "equipSound": {
-      "value": ""
-    },
-    "repairItems": []
+    "equipSound": "",
+    "repairItems": [],
+    "rarity": "COMMON",
+    "attributeModifiers": []
   }
 }

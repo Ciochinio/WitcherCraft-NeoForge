@@ -1,10 +1,11 @@
 package net.redboltmedia.witchercraft.procedures;
 
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.Level;
 
 public class MeditationGuiTimeNow11Procedure {
 	public static boolean execute(LevelAccessor world) {
-		if (world.dayTime() >= 4500 && world.dayTime() <= 5500) {
+		if ((world instanceof Level _level0 ? _level0.getDefaultClockTime() : 0) >= 4500 && (world instanceof Level _level1 ? _level1.getDefaultClockTime() : 0) <= 5500) {
 			return true;
 		}
 		return false;

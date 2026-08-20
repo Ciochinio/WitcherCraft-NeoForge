@@ -1,5 +1,5 @@
 {
-  "_fv": 79,
+  "_fv": 89,
   "_type": "potioneffect",
   "definition": {
     "effectName": "Quen Effect Timer",
@@ -8,17 +8,13 @@
       "value": -1,
       "falpha": 0.0
     },
-    "onAddedSound": {
-      "value": ""
-    },
+    "onAddedSound": "",
     "isInstant": false,
     "mobEffectCategory": "NEUTRAL",
     "renderStatusInInventory": true,
     "renderStatusInHUD": true,
     "isCuredbyHoney": false,
     "modifiers": [],
-    "onExpired": {
-      "name": "QuenEffectParticles"
-    }
+    "onExpired": "QuenEffectParticles"
   }
 }

@@ -1,5 +1,5 @@
 {
-  "_fv": 79,
+  "_fv": 89,
   "_type": "potioneffect",
   "definition": {
     "effectName": "Full Moon ",
@@ -8,9 +8,7 @@
       "value": -1,
       "falpha": 0.0
     },
-    "onAddedSound": {
-      "value": ""
-    },
+    "onAddedSound": "",
     "isInstant": false,
     "mobEffectCategory": "NEUTRAL",
     "renderStatusInInventory": true,

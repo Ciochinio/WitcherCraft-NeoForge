@@ -3,8 +3,8 @@ package net.redboltmedia.witchercraft.procedures;
 import net.redboltmedia.witchercraft.init.WitchercraftModParticleTypes;
 
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.core.particles.SimpleParticleType;
 
@@ -16,8 +16,8 @@ public class AltQuenCastProcedure {
 		double loop = 0;
 		double zRadius = 0;
 		double particleAmount = 0;
-		if (entity instanceof Player _player && !_player.level().isClientSide())
-			_player.displayClientMessage(Component.literal("ALT QUEN"), false);
+		if (entity instanceof ServerPlayer _player)
+			_player.sendSystemMessage(Component.literal("ALT QUEN"), false);
 		loop = 0;
 		particleAmount = 8;
 		xRadius = 1.5;

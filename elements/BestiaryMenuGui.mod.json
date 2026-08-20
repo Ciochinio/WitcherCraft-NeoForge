@@ -1,5 +1,5 @@
 {
-  "_fv": 79,
+  "_fv": 89,
   "_type": "gui",
   "definition": {
     "type": 0,
@@ -16,9 +16,7 @@
           "name": "button_back",
           "text": "Back",
           "isUndecorated": false,
-          "onClick": {
-            "name": "PauseMenuGuiBackButton"
-          },
+          "onClick": "PauseMenuGuiBackButton",
           "width": 46,
           "height": 20,
           "x": 375,
@@ -32,9 +30,7 @@
           "name": "imagebutton_drownerface",
           "image": "drownerface.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "DrownerGuiOpen"
-          },
+          "onClick": "DrownerGuiOpen",
           "x": 87,
           "y": 35,
           "locked": false
@@ -51,6 +47,7 @@
             "value": -12829636,
             "falpha": 0.0
           },
+          "hasShadow": false,
           "x": 87,
           "y": 17,
           "locked": false
@@ -81,12 +78,8 @@
         }
       }
     ],
-    "onOpen": {
-      "name": "PauseMenuGuiBlind"
-    },
-    "onClosed": {
-      "name": "PauseMenuGuiBlindEnd"
-    },
+    "onOpen": "PauseMenuGuiBlind",
+    "onClosed": "PauseMenuGuiBlindEnd",
     "gridSettings": {
       "sx": 18,
       "sy": 18,

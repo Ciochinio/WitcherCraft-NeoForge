@@ -1,5 +1,5 @@
 {
-  "_fv": 79,
+  "_fv": 89,
   "_type": "gui",
   "definition": {
     "type": 0,
@@ -15,9 +15,7 @@
         "data": {
           "image": "meditationhandnow24.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTimeNow24"
-          },
+          "displayCondition": "MeditationGuiTimeNow24",
           "x": 148,
           "y": 54,
           "locked": true
@@ -28,9 +26,7 @@
         "data": {
           "image": "meditationhandnow23.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTimeNow23"
-          },
+          "displayCondition": "MeditationGuiTimeNow23",
           "x": 148,
           "y": 54,
           "locked": true
@@ -41,9 +37,7 @@
         "data": {
           "image": "meditationhandnow22.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTimeNow22"
-          },
+          "displayCondition": "MeditationGuiTimeNow22",
           "x": 148,
           "y": 54,
           "locked": true
@@ -54,9 +48,7 @@
         "data": {
           "image": "meditationhandnow21.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTimeNow21"
-          },
+          "displayCondition": "MeditationGuiTimeNow21",
           "x": 148,
           "y": 54,
           "locked": true
@@ -67,9 +59,7 @@
         "data": {
           "image": "meditationhandnow20.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTimeNow20"
-          },
+          "displayCondition": "MeditationGuiTimeNow20",
           "x": 148,
           "y": 54,
           "locked": true
@@ -80,9 +70,7 @@
         "data": {
           "image": "meditationhandnow19.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTimeNow19"
-          },
+          "displayCondition": "MeditationGuiTimeNow19",
           "x": 148,
           "y": 54,
           "locked": true
@@ -93,9 +81,7 @@
         "data": {
           "image": "meditationhandnow18.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTimeNow18"
-          },
+          "displayCondition": "MeditationGuiTimeNow18",
           "x": 148,
           "y": 54,
           "locked": true
@@ -106,9 +92,7 @@
         "data": {
           "image": "meditationhandnow17.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTimeNow17"
-          },
+          "displayCondition": "MeditationGuiTimeNow17",
           "x": 148,
           "y": 54,
           "locked": true
@@ -119,9 +103,7 @@
         "data": {
           "image": "meditationhandnow16.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTimeNow16"
-          },
+          "displayCondition": "MeditationGuiTimeNow16",
           "x": 148,
           "y": 54,
           "locked": true
@@ -132,9 +114,7 @@
         "data": {
           "image": "meditationhandnow15.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTimeNow15"
-          },
+          "displayCondition": "MeditationGuiTimeNow15",
           "x": 148,
           "y": 54,
           "locked": true
@@ -145,9 +125,7 @@
         "data": {
           "image": "meditationhandnow14.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTimeNow14"
-          },
+          "displayCondition": "MeditationGuiTimeNow14",
           "x": 148,
           "y": 54,
           "locked": true
@@ -158,9 +136,7 @@
         "data": {
           "image": "meditationhandnow13.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTimeNow13"
-          },
+          "displayCondition": "MeditationGuiTimeNow13",
           "x": 148,
           "y": 54,
           "locked": true
@@ -171,9 +147,7 @@
         "data": {
           "image": "meditationhandnow12.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTimeNow12"
-          },
+          "displayCondition": "MeditationGuiTimeNow12",
           "x": 148,
           "y": 54,
           "locked": true
@@ -184,9 +158,7 @@
         "data": {
           "image": "meditationhandnow11.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTimeNow11"
-          },
+          "displayCondition": "MeditationGuiTimeNow11",
           "x": 148,
           "y": 54,
           "locked": true
@@ -197,9 +169,7 @@
         "data": {
           "image": "meditationhandnow10.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTimeNow10"
-          },
+          "displayCondition": "MeditationGuiTimeNow10",
           "x": 148,
           "y": 54,
           "locked": true
@@ -210,9 +180,7 @@
         "data": {
           "image": "meditationhandnow9.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTimeNow9"
-          },
+          "displayCondition": "MeditationGuiTimeNow9",
           "x": 148,
           "y": 54,
           "locked": true
@@ -223,9 +191,7 @@
         "data": {
           "image": "meditationhandnow8.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTimeNow8"
-          },
+          "displayCondition": "MeditationGuiTimeNow8",
           "x": 148,
           "y": 54,
           "locked": true
@@ -236,9 +202,7 @@
         "data": {
           "image": "meditationhandnow7.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTimeNow7"
-          },
+          "displayCondition": "MeditationGuiTimeNow7",
           "x": 148,
           "y": 54,
           "locked": true
@@ -249,9 +213,7 @@
         "data": {
           "image": "meditationhandnow6.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTimeNow6"
-          },
+          "displayCondition": "MeditationGuiTimeNow6",
           "x": 148,
           "y": 54,
           "locked": true
@@ -262,9 +224,7 @@
         "data": {
           "image": "meditationhandnow5.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTimeNow5"
-          },
+          "displayCondition": "MeditationGuiTimeNow5",
           "x": 148,
           "y": 54,
           "locked": true
@@ -275,9 +235,7 @@
         "data": {
           "image": "meditationhandnow4.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTimeNow4"
-          },
+          "displayCondition": "MeditationGuiTimeNow4",
           "x": 148,
           "y": 54,
           "locked": true
@@ -288,9 +246,7 @@
         "data": {
           "image": "meditationhandnow3.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTimeNow3"
-          },
+          "displayCondition": "MeditationGuiTimeNow3",
           "x": 148,
           "y": 54,
           "locked": true
@@ -301,9 +257,7 @@
         "data": {
           "image": "meditationhandnow2.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTimeNow2"
-          },
+          "displayCondition": "MeditationGuiTimeNow2",
           "x": 148,
           "y": 54,
           "locked": true
@@ -314,9 +268,7 @@
         "data": {
           "image": "meditationhandnow1.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTimeNow1"
-          },
+          "displayCondition": "MeditationGuiTimeNow1",
           "x": 148,
           "y": 54,
           "locked": true
@@ -328,9 +280,7 @@
           "name": "button_back",
           "text": "Back",
           "isUndecorated": false,
-          "onClick": {
-            "name": "PauseMenuGuiBackButton"
-          },
+          "onClick": "PauseMenuGuiBackButton",
           "width": 46,
           "height": 20,
           "x": 376,
@@ -344,9 +294,7 @@
           "name": "button_meditate",
           "text": "Meditate",
           "isUndecorated": false,
-          "onClick": {
-            "name": "MeditationGuiChangeTime"
-          },
+          "onClick": "MeditationGuiChangeTime",
           "width": 67,
           "height": 20,
           "x": 178,
@@ -369,9 +317,7 @@
         "data": {
           "image": "meditationhand24.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTime24"
-          },
+          "displayCondition": "MeditationGuiTime24",
           "x": 148,
           "y": 54,
           "locked": true
@@ -382,9 +328,7 @@
         "data": {
           "image": "meditationhand23.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTime23"
-          },
+          "displayCondition": "MeditationGuiTime23",
           "x": 148,
           "y": 54,
           "locked": true
@@ -395,9 +339,7 @@
         "data": {
           "image": "meditationhand22.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTime22"
-          },
+          "displayCondition": "MeditationGuiTime22",
           "x": 148,
           "y": 54,
           "locked": true
@@ -408,9 +350,7 @@
         "data": {
           "image": "meditationhand21.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTime21"
-          },
+          "displayCondition": "MeditationGuiTime21",
           "x": 148,
           "y": 54,
           "locked": true
@@ -421,9 +361,7 @@
         "data": {
           "image": "meditationhand20.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTime20"
-          },
+          "displayCondition": "MeditationGuiTime20",
           "x": 148,
           "y": 54,
           "locked": true
@@ -434,9 +372,7 @@
         "data": {
           "image": "meditationhand19.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTime19"
-          },
+          "displayCondition": "MeditationGuiTime19",
           "x": 148,
           "y": 54,
           "locked": true
@@ -447,9 +383,7 @@
         "data": {
           "image": "meditationhand18.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTime18"
-          },
+          "displayCondition": "MeditationGuiTime18",
           "x": 148,
           "y": 54,
           "locked": true
@@ -460,9 +394,7 @@
         "data": {
           "image": "meditationhand17.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTime17"
-          },
+          "displayCondition": "MeditationGuiTime17",
           "x": 148,
           "y": 54,
           "locked": true
@@ -473,9 +405,7 @@
         "data": {
           "image": "meditationhand16.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTime16"
-          },
+          "displayCondition": "MeditationGuiTime16",
           "x": 148,
           "y": 54,
           "locked": true
@@ -486,9 +416,7 @@
         "data": {
           "image": "meditationhand15.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTime15"
-          },
+          "displayCondition": "MeditationGuiTime15",
           "x": 148,
           "y": 54,
           "locked": true
@@ -499,9 +427,7 @@
         "data": {
           "image": "meditationhand14.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTime14"
-          },
+          "displayCondition": "MeditationGuiTime14",
           "x": 148,
           "y": 54,
           "locked": true
@@ -512,9 +438,7 @@
         "data": {
           "image": "meditationhand13.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTime13"
-          },
+          "displayCondition": "MeditationGuiTime13",
           "x": 148,
           "y": 54,
           "locked": true
@@ -525,9 +449,7 @@
         "data": {
           "image": "meditationhand12.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTime12"
-          },
+          "displayCondition": "MeditationGuiTime12",
           "x": 148,
           "y": 54,
           "locked": true
@@ -538,9 +460,7 @@
         "data": {
           "image": "meditationhand11.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTime11"
-          },
+          "displayCondition": "MeditationGuiTime11",
           "x": 148,
           "y": 54,
           "locked": true
@@ -551,9 +471,7 @@
         "data": {
           "image": "meditationhand10.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTime10"
-          },
+          "displayCondition": "MeditationGuiTime10",
           "x": 148,
           "y": 54,
           "locked": true
@@ -564,9 +482,7 @@
         "data": {
           "image": "meditationhand9.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTime9"
-          },
+          "displayCondition": "MeditationGuiTime9",
           "x": 148,
           "y": 54,
           "locked": true
@@ -577,9 +493,7 @@
         "data": {
           "image": "meditationhand8.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTime8"
-          },
+          "displayCondition": "MeditationGuiTime8",
           "x": 148,
           "y": 54,
           "locked": true
@@ -590,9 +504,7 @@
         "data": {
           "image": "meditationhand7.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTime7"
-          },
+          "displayCondition": "MeditationGuiTime7",
           "x": 148,
           "y": 54,
           "locked": true
@@ -603,9 +515,7 @@
         "data": {
           "image": "meditationhand6.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTime6"
-          },
+          "displayCondition": "MeditationGuiTime6",
           "x": 148,
           "y": 54,
           "locked": true
@@ -616,9 +526,7 @@
         "data": {
           "image": "meditationhand5.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTime5"
-          },
+          "displayCondition": "MeditationGuiTime5",
           "x": 148,
           "y": 54,
           "locked": true
@@ -629,9 +537,7 @@
         "data": {
           "image": "meditationhand4.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTime4"
-          },
+          "displayCondition": "MeditationGuiTime4",
           "x": 148,
           "y": 54,
           "locked": true
@@ -642,9 +548,7 @@
         "data": {
           "image": "meditationhand3.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTime3"
-          },
+          "displayCondition": "MeditationGuiTime3",
           "x": 148,
           "y": 54,
           "locked": true
@@ -655,9 +559,7 @@
         "data": {
           "image": "meditationhand2.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTime2"
-          },
+          "displayCondition": "MeditationGuiTime2",
           "x": 148,
           "y": 54,
           "locked": true
@@ -668,9 +570,7 @@
         "data": {
           "image": "meditationhand1.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "MeditationGuiTime1"
-          },
+          "displayCondition": "MeditationGuiTime1",
           "x": 148,
           "y": 54,
           "locked": true

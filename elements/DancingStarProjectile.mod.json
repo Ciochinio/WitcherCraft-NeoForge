@@ -1,16 +1,13 @@
 {
-  "_fv": 79,
+  "_fv": 89,
   "_type": "projectile",
   "definition": {
-    "projectileItem": {
-      "value": "CUSTOM:DancingStar"
-    },
+    "projectileItem": "CUSTOM:DancingStar",
     "showParticles": false,
-    "actionSound": {
-      "value": "entity.arrow.shoot"
-    },
+    "actionSound": "entity.arrow.shoot",
     "igniteFire": false,
     "disableGravity": false,
+    "disableDiscarding": false,
     "power": 0.7,
     "damage": 5.0,
     "knockback": 5,
@@ -18,11 +15,7 @@
     "customModelTexture": "",
     "modelWidth": 0.5,
     "modelHeight": 0.5,
-    "onHitsBlock": {
-      "name": "DancingStarExplosion"
-    },
-    "onHitsEntity": {
-      "name": "DancingStarExplosion"
-    }
+    "onHitsBlock": "DancingStarExplosion",
+    "onHitsEntity": "DancingStarExplosion"
   }
 }

@@ -1,5 +1,5 @@
 {
-  "_fv": 79,
+  "_fv": 89,
   "_type": "gui",
   "definition": {
     "type": 0,
@@ -16,9 +16,7 @@
           "name": "button_yrden",
           "text": "YRDEN",
           "isUndecorated": false,
-          "onClick": {
-            "name": "YrdenSignChoose"
-          },
+          "onClick": "YrdenSignChoose",
           "width": 51,
           "height": 20,
           "x": 69,
@@ -32,9 +30,7 @@
           "name": "button_quen",
           "text": "QUEN",
           "isUndecorated": false,
-          "onClick": {
-            "name": "QuenSignChoose"
-          },
+          "onClick": "QuenSignChoose",
           "width": 46,
           "height": 20,
           "x": 128,
@@ -48,9 +44,7 @@
           "name": "button_igni",
           "text": "IGNI",
           "isUndecorated": false,
-          "onClick": {
-            "name": "IgniSignChoose"
-          },
+          "onClick": "IgniSignChoose",
           "width": 46,
           "height": 20,
           "x": 189,
@@ -64,9 +58,7 @@
           "name": "button_axii",
           "text": "AXII",
           "isUndecorated": false,
-          "onClick": {
-            "name": "AxiiSignChoose"
-          },
+          "onClick": "AxiiSignChoose",
           "width": 46,
           "height": 20,
           "x": 249,
@@ -80,9 +72,7 @@
           "name": "button_aard",
           "text": "AARD",
           "isUndecorated": false,
-          "onClick": {
-            "name": "AardSignChoose"
-          },
+          "onClick": "AardSignChoose",
           "width": 46,
           "height": 20,
           "x": 308,

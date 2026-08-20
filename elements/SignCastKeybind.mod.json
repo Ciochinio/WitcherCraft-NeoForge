@@ -1,15 +1,11 @@
 {
-  "_fv": 79,
+  "_fv": 89,
   "_type": "keybind",
   "definition": {
     "triggerKey": "R",
     "keyBindingName": "Sign Cast Keybind",
     "keyBindingCategoryKey": "witchercraft",
-    "onKeyPressed": {
-      "name": "SignCastKeyPress"
-    },
-    "onKeyReleased": {
-      "name": "SignCastKeyRelease"
-    }
+    "onKeyPressed": "SignCastKeyPress",
+    "onKeyReleased": "SignCastKeyRelease"
   }
 }

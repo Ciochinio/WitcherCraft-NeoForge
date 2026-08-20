@@ -39,7 +39,7 @@ public class PassiveStaminaRegenStartProcedure {
 				_vars.markSyncDirty();
 			}
 		}
-		if (entity instanceof LivingEntity _livEnt2 && _livEnt2.hasEffect(WitchercraftModMobEffects.WEREWOLF_DECOCTION_EFFECT) && !world.getLevelData().isRaining() && !(world instanceof Level _lvl4 && _lvl4.isBrightOutside())) {
+		if (entity instanceof LivingEntity _livEnt2 && _livEnt2.hasEffect(WitchercraftModMobEffects.WEREWOLF_DECOCTION_EFFECT) && !(world instanceof Level _lvl3 && _lvl3.isRaining()) && !(world instanceof Level _lvl4 && _lvl4.isBrightOutside())) {
 			{
 				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 				_vars.witchercraftPassiveStaminaRegeneration = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPassiveStaminaRegeneration + 1;

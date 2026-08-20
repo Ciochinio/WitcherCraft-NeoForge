@@ -1,5 +1,5 @@
 {
-  "_fv": 79,
+  "_fv": 89,
   "_type": "gui",
   "definition": {
     "type": 0,
@@ -16,9 +16,7 @@
           "name": "button_back",
           "text": "Back",
           "isUndecorated": false,
-          "onClick": {
-            "name": "PauseMenuGuiBackButton"
-          },
+          "onClick": "PauseMenuGuiBackButton",
           "width": 46,
           "height": 20,
           "x": 375,
@@ -27,12 +25,8 @@
         }
       }
     ],
-    "onOpen": {
-      "name": "PauseMenuGuiBlindEnd"
-    },
-    "onClosed": {
-      "name": "PauseMenuGuiBlindEnd"
-    },
+    "onOpen": "PauseMenuGuiBlindEnd",
+    "onClosed": "PauseMenuGuiBlindEnd",
     "gridSettings": {
       "sx": 18,
       "sy": 18,

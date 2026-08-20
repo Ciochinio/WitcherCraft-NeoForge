@@ -1,5 +1,5 @@
 {
-  "_fv": 79,
+  "_fv": 89,
   "_type": "gui",
   "definition": {
     "type": 1,
@@ -16,9 +16,7 @@
           "name": "button_brew",
           "text": "Brew",
           "isUndecorated": false,
-          "onClick": {
-            "name": "AlchemyMenuBrewButton"
-          },
+          "onClick": "AlchemyMenuBrewButton",
           "width": 46,
           "height": 20,
           "x": 205,
@@ -32,9 +30,7 @@
           "name": "button_back",
           "text": "Back",
           "isUndecorated": false,
-          "onClick": {
-            "name": "PauseMenuGuiBackButton"
-          },
+          "onClick": "PauseMenuGuiBackButton",
           "width": 46,
           "height": 20,
           "x": 376,
@@ -194,9 +190,7 @@
           "name": "button_potions",
           "text": "Potions",
           "isUndecorated": false,
-          "onClick": {
-            "name": "AlchemyGuiPotionsOpen"
-          },
+          "onClick": "AlchemyGuiPotionsOpen",
           "width": 61,
           "height": 20,
           "x": 34,
@@ -231,9 +225,7 @@
         }
       }
     ],
-    "onClosed": {
-      "name": "PauseMenuGuiBlindEnd"
-    },
+    "onClosed": "PauseMenuGuiBlindEnd",
     "gridSettings": {
       "sx": 18,
       "sy": 18,

@@ -12,6 +12,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.network.chat.Component;
 
 import javax.annotation.Nullable;
@@ -42,8 +43,8 @@ public class SignCastHoldProcedure {
 				SignCastKeyReleaseProcedure.execute(world, x, y, z, entity);
 				if (entity instanceof LivingEntity _entity)
 					_entity.removeEffect(WitchercraftModMobEffects.SIGN_HOLD);
-				if (entity instanceof Player _player && !_player.level().isClientSide())
-					_player.displayClientMessage(Component.literal("Not enough stamina hold "), true);
+				if (entity instanceof ServerPlayer _player)
+					_player.sendSystemMessage(Component.literal("Not enough stamina hold "), true);
 			}
 		}
 	}

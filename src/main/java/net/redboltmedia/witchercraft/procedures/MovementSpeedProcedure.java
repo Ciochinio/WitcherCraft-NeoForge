@@ -12,7 +12,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import javax.annotation.Nullable;
 
@@ -33,26 +33,26 @@ public class MovementSpeedProcedure {
 		double sumMovementSpeed = 0;
 		if (entity instanceof LivingEntity _livEnt0 && _livEnt0.hasEffect(WitchercraftModMobEffects.SIGN_HOLD)) {
 			if (entity instanceof LivingEntity _entity) {
-				AttributeModifier modifier = new AttributeModifier(ResourceLocation.parse("witchercraft:signcast"), (0 - 0.5), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+				AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:signcast"), (0 - 0.5), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
 				if (!_entity.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(modifier.id())) {
 					_entity.getAttribute(Attributes.MOVEMENT_SPEED).addPermanentModifier(modifier);
 				}
 			}
 		} else {
 			if (entity instanceof LivingEntity _entity) {
-				_entity.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(ResourceLocation.parse("witchercraft:signcast"));
+				_entity.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(Identifier.parse("witchercraft:signcast"));
 			}
 		}
 		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesFleetFooted == true) {
 			if (entity instanceof LivingEntity _entity) {
-				AttributeModifier modifier = new AttributeModifier(ResourceLocation.parse("witchercraft:fleetfooted"), 0.15, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+				AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:fleetfooted"), 0.15, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
 				if (!_entity.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(modifier.id())) {
 					_entity.getAttribute(Attributes.MOVEMENT_SPEED).addTransientModifier(modifier);
 				}
 			}
 		} else {
 			if (entity instanceof LivingEntity _entity) {
-				_entity.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(ResourceLocation.parse("witchercraft:fleetfooted"));
+				_entity.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(Identifier.parse("witchercraft:fleetfooted"));
 			}
 		}
 		{

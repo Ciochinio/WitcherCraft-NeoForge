@@ -8,6 +8,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.network.chat.Component;
 
 public class SignCastKeyPressProcedure {
@@ -20,8 +21,8 @@ public class SignCastKeyPressProcedure {
 				_vars.witchercraftSignNoCast = true;
 				_vars.markSyncDirty();
 			}
-			if (entity instanceof Player _player && !_player.level().isClientSide())
-				_player.displayClientMessage(Component.literal("CANT CAST YET"), true);
+			if (entity instanceof ServerPlayer _player)
+				_player.sendSystemMessage(Component.literal("CANT CAST YET"), true);
 		} else {
 			{
 				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
@@ -67,8 +68,8 @@ public class SignCastKeyPressProcedure {
 							_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.SIGN_COOLDOWN, 40, 0));
 					}
 				} else {
-					if (entity instanceof Player _player && !_player.level().isClientSide())
-						_player.displayClientMessage(Component.literal("Not enough stamina"), true);
+					if (entity instanceof ServerPlayer _player)
+						_player.sendSystemMessage(Component.literal("Not enough stamina"), true);
 					if (entity instanceof LivingEntity _entity)
 						_entity.removeEffect(WitchercraftModMobEffects.SIGN_HOLD);
 				}

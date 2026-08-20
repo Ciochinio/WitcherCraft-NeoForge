@@ -9,6 +9,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.server.level.ServerLevel;
 
 public class BleedEffectStartProcedure {
 	public static void execute(LevelAccessor world, Entity entity) {
@@ -19,7 +20,12 @@ public class BleedEffectStartProcedure {
 				if (!(entity instanceof LivingEntity _livEnt1 && _livEnt1.hasEffect(WitchercraftModMobEffects.BLEED_COOLDOWN))) {
 					if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
 						_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.BLEED_COOLDOWN, 20, 0));
-					entity.hurt(new DamageSource(world.holderOrThrow(DamageTypes.MAGIC)), 1);
+					{
+						Entity _ent = entity;
+						if (_ent.level() instanceof ServerLevel _serverLevel) {
+							_ent.hurtServer(_serverLevel, new DamageSource(world.holderOrThrow(DamageTypes.MAGIC)), 1);
+						}
+					}
 				}
 				BleedEffectStartProcedure.execute(world, entity);
 			});

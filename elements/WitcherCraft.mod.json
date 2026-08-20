@@ -1,11 +1,9 @@
 {
-  "_fv": 79,
+  "_fv": 89,
   "_type": "tab",
   "definition": {
     "name": "Witcher Craft",
-    "icon": {
-      "value": "CUSTOM:Swallow"
-    },
+    "icon": "CUSTOM:Swallow",
     "showSearch": false
   }
 }

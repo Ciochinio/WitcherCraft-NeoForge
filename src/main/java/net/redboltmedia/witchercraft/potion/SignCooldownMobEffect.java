@@ -11,7 +11,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 @EventBusSubscriber
 public class SignCooldownMobEffect extends MobEffect {
@@ -28,7 +28,7 @@ public class SignCooldownMobEffect extends MobEffect {
 			}
 
 			@Override
-			public boolean renderInventoryText(MobEffectInstance instance, AbstractContainerScreen<?> screen, GuiGraphics guiGraphics, int x, int y, int blitOffset) {
+			public boolean renderInventoryText(MobEffectInstance instance, AbstractContainerScreen<?> screen, GuiGraphicsExtractor guiGraphics, int x, int y, int blitOffset) {
 				return false;
 			}
 		}, WitchercraftModMobEffects.SIGN_COOLDOWN.get());

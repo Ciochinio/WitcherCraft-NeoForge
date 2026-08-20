@@ -13,8 +13,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.tags.TagKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.Identifier;
 import net.minecraft.core.registries.Registries;
 
 import javax.annotation.Nullable;
@@ -36,8 +36,8 @@ public class BeastOilHitProcedure {
 		if (entity == null || sourceentity == null)
 			return;
 		if ((sourceentity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY)
-				.getEnchantmentLevel(world.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(ResourceKey.create(Registries.ENCHANTMENT, ResourceLocation.parse("witchercraft:beast_oil_enchantment")))) != 0
-				&& entity.getType().is(TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.parse("witchercraft:beast")))) {
+				.getEnchantmentLevel(world.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(ResourceKey.create(Registries.ENCHANTMENT, Identifier.parse("witchercraft:beast_oil_enchantment")))) != 0
+				&& entity.is(TagKey.create(Registries.ENTITY_TYPE, Identifier.parse("witchercraft:beast")))) {
 			if (sourceentity instanceof LivingEntity _entity && !_entity.level().isClientSide())
 				_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.CORRECT_OIL, 10, 0, false, false));
 		}

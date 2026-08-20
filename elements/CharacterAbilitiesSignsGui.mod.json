@@ -1,5 +1,5 @@
 {
-  "_fv": 79,
+  "_fv": 89,
   "_type": "gui",
   "definition": {
     "type": 0,
@@ -16,9 +16,7 @@
           "name": "button_back",
           "text": "Back",
           "isUndecorated": false,
-          "onClick": {
-            "name": "PauseMenuGuiOpen"
-          },
+          "onClick": "PauseMenuGuiOpen",
           "width": 46,
           "height": 20,
           "x": 375,
@@ -32,12 +30,8 @@
           "name": "imagebutton_farreachingaard",
           "image": "farreachingaard.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "FarReachingAardEffect"
-          },
-          "displayCondition": {
-            "name": "FarReachingAardShow"
-          },
+          "onClick": "FarReachingAardEffect",
+          "displayCondition": "FarReachingAardShow",
           "x": 123,
           "y": 44,
           "locked": false
@@ -49,12 +43,8 @@
           "name": "imagebutton_aardintensity",
           "image": "aardintensity.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "AardIntensityEffect"
-          },
-          "displayCondition": {
-            "name": "AardIntensityShow"
-          },
+          "onClick": "AardIntensityEffect",
+          "displayCondition": "AardIntensityShow",
           "x": 123,
           "y": 107,
           "locked": false
@@ -66,12 +56,8 @@
           "name": "imagebutton_shockwave",
           "image": "shockwave.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "ShockWaveEffect"
-          },
-          "displayCondition": {
-            "name": "ShockWaveShow"
-          },
+          "onClick": "ShockWaveEffect",
+          "displayCondition": "ShockWaveShow",
           "x": 123,
           "y": 161,
           "locked": false
@@ -83,12 +69,8 @@
           "name": "imagebutton_firestream",
           "image": "firestream.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "FirestreamEffect"
-          },
-          "displayCondition": {
-            "name": "FirestreamShow"
-          },
+          "onClick": "FirestreamEffect",
+          "displayCondition": "FirestreamShow",
           "x": 159,
           "y": 44,
           "locked": false
@@ -100,12 +82,8 @@
           "name": "imagebutton_igniintensity",
           "image": "igniintensity.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "IgniIntensityEffect"
-          },
-          "displayCondition": {
-            "name": "IgniIntensityShow"
-          },
+          "onClick": "IgniIntensityEffect",
+          "displayCondition": "IgniIntensityShow",
           "x": 159,
           "y": 107,
           "locked": false
@@ -117,12 +95,8 @@
           "name": "imagebutton_pyromaniac",
           "image": "pyromaniac.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "PyromaniacEffect"
-          },
-          "displayCondition": {
-            "name": "PyromaniacShow"
-          },
+          "onClick": "PyromaniacEffect",
+          "displayCondition": "PyromaniacShow",
           "x": 159,
           "y": 161,
           "locked": false
@@ -134,12 +108,8 @@
           "name": "imagebutton_sustainedglyphs",
           "image": "sustainedglyphs.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "SustainedGlyphsEffect"
-          },
-          "displayCondition": {
-            "name": "SustainedGlyphsShow"
-          },
+          "onClick": "SustainedGlyphsEffect",
+          "displayCondition": "SustainedGlyphsShow",
           "x": 195,
           "y": 44,
           "locked": false
@@ -151,12 +121,8 @@
           "name": "imagebutton_yrdenintensity",
           "image": "yrdenintensity.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "YrdenIntensityEffect"
-          },
-          "displayCondition": {
-            "name": "YrdenIntensityShow"
-          },
+          "onClick": "YrdenIntensityEffect",
+          "displayCondition": "YrdenIntensityShow",
           "x": 195,
           "y": 107,
           "locked": false
@@ -168,12 +134,8 @@
           "name": "imagebutton_magictrap",
           "image": "magictrap.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "MagicTrapEffect"
-          },
-          "displayCondition": {
-            "name": "MagicTrapShow"
-          },
+          "onClick": "MagicTrapEffect",
+          "displayCondition": "MagicTrapShow",
           "x": 195,
           "y": 161,
           "locked": false
@@ -185,12 +147,8 @@
           "name": "imagebutton_explodingshield",
           "image": "exploadingshield.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "ExplodingShieldEffect"
-          },
-          "displayCondition": {
-            "name": "ExploadingShildshow"
-          },
+          "onClick": "ExplodingShieldEffect",
+          "displayCondition": "ExploadingShildshow",
           "x": 231,
           "y": 44,
           "locked": false
@@ -202,12 +160,8 @@
           "name": "imagebutton_quenintensity",
           "image": "quenintensity.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "QuenIntensityEffect"
-          },
-          "displayCondition": {
-            "name": "QuenIntensityShow"
-          },
+          "onClick": "QuenIntensityEffect",
+          "displayCondition": "QuenIntensityShow",
           "x": 231,
           "y": 107,
           "locked": false
@@ -219,12 +173,8 @@
           "name": "imagebutton_quendischarge",
           "image": "quendischarge.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "QuenDiscahrgeEffect"
-          },
-          "displayCondition": {
-            "name": "QuenDiscahrgeShow"
-          },
+          "onClick": "QuenDiscahrgeEffect",
+          "displayCondition": "QuenDiscahrgeShow",
           "x": 231,
           "y": 161,
           "locked": false
@@ -236,12 +186,8 @@
           "name": "imagebutton_delusion",
           "image": "delusion.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "DelusionEffect"
-          },
-          "displayCondition": {
-            "name": "DelusionShow"
-          },
+          "onClick": "DelusionEffect",
+          "displayCondition": "DelusionShow",
           "x": 267,
           "y": 44,
           "locked": false
@@ -253,12 +199,8 @@
           "name": "imagebutton_axiiintensity",
           "image": "axiiintensity.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "AxiiIntensityEffect"
-          },
-          "displayCondition": {
-            "name": "AxiiIntensityShow"
-          },
+          "onClick": "AxiiIntensityEffect",
+          "displayCondition": "AxiiIntensityShow",
           "x": 267,
           "y": 107,
           "locked": false
@@ -270,12 +212,8 @@
           "name": "imagebutton_domination",
           "image": "domination.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "DominationEffect"
-          },
-          "displayCondition": {
-            "name": "DominationShow"
-          },
+          "onClick": "DominationEffect",
+          "displayCondition": "DominationShow",
           "x": 267,
           "y": 161,
           "locked": false
@@ -287,9 +225,7 @@
           "name": "button_general",
           "text": "General",
           "isUndecorated": false,
-          "onClick": {
-            "name": "CharaterAbilitesGeneralGuiOpen"
-          },
+          "onClick": "CharaterAbilitesGeneralGuiOpen",
           "width": 61,
           "height": 20,
           "x": 51,
@@ -303,9 +239,7 @@
           "name": "button_combat",
           "text": " Combat",
           "isUndecorated": false,
-          "onClick": {
-            "name": "CharacterAbilitiesCombatGuiOpen"
-          },
+          "onClick": "CharacterAbilitiesCombatGuiOpen",
           "width": 61,
           "height": 20,
           "x": 51,
@@ -319,9 +253,7 @@
           "name": "button_alchemy",
           "text": "Alchemy",
           "isUndecorated": false,
-          "onClick": {
-            "name": "CharacterAbilitiesAlchemyGuiOpen"
-          },
+          "onClick": "CharacterAbilitiesAlchemyGuiOpen",
           "width": 61,
           "height": 20,
           "x": 51,
@@ -335,9 +267,7 @@
           "name": "button_signs",
           "text": " Signs ",
           "isUndecorated": false,
-          "onClick": {
-            "name": "CharacterAbilitiesSignsGuiOpen"
-          },
+          "onClick": "CharacterAbilitiesSignsGuiOpen",
           "width": 61,
           "height": 20,
           "x": 51,
@@ -727,6 +657,7 @@
             "value": -12829636,
             "falpha": 0.0
           },
+          "hasShadow": false,
           "x": 312,
           "y": 62,
           "locked": false
@@ -744,6 +675,7 @@
             "value": -12829636,
             "falpha": 0.0
           },
+          "hasShadow": false,
           "x": 312,
           "y": 71,
           "locked": false

@@ -5,7 +5,6 @@ import net.redboltmedia.witchercraft.init.WitchercraftModMobEffects;
 import net.redboltmedia.witchercraft.WitchercraftMod;
 
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -13,7 +12,9 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.Mth;
 import net.minecraft.tags.TagKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.resources.Identifier;
 import net.minecraft.network.chat.Component;
 import net.minecraft.core.registries.Registries;
 
@@ -24,32 +25,37 @@ public class DamageCalculatorProcedure {
 		double critChanceRoll = 0;
 		critChanceRoll = Mth.nextInt(RandomSource.create(), 1, 100);
 		if (sourceentity instanceof LivingEntity _livEnt1 && _livEnt1.hasEffect(WitchercraftModMobEffects.DEV_LOG)) {
-			if (sourceentity instanceof Player _player && !_player.level().isClientSide())
-				_player.displayClientMessage(Component.literal(("crit roll:" + critChanceRoll)), false);
-			if (sourceentity instanceof Player _player && !_player.level().isClientSide())
-				_player.displayClientMessage(Component.literal(("crit chance:" + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftCritChance)), false);
+			if (sourceentity instanceof ServerPlayer _player)
+				_player.sendSystemMessage(Component.literal(("crit roll:" + critChanceRoll)), false);
+			if (sourceentity instanceof ServerPlayer _player)
+				_player.sendSystemMessage(Component.literal(("crit chance:" + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftCritChance)), false);
 		}
 		if (critChanceRoll <= sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftCritChance) {
-			if (!entity.getType().is(TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.parse("minecraft:enderdragon")))) {
+			if (!entity.is(TagKey.create(Registries.ENTITY_TYPE, Identifier.parse("minecraft:enderdragon")))) {
 				if (sourceentity instanceof LivingEntity _livEnt5 && _livEnt5.hasEffect(WitchercraftModMobEffects.DEV_LOG)) {
-					if (sourceentity instanceof Player _player && !_player.level().isClientSide())
-						_player.displayClientMessage(Component.literal(("BAZA"
+					if (sourceentity instanceof ServerPlayer _player)
+						_player.sendSystemMessage(Component.literal(("BAZA"
 								+ (amount + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAdditionalDamage) * (1 + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftIncreasedDamage * 0.01))),
 								false);
-					if (sourceentity instanceof Player _player && !_player.level().isClientSide())
-						_player.displayClientMessage(
+					if (sourceentity instanceof ServerPlayer _player)
+						_player.sendSystemMessage(
 								Component.literal(("CRIT!" + (amount + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAdditionalDamage)
 										* (1 + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftIncreasedDamage * 0.01) * sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftCritDamage * 0.01)),
 								false);
-					if (sourceentity instanceof Player _player && !_player.level().isClientSide())
-						_player.displayClientMessage(Component.literal(("Steal:"
+					if (sourceentity instanceof ServerPlayer _player)
+						_player.sendSystemMessage(Component.literal(("Steal:"
 								+ (amount + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAdditionalDamage) * (1 + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftIncreasedDamage * 0.01)
 										* sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftCritDamage * 0.01 * sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftLifeSteal * 0.01)),
 								false);
 				}
 				WitchercraftMod.queueServerWork(1, () -> {
-					entity.hurt(new DamageSource(world.holderOrThrow(DamageTypes.PLAYER_ATTACK)), (float) ((amount + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAdditionalDamage)
-							* (1 + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftIncreasedDamage * 0.01) * sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftCritDamage * 0.01));
+					{
+						Entity _ent = entity;
+						if (_ent.level() instanceof ServerLevel _serverLevel) {
+							_ent.hurtServer(_serverLevel, new DamageSource(world.holderOrThrow(DamageTypes.PLAYER_ATTACK)), (float) ((amount + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAdditionalDamage)
+									* (1 + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftIncreasedDamage * 0.01) * sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftCritDamage * 0.01));
+						}
+					}
 					if (sourceentity instanceof LivingEntity _entity)
 						_entity.setHealth((float) ((sourceentity instanceof LivingEntity _livEnt ? _livEnt.getHealth() : -1)
 								+ (amount + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAdditionalDamage) * (1 + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftIncreasedDamage * 0.01)
@@ -58,21 +64,26 @@ public class DamageCalculatorProcedure {
 			}
 		} else {
 			if (sourceentity instanceof LivingEntity _livEnt14 && _livEnt14.hasEffect(WitchercraftModMobEffects.DEV_LOG)) {
-				if (sourceentity instanceof Player _player && !_player.level().isClientSide())
-					_player.displayClientMessage(Component.literal(("Baza" + amount)), false);
-				if (sourceentity instanceof Player _player && !_player.level().isClientSide())
-					_player.displayClientMessage(Component.literal(("Additional Flat" + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAdditionalDamage)), false);
-				if (sourceentity instanceof Player _player && !_player.level().isClientSide())
-					_player.displayClientMessage(Component.literal(("Combined Damage"
+				if (sourceentity instanceof ServerPlayer _player)
+					_player.sendSystemMessage(Component.literal(("Baza" + amount)), false);
+				if (sourceentity instanceof ServerPlayer _player)
+					_player.sendSystemMessage(Component.literal(("Additional Flat" + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAdditionalDamage)), false);
+				if (sourceentity instanceof ServerPlayer _player)
+					_player.sendSystemMessage(Component.literal(("Combined Damage"
 							+ (amount + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAdditionalDamage) * (1 + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftIncreasedDamage * 0.01) * 1)),
 							false);
-				if (sourceentity instanceof Player _player && !_player.level().isClientSide())
-					_player.displayClientMessage(Component.literal(("Steal:" + (amount + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAdditionalDamage)
+				if (sourceentity instanceof ServerPlayer _player)
+					_player.sendSystemMessage(Component.literal(("Steal:" + (amount + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAdditionalDamage)
 							* (1 + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftIncreasedDamage * 0.01) * sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftLifeSteal * 0.01)), false);
 			}
 			WitchercraftMod.queueServerWork(1, () -> {
-				entity.hurt(new DamageSource(world.holderOrThrow(DamageTypes.PLAYER_ATTACK)),
-						(float) ((amount + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAdditionalDamage) * (1 + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftIncreasedDamage * 0.01) * 1));
+				{
+					Entity _ent = entity;
+					if (_ent.level() instanceof ServerLevel _serverLevel) {
+						_ent.hurtServer(_serverLevel, new DamageSource(world.holderOrThrow(DamageTypes.PLAYER_ATTACK)), (float) ((amount + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAdditionalDamage)
+								* (1 + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftIncreasedDamage * 0.01) * 1));
+					}
+				}
 				if (sourceentity instanceof LivingEntity _entity)
 					_entity.setHealth((float) ((sourceentity instanceof LivingEntity _livEnt ? _livEnt.getHealth() : -1) + (amount + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAdditionalDamage)
 							* (1 + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftIncreasedDamage * 0.01) * sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftLifeSteal * 0.01));

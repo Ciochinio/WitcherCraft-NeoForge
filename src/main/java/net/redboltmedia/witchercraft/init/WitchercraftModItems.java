@@ -167,6 +167,6 @@ public class WitchercraftModItems {
 	// Start of user code block custom items
 	// End of user code block custom items
 	private static <I extends Item> DeferredItem<I> register(String name, Function<Item.Properties, ? extends I> supplier) {
-		return REGISTRY.registerItem(name, supplier, new Item.Properties());
+		return REGISTRY.registerItem(name, supplier, Item.Properties::new);
 	}
 }

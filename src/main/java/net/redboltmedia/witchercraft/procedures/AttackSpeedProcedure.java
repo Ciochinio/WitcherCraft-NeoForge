@@ -12,7 +12,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import javax.annotation.Nullable;
 
@@ -34,14 +34,14 @@ public class AttackSpeedProcedure {
 		double sumMovementSpeed = 0;
 		if (entity instanceof LivingEntity _livEnt0 && _livEnt0.hasEffect(WitchercraftModMobEffects.BLIZZARD_EFFECT)) {
 			if (entity instanceof LivingEntity _entity) {
-				AttributeModifier modifier = new AttributeModifier(ResourceLocation.parse("witchercraft:blizzard"), 0.55, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+				AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:blizzard"), 0.55, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
 				if (!_entity.getAttribute(Attributes.ATTACK_SPEED).hasModifier(modifier.id())) {
 					_entity.getAttribute(Attributes.ATTACK_SPEED).addTransientModifier(modifier);
 				}
 			}
 		} else {
 			if (entity instanceof LivingEntity _entity) {
-				_entity.getAttribute(Attributes.ATTACK_SPEED).removeModifier(ResourceLocation.parse("witchercraft:blizzard"));
+				_entity.getAttribute(Attributes.ATTACK_SPEED).removeModifier(Identifier.parse("witchercraft:blizzard"));
 			}
 		}
 		{

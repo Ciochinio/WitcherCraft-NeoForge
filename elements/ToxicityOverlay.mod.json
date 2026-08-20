@@ -1,5 +1,5 @@
 {
-  "_fv": 79,
+  "_fv": 89,
   "_type": "overlay",
   "definition": {
     "priority": "NORMAL",
@@ -9,9 +9,7 @@
         "data": {
           "image": "arrowforword.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "Tox1"
-          },
+          "displayCondition": "Tox1",
           "anchorPoint": "CENTER",
           "x": 95,
           "y": 162,
@@ -23,9 +21,7 @@
         "data": {
           "image": "arrowback.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "Tox2"
-          },
+          "displayCondition": "Tox2",
           "anchorPoint": "CENTER",
           "x": 152,
           "y": 162,
@@ -37,9 +33,7 @@
         "data": {
           "image": "arrowforword.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "Tox3"
-          },
+          "displayCondition": "Tox3",
           "anchorPoint": "CENTER",
           "x": 210,
           "y": 159,
@@ -51,9 +45,7 @@
         "data": {
           "image": "arrowback.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "Tox4"
-          },
+          "displayCondition": "Tox4",
           "anchorPoint": "CENTER",
           "x": 263,
           "y": 158,
@@ -65,9 +57,7 @@
         "data": {
           "image": "arrowforword.png",
           "use1Xscale": false,
-          "displayCondition": {
-            "name": "Tox5"
-          },
+          "displayCondition": "Tox5",
           "anchorPoint": "CENTER",
           "x": 318,
           "y": 155,

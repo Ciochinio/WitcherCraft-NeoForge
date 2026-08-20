@@ -7,8 +7,8 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.bus.api.Event;
 
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.network.chat.Component;
 
 import javax.annotation.Nullable;
@@ -29,8 +29,8 @@ public class CharacterExperienceCalculatorProcedure {
 	private static void execute(@Nullable Event event, Entity entity, double amount) {
 		if (entity == null)
 			return;
-		if (entity instanceof Player _player && !_player.level().isClientSide())
-			_player.displayClientMessage(Component.literal(("xp  " + amount)), false);
+		if (entity instanceof ServerPlayer _player)
+			_player.sendSystemMessage(Component.literal(("xp  " + amount)), false);
 		{
 			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 			_vars.wichercraftPlayerExperience = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).wichercraftPlayerExperience + amount;
@@ -43,8 +43,8 @@ public class CharacterExperienceCalculatorProcedure {
 				_vars.wichercraftPlayerLevel = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).wichercraftPlayerLevel + 1;
 				_vars.markSyncDirty();
 			}
-			if (entity instanceof Player _player && !_player.level().isClientSide())
-				_player.displayClientMessage(Component.literal(("poziom  " + entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).wichercraftPlayerLevel)), false);
+			if (entity instanceof ServerPlayer _player)
+				_player.sendSystemMessage(Component.literal(("poziom  " + entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).wichercraftPlayerLevel)), false);
 			if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).wichercraftPlayerLevel >= 21) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);

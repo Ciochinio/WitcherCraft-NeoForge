@@ -1,5 +1,5 @@
 {
-  "_fv": 79,
+  "_fv": 89,
   "_type": "gui",
   "definition": {
     "type": 0,
@@ -16,12 +16,8 @@
           "name": "imagebutton_muslememory",
           "image": "muslememory.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "MuscleMemoryEffect"
-          },
-          "displayCondition": {
-            "name": "MuscleMemoryShow"
-          },
+          "onClick": "MuscleMemoryEffect",
+          "displayCondition": "MuscleMemoryShow",
           "x": 123,
           "y": 53,
           "locked": false
@@ -33,12 +29,8 @@
           "name": "imagebutton_preciseblows",
           "image": "preciseblows.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "PreciseBlowsEffect"
-          },
-          "displayCondition": {
-            "name": "PreciseBlowsShow"
-          },
+          "onClick": "PreciseBlowsEffect",
+          "displayCondition": "PreciseBlowsShow",
           "x": 123,
           "y": 107,
           "locked": false
@@ -50,12 +42,8 @@
           "name": "imagebutton_cripplingstrikes",
           "image": "cripplingstrikes.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "CrippllingStrikesEffect"
-          },
-          "displayCondition": {
-            "name": "CrippllingStrikesShow"
-          },
+          "onClick": "CrippllingStrikesEffect",
+          "displayCondition": "CrippllingStrikesShow",
           "x": 123,
           "y": 152,
           "locked": false
@@ -67,12 +55,8 @@
           "name": "imagebutton_strengthtraining",
           "image": "strengthtraining.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "StrengthTrainingEffect"
-          },
-          "displayCondition": {
-            "name": "StrengthTrainingShow"
-          },
+          "onClick": "StrengthTrainingEffect",
+          "displayCondition": "StrengthTrainingShow",
           "x": 159,
           "y": 53,
           "locked": false
@@ -84,12 +68,8 @@
           "name": "imagebutton_crushingblows",
           "image": "crushingblows.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "CrushingBlowsEffect"
-          },
-          "displayCondition": {
-            "name": "CrushingBlowsShow"
-          },
+          "onClick": "CrushingBlowsEffect",
+          "displayCondition": "CrushingBlowsShow",
           "x": 159,
           "y": 107,
           "locked": false
@@ -101,12 +81,8 @@
           "name": "imagebutton_sunderarmor",
           "image": "sunderarmor.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "SunderArmorEffect"
-          },
-          "displayCondition": {
-            "name": "SunderArmorShow"
-          },
+          "onClick": "SunderArmorEffect",
+          "displayCondition": "SunderArmorShow",
           "x": 159,
           "y": 152,
           "locked": false
@@ -118,12 +94,8 @@
           "name": "imagebutton_fleetfooted",
           "image": "fleetfooted.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "FleetFootedEffect"
-          },
-          "displayCondition": {
-            "name": "FleetFootedShow"
-          },
+          "onClick": "FleetFootedEffect",
+          "displayCondition": "FleetFootedShow",
           "x": 195,
           "y": 53,
           "locked": false
@@ -135,12 +107,8 @@
           "name": "imagebutton_defense",
           "image": "defense.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "DefenceEffect"
-          },
-          "displayCondition": {
-            "name": "DefenceShow"
-          },
+          "onClick": "DefenceEffect",
+          "displayCondition": "DefenceShow",
           "x": 195,
           "y": 107,
           "locked": false
@@ -152,12 +120,8 @@
           "name": "imagebutton_deadlyprecision",
           "image": "deadlyprecision.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "DeadlyPresicionEffect"
-          },
-          "displayCondition": {
-            "name": "DeadlyPresicionShow"
-          },
+          "onClick": "DeadlyPresicionEffect",
+          "displayCondition": "DeadlyPresicionShow",
           "x": 195,
           "y": 152,
           "locked": false
@@ -169,12 +133,8 @@
           "name": "imagebutton_coldblood",
           "image": "coldblood.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "ColdBloodEffect"
-          },
-          "displayCondition": {
-            "name": "ColdBloodShow"
-          },
+          "onClick": "ColdBloodEffect",
+          "displayCondition": "ColdBloodShow",
           "x": 231,
           "y": 53,
           "locked": false
@@ -186,12 +146,8 @@
           "name": "imagebutton_anatomicalknowledge",
           "image": "anatomicalknowledge.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "AnatomicalKnowledgeEffect"
-          },
-          "displayCondition": {
-            "name": "AnatomicalKnowledgeShow"
-          },
+          "onClick": "AnatomicalKnowledgeEffect",
+          "displayCondition": "AnatomicalKnowledgeShow",
           "x": 231,
           "y": 107,
           "locked": false
@@ -203,12 +159,8 @@
           "name": "imagebutton_cripplingshot",
           "image": "cripplingshot.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "CripplingShotEffect"
-          },
-          "displayCondition": {
-            "name": "CripplingShotShow"
-          },
+          "onClick": "CripplingShotEffect",
+          "displayCondition": "CripplingShotShow",
           "x": 231,
           "y": 152,
           "locked": false
@@ -220,12 +172,8 @@
           "name": "imagebutton_floodofanger",
           "image": "floodofanger.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "FlooodOfAngerEffec"
-          },
-          "displayCondition": {
-            "name": "FloodOfAngerShow"
-          },
+          "onClick": "FlooodOfAngerEffec",
+          "displayCondition": "FloodOfAngerShow",
           "x": 267,
           "y": 53,
           "locked": false
@@ -237,12 +185,8 @@
           "name": "imagebutton_razorfocus",
           "image": "razorfocus.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "RazorFocusEffect"
-          },
-          "displayCondition": {
-            "name": "RazorFocusShow"
-          },
+          "onClick": "RazorFocusEffect",
+          "displayCondition": "RazorFocusShow",
           "x": 267,
           "y": 107,
           "locked": false
@@ -254,12 +198,8 @@
           "name": "imagebutton_undying",
           "image": "undying.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "UndyingEffect"
-          },
-          "displayCondition": {
-            "name": "UndyingShow"
-          },
+          "onClick": "UndyingEffect",
+          "displayCondition": "UndyingShow",
           "x": 267,
           "y": 152,
           "locked": false
@@ -271,9 +211,7 @@
           "name": "button_back",
           "text": "Back",
           "isUndecorated": false,
-          "onClick": {
-            "name": "PauseMenuGuiOpen"
-          },
+          "onClick": "PauseMenuGuiOpen",
           "width": 46,
           "height": 20,
           "x": 375,
@@ -287,9 +225,7 @@
           "name": "button_general",
           "text": "General",
           "isUndecorated": false,
-          "onClick": {
-            "name": "CharaterAbilitesGeneralGuiOpen"
-          },
+          "onClick": "CharaterAbilitesGeneralGuiOpen",
           "width": 61,
           "height": 20,
           "x": 51,
@@ -303,9 +239,7 @@
           "name": "button_combat",
           "text": " Combat",
           "isUndecorated": false,
-          "onClick": {
-            "name": "CharacterAbilitiesCombatGuiOpen"
-          },
+          "onClick": "CharacterAbilitiesCombatGuiOpen",
           "width": 61,
           "height": 20,
           "x": 51,
@@ -319,9 +253,7 @@
           "name": "button_alchemy",
           "text": "Alchemy",
           "isUndecorated": false,
-          "onClick": {
-            "name": "CharacterAbilitiesAlchemyGuiOpen"
-          },
+          "onClick": "CharacterAbilitiesAlchemyGuiOpen",
           "width": 61,
           "height": 20,
           "x": 51,
@@ -335,9 +267,7 @@
           "name": "button_signs",
           "text": " Signs ",
           "isUndecorated": false,
-          "onClick": {
-            "name": "CharacterAbilitiesSignsGuiOpen"
-          },
+          "onClick": "CharacterAbilitiesSignsGuiOpen",
           "width": 61,
           "height": 20,
           "x": 51,
@@ -727,6 +657,7 @@
             "value": -12829636,
             "falpha": 0.0
           },
+          "hasShadow": false,
           "x": 312,
           "y": 62,
           "locked": false
@@ -744,6 +675,7 @@
             "value": -12829636,
             "falpha": 0.0
           },
+          "hasShadow": false,
           "x": 312,
           "y": 71,
           "locked": false

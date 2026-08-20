@@ -9,7 +9,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.bus.api.Event;
 
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -17,7 +16,9 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.Mth;
 import net.minecraft.tags.TagKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.resources.Identifier;
 import net.minecraft.network.chat.Component;
 import net.minecraft.core.registries.Registries;
 
@@ -42,18 +43,23 @@ public class InstantKillProcedure {
 		double instantKillRoll = 0;
 		instantKillRoll = Mth.nextInt(RandomSource.create(), 1, 100);
 		if (sourceentity instanceof LivingEntity _livEnt1 && _livEnt1.hasEffect(WitchercraftModMobEffects.DEV_LOG)) {
-			if (sourceentity instanceof Player _player && !_player.level().isClientSide())
-				_player.displayClientMessage(Component.literal(("instant kill roll>>>" + instantKillRoll)), false);
-			if (sourceentity instanceof Player _player && !_player.level().isClientSide())
-				_player.displayClientMessage(Component.literal(("instant kill chance>>>" + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftInstantKillChance)), false);
+			if (sourceentity instanceof ServerPlayer _player)
+				_player.sendSystemMessage(Component.literal(("instant kill roll>>>" + instantKillRoll)), false);
+			if (sourceentity instanceof ServerPlayer _player)
+				_player.sendSystemMessage(Component.literal(("instant kill chance>>>" + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftInstantKillChance)), false);
 		}
-		if (!entity.getType().is(TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.parse("minecraft:enderdragon"))) && instantKillRoll <= sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftInstantKillChance) {
+		if (!entity.is(TagKey.create(Registries.ENTITY_TYPE, Identifier.parse("minecraft:enderdragon"))) && instantKillRoll <= sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftInstantKillChance) {
 			if (!damagesource.is(DamageTypes.ARROW)) {
 				if (sourceentity instanceof LivingEntity _livEnt6 && _livEnt6.hasEffect(WitchercraftModMobEffects.DEV_LOG)) {
-					if (sourceentity instanceof Player _player && !_player.level().isClientSide())
-						_player.displayClientMessage(Component.literal("BOMBA"), false);
+					if (sourceentity instanceof ServerPlayer _player)
+						_player.sendSystemMessage(Component.literal("BOMBA"), false);
 				}
-				entity.hurt(new DamageSource(world.holderOrThrow(DamageTypes.GENERIC)), 999);
+				{
+					Entity _ent = entity;
+					if (_ent.level() instanceof ServerLevel _serverLevel) {
+						_ent.hurtServer(_serverLevel, new DamageSource(world.holderOrThrow(DamageTypes.GENERIC)), 999);
+					}
+				}
 			}
 		}
 	}

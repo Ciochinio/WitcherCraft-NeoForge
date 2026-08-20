@@ -1,5 +1,5 @@
 {
-  "_fv": 79,
+  "_fv": 89,
   "_type": "armor",
   "definition": {
     "enableHelmet": true,
@@ -10,22 +10,12 @@
     "textureLeggings": "feline_trousers",
     "enableBoots": true,
     "textureBoots": "feline_boots",
-    "onHelmetTick": {
-      "name": "FelineArmorEffect"
-    },
-    "onBodyTick": {
-      "name": "FelineArmorEffect"
-    },
-    "onLeggingsTick": {
-      "name": "FelineArmorEffect"
-    },
-    "onBootsTick": {
-      "name": "FelineArmorEffect"
-    },
+    "onHelmetTick": "FelineArmorEffect",
+    "onBodyTick": "FelineArmorEffect",
+    "onLeggingsTick": "FelineArmorEffect",
+    "onBootsTick": "FelineArmorEffect",
     "creativeTabs": [
-      {
-        "value": "CUSTOM:WitcherCraft"
-      }
+      "CUSTOM:WitcherCraft"
     ],
     "armorTextureFile": "cat.",
     "helmetName": "Feline Armor Helmet",
@@ -68,6 +58,10 @@
     "leggingsItemCustomModelName": "Normal",
     "bootsItemRenderType": 0,
     "bootsItemCustomModelName": "Normal",
+    "helmetTranslucency": false,
+    "bodyTranslucency": false,
+    "leggingsTranslucency": false,
+    "bootsTranslucency": false,
     "helmetImmuneToFire": false,
     "bodyImmuneToFire": false,
     "leggingsImmuneToFire": false,
@@ -104,9 +98,9 @@
     "enchantability": 9,
     "toughness": 0.0,
     "knockbackResistance": 0.0,
-    "equipSound": {
-      "value": ""
-    },
-    "repairItems": []
+    "equipSound": "",
+    "repairItems": [],
+    "rarity": "COMMON",
+    "attributeModifiers": []
   }
 }

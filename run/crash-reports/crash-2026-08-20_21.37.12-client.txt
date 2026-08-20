@@ -1,0 +1,237 @@
+---- Minecraft Crash Report ----
+// Uh... Did I do that?
+
+Time: 2026-08-20 21:37:12
+Description: Bootstrap
+
+net.neoforged.fml.ModLoadingException: Loading errors encountered:
+	- YDM's Mob Health Bar (mobhealthbar) has failed to load correctly
+	  java.lang.NoClassDefFoundError: net/minecraft/resources/ResourceLocation
+
+	at net.neoforged.fml.ModLoader.waitForFuture(ModLoader.java:253) ~[loader-11.0.15.jar:11.0] {}
+	at net.neoforged.fml.ModLoader.dispatchParallelTask(ModLoader.java:216) ~[loader-11.0.15.jar:11.0] {}
+	at net.neoforged.fml.ModLoader.constructMods(ModLoader.java:124) ~[loader-11.0.15.jar:11.0] {}
+	at net.neoforged.fml.ModLoader.gatherAndInitializeMods(ModLoader.java:101) ~[loader-11.0.15.jar:11.0] {}
+	at TRANSFORMER/neoforge@26.1.2.95/net.neoforged.neoforge.internal.CommonModLoader.begin(CommonModLoader.java:49) ~[neoforge-26.1.2.95-universal.jar:?] {}
+	at TRANSFORMER/neoforge@26.1.2.95/net.neoforged.neoforge.client.loading.ClientModLoader.begin(ClientModLoader.java:55) ~[neoforge-26.1.2.95-universal.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.main.Main.main(Main.java:122) [minecraft-patched-26.1.2.95.jar:?] {}
+	at net.neoforged.fml.startup.Client.main(Client.java:19) [loader-11.0.15.jar:11.0] {}
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[?:?] {}
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565) ~[?:?] {}
+	at net.neoforged.devlaunch.Main.main(Main.java:57) [DevLaunch-1.0.2.jar:?] {}
+
+
+A detailed walkthrough of the error, its code path and all known details is as follows:
+---------------------------------------------------------------------------------------
+
+-- Head --
+Thread: main
+Stacktrace:
+	at net.neoforged.fml.ModLoader.waitForFuture(ModLoader.java:253) ~[loader-11.0.15.jar:11.0] {}
+	at net.neoforged.fml.ModLoader.dispatchParallelTask(ModLoader.java:216) ~[loader-11.0.15.jar:11.0] {}
+	at net.neoforged.fml.ModLoader.constructMods(ModLoader.java:124) ~[loader-11.0.15.jar:11.0] {}
+	at net.neoforged.fml.ModLoader.gatherAndInitializeMods(ModLoader.java:101) ~[loader-11.0.15.jar:11.0] {}
+	at TRANSFORMER/neoforge@26.1.2.95/net.neoforged.neoforge.internal.CommonModLoader.begin(CommonModLoader.java:49) ~[neoforge-26.1.2.95-universal.jar:?] {}
+	at TRANSFORMER/neoforge@26.1.2.95/net.neoforged.neoforge.client.loading.ClientModLoader.begin(ClientModLoader.java:55) ~[neoforge-26.1.2.95-universal.jar:?] {}
+-- Initialization --
+Details:
+	Modules: 
+		ADVAPI32.dll:Advanced Windows 32 Base API:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		COMCTL32.dll:Biblioteka formantów czynności użytkownika:6.10 (WinBuild.160101.0800):Microsoft Corporation
+		CRYPT32.dll:Crypto API32:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		CRYPTBASE.dll:Base cryptographic API DLL:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		CRYPTSP.dll:Cryptographic Service Provider API:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		CoreMessaging.dll:Microsoft CoreMessaging Dll:10.0.26100.8972 (WinBuild.160101.0800):Microsoft Corporation
+		DBGHELP.DLL:Windows Image Helper:10.0.26100.8328 (WinBuild.160101.0800):Microsoft Corporation
+		DEVOBJ.dll:Device Information Set DLL:10.0.26100.8972 (WinBuild.160101.0800):Microsoft Corporation
+		DNSAPI.dll:Biblioteka DLL interfejsu API klienta usługi DNS:10.0.26100.8972 (WinBuild.160101.0800):Microsoft Corporation
+		DSPARSE.dll:Active Directory Domain Services API:10.0.26100.1 (WinBuild.160101.0800):Microsoft Corporation
+		GDI32.dll:GDI Client DLL:10.0.26100.8328 (WinBuild.160101.0800):Microsoft Corporation
+		GLU32.dll:Biblioteka DLL OpenGL Utility Library:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		IMM32.DLL:Multi-User Windows IMM32 API Client DLL:10.0.26100.8521 (WinBuild.160101.0800):Microsoft Corporation
+		IPHLPAPI.DLL:IP Helper API:10.0.26100.1 (WinBuild.160101.0800):Microsoft Corporation
+		KERNEL32.DLL:Biblioteka DLL klienta Windows NT BASE API:10.0.26100.8972 (WinBuild.160101.0800):Microsoft Corporation
+		KERNELBASE.dll:Biblioteka DLL klienta Windows NT BASE API:10.0.26100.8972 (WinBuild.160101.0800):Microsoft Corporation
+		MSCTF.dll:Biblioteka DLL serwera MSCTF:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		MpOav.dll:IOfficeAntiVirus Module:4.18.26070.9 (797b3603749206dfffe67a1cc891531b0a2cf438):Microsoft Corporation
+		NSI.dll:NSI User-mode interface DLL:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		OLEAUT32.dll:OLEAUT32.DLL:10.0.26100.8972 (WinBuild.160101.0800):Microsoft Corporation
+		POWRPROF.dll:Pomocnicza biblioteka DLL dla profilu zasilania:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		PSAPI.DLL:Process Status Helper:10.0.26100.8521 (WinBuild.160101.0800):Microsoft Corporation
+		RPCRT4.dll:Czas wykonania zdalnego wywoływania procedury:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		RTSSHooks64.dll
+		SETUPAPI.dll:Interfejs API Instalatora systemu Windows:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		SHCORE.dll:SHCORE:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		SHELL32.dll:Wspólna biblioteka DLL Powłoki systemu Windows:10.0.26100.8972 (WinBuild.160101.0800):Microsoft Corporation
+		SspiCli.dll:Security Support Provider Interface:10.0.26100.8972 (WinBuild.160101.0800):Microsoft Corporation
+		UMPDC.dll:User Mode Power Dependency Coordinator:10.0.26100.8972 (WinBuild.160101.0800):Microsoft Corporation
+		USER32.dll:Współużytkowana biblioteka DLL klienta Windows USER API:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		USERENV.dll:Userenv:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		VCRUNTIME140.dll:Microsoft® C Runtime Library:14.44.35211.0:Microsoft Corporation
+		VERSION.dll:Version Checking and File Installation Libraries:10.0.26100.1150 (WinBuild.160101.0800):Microsoft Corporation
+		WINMM.dll:MCI API DLL:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		WINSTA.dll:Winstation Library:10.0.26100.8972 (WinBuild.160101.0800):Microsoft Corporation
+		WINTRUST.dll:Microsoft Trust Verification APIs:10.0.26100.8972 (WinBuild.160101.0800):Microsoft Corporation
+		WS2_32.dll:Biblioteka DLL 32-bitowej wersji usługi Windows Socket 2.0:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		WTSAPI32.dll:Windows Remote Desktop Session Host Server SDK APIs:10.0.26100.8972 (WinBuild.160101.0800):Microsoft Corporation
+		amsi.dll:Anti-Malware Scan Interface:10.0.26100.7309 (WinBuild.160101.0800):Microsoft Corporation
+		apphelp.dll:Biblioteka klienta zgodności aplikacji:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		bcrypt.dll:Biblioteka podstawowych elementów kryptograficznych systemu Windows:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		bcryptPrimitives.dll:Windows Cryptographic Primitives Library:10.0.26100.9168 (WinBuild.160101.0800):Microsoft Corporation
+		cfgmgr32.dll:Configuration Manager DLL:10.0.26100.8972 (WinBuild.160101.0800):Microsoft Corporation
+		clbcatq.dll:COM+ Configuration Catalog:2001.12.10941.16384 (WinBuild.160101.0800):Microsoft Corporation
+		combase.dll:Microsoft COM for Windows:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		cryptnet.dll:Crypto Network Related API:10.0.26100.8972 (WinBuild.160101.0800):Microsoft Corporation
+		dbgcore.DLL:Windows Core Debugging Helpers:10.0.26100.8972 (WinBuild.160101.0800):Microsoft Corporation
+		dinput8.dll:Microsoft DirectInput:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		drvstore.dll:Driver Store API:10.0.26100.8972 (WinBuild.160101.0800):Microsoft Corporation
+		dwmapi.dll:Interfejs API menedżera okien Microsoft Desktop Window Manager:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		dxcore.dll:DXCore:10.0.26100.8972 (WinBuild.160101.0800):Microsoft Corporation
+		extnet.dll:OpenJDK Platform binary:25.0.2.0:JetBrains s.r.o.
+		fastprox.dll:WMI Custom Marshaller:10.0.26100.8972 (WinBuild.160101.0800):Microsoft Corporation
+		fwpuclnt.dll:Interfejs API trybu użytkownika funkcji FWP/IPSec:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		gdi32full.dll:GDI Client DLL:10.0.26100.9168 (WinBuild.160101.0800):Microsoft Corporation
+		glfw.dll:GLFW 3.5.0 DLL:3.5.0:GLFW
+		icm32.dll:Microsoft Color Management Module (CMM):10.0.26100.9168 (WinBuild.160101.0800):Microsoft Corporation
+		imagehlp.dll:Windows NT Image Helper:10.0.26100.4202 (WinBuild.160101.0800):Microsoft Corporation
+		inputhost.dll:InputHost:10.0.26100.8972 (WinBuild.160101.0800):Microsoft Corporation
+		java.dll:OpenJDK Platform binary:25.0.2.0:JetBrains s.r.o.
+		java.exe:OpenJDK Platform binary:25.0.2.0:JetBrains s.r.o.
+		jemalloc.dll
+		jimage.dll:OpenJDK Platform binary:25.0.2.0:JetBrains s.r.o.
+		jli.dll:OpenJDK Platform binary:25.0.2.0:JetBrains s.r.o.
+		jna845051921016579763.dll:JNA native library:7.0.2:Java(TM) Native Access (JNA)
+		jvm.dll:OpenJDK 64-Bit server VM:25.0.2.0:JetBrains s.r.o.
+		kernel.appcore.dll:AppModel API Host:10.0.26100.8737 (WinBuild.160101.0800):Microsoft Corporation
+		lwjgl.dll
+		lwjgl_opengl.dll
+		lwjgl_stb.dll
+		management.dll:OpenJDK Platform binary:25.0.2.0:JetBrains s.r.o.
+		management_ext.dll:OpenJDK Platform binary:25.0.2.0:JetBrains s.r.o.
+		msasn1.dll:ASN.1 Runtime APIs:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		mscms.dll:Biblioteka DLL systemu dopasowywania kolorów firmy Microsoft:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		msvcp140.dll:Microsoft® C Runtime Library:14.44.35211.0:Microsoft Corporation
+		msvcp_win.dll:Microsoft® C Runtime Library:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		msvcrt.dll:Windows NT CRT DLL:7.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		mswsock.dll:Microsoft Windows Sockets 2.0 Dostawca usługi:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		napinsp.dll:Dostawca podkładek nazewnictwa poczty e-mail:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		net.dll:OpenJDK Platform binary:25.0.2.0:JetBrains s.r.o.
+		nio.dll:OpenJDK Platform binary:25.0.2.0:JetBrains s.r.o.
+		nlansp_c.dll:NLA Namespace Service Provider DLL:10.0.26100.8972 (WinBuild.160101.0800):Microsoft Corporation
+		ntdll.dll:Biblioteka NT Layer DLL:10.0.26100.8972 (WinBuild.160101.0800):Microsoft Corporation
+		ntmarta.dll:Windows NT - dostawca MARTA:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		nvgpucomp64.dll:NVIDIA GPU Compiler Driver, Version 610.74 :32.0.16.1074:NVIDIA Corporation
+		nvoglv64.dll:NVIDIA Compatible OpenGL ICD:32.0.16.1074:NVIDIA Corporation
+		nvspcap64.dll:NVIDIA Game Proxy 8FileVersion  1:11.0.8.299  8Produc:NVIDIA Corporation  L$FileDescriptio
+		ole32.dll:Microsoft OLE for Windows:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		opengl32.dll:OpenGL Client DLL:10.0.26100.8972 (WinBuild.160101.0800):Microsoft Corporation
+		pdh.dll:Windows Performance Data Helper DLL:10.0.26100.1 (WinBuild.160101.0800):Microsoft Corporation
+		perfos.dll:Biblioteka DLL obiektów wydajności systemu Windows:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		perfproc.dll:Biblioteka DLL obiektów wydajności procesów systemu Windows:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		pfclient.dll:SysMain Client:10.0.26100.4202 (WinBuild.160101.0800):Microsoft Corporation
+		profapi.dll:User Profile Basic API:10.0.26100.9168 (WinBuild.160101.0800):Microsoft Corporation
+		rasadhlp.dll:Remote Access AutoDial Helper:10.0.26100.7920 (WinBuild.160101.0800):Microsoft Corporation
+		rsaenh.dll:Microsoft Enhanced Cryptographic Provider:10.0.26100.1 (WinBuild.160101.0800):Microsoft Corporation
+		sechost.dll:Host for SCM/SDDL/LSA Lookup APIs:10.0.26100.1 (WinBuild.160101.0800):Microsoft Corporation
+		shlwapi.dll:Biblioteka dodatkowych narzędzi powłoki:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		textinputframework.dll:"TextInputFramework.DYNLINK":10.0.26100.8972 (WinBuild.160101.0800):Microsoft Corporation
+		ucrtbase.dll:Microsoft® C Runtime Library:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		uxtheme.dll:Biblioteka Microsoft UxTheme:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		vcruntime140_1.dll:Microsoft® C Runtime Library:14.44.35211.0:Microsoft Corporation
+		verify.dll:OpenJDK Platform binary:25.0.2.0:JetBrains s.r.o.
+		wbemcomn.dll:WMI:10.0.26100.7920 (WinBuild.160101.0800):Microsoft Corporation
+		wbemprox.dll:WMI:10.0.26100.8972 (WinBuild.160101.0800):Microsoft Corporation
+		wbemsvc.dll:WMI:10.0.26100.8972 (WinBuild.160101.0800):Microsoft Corporation
+		win32u.dll:Win32u:10.0.26100.9168 (WinBuild.160101.0800):Microsoft Corporation
+		windows.staterepositorycore.dll:Windows StateRepository API Core:10.0.26100.8972 (WinBuild.160101.0800):Microsoft Corporation
+		windows.storage.dll:Interfejs API magazynu systemu Microsoft WinRT:10.0.26100.8972 (WinBuild.160101.0800):Microsoft Corporation
+		winrnr.dll:LDAP RnR Provider DLL:10.0.26100.8737 (WinBuild.160101.0800):Microsoft Corporation
+		wldp.dll:Zasady blokady systemu Windows:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		wshbth.dll:Windows Sockets Helper DLL:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		xinput1_4.dll:Interfejs API typowego kontrolera firmy Microsoft:10.0.26100.8875 (WinBuild.160101.0800):Microsoft Corporation
+		zip.dll:OpenJDK Platform binary:25.0.2.0:JetBrains s.r.o.
+Stacktrace:
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.main.Main.main(Main.java:122) [minecraft-patched-26.1.2.95.jar:?] {}
+	at net.neoforged.fml.startup.Client.main(Client.java:19) [loader-11.0.15.jar:11.0] {}
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[?:?] {}
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565) ~[?:?] {}
+	at net.neoforged.devlaunch.Main.main(Main.java:57) [DevLaunch-1.0.2.jar:?] {}
+
+
+-- System Details --
+Details:
+	Minecraft Version: 26.1.2
+	Minecraft Version ID: 26.1.2
+	Operating System: Windows 11 (amd64) version 10.0
+	Java Version: 25.0.2, JetBrains s.r.o.
+	Java VM Version: OpenJDK 64-Bit Server VM (mixed mode, sharing), JetBrains s.r.o.
+	Memory: 113441536 bytes (108 MiB) / 360710144 bytes (344 MiB) up to 6425673728 bytes (6128 MiB)
+	Memory (heap): init: 384MiB, used: 233MiB, committed: 344MiB, max: 6128MiB
+	Memory (non-head): init: 007MiB, used: 129MiB, committed: 132MiB, max: 000MiB
+	CPUs: 6
+	Processor Vendor: GenuineIntel
+	Processor Name: Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz
+	Identifier: Intel64 Family 6 Model 158 Stepping 13
+	Microarchitecture: Coffee Lake
+	Frequency (GHz): 2.90
+	Number of physical packages: 1
+	Number of physical CPUs: 6
+	Number of logical CPUs: 6
+	Graphics card #0 name: NVIDIA GeForce RTX 2060
+	Graphics card #0 vendor: NVIDIA
+	Graphics card #0 VRAM (MiB): 6144.00
+	Graphics card #0 deviceId: VideoController1
+	Graphics card #0 versionInfo: 32.0.16.1074
+	Memory slot #0 capacity (MiB): 8192.00
+	Memory slot #0 clockSpeed (GHz): 2.67
+	Memory slot #0 type: DDR4
+	Memory slot #1 capacity (MiB): 8192.00
+	Memory slot #1 clockSpeed (GHz): 2.67
+	Memory slot #1 type: DDR4
+	Memory slot #2 capacity (MiB): 8192.00
+	Memory slot #2 clockSpeed (GHz): 2.67
+	Memory slot #2 type: DDR4
+	Virtual memory max (MiB): 30399.35
+	Virtual memory used (MiB): 16339.34
+	Swap memory total (MiB): 5888.00
+	Swap memory used (MiB): 93.56
+	Space in storage for jna.tmpdir (MiB): <path not set>
+	Space in storage for org.lwjgl.system.SharedLibraryExtractPath (MiB): <path not set>
+	Space in storage for io.netty.native.workdir (MiB): <path not set>
+	Space in storage for java.io.tmpdir (MiB): available: 188457.80, total: 476062.00
+	Space in storage for workdir (MiB): available: 188457.80, total: 476062.00
+	JVM Flags: 0 total; 
+	Debug Flags: 0 total; 
+	Launched Version: 26.1.2.95
+	Backend library: LWJGL version 3.4.1+2
+	Backend API: Unknown
+	Window size: <not initialized>
+	GFLW Platform: win32
+	Render Extensions: <no renderer available>
+	GL debug messages: <no renderer available>
+	Is Modded: Definitely; Client brand changed to 'neoforge'
+	Universe: 404
+	Type: Client
+	Locale: en_US
+	System encoding: Cp1250
+	File encoding: UTF-8
+	CPU: 6x Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz
+	Class Processors: 
+		00.00%: neoforge:neoforge_dev_dist_cleaner
+		00.00%: neoforge:computing_frames (marker)
+		00.00%: neoforge:runtime_enum_extender
+		04.36%: neoforge:access_transformer
+		00.08%: neoforge:mixin
+		00.00%: neoforge:simple_processors_default (marker)
+		00.02%: neoforge.coremods:field_to_getter.net.minecraft.world.level.biome.biome
+		00.02%: neoforge.coremods:field_to_getter.net.minecraft.world.level.block.flowerpotblock
+		00.02%: neoforge.coremods:field_to_getter.net.minecraft.world.level.levelgen.structure.structure
+		00.36%: neoforge.coremods:method_redirector
+	Mod List: 
+		minecraft-patched-26.1.2.95.jar                   |Minecraft                     |minecraft                     |26.1.2              |Manifest: NOSIGNATURE
+		neoforge-26.1.2.95-universal.jar                  |NeoForge                      |neoforge                      |26.1.2.95           |Manifest: NOSIGNATURE
+		main                                              |WitcherCraft                  |witchercraft                  |1.0.0               |Manifest: NOSIGNATURE
+		mobhealthbar-neoforge-1.21.7-2.3.1.jar            |YDM's Mob Health Bar          |mobhealthbar                  |1.0.0               |Manifest: adb33be87630ffc95eb34ba8f1d59b4e2c3213f86ee0ca1fdf152260c2f4870b
+	Crash Report UUID: 5288d9dc-0b1e-43d3-b6b8-89c87ea2ffb9
+	FML: 11.0.15
+	NeoForge: 26.1.2.95

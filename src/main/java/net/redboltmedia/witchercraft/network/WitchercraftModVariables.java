@@ -20,7 +20,7 @@ import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.codec.StreamCodec;
@@ -32,7 +32,7 @@ import java.util.function.Supplier;
 @EventBusSubscriber
 public class WitchercraftModVariables {
 	public static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister.create(NeoForgeRegistries.Keys.ATTACHMENT_TYPES, WitchercraftMod.MODID);
-	public static final Supplier<AttachmentType<PlayerVariables>> PLAYER_VARIABLES = ATTACHMENT_TYPES.register("player_variables", () -> AttachmentType.serializable(() -> new PlayerVariables()).build());
+	public static final Supplier<AttachmentType<PlayerVariables>> PLAYER_VARIABLES = ATTACHMENT_TYPES.register("player_variables", () -> AttachmentType.serializable(PlayerVariables::new).build());
 	public static double sekund = 0;
 	public static double minut = 0;
 
@@ -429,9 +429,9 @@ public class WitchercraftModVariables {
 	}
 
 	public record PlayerVariablesSyncMessage(PlayerVariables data) implements CustomPacketPayload {
-		public static final Type<PlayerVariablesSyncMessage> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(WitchercraftMod.MODID, "player_variables_sync"));
+		public static final Type<PlayerVariablesSyncMessage> TYPE = new Type<>(Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "player_variables_sync"));
 		public static final StreamCodec<RegistryFriendlyByteBuf, PlayerVariablesSyncMessage> STREAM_CODEC = StreamCodec.of((RegistryFriendlyByteBuf buffer, PlayerVariablesSyncMessage message) -> {
-			TagValueOutput output = TagValueOutput.createWithoutContext(ProblemReporter.DISCARDING);
+			TagValueOutput output = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, buffer.registryAccess());
 			message.data.serialize(output);
 			buffer.writeNbt(output.buildResult());
 		}, (RegistryFriendlyByteBuf buffer) -> {

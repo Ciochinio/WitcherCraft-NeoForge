@@ -16,12 +16,14 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.api.distmarker.Dist;
 
+import net.minecraft.resources.Identifier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.KeyMapping;
 
 @EventBusSubscriber(Dist.CLIENT)
 public class WitchercraftModKeyMappings {
-	public static final KeyMapping PAUSE_MENU_KEYBIND_PRESS = new KeyMapping("key.witchercraft.pause_menu_keybind_press", GLFW.GLFW_KEY_B, "key.categories.misc") {
+	public static final KeyMapping.Category CATEGORY_WITCHERCRAFT = new KeyMapping.Category(Identifier.parse("witchercraft:witchercraft"));
+	public static final KeyMapping PAUSE_MENU_KEYBIND_PRESS = new KeyMapping("key.witchercraft.pause_menu_keybind_press", GLFW.GLFW_KEY_B, KeyMapping.Category.MISC) {
 		private boolean isDownOld = false;
 
 		@Override
@@ -34,7 +36,7 @@ public class WitchercraftModKeyMappings {
 			isDownOld = isDown;
 		}
 	};
-	public static final KeyMapping SIGN_GUI_KEYBIND = new KeyMapping("key.witchercraft.sign_gui_keybind", GLFW.GLFW_KEY_TAB, "key.categories.witchercraft") {
+	public static final KeyMapping SIGN_GUI_KEYBIND = new KeyMapping("key.witchercraft.sign_gui_keybind", GLFW.GLFW_KEY_TAB, CATEGORY_WITCHERCRAFT) {
 		private boolean isDownOld = false;
 
 		@Override
@@ -47,7 +49,7 @@ public class WitchercraftModKeyMappings {
 			isDownOld = isDown;
 		}
 	};
-	public static final KeyMapping SIGN_CAST_KEYBIND = new KeyMapping("key.witchercraft.sign_cast_keybind", GLFW.GLFW_KEY_R, "key.categories.witchercraft") {
+	public static final KeyMapping SIGN_CAST_KEYBIND = new KeyMapping("key.witchercraft.sign_cast_keybind", GLFW.GLFW_KEY_R, CATEGORY_WITCHERCRAFT) {
 		private boolean isDownOld = false;
 
 		@Override
@@ -69,6 +71,7 @@ public class WitchercraftModKeyMappings {
 
 	@SubscribeEvent
 	public static void registerKeyMappings(RegisterKeyMappingsEvent event) {
+		event.registerCategory(CATEGORY_WITCHERCRAFT);
 		event.register(PAUSE_MENU_KEYBIND_PRESS);
 		event.register(SIGN_GUI_KEYBIND);
 		event.register(SIGN_CAST_KEYBIND);

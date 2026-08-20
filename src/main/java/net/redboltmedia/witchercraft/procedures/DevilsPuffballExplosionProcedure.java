@@ -7,9 +7,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.Identifier;
 import net.minecraft.network.chat.Component;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.core.particles.ParticleTypes;
@@ -28,9 +29,14 @@ public class DevilsPuffballExplosionProcedure {
 			final Vec3 _center = new Vec3(x, y, z);
 			for (Entity entityiterator : world.getEntitiesOfClass(Entity.class, new AABB(_center, _center).inflate(5 / 2d), e -> true).stream().sorted(Comparator.comparingDouble(_entcnd -> _entcnd.distanceToSqr(_center))).toList()) {
 				if (!(entityiterator instanceof Player)) {
-					entityiterator.hurt(new DamageSource(world.holderOrThrow(ResourceKey.create(Registries.DAMAGE_TYPE, ResourceLocation.parse("witchercraft:bomb")))), 12);
-					if (entity instanceof Player _player && !_player.level().isClientSide())
-						_player.displayClientMessage(Component.literal("DevilsPuffbal"), false);
+					{
+						Entity _ent = entityiterator;
+						if (_ent.level() instanceof ServerLevel _serverLevel) {
+							_ent.hurtServer(_serverLevel, new DamageSource(world.holderOrThrow(ResourceKey.create(Registries.DAMAGE_TYPE, Identifier.parse("witchercraft:bomb")))), 12);
+						}
+					}
+					if (entity instanceof ServerPlayer _player)
+						_player.sendSystemMessage(Component.literal("DevilsPuffbal"), false);
 				}
 			}
 		}

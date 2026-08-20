@@ -1,5 +1,5 @@
 {
-  "_fv": 79,
+  "_fv": 89,
   "_type": "procedure",
   "definition": {
     "procedurexml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><xml xmlns=\"https://developers.google.com/blockly/xml\"><variables><variable id=\"MovementSpeed\" type=\"String\">MovementSpeed</variable></variables><block deletable=\"false\" type=\"event_trigger\" x=\"29\" y=\"49\"><field name=\"trigger\">player_ticks</field><next><block type=\"return_string\"><value name=\"return\"><block type=\"text_format_number\"><value name=\"number\"><block type=\"variables_get_number\"><mutation xmlns=\"http://www.w3.org/1999/xhtml\" has_entity=\"true\" is_player_var=\"true\"/><field name=\"VAR\">global:witchercraftMovementSpeed</field><value name=\"entity\"><block type=\"entity_from_deps\"/></value></block></value><value name=\"format\"><block type=\"text\"><field name=\"TEXT\">##.##</field></block></value></block></value></block></next></block></xml>",

@@ -9,6 +9,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.bus.api.Event;
 
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.LivingEntity;
@@ -64,7 +65,7 @@ public class CritChanceProcedure {
 				_vars.markSyncDirty();
 			}
 		}
-		if (entity instanceof LivingEntity _livEnt5 && _livEnt5.hasEffect(WitchercraftModMobEffects.THUNDERBOLT_EFFECT) && world.getLevelData().isThundering()) {
+		if (entity instanceof LivingEntity _livEnt5 && _livEnt5.hasEffect(WitchercraftModMobEffects.THUNDERBOLT_EFFECT) && world instanceof Level _lvl6 && _lvl6.isThundering()) {
 			{
 				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 				_vars.witchercraftCritChance = 100;

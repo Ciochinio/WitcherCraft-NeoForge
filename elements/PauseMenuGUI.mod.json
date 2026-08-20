@@ -1,5 +1,5 @@
 {
-  "_fv": 79,
+  "_fv": 89,
   "_type": "gui",
   "definition": {
     "type": 0,
@@ -16,9 +16,7 @@
           "name": "button_meditation",
           "text": "Meditation",
           "isUndecorated": false,
-          "onClick": {
-            "name": "MeditationGuiOpen"
-          },
+          "onClick": "MeditationGuiOpen",
           "width": 77,
           "height": 20,
           "x": 342,
@@ -32,9 +30,7 @@
           "name": "button_character",
           "text": "Character",
           "isUndecorated": false,
-          "onClick": {
-            "name": "CharacterGuiOpen"
-          },
+          "onClick": "CharacterGuiOpen",
           "width": 77,
           "height": 20,
           "x": 177,
@@ -48,9 +44,7 @@
           "name": "button_alchemy",
           "text": "Alchemy",
           "isUndecorated": false,
-          "onClick": {
-            "name": "AlchemyGuiOpen"
-          },
+          "onClick": "AlchemyGuiOpen",
           "width": 76,
           "height": 20,
           "x": 177,
@@ -64,9 +58,7 @@
           "name": "button_glossary",
           "text": "Glossary",
           "isUndecorated": false,
-          "onClick": {
-            "name": "GlossaryMenuGuiOpen"
-          },
+          "onClick": "GlossaryMenuGuiOpen",
           "width": 77,
           "height": 20,
           "x": 12,
@@ -80,9 +72,7 @@
           "name": "button_bestiary",
           "text": "Bestiary",
           "isUndecorated": false,
-          "onClick": {
-            "name": "BestiaryMenuGuiOpen"
-          },
+          "onClick": "BestiaryMenuGuiOpen",
           "width": 77,
           "height": 20,
           "x": 94,
@@ -96,9 +86,7 @@
           "name": "button_skill_tree",
           "text": "Skill Tree",
           "isUndecorated": false,
-          "onClick": {
-            "name": "CharaterAbilitesGeneralGuiOpen"
-          },
+          "onClick": "CharaterAbilitesGeneralGuiOpen",
           "width": 77,
           "height": 20,
           "x": 259,
@@ -107,12 +95,8 @@
         }
       }
     ],
-    "onOpen": {
-      "name": "PauseMenuGuiBlind"
-    },
-    "onClosed": {
-      "name": "PauseMenuGuiBlindEnd"
-    },
+    "onOpen": "PauseMenuGuiBlind",
+    "onClosed": "PauseMenuGuiBlindEnd",
     "gridSettings": {
       "sx": 15,
       "sy": 18,

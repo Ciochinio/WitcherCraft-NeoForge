@@ -6,7 +6,7 @@ public class ExpfixProcedure {
 	public static void execute(Entity entity) {
 		if (entity == null)
 			return;
-		for (int index0 = 0; index0 < 50; index0++) {
+		for (int _i1 = 0; _i1 < 50; _i1++) {
 			CharacterExperienceCalculatorProcedure.execute(entity, 0);
 		}
 	}

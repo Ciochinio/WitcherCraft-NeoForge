@@ -1,5 +1,5 @@
 {
-  "_fv": 79,
+  "_fv": 89,
   "_type": "gui",
   "definition": {
     "type": 0,
@@ -31,6 +31,7 @@
             "value": -12829636,
             "falpha": 0.0
           },
+          "hasShadow": false,
           "x": 87,
           "y": 35,
           "locked": false
@@ -42,9 +43,7 @@
           "name": "imagebutton_arrowforword",
           "image": "arrowforword.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "RotfiendGuiOpen"
-          },
+          "onClick": "RotfiendGuiOpen",
           "x": 375,
           "y": 206,
           "locked": false
@@ -71,6 +70,7 @@
             "value": -12829636,
             "falpha": 0.0
           },
+          "hasShadow": false,
           "x": 87,
           "y": 53,
           "locked": false
@@ -87,6 +87,7 @@
             "value": -12829636,
             "falpha": 0.0
           },
+          "hasShadow": false,
           "x": 87,
           "y": 62,
           "locked": false
@@ -103,6 +104,7 @@
             "value": -12829636,
             "falpha": 0.0
           },
+          "hasShadow": false,
           "x": 87,
           "y": 71,
           "locked": false
@@ -114,9 +116,7 @@
           "name": "imagebutton_bookmark",
           "image": "bookmark.png",
           "hoveredImage": "",
-          "onClick": {
-            "name": "BestiaryMenuGuiOpen"
-          },
+          "onClick": "BestiaryMenuGuiOpen",
           "x": 274,
           "y": 25,
           "locked": false
@@ -265,6 +265,7 @@
             "value": -12829636,
             "falpha": 0.0
           },
+          "hasShadow": false,
           "x": 87,
           "y": 80,
           "locked": false
@@ -281,6 +282,7 @@
             "value": -12829636,
             "falpha": 0.0
           },
+          "hasShadow": false,
           "x": 87,
           "y": 89,
           "locked": false
@@ -297,6 +299,7 @@
             "value": -12829636,
             "falpha": 0.0
           },
+          "hasShadow": false,
           "x": 87,
           "y": 98,
           "locked": false

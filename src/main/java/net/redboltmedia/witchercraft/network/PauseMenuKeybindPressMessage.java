@@ -10,16 +10,17 @@ import net.neoforged.bus.api.SubscribeEvent;
 
 import net.minecraft.world.level.Level;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.core.SectionPos;
 
 @EventBusSubscriber
 public record PauseMenuKeybindPressMessage(int eventType, int pressedms) implements CustomPacketPayload {
-	public static final Type<PauseMenuKeybindPressMessage> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(WitchercraftMod.MODID, "key_pause_menu_keybind_press"));
+	public static final Type<PauseMenuKeybindPressMessage> TYPE = new Type<>(Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "key_pause_menu_keybind_press"));
 	public static final StreamCodec<RegistryFriendlyByteBuf, PauseMenuKeybindPressMessage> STREAM_CODEC = StreamCodec.of((RegistryFriendlyByteBuf buffer, PauseMenuKeybindPressMessage message) -> {
 		buffer.writeInt(message.eventType);
 		buffer.writeInt(message.pressedms);
@@ -47,7 +48,7 @@ public record PauseMenuKeybindPressMessage(int eventType, int pressedms) impleme
 		double y = entity.getY();
 		double z = entity.getZ();
 		// security measure to prevent arbitrary chunk generation
-		if (!world.hasChunkAt(entity.blockPosition()))
+		if (!world.getChunkSource().hasChunk(SectionPos.blockToSectionCoord(x), SectionPos.blockToSectionCoord(z)))
 			return;
 		if (type == 0) {
 

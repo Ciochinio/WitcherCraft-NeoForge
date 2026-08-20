@@ -8,6 +8,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.network.chat.Component;
 
 public class SignCastKeyReleaseProcedure {
@@ -46,8 +47,8 @@ public class SignCastKeyReleaseProcedure {
 								_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.SIGN_COOLDOWN, 40, 0));
 						}
 					} else if (!(entity instanceof LivingEntity _livEnt10 && _livEnt10.hasEffect(WitchercraftModMobEffects.QUEN_SIGN)) && !(entity instanceof LivingEntity _livEnt11 && _livEnt11.hasEffect(WitchercraftModMobEffects.IGNI_SIGN))) {
-						if (entity instanceof Player _player && !_player.level().isClientSide())
-							_player.displayClientMessage(Component.literal("Not enough stamina for alternate sign"), true);
+						if (entity instanceof ServerPlayer _player)
+							_player.sendSystemMessage(Component.literal("Not enough stamina for alternate sign"), true);
 					}
 					if (entity instanceof LivingEntity _livEnt13 && _livEnt13.hasEffect(WitchercraftModMobEffects.QUEN_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesExploadingShield) {
 						if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
@@ -91,8 +92,8 @@ public class SignCastKeyReleaseProcedure {
 								_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.SIGN_COOLDOWN, 40, 1));
 						}
 					} else {
-						if (entity instanceof Player _player && !_player.level().isClientSide())
-							_player.displayClientMessage(Component.literal("Not enough stamina"), true);
+						if (entity instanceof ServerPlayer _player)
+							_player.sendSystemMessage(Component.literal("Not enough stamina"), true);
 					}
 				}
 			}
