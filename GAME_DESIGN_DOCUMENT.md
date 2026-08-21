@@ -219,7 +219,7 @@ a Sign plays rather than just pushing its numbers, and they're still being final
 
 | Base Sign | Alternate | Change in behavior |
 |-----------|-----------|--------------------|
-| Aard | **Far-Reaching Aard** | Flips Aard from a push into a wider pull, dragging surrounding enemies toward the caster (with special handling for undead) to gather a scattered group into one place. |
+| Aard | **Far-Reaching Aard** | Widens Aard from a frontal cone into a full 360-degree radial blast, shoving every nearby enemy away from the caster at once to clear space on all sides. |
 | Igni | **Fire Stream** | An enhanced, sustained flame projection. |
 | Quen | **Exploding Shield** | The shield discharges outward when it ends or breaks instead of just fading. |
 | Yrden | **Magic Trap** | An upgraded trap variant of the Yrden zone. |

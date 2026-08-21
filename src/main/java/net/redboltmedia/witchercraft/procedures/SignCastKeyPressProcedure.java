@@ -53,7 +53,7 @@ public class SignCastKeyPressProcedure {
 						if (entity instanceof LivingEntity _entity)
 							_entity.removeEffect(WitchercraftModMobEffects.SIGN_HOLD);
 					} else if (entity instanceof LivingEntity _livEnt11 && _livEnt11.hasEffect(WitchercraftModMobEffects.AARD_SIGN) && !entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesFarReachingAard) {
-						AardCastProcedure.execute(entity);
+						AardCastProcedure.execute(world, x, y, z, entity);
 						SignCostProcedure.execute(entity);
 						if (entity instanceof LivingEntity _entity)
 							_entity.removeEffect(WitchercraftModMobEffects.SIGN_HOLD);

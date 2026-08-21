@@ -75,7 +75,7 @@ public class SignCastKeyReleaseProcedure {
 						}
 						if (entity instanceof LivingEntity _livEnt22 && _livEnt22.hasEffect(WitchercraftModMobEffects.AARD_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesFarReachingAard) {
 							SignCostProcedure.execute(entity);
-							AardCastProcedure.execute(entity);
+							AardCastProcedure.execute(world, x, y, z, entity);
 							if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
 								_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.SIGN_COOLDOWN, 40, 1));
 						}
