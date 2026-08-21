@@ -694,7 +694,7 @@ Perks are switches the combat, Sign, and alchemy systems read live (see
 
 | Perk | Effect |
 |------|--------|
-| **Far-Reaching Aard** | Swaps Aard for its pull/vacuum alternate |
+| **Far-Reaching Aard** | Swaps Aard for its radial knockback alternate (pushes all nearby enemies away) |
 | **Fire Stream** | Swaps Igni for its sustained-stream alternate |
 | **Magic Trap** | Swaps Yrden for its upgraded trap alternate |
 | **Exploding Shield** | Swaps Quen for its discharge-on-break alternate |
