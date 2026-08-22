@@ -31,8 +31,8 @@ public class QuenParticlesParticle extends SingleQuadParticle {
 		super(world, x, y, z, spriteSet.first());
 		this.spriteSet = spriteSet;
 		this.setSize(0.2f, 0.2f);
-		this.quadSize *= 2f;
-		this.lifetime = 2;
+		this.quadSize *= 0.4f;
+		this.lifetime = 1;
 		this.gravity = 0f;
 		this.hasPhysics = true;
 		this.xd = vx * 1;

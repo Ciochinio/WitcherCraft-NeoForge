@@ -51,6 +51,8 @@ public class DodgeCalculatorProcedure {
 				_player.sendSystemMessage(Component.literal("Dodged EZ"), false);
 			if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
 				_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.DODGE_COOLDOWN, 60, 1));
+			if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
+				_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.DAMAGE_BLOCKED, 3, 0));
 		}
 	}
 }

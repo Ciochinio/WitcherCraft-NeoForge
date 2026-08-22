@@ -32,6 +32,17 @@ WitcherCraft — a NeoForge Minecraft mod built with **MCreator**, targeting gen
   the working tree. Summarizing what's uncommitted at wrap-up is welcome;
   running the commit is not, unless explicitly asked in the moment (a past
   "you can commit" does not carry over to later work).
+- **Name every procedure you edit, and say where it lives in MCreator.** After
+  creating or changing any MCreator procedure (or other element), list the
+  affected element names explicitly in that same response - a short "procedures
+  touched: X, Y, Z" line - so nothing gets lost track of when the workspace is
+  next opened in MCreator. Format each name as a clickable markdown link to its
+  `elements/<Name>.mod.json` (or the generated Java file) so it can be opened
+  directly. For EACH listed element, also state its location in the MCreator
+  element browser - the `"path"` from its `mod_elements` entry in
+  `witchercraft.mcreator` (e.g. `~/Signs/Quen`), or "Variables" for a
+  player/global variable - so it can be found in the GUI. Note whether it's new
+  or edited.
 - **Track changes per commit and keep the GDD current.**
   `GAME_DESIGN_DOCUMENT.md` is the living design doc and must not drift from the
   build. Whenever work changes gameplay, content, or balance (a new or edited

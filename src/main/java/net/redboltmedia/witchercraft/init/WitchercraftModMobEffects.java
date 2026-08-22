@@ -4,7 +4,7 @@
 package net.redboltmedia.witchercraft.init;
 
 import net.redboltmedia.witchercraft.procedures.SuccubusDecoctionTickStartProcedure;
-import net.redboltmedia.witchercraft.procedures.QuenEffectParticlesProcedure;
+import net.redboltmedia.witchercraft.procedures.QuenBrokeProcedure;
 import net.redboltmedia.witchercraft.potion.*;
 import net.redboltmedia.witchercraft.WitchercraftMod;
 
@@ -70,8 +70,8 @@ public class WitchercraftModMobEffects {
 	public static final DeferredHolder<MobEffect, MobEffect> BLINDNESS = REGISTRY.register("blindness", BlindnessMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> SIGN_COOLDOWN = REGISTRY.register("sign_cooldown", SignCooldownMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> SIGN_HOLD = REGISTRY.register("sign_hold", SignHoldMobEffect::new);
-	public static final DeferredHolder<MobEffect, MobEffect> QUEN_EFFECT_TIMER = REGISTRY.register("quen_effect_timer", QuenEffectTimerMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> QUEN_EFFECT = REGISTRY.register("quen_effect", QuenEffectMobEffect::new);
+	public static final DeferredHolder<MobEffect, MobEffect> DAMAGE_BLOCKED = REGISTRY.register("damage_blocked", DamageBlockedMobEffect::new);
 
 	@SubscribeEvent
 	public static void onEffectRemoved(MobEffectEvent.Remove event) {
@@ -92,8 +92,8 @@ public class WitchercraftModMobEffects {
 	private static void expireEffects(Entity entity, MobEffectInstance effectInstance) {
 		if (effectInstance.is(SUCCUBUS_DECOCTION_TICK)) {
 			SuccubusDecoctionTickStartProcedure.execute(entity.level(), entity);
-		} else if (effectInstance.is(QUEN_EFFECT_TIMER)) {
-			QuenEffectParticlesProcedure.execute(entity.level(), entity);
+		} else if (effectInstance.is(QUEN_EFFECT)) {
+			QuenBrokeProcedure.execute(entity);
 		}
 	}
 }

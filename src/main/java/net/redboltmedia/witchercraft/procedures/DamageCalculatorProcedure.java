@@ -22,6 +22,11 @@ public class DamageCalculatorProcedure {
 	public static void execute(LevelAccessor world, Entity entity, Entity sourceentity, double amount) {
 		if (entity == null || sourceentity == null)
 			return;
+		if (entity instanceof LivingEntity _livEntBlk && _livEntBlk.hasEffect(WitchercraftModMobEffects.DAMAGE_BLOCKED)) {
+			if (entity instanceof LivingEntity _entity)
+				_entity.removeEffect(WitchercraftModMobEffects.DAMAGE_BLOCKED);
+			return;
+		}
 		double critChanceRoll = 0;
 		critChanceRoll = Mth.nextInt(RandomSource.create(), 1, 100);
 		if (sourceentity instanceof LivingEntity _livEnt1 && _livEnt1.hasEffect(WitchercraftModMobEffects.DEV_LOG)) {

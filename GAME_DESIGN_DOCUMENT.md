@@ -189,7 +189,7 @@ Each Sign owns one job.
 |------|------|----------|
 | **Aard** | Displacement | A telekinetic cone that throws enemies away from the caster and staggers a group in front of them. |
 | **Igni** | Area damage | A wide, piercing stream of flame thrown forward that burns everything it passes through. |
-| **Quen** | Defense | A shield placed on the caster for a fixed duration, held up by its own particle aura. |
+| **Quen** | Defense | A timed shield that absorbs a pool of damage, scaling with Sign Intensity, marked by a particle spinning around the caster. |
 | **Yrden** | Control | A magic trap on the ground that slows and holds enemies caught inside it. |
 | **Axii** | Crowd control | A targeted charm that freezes a single enemy in place; refunds its cost when there's no target. |
 
@@ -199,9 +199,17 @@ nearby enemies back and buys room when you're swarmed.
 **Igni** is your main damage Sign. A dense stream of fire straight ahead that pierces through
 enemies instead of stopping at the first, setting them alight. Best when they're lined up.
 
-**Quen** is the defensive Sign. Casting it wraps you in a timed shield, marked by a particle
-aura that stays up as long as the shield does. It's what you throw up before a hit you can't
-dodge.
+**Quen** is the defensive Sign. Casting it grants a pool of absorption (**base 8**, scaling with
+Sign Intensity) that eats incoming damage until it's spent or the **10-second** timer runs out -
+whichever comes first. It absorbs virtually everything (melee, projectiles, fire and burning,
+explosions, magic) but deliberately lets fall, freezing, drowning, starvation, and the void
+through untouched, since a magic ward shouldn't cushion a fall. A hit bigger than what's left
+partially drains the shield and lets the rest through as real damage, same as an absorption
+effect - so the shield doesn't just "not work" on a big hit, it softens it. While it's up, a
+gold action-bar readout tracks the remaining pool, and a single particle orbits the caster with
+a slight vertical bob; both cut out the moment the shield breaks or expires, with a clear
+"Quen broke!" message so there's no ambiguity about whether it's still up. It's what you throw
+up before a hit you can't dodge.
 
 **Yrden** is the crowd-control Sign. It lays a ring on the ground; enemies inside it are slowed
 and held while you reposition or focus someone down. Best against fast enemies and in
@@ -221,7 +229,7 @@ a Sign plays rather than just pushing its numbers, and they're still being final
 |-----------|-----------|--------------------|
 | Aard | **Far-Reaching Aard** | Widens Aard from a frontal cone into a full 360-degree radial blast, shoving every nearby enemy away from the caster at once to clear space on all sides. |
 | Igni | **Fire Stream** | An enhanced, sustained flame projection. |
-| Quen | **Exploding Shield** | The shield discharges outward when it ends or breaks instead of just fading. |
+| Quen | **Active Shield** | A held, channeled shield you keep raised at will, like in the games, instead of the fire-and-forget timed pool. |
 | Yrden | **Magic Trap** | An upgraded trap variant of the Yrden zone. |
 | Axii | **Alternate Axii** | An upgraded charm; like base Axii, it refunds its cost when it finds no target. |
 
@@ -697,7 +705,7 @@ Perks are switches the combat, Sign, and alchemy systems read live (see
 | **Far-Reaching Aard** | Swaps Aard for its radial knockback alternate (pushes all nearby enemies away) |
 | **Fire Stream** | Swaps Igni for its sustained-stream alternate |
 | **Magic Trap** | Swaps Yrden for its upgraded trap alternate |
-| **Exploding Shield** | Swaps Quen for its discharge-on-break alternate |
+| **Active Shield** | Swaps Quen for its held/channeled shield alternate |
 
 **Alchemy**
 

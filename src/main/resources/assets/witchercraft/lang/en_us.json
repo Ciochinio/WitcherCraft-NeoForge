@@ -292,9 +292,9 @@
   "gui.witchercraft.player_stats_overlay.label_signhold": "SignHold",
   "effect.witchercraft.sign_hold": "Sign Hold",
   "gui.witchercraft.testmedallion.label_sekund": "Sekund",
-  "effect.witchercraft.quen_effect_timer": "Quen Effect Timer",
   "effect.witchercraft.quen_effect": "Quen Effect",
   "gui.witchercraft.drowner_gui.label_weak_to_igni": "Weak to: Igni",
   "gui.witchercraft.drowner_gui.label_spawning_swamp": "Spawning: Swamp",
-  "gui.witchercraft.drowner_gui.label_loot_monster_brain_monster_too": "Loot: Monster Brain"
+  "gui.witchercraft.drowner_gui.label_loot_monster_brain_monster_too": "Loot: Monster Brain",
+  "effect.witchercraft.damage_blocked": "Damage Blocked Double DMG Fix"
 }

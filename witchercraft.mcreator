@@ -2352,7 +2352,126 @@
           }
         ]
       },
-      "path": "~/Signs/Quen"
+      "path": "~/Signs/Quen/DefQuen"
+    },
+    {
+      "name": "QuenEffectTick",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "quen_effect_tick",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/QuenEffectTickProcedure.java"
+        ]
+      },
+      "path": "~/Signs/Quen/DefQuen"
+    },
+    {
+      "name": "QuenAura",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "quen_aura",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/QuenAuraProcedure.java"
+        ]
+      },
+      "path": "~/Signs/Quen/DefQuen"
+    },
+    {
+      "name": "QuenBroke",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "quen_broke",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/QuenBrokeProcedure.java"
+        ]
+      },
+      "path": "~/Signs/Quen/Quen Text"
+    },
+    {
+      "name": "QuenActiveTick",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "quen_active_tick",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/QuenActiveTickProcedure.java"
+        ]
+      },
+      "path": "~/Signs/Quen/Quen Text"
+    },
+    {
+      "name": "QuenBlock",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "quen_block",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "sourceentity",
+            "type": "entity"
+          },
+          {
+            "name": "amount",
+            "type": "number"
+          },
+          {
+            "name": "damagesource",
+            "type": "damagesource"
+          },
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/QuenBlockProcedure.java"
+        ]
+      },
+      "path": "~/Signs/Quen/DefQuen"
     },
     {
       "name": "AardCast",
@@ -9631,7 +9750,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/AltQuenCastProcedure.java"
         ]
       },
-      "path": "~/Signs/Quen"
+      "path": "~/Signs/Quen/AltQuen"
     },
     {
       "name": "AltAardCast",
@@ -9986,7 +10105,7 @@
           "src/main/java/net/redboltmedia/witchercraft/client/particle/QuenHoldParticlesParticle.java"
         ]
       },
-      "path": "~/Signs/Quen"
+      "path": "~/Signs/Quen/AltQuen"
     },
     {
       "name": "QuenParticles",
@@ -10000,43 +10119,7 @@
           "src/main/java/net/redboltmedia/witchercraft/client/particle/QuenParticlesParticle.java"
         ]
       },
-      "path": "~/Signs/Quen"
-    },
-    {
-      "name": "QuenEffectTimer",
-      "type": "potioneffect",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "quen_effect_timer",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/potion/QuenEffectTimerMobEffect.java"
-        ]
-      },
-      "path": "~/Signs/Quen"
-    },
-    {
-      "name": "QuenEffectParticles",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "quen_effect_particles",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/QuenEffectParticlesProcedure.java"
-        ]
-      },
-      "path": "~/Signs/Quen"
+      "path": "~/Signs/Quen/DefQuen"
     },
     {
       "name": "QuenEffect",
@@ -10049,7 +10132,20 @@
           "src/main/java/net/redboltmedia/witchercraft/potion/QuenEffectMobEffect.java"
         ]
       },
-      "path": "~/Signs/Quen"
+      "path": "~/Signs/Quen/DefQuen"
+    },
+    {
+      "name": "DamageBlocked",
+      "type": "potioneffect",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "damage_blocked",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/potion/DamageBlockedMobEffect.java"
+        ]
+      },
+      "path": "~/Admin"
     }
   ],
   "variable_elements": [
@@ -10451,6 +10547,12 @@
     },
     {
       "name": "witchercraftDodgeChance",
+      "type": "number",
+      "scope": "player_lifetime",
+      "value": "0"
+    },
+    {
+      "name": "witchercraftQuenShield",
       "type": "number",
       "scope": "player_lifetime",
       "value": "0"
@@ -10943,11 +11045,11 @@
       "gui.witchercraft.player_stats_overlay.label_signhold": "SignHold",
       "effect.witchercraft.sign_hold": "Sign Hold",
       "gui.witchercraft.testmedallion.label_sekund": "Sekund",
-      "effect.witchercraft.quen_effect_timer": "Quen Effect Timer",
       "effect.witchercraft.quen_effect": "Quen Effect",
       "gui.witchercraft.drowner_gui.label_weak_to_igni": "Weak to: Igni",
       "gui.witchercraft.drowner_gui.label_spawning_swamp": "Spawning: Swamp",
-      "gui.witchercraft.drowner_gui.label_loot_monster_brain_monster_too": "Loot: Monster Brain"
+      "gui.witchercraft.drowner_gui.label_loot_monster_brain_monster_too": "Loot: Monster Brain",
+      "effect.witchercraft.damage_blocked": "Damage Blocked Double DMG Fix"
     }
   },
   "metadata": {
@@ -11196,7 +11298,20 @@
           },
           {
             "name": "Quen",
-            "children": []
+            "children": [
+              {
+                "name": "Quen Text",
+                "children": []
+              },
+              {
+                "name": "DefQuen",
+                "children": []
+              },
+              {
+                "name": "AltQuen",
+                "children": []
+              }
+            ]
           },
           {
             "name": "Aard",
