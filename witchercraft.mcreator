@@ -4896,6 +4896,98 @@
       "path": "~/Alchemy/ Toxicity"
     },
     {
+      "name": "WitcherHud",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "witcher_hud",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WitcherHud.java"
+        ]
+      }
+    },
+    {
+      "name": "QuenHudShow",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "quen_hud_show",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "return_type": "logic",
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/QuenHudShowProcedure.java"
+        ]
+      },
+      "path": "~/Signs/Quen"
+    },
+    {
+      "name": "QuenHudFill",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "quen_hud_fill",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "return_type": "number",
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/QuenHudFillProcedure.java"
+        ]
+      },
+      "path": "~/Signs/Quen"
+    },
+    {
+      "name": "ToxicityHudFill",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "toxicity_hud_fill",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "return_type": "number",
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/ToxicityHudFillProcedure.java"
+        ]
+      },
+      "path": "~/Alchemy/ Toxicity"
+    },
+    {
+      "name": "ToxicityHudOverdose",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "toxicity_hud_overdose",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "return_type": "logic",
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/ToxicityHudOverdoseProcedure.java"
+        ]
+      },
+      "path": "~/Alchemy/ Toxicity"
+    },
+    {
       "name": "Tox1",
       "type": "procedure",
       "compiles": true,
@@ -10553,6 +10645,12 @@
     },
     {
       "name": "witchercraftQuenShield",
+      "type": "number",
+      "scope": "player_lifetime",
+      "value": "0"
+    },
+    {
+      "name": "witchercraftQuenShieldMax",
       "type": "number",
       "scope": "player_lifetime",
       "value": "0"

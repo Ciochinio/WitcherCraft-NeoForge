@@ -140,6 +140,7 @@ public class WitchercraftModVariables {
 			clone.witchercraftEnemyNearby = original.witchercraftEnemyNearby;
 			clone.witchercraftDodgeChance = original.witchercraftDodgeChance;
 			clone.witchercraftQuenShield = original.witchercraftQuenShield;
+			clone.witchercraftQuenShieldMax = original.witchercraftQuenShieldMax;
 			clone.witchercraftInstantKillChance = original.witchercraftInstantKillChance;
 			clone.witchercraftBasePassiveStaminaRegeneration = original.witchercraftBasePassiveStaminaRegeneration;
 			clone.witchercraftPotionDuration = original.witchercraftPotionDuration;
@@ -231,6 +232,7 @@ public class WitchercraftModVariables {
 		public boolean witchercraftEnemyNearby = false;
 		public double witchercraftDodgeChance = 0;
 		public double witchercraftQuenShield = 0;
+		public double witchercraftQuenShieldMax = 0;
 		public double witchercraftInstantKillChance = 0;
 		public double witchercraftBasePassiveStaminaRegeneration = 0;
 		public double witchercraftPotionDuration = 0;
@@ -319,6 +321,7 @@ public class WitchercraftModVariables {
 			output.putBoolean("witchercraftEnemyNearby", witchercraftEnemyNearby);
 			output.putDouble("witchercraftDodgeChance", witchercraftDodgeChance);
 			output.putDouble("witchercraftQuenShield", witchercraftQuenShield);
+			output.putDouble("witchercraftQuenShieldMax", witchercraftQuenShieldMax);
 			output.putDouble("witchercraftInstantKillChance", witchercraftInstantKillChance);
 			output.putDouble("witchercraftBasePassiveStaminaRegeneration", witchercraftBasePassiveStaminaRegeneration);
 			output.putDouble("witchercraftPotionDuration", witchercraftPotionDuration);
@@ -408,6 +411,7 @@ public class WitchercraftModVariables {
 			witchercraftEnemyNearby = input.getBooleanOr("witchercraftEnemyNearby", false);
 			witchercraftDodgeChance = input.getDoubleOr("witchercraftDodgeChance", 0);
 			witchercraftQuenShield = input.getDoubleOr("witchercraftQuenShield", 0);
+			witchercraftQuenShieldMax = input.getDoubleOr("witchercraftQuenShieldMax", 0);
 			witchercraftInstantKillChance = input.getDoubleOr("witchercraftInstantKillChance", 0);
 			witchercraftBasePassiveStaminaRegeneration = input.getDoubleOr("witchercraftBasePassiveStaminaRegeneration", 0);
 			witchercraftPotionDuration = input.getDoubleOr("witchercraftPotionDuration", 0);

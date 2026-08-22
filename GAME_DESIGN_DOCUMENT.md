@@ -189,7 +189,7 @@ Each Sign owns one job.
 |------|------|----------|
 | **Aard** | Displacement | A telekinetic cone that throws enemies away from the caster and staggers a group in front of them. |
 | **Igni** | Area damage | A wide, piercing stream of flame thrown forward that burns everything it passes through. |
-| **Quen** | Defense | A timed shield that absorbs a pool of damage, scaling with Sign Intensity, marked by a particle spinning around the caster. |
+| **Quen** | Defense | A timed shield that absorbs a pool of damage, scaling with Sign Intensity, shown as shield bubbles above your health and marked by a particle spinning around the caster. |
 | **Yrden** | Control | A magic trap on the ground that slows and holds enemies caught inside it. |
 | **Axii** | Crowd control | A targeted charm that freezes a single enemy in place; refunds its cost when there's no target. |
 
@@ -206,9 +206,11 @@ explosions, magic) but deliberately lets fall, freezing, drowning, starvation, a
 through untouched, since a magic ward shouldn't cushion a fall. A hit bigger than what's left
 partially drains the shield and lets the rest through as real damage, same as an absorption
 effect - so the shield doesn't just "not work" on a big hit, it softens it. While it's up, a
-gold action-bar readout tracks the remaining pool, and a single particle orbits the caster with
-a slight vertical bob; both cut out the moment the shield breaks or expires, with a clear
-"Quen broke!" message so there's no ambiguity about whether it's still up. It's what you throw
+row of yellow shield bubbles appears above your health, one bubble per **2** points absorbed and a
+small bubble for an odd leftover, emptying as the pool is eaten, and a single particle
+orbits the caster with a slight vertical bob; both cut out the moment the shield breaks or expires,
+with a clear "Quen broke!" message so there's no ambiguity about whether it's still up. A gold
+action-bar readout of the exact remaining pool runs alongside the bar as a debugging aid. It's what you throw
 up before a hit you can't dodge.
 
 **Yrden** is the crowd-control Sign. It lays a ring on the ground; enemies inside it are slowed
@@ -324,7 +326,8 @@ drink pushes it up; sit too high and it starts killing you.
 
 - **Gaining it.** Every decoction adds **50**. Potions vary by recipe, from **10** (Cat) up to
   **25** (Swallow, Thunderbolt, Full Moon, White Raffard's). It's tracked as a single global
-  value and shown on a dedicated HUD overlay that fills as you climb.
+  value and shown on a dedicated HUD bar, sitting above the hunger bar, that fills as you climb
+  and turns red once you cross the Overdose Threshold.
 - **Losing it.** Toxicity decays on its own, ticking down by **1** at a steady interval, so
   it's a temporary debt rather than a permanent one. Stop drinking and it drains back to zero.
 - **The Overdose Threshold.** This is your ceiling. Stay under it and there's no penalty. Reach
@@ -567,11 +570,26 @@ Character screen, the Bestiary, the Glossary, and Meditation.
 
 ### Custom HUD
 
-WitcherCraft draws its own HUD on top of the vanilla one. A player-stats overlay shows your live
-combat and Sign stats, a Toxicity overlay tracks how close you are to overdosing, and the Sign
-cooldown is shown while it's running. The intent is that everything you need to make an in-the-moment
-decision - can I cast, how toxic am I, is my build actually giving me the numbers I expect - is
-readable at a glance.
+WitcherCraft draws its own HUD on top of the vanilla one. The intent is that everything you need to
+make an in-the-moment decision - can I cast, how toxic am I, is my shield still up, is my build
+actually giving me the numbers I expect - is readable at a glance, without opening a screen.
+
+Two resource bars sit with the vanilla ones at the bottom of the screen, deliberately mirroring how
+health and hunger read:
+
+- **Quen shield**, on the **left** above health and armor, read the same way as your hearts: one
+  bubble per **2** points of shield, a small bubble for an odd leftover point, ten to a row and extra
+  rows stacking upward if a build ever pushes the pool that high. It only exists while a shield is
+  up, the same way the armor row only exists while you're wearing armor.
+- **Toxicity**, on the **right**, stacked between hunger and oxygen. Always visible, filling
+  smoothly like the experience bar, and switching to a warning colour once you're overdosing.
+
+The left column is defensive state and the right column is the alchemy resource. That split is the
+convention any future bar should follow. Both bars place themselves relative to whatever vanilla has
+already drawn, so they stay correct with any amount of armor, absorption, or bonus max health.
+
+Alongside them, a player-stats overlay shows your live combat and Sign stats, and the Sign cooldown
+is shown while it's running.
 
 ### Meditation
 
