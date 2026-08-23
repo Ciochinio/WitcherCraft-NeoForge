@@ -4,18 +4,18 @@ import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
 
 import net.minecraft.world.entity.Entity;
 
-public class CrippllingStrikesEffectProcedure {
+public class QuenDischargeEffectProcedure {
 	public static void execute(Entity entity) {
 		if (entity == null)
 			return;
 		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
-			if (CharacterAbilitiesCombatTier3Procedure.execute(entity)) {
+			if (CharacterAbilitiesSignsTier3Procedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-					_vars.witchercraftAbilitiesCripplingStrikes = true;
+					_vars.witchercraftAbilitiesQuenDischarge = true;
 					_vars.markSyncDirty();
 				}
-				CharacterAbilitiesCombatSkillPointsUsedProcedure.execute(entity);
+				CharacterAbilitiesSignsSkillPointsUsedProcedure.execute(entity);
 			}
 		}
 	}

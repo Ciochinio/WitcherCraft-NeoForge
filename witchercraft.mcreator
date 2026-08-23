@@ -1014,14 +1014,14 @@
       "path": "~/Alchemy/Potions/GoldenOriole"
     },
     {
-      "name": "WhiteHoneyPlayerUsed",
+      "name": "WhiteHoneyUsed",
       "type": "procedure",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "white_honey_player_used",
+      "registry_name": "white_honey_used",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/WhiteHoneyPlayerUsedProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WhiteHoneyUsedProcedure.java"
         ],
         "dependencies": [
           {
@@ -2522,14 +2522,14 @@
       "path": "~/Signs/Aard"
     },
     {
-      "name": "CharaterAbilitesGeneralGuiOpen",
+      "name": "CharacterAbilitiesGeneralGuiOpen",
       "type": "procedure",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "charater_abilites_general_gui_open",
+      "registry_name": "character_abilities_general_gui_open",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CharaterAbilitesGeneralGuiOpenProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/CharacterAbilitiesGeneralGuiOpenProcedure.java"
         ],
         "dependencies": [
           {
@@ -3280,14 +3280,14 @@
       "path": "~/Character Abilities/CombatPerks/PRECISE BLOWS"
     },
     {
-      "name": "CrippllingStrikesEffect",
+      "name": "CripplingStrikesEffect",
       "type": "procedure",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "cripplling_strikes_effect",
+      "registry_name": "crippling_strikes_effect",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CrippllingStrikesEffectProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/CripplingStrikesEffectProcedure.java"
         ],
         "dependencies": [
           {
@@ -3394,14 +3394,14 @@
       "path": "~/Character Abilities/CombatPerks/DEFENCE"
     },
     {
-      "name": "DeadlyPresicionEffect",
+      "name": "DeadlyPrecisionEffect",
       "type": "procedure",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "deadly_presicion_effect",
+      "registry_name": "deadly_precision_effect",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/DeadlyPresicionEffectProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/DeadlyPrecisionEffectProcedure.java"
         ],
         "dependencies": [
           {
@@ -3410,7 +3410,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/DEADLY PRESICION"
+      "path": "~/Character Abilities/CombatPerks/DEADLY PRECISION"
     },
     {
       "name": "ColdBloodEffect",
@@ -3451,14 +3451,14 @@
       "path": "~/Character Abilities/CombatPerks/ANATOMICAL KNOWLEDGE"
     },
     {
-      "name": "FlooodOfAngerEffec",
+      "name": "FloodOfAngerEffect",
       "type": "procedure",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "floood_of_anger_effec",
+      "registry_name": "flood_of_anger_effect",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/FlooodOfAngerEffecProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/FloodOfAngerEffectProcedure.java"
         ],
         "dependencies": [
           {
@@ -3548,15 +3548,15 @@
       "path": "~/Character Abilities/CombatPerks/PRECISE BLOWS"
     },
     {
-      "name": "CrippllingStrikesShow",
+      "name": "CripplingStrikesShow",
       "type": "procedure",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "cripplling_strikes_show",
+      "registry_name": "crippling_strikes_show",
       "metadata": {
         "return_type": "logic",
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CrippllingStrikesShowProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/CripplingStrikesShowProcedure.java"
         ],
         "dependencies": [
           {
@@ -3668,15 +3668,15 @@
       "path": "~/Character Abilities/CombatPerks/DEFENCE"
     },
     {
-      "name": "DeadlyPresicionShow",
+      "name": "DeadlyPrecisionShow",
       "type": "procedure",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "deadly_presicion_show",
+      "registry_name": "deadly_precision_show",
       "metadata": {
         "return_type": "logic",
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/DeadlyPresicionShowProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/DeadlyPrecisionShowProcedure.java"
         ],
         "dependencies": [
           {
@@ -3685,7 +3685,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/DEADLY PRESICION"
+      "path": "~/Character Abilities/CombatPerks/DEADLY PRECISION"
     },
     {
       "name": "ColdBloodShow",
@@ -4017,14 +4017,14 @@
       "path": "~/Character Abilities/SignsPerks/Quen Intensity"
     },
     {
-      "name": "QuenDiscahrgeEffect",
+      "name": "QuenDischargeEffect",
       "type": "procedure",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "quen_discahrge_effect",
+      "registry_name": "quen_discharge_effect",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/QuenDiscahrgeEffectProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/QuenDischargeEffectProcedure.java"
         ],
         "dependencies": [
           {
@@ -4033,7 +4033,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/SignsPerks/Quen Discahrge"
+      "path": "~/Character Abilities/SignsPerks/Quen Discharge"
     },
     {
       "name": "DelusionEffect",
@@ -4273,15 +4273,15 @@
       "path": "~/Character Abilities/SignsPerks/Magic Trap"
     },
     {
-      "name": "ExploadingShildshow",
+      "name": "ExplodingShieldShow",
       "type": "procedure",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "exploading_shildshow",
+      "registry_name": "exploding_shield_show",
       "metadata": {
         "return_type": "logic",
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/ExploadingShildshowProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/ExplodingShieldShowProcedure.java"
         ],
         "dependencies": [
           {
@@ -4313,15 +4313,15 @@
       "path": "~/Character Abilities/SignsPerks/Quen Intensity"
     },
     {
-      "name": "QuenDiscahrgeShow",
+      "name": "QuenDischargeShow",
       "type": "procedure",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "quen_discahrge_show",
+      "registry_name": "quen_discharge_show",
       "metadata": {
         "return_type": "logic",
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/QuenDiscahrgeShowProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/QuenDischargeShowProcedure.java"
         ],
         "dependencies": [
           {
@@ -4330,7 +4330,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/SignsPerks/Quen Discahrge"
+      "path": "~/Character Abilities/SignsPerks/Quen Discharge"
     },
     {
       "name": "DelusionShow",
@@ -4393,15 +4393,15 @@
       "path": "~/Character Abilities/SignsPerks/Domination"
     },
     {
-      "name": "CharaterLevel",
+      "name": "CharacterLevel",
       "type": "procedure",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "charater_level",
+      "registry_name": "character_level",
       "metadata": {
         "return_type": "string",
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CharaterLevelProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/CharacterLevelProcedure.java"
         ],
         "dependencies": [
           {
@@ -4511,14 +4511,14 @@
       "path": "~/Character Abilities/GeneralPerks/SURVIVAL INSINCT"
     },
     {
-      "name": "Expfix",
+      "name": "ExperienceFix",
       "type": "procedure",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "expfix",
+      "registry_name": "experience_fix",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/ExpfixProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/ExperienceFixProcedure.java"
         ],
         "dependencies": [
           {
@@ -4808,14 +4808,14 @@
       "path": "~/Bestiary/Vampires/Graveir"
     },
     {
-      "name": "HigherVamoireGuiOpen",
+      "name": "HigherVampireGuiOpen",
       "type": "procedure",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "higher_vamoire_gui_open",
+      "registry_name": "higher_vampire_gui_open",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/HigherVamoireGuiOpenProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/HigherVampireGuiOpenProcedure.java"
         ],
         "dependencies": [
           {
@@ -5212,11 +5212,11 @@
       "path": "~/Character Stats/Stats/VariableStats/AdditionalDamage"
     },
     {
-      "name": "CharacterGuIncreasedDamage",
+      "name": "CharacterGuiIncreasedDamage",
       "type": "procedure",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "character_gu_increased_damage",
+      "registry_name": "character_gui_increased_damage",
       "metadata": {
         "return_type": "string",
         "dependencies": [
@@ -5226,7 +5226,7 @@
           }
         ],
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CharacterGuIncreasedDamageProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/CharacterGuiIncreasedDamageProcedure.java"
         ]
       },
       "path": "~/Character Stats/Stats/Gui"
@@ -5275,11 +5275,11 @@
       "path": "~/Admin/Calc"
     },
     {
-      "name": "CharacterAbilitesSkillPointsAvailable",
+      "name": "CharacterAbilitiesSkillPointsAvailable",
       "type": "procedure",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "character_abilites_skill_points_available",
+      "registry_name": "character_abilities_skill_points_available",
       "metadata": {
         "return_type": "string",
         "dependencies": [
@@ -5289,17 +5289,17 @@
           }
         ],
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CharacterAbilitesSkillPointsAvailableProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/CharacterAbilitiesSkillPointsAvailableProcedure.java"
         ]
       },
       "path": "~/Character Abilities/CharacterAbilitiesExperience"
     },
     {
-      "name": "GourmetShowIcon",
+      "name": "GourmetShow",
       "type": "procedure",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "gourmet_show_icon",
+      "registry_name": "gourmet_show",
       "metadata": {
         "return_type": "logic",
         "dependencies": [
@@ -5309,7 +5309,7 @@
           }
         ],
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/GourmetShowIconProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/GourmetShowProcedure.java"
         ]
       },
       "path": "~/Character Abilities/GeneralPerks/GOURMET"
@@ -11819,7 +11819,7 @@
                 "children": []
               },
               {
-                "name": "DEADLY PRESICION",
+                "name": "DEADLY PRECISION",
                 "children": []
               },
               {
@@ -11942,7 +11942,7 @@
                 "children": []
               },
               {
-                "name": "Quen Discahrge",
+                "name": "Quen Discharge",
                 "children": []
               },
               {

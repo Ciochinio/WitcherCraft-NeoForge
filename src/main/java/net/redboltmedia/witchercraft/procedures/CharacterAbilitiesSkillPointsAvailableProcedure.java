@@ -4,7 +4,7 @@ import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
 
 import net.minecraft.world.entity.Entity;
 
-public class CharacterAbilitesSkillPointsAvailableProcedure {
+public class CharacterAbilitiesSkillPointsAvailableProcedure {
 	public static String execute(Entity entity) {
 		if (entity == null)
 			return "";

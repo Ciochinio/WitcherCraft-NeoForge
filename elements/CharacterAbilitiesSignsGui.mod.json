@@ -148,7 +148,7 @@
           "image": "exploadingshield.png",
           "hoveredImage": "",
           "onClick": "ExplodingShieldEffect",
-          "displayCondition": "ExploadingShildshow",
+          "displayCondition": "ExplodingShieldShow",
           "x": 231,
           "y": 44,
           "locked": false
@@ -173,8 +173,8 @@
           "name": "imagebutton_quendischarge",
           "image": "quendischarge.png",
           "hoveredImage": "",
-          "onClick": "QuenDiscahrgeEffect",
-          "displayCondition": "QuenDiscahrgeShow",
+          "onClick": "QuenDischargeEffect",
+          "displayCondition": "QuenDischargeShow",
           "x": 231,
           "y": 161,
           "locked": false
@@ -225,7 +225,7 @@
           "name": "button_general",
           "text": "General",
           "isUndecorated": false,
-          "onClick": "CharaterAbilitesGeneralGuiOpen",
+          "onClick": "CharacterAbilitiesGeneralGuiOpen",
           "width": 61,
           "height": 20,
           "x": 51,
@@ -651,7 +651,7 @@
           "name": "label_proc_character_abilites_skill_po",
           "text": {
             "fixedValue": "",
-            "name": "CharacterAbilitesSkillPointsAvailable"
+            "name": "CharacterAbilitiesSkillPointsAvailable"
           },
           "color": {
             "value": -12829636,

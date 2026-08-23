@@ -6,7 +6,7 @@ import net.redboltmedia.witchercraft.init.WitchercraftModMobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
 
-public class WhiteHoneyPlayerUsedProcedure {
+public class WhiteHoneyUsedProcedure {
 	public static void execute(Entity entity) {
 		if (entity == null)
 			return;

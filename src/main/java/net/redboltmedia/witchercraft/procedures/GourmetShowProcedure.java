@@ -4,11 +4,11 @@ import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
 
 import net.minecraft.world.entity.Entity;
 
-public class DeadlyPresicionShowProcedure {
+public class GourmetShowProcedure {
 	public static boolean execute(Entity entity) {
 		if (entity == null)
 			return false;
-		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesDeadlyPrecision == true) {
+		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesGourmet == true) {
 			return false;
 		}
 		return true;

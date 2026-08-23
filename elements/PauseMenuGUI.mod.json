@@ -86,7 +86,7 @@
           "name": "button_skill_tree",
           "text": "Skill Tree",
           "isUndecorated": false,
-          "onClick": "CharaterAbilitesGeneralGuiOpen",
+          "onClick": "CharacterAbilitiesGeneralGuiOpen",
           "width": 77,
           "height": 20,
           "x": 259,

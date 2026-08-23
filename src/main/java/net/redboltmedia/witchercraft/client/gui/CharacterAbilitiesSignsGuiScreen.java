@@ -164,7 +164,7 @@ public class CharacterAbilitiesSignsGuiScreen extends AbstractContainerScreen<Ch
 
 	@Override
 	protected void extractLabels(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
-		guiGraphics.text(this.font, CharacterAbilitesSkillPointsAvailableProcedure.execute(entity), 193, 25, -12829636, false);
+		guiGraphics.text(this.font, CharacterAbilitiesSkillPointsAvailableProcedure.execute(entity), 193, 25, -12829636, false);
 		guiGraphics.text(this.font, CharacterAbilitiesSignsGuiSkillPointsUsedProcedure.execute(entity), 193, 34, -12829636, false);
 	}
 
@@ -352,7 +352,7 @@ public class CharacterAbilitiesSignsGuiScreen extends AbstractContainerScreen<Ch
 				new WidgetSprites(Identifier.parse("witchercraft:textures/screens/exploadingshield.png"), Identifier.parse("witchercraft:textures/screens/exploadingshield.png")), e -> {
 					int x = CharacterAbilitiesSignsGuiScreen.this.x;
 					int y = CharacterAbilitiesSignsGuiScreen.this.y;
-					if (ExploadingShildshowProcedure.execute(entity)) {
+					if (ExplodingShieldShowProcedure.execute(entity)) {
 						ClientPacketDistributor.sendToServer(new CharacterAbilitiesSignsGuiButtonMessage(14, x, y, z));
 						CharacterAbilitiesSignsGuiButtonMessage.handleButtonAction(entity, 14, x, y, z);
 					}
@@ -382,7 +382,7 @@ public class CharacterAbilitiesSignsGuiScreen extends AbstractContainerScreen<Ch
 				new WidgetSprites(Identifier.parse("witchercraft:textures/screens/quendischarge.png"), Identifier.parse("witchercraft:textures/screens/quendischarge.png")), e -> {
 					int x = CharacterAbilitiesSignsGuiScreen.this.x;
 					int y = CharacterAbilitiesSignsGuiScreen.this.y;
-					if (QuenDiscahrgeShowProcedure.execute(entity)) {
+					if (QuenDischargeShowProcedure.execute(entity)) {
 						ClientPacketDistributor.sendToServer(new CharacterAbilitiesSignsGuiButtonMessage(16, x, y, z));
 						CharacterAbilitiesSignsGuiButtonMessage.handleButtonAction(entity, 16, x, y, z);
 					}
@@ -451,9 +451,9 @@ public class CharacterAbilitiesSignsGuiScreen extends AbstractContainerScreen<Ch
 		this.imagebutton_sustainedglyphs.visible = SustainedGlyphsShowProcedure.execute(entity);
 		this.imagebutton_yrdenintensity.visible = YrdenIntensityShowProcedure.execute(entity);
 		this.imagebutton_magictrap.visible = MagicTrapShowProcedure.execute(entity);
-		this.imagebutton_explodingshield.visible = ExploadingShildshowProcedure.execute(entity);
+		this.imagebutton_explodingshield.visible = ExplodingShieldShowProcedure.execute(entity);
 		this.imagebutton_quenintensity.visible = QuenIntensityShowProcedure.execute(entity);
-		this.imagebutton_quendischarge.visible = QuenDiscahrgeShowProcedure.execute(entity);
+		this.imagebutton_quendischarge.visible = QuenDischargeShowProcedure.execute(entity);
 		this.imagebutton_delusion.visible = DelusionShowProcedure.execute(entity);
 		this.imagebutton_axiiintensity.visible = AxiiIntensityShowProcedure.execute(entity);
 		this.imagebutton_domination.visible = DominationShowProcedure.execute(entity);

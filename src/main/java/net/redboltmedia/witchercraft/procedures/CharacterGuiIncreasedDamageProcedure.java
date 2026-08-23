@@ -12,7 +12,7 @@ import net.minecraft.world.entity.Entity;
 import javax.annotation.Nullable;
 
 @EventBusSubscriber
-public class CharacterGuIncreasedDamageProcedure {
+public class CharacterGuiIncreasedDamageProcedure {
 	@SubscribeEvent
 	public static void onPlayerTick(PlayerTickEvent.Post event) {
 		execute(event, event.getEntity());

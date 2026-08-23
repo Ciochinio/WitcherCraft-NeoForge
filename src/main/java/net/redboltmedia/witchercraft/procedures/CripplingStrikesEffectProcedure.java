@@ -4,7 +4,7 @@ import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
 
 import net.minecraft.world.entity.Entity;
 
-public class DeadlyPresicionEffectProcedure {
+public class CripplingStrikesEffectProcedure {
 	public static void execute(Entity entity) {
 		if (entity == null)
 			return;
@@ -12,7 +12,7 @@ public class DeadlyPresicionEffectProcedure {
 			if (CharacterAbilitiesCombatTier3Procedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-					_vars.witchercraftAbilitiesDeadlyPrecision = true;
+					_vars.witchercraftAbilitiesCripplingStrikes = true;
 					_vars.markSyncDirty();
 				}
 				CharacterAbilitiesCombatSkillPointsUsedProcedure.execute(entity);

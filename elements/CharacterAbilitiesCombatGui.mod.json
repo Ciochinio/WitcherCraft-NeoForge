@@ -42,8 +42,8 @@
           "name": "imagebutton_cripplingstrikes",
           "image": "cripplingstrikes.png",
           "hoveredImage": "",
-          "onClick": "CrippllingStrikesEffect",
-          "displayCondition": "CrippllingStrikesShow",
+          "onClick": "CripplingStrikesEffect",
+          "displayCondition": "CripplingStrikesShow",
           "x": 123,
           "y": 152,
           "locked": false
@@ -120,8 +120,8 @@
           "name": "imagebutton_deadlyprecision",
           "image": "deadlyprecision.png",
           "hoveredImage": "",
-          "onClick": "DeadlyPresicionEffect",
-          "displayCondition": "DeadlyPresicionShow",
+          "onClick": "DeadlyPrecisionEffect",
+          "displayCondition": "DeadlyPrecisionShow",
           "x": 195,
           "y": 152,
           "locked": false
@@ -172,7 +172,7 @@
           "name": "imagebutton_floodofanger",
           "image": "floodofanger.png",
           "hoveredImage": "",
-          "onClick": "FlooodOfAngerEffec",
+          "onClick": "FloodOfAngerEffect",
           "displayCondition": "FloodOfAngerShow",
           "x": 267,
           "y": 53,
@@ -225,7 +225,7 @@
           "name": "button_general",
           "text": "General",
           "isUndecorated": false,
-          "onClick": "CharaterAbilitesGeneralGuiOpen",
+          "onClick": "CharacterAbilitiesGeneralGuiOpen",
           "width": 61,
           "height": 20,
           "x": 51,
@@ -651,7 +651,7 @@
           "name": "label_proc_character_abilites_skill_po",
           "text": {
             "fixedValue": "",
-            "name": "CharacterAbilitesSkillPointsAvailable"
+            "name": "CharacterAbilitiesSkillPointsAvailable"
           },
           "color": {
             "value": -12829636,

@@ -4,7 +4,7 @@ import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
 
 import net.minecraft.world.entity.Entity;
 
-public class CrippllingStrikesShowProcedure {
+public class CripplingStrikesShowProcedure {
 	public static boolean execute(Entity entity) {
 		if (entity == null)
 			return false;

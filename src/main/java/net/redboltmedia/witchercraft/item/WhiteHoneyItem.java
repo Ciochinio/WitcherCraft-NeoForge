@@ -1,6 +1,6 @@
 package net.redboltmedia.witchercraft.item;
 
-import net.redboltmedia.witchercraft.procedures.WhiteHoneyPlayerUsedProcedure;
+import net.redboltmedia.witchercraft.procedures.WhiteHoneyUsedProcedure;
 
 import net.minecraft.world.level.Level;
 import net.minecraft.world.item.component.Consumables;
@@ -17,7 +17,7 @@ public class WhiteHoneyItem extends Item {
 	@Override
 	public ItemStack finishUsingItem(ItemStack itemstack, Level world, LivingEntity entity) {
 		ItemStack retval = super.finishUsingItem(itemstack, world, entity);
-		WhiteHoneyPlayerUsedProcedure.execute(entity);
+		WhiteHoneyUsedProcedure.execute(entity);
 		return retval;
 	}
 }

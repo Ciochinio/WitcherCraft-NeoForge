@@ -164,7 +164,7 @@ public class CharacterAbilitiesCombatGuiScreen extends AbstractContainerScreen<C
 
 	@Override
 	protected void extractLabels(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
-		guiGraphics.text(this.font, CharacterAbilitesSkillPointsAvailableProcedure.execute(entity), 193, 25, -12829636, false);
+		guiGraphics.text(this.font, CharacterAbilitiesSkillPointsAvailableProcedure.execute(entity), 193, 25, -12829636, false);
 		guiGraphics.text(this.font, CharacterAbilitiesCombatGuiSkillPointsUsedProcedure.execute(entity), 193, 34, -12829636, false);
 	}
 
@@ -250,7 +250,7 @@ public class CharacterAbilitiesCombatGuiScreen extends AbstractContainerScreen<C
 				new WidgetSprites(Identifier.parse("witchercraft:textures/screens/cripplingstrikes.png"), Identifier.parse("witchercraft:textures/screens/cripplingstrikes.png")), e -> {
 					int x = CharacterAbilitiesCombatGuiScreen.this.x;
 					int y = CharacterAbilitiesCombatGuiScreen.this.y;
-					if (CrippllingStrikesShowProcedure.execute(entity)) {
+					if (CripplingStrikesShowProcedure.execute(entity)) {
 						ClientPacketDistributor.sendToServer(new CharacterAbilitiesCombatGuiButtonMessage(7, x, y, z));
 						CharacterAbilitiesCombatGuiButtonMessage.handleButtonAction(entity, 7, x, y, z);
 					}
@@ -339,7 +339,7 @@ public class CharacterAbilitiesCombatGuiScreen extends AbstractContainerScreen<C
 				new WidgetSprites(Identifier.parse("witchercraft:textures/screens/deadlyprecision.png"), Identifier.parse("witchercraft:textures/screens/deadlyprecision.png")), e -> {
 					int x = CharacterAbilitiesCombatGuiScreen.this.x;
 					int y = CharacterAbilitiesCombatGuiScreen.this.y;
-					if (DeadlyPresicionShowProcedure.execute(entity)) {
+					if (DeadlyPrecisionShowProcedure.execute(entity)) {
 						ClientPacketDistributor.sendToServer(new CharacterAbilitiesCombatGuiButtonMessage(13, x, y, z));
 						CharacterAbilitiesCombatGuiButtonMessage.handleButtonAction(entity, 13, x, y, z);
 					}
@@ -445,13 +445,13 @@ public class CharacterAbilitiesCombatGuiScreen extends AbstractContainerScreen<C
 		super.containerTick();
 		this.imagebutton_muslememory.visible = MuscleMemoryShowProcedure.execute(entity);
 		this.imagebutton_preciseblows.visible = PreciseBlowsShowProcedure.execute(entity);
-		this.imagebutton_cripplingstrikes.visible = CrippllingStrikesShowProcedure.execute(entity);
+		this.imagebutton_cripplingstrikes.visible = CripplingStrikesShowProcedure.execute(entity);
 		this.imagebutton_strengthtraining.visible = StrengthTrainingShowProcedure.execute(entity);
 		this.imagebutton_crushingblows.visible = CrushingBlowsShowProcedure.execute(entity);
 		this.imagebutton_sunderarmor.visible = SunderArmorShowProcedure.execute(entity);
 		this.imagebutton_fleetfooted.visible = FleetFootedShowProcedure.execute(entity);
 		this.imagebutton_defense.visible = DefenceShowProcedure.execute(entity);
-		this.imagebutton_deadlyprecision.visible = DeadlyPresicionShowProcedure.execute(entity);
+		this.imagebutton_deadlyprecision.visible = DeadlyPrecisionShowProcedure.execute(entity);
 		this.imagebutton_coldblood.visible = ColdBloodShowProcedure.execute(entity);
 		this.imagebutton_anatomicalknowledge.visible = AnatomicalKnowledgeShowProcedure.execute(entity);
 		this.imagebutton_cripplingshot.visible = CripplingShotShowProcedure.execute(entity);

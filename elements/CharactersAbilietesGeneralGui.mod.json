@@ -71,7 +71,7 @@
           "image": "gourment.png",
           "hoveredImage": "",
           "onClick": "GourmetEffect",
-          "displayCondition": "GourmetShowIcon",
+          "displayCondition": "GourmetShow",
           "x": 249,
           "y": 62,
           "locked": false
@@ -178,7 +178,7 @@
           "name": "button_general",
           "text": "General",
           "isUndecorated": false,
-          "onClick": "CharaterAbilitesGeneralGuiOpen",
+          "onClick": "CharacterAbilitiesGeneralGuiOpen",
           "width": 61,
           "height": 20,
           "x": 60,
@@ -304,7 +304,7 @@
           "name": "label_proc_character_abilites_skill_po",
           "text": {
             "fixedValue": "",
-            "name": "CharacterAbilitesSkillPointsAvailable"
+            "name": "CharacterAbilitiesSkillPointsAvailable"
           },
           "color": {
             "value": -12829636,

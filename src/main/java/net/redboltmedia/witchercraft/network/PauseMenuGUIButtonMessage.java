@@ -69,7 +69,7 @@ public record PauseMenuGUIButtonMessage(int buttonID, int x, int y, int z) imple
 		}
 		if (buttonID == 5) {
 
-			CharaterAbilitesGeneralGuiOpenProcedure.execute(world, x, y, z, entity);
+			CharacterAbilitiesGeneralGuiOpenProcedure.execute(world, x, y, z, entity);
 		}
 	}
 

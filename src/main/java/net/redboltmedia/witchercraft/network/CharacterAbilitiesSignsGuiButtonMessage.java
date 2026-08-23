@@ -53,7 +53,7 @@ public record CharacterAbilitiesSignsGuiButtonMessage(int buttonID, int x, int y
 		}
 		if (buttonID == 1) {
 
-			CharaterAbilitesGeneralGuiOpenProcedure.execute(world, x, y, z, entity);
+			CharacterAbilitiesGeneralGuiOpenProcedure.execute(world, x, y, z, entity);
 		}
 		if (buttonID == 2) {
 
@@ -113,7 +113,7 @@ public record CharacterAbilitiesSignsGuiButtonMessage(int buttonID, int x, int y
 		}
 		if (buttonID == 16) {
 
-			QuenDiscahrgeEffectProcedure.execute(entity);
+			QuenDischargeEffectProcedure.execute(entity);
 		}
 		if (buttonID == 17) {
 

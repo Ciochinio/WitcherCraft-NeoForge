@@ -43,7 +43,7 @@
           "name": "imagebutton_arrowforword",
           "image": "arrowforword.png",
           "hoveredImage": "",
-          "onClick": "HigherVamoireGuiOpen",
+          "onClick": "HigherVampireGuiOpen",
           "x": 285,
           "y": 161,
           "locked": false

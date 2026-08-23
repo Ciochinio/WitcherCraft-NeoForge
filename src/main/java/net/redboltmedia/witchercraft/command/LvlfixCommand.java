@@ -1,6 +1,6 @@
 package net.redboltmedia.witchercraft.command;
 
-import net.redboltmedia.witchercraft.procedures.ExpfixProcedure;
+import net.redboltmedia.witchercraft.procedures.ExperienceFixProcedure;
 
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.common.util.FakePlayerFactory;
@@ -31,7 +31,7 @@ public class LvlfixCommand {
 					if (entity != null)
 						direction = entity.getDirection();
 
-					ExpfixProcedure.execute(entity);
+					ExperienceFixProcedure.execute(entity);
 					return 0;
 				}));
 	}

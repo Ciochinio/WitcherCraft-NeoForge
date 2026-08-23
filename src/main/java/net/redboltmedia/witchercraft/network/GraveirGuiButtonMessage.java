@@ -1,6 +1,6 @@
 package net.redboltmedia.witchercraft.network;
 
-import net.redboltmedia.witchercraft.procedures.HigherVamoireGuiOpenProcedure;
+import net.redboltmedia.witchercraft.procedures.HigherVampireGuiOpenProcedure;
 import net.redboltmedia.witchercraft.procedures.BruxaGuiOpenProcedure;
 import net.redboltmedia.witchercraft.procedures.BestiaryMenuGuiOpenProcedure;
 import net.redboltmedia.witchercraft.WitchercraftMod;
@@ -51,7 +51,7 @@ public record GraveirGuiButtonMessage(int buttonID, int x, int y, int z) impleme
 			return;
 		if (buttonID == 0) {
 
-			HigherVamoireGuiOpenProcedure.execute(world, x, y, z, entity);
+			HigherVampireGuiOpenProcedure.execute(world, x, y, z, entity);
 		}
 		if (buttonID == 1) {
 

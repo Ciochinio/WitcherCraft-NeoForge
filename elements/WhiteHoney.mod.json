@@ -40,7 +40,7 @@
     },
     "inventorySize": 9,
     "inventoryStackSize": 64,
-    "onFinishUsingItem": "WhiteHoneyPlayerUsed",
+    "onFinishUsingItem": "WhiteHoneyUsed",
     "enableRanged": false,
     "shootConstantly": false,
     "rangedItemChargesPower": false,

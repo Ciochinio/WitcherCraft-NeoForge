@@ -361,7 +361,7 @@
           "name": "label_proc_character_gui_additional_da",
           "text": {
             "fixedValue": "",
-            "name": "CharacterGuIncreasedDamage"
+            "name": "CharacterGuiIncreasedDamage"
           },
           "color": {
             "value": -1,

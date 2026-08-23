@@ -70,7 +70,7 @@ public class PlayerStatsOverlayOverlay {
 			event.getGuiGraphics().text(Minecraft.getInstance().font, Component.translatable("gui.witchercraft.player_stats_overlay.label_additionaldamage"), w / 2 + -207, h / 2 + -22, -1, false);
 			event.getGuiGraphics().text(Minecraft.getInstance().font,
 
-					CharacterGuIncreasedDamageProcedure.execute(entity), w / 2 + -108, h / 2 + -22, -1, false);
+					CharacterGuiIncreasedDamageProcedure.execute(entity), w / 2 + -108, h / 2 + -22, -1, false);
 			event.getGuiGraphics().text(Minecraft.getInstance().font, Component.translatable("gui.witchercraft.player_stats_overlay.label_additionaldamgeflat"), w / 2 + -207, h / 2 + -31, -1, false);
 			event.getGuiGraphics().text(Minecraft.getInstance().font,
 

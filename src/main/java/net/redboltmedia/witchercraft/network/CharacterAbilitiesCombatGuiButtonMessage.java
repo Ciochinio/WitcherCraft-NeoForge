@@ -53,7 +53,7 @@ public record CharacterAbilitiesCombatGuiButtonMessage(int buttonID, int x, int 
 		}
 		if (buttonID == 1) {
 
-			CharaterAbilitesGeneralGuiOpenProcedure.execute(world, x, y, z, entity);
+			CharacterAbilitiesGeneralGuiOpenProcedure.execute(world, x, y, z, entity);
 		}
 		if (buttonID == 2) {
 
@@ -77,7 +77,7 @@ public record CharacterAbilitiesCombatGuiButtonMessage(int buttonID, int x, int 
 		}
 		if (buttonID == 7) {
 
-			CrippllingStrikesEffectProcedure.execute(entity);
+			CripplingStrikesEffectProcedure.execute(entity);
 		}
 		if (buttonID == 8) {
 
@@ -101,7 +101,7 @@ public record CharacterAbilitiesCombatGuiButtonMessage(int buttonID, int x, int 
 		}
 		if (buttonID == 13) {
 
-			DeadlyPresicionEffectProcedure.execute(entity);
+			DeadlyPrecisionEffectProcedure.execute(entity);
 		}
 		if (buttonID == 14) {
 
@@ -117,7 +117,7 @@ public record CharacterAbilitiesCombatGuiButtonMessage(int buttonID, int x, int 
 		}
 		if (buttonID == 17) {
 
-			FlooodOfAngerEffecProcedure.execute(entity);
+			FloodOfAngerEffectProcedure.execute(entity);
 		}
 		if (buttonID == 18) {
 

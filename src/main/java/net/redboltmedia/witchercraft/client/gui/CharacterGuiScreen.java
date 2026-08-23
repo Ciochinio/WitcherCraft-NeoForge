@@ -82,7 +82,7 @@ public class CharacterGuiScreen extends AbstractContainerScreen<CharacterGuiMenu
 		guiGraphics.text(this.font, CharacterGuiCritDamageProcedure.execute(entity), 87, 43, -12829636, false);
 		guiGraphics.text(this.font, Component.translatable("gui.witchercraft.character_gui.label_health"), 6, 52, -12829636, false);
 		guiGraphics.text(this.font, CharacterGuiHealthProcedure.execute(entity), 87, 52, -12829636, false);
-		guiGraphics.text(this.font, CharaterLevelProcedure.execute(entity), 6, 142, -12829636, false);
+		guiGraphics.text(this.font, CharacterLevelProcedure.execute(entity), 6, 142, -12829636, false);
 		guiGraphics.text(this.font, CharacterExperienceProcedure.execute(entity), 6, 151, -12829636, false);
 		guiGraphics.text(this.font, Component.translatable("gui.witchercraft.character_gui.label_passivehealthregen"), 6, 61, -12829636, false);
 		guiGraphics.text(this.font, CharacterGuiPassiveHealthRegenProcedure.execute(entity), 87, 61, -12829636, false);

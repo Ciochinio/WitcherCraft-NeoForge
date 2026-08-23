@@ -53,7 +53,7 @@ public record CharacterAbilitiesAlchemyGuiButtonMessage(int buttonID, int x, int
 		}
 		if (buttonID == 1) {
 
-			CharaterAbilitesGeneralGuiOpenProcedure.execute(world, x, y, z, entity);
+			CharacterAbilitiesGeneralGuiOpenProcedure.execute(world, x, y, z, entity);
 		}
 		if (buttonID == 2) {
 

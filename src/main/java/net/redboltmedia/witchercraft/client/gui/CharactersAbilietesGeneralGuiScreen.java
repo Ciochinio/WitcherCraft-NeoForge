@@ -116,7 +116,7 @@ public class CharactersAbilietesGeneralGuiScreen extends AbstractContainerScreen
 
 	@Override
 	protected void extractLabels(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
-		guiGraphics.text(this.font, CharacterAbilitesSkillPointsAvailableProcedure.execute(entity), 187, 5, -12829636, false);
+		guiGraphics.text(this.font, CharacterAbilitiesSkillPointsAvailableProcedure.execute(entity), 187, 5, -12829636, false);
 	}
 
 	@Override
@@ -200,7 +200,7 @@ public class CharactersAbilietesGeneralGuiScreen extends AbstractContainerScreen
 		imagebutton_gourment = new ImageButton(this.leftPos + 123, this.topPos + 25, 32, 32, new WidgetSprites(Identifier.parse("witchercraft:textures/screens/gourment.png"), Identifier.parse("witchercraft:textures/screens/gourment.png")), e -> {
 			int x = CharactersAbilietesGeneralGuiScreen.this.x;
 			int y = CharactersAbilietesGeneralGuiScreen.this.y;
-			if (GourmetShowIconProcedure.execute(entity)) {
+			if (GourmetShowProcedure.execute(entity)) {
 				ClientPacketDistributor.sendToServer(new CharactersAbilietesGeneralGuiButtonMessage(7, x, y, z));
 				CharactersAbilietesGeneralGuiButtonMessage.handleButtonAction(entity, 7, x, y, z);
 			}
@@ -263,7 +263,7 @@ public class CharactersAbilietesGeneralGuiScreen extends AbstractContainerScreen
 		super.containerTick();
 		this.imagebutton_sunandstars.visible = SunAndStarsShowProcedure.execute(entity);
 		this.imagebutton_survivalinstict.visible = SurvivalInstinctShowProcedure.execute(entity);
-		this.imagebutton_gourment.visible = GourmetShowIconProcedure.execute(entity);
+		this.imagebutton_gourment.visible = GourmetShowProcedure.execute(entity);
 		this.imagebutton_catschooltechniques.visible = CatSchoolShowProcedure.execute(entity);
 		this.imagebutton_griffinschool.visible = GriffinSchoolShowProcedure.execute(entity);
 		this.imagebutton_bearschool.visible = BearSchoolShowProcedure.execute(entity);
