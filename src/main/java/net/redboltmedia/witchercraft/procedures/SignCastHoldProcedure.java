@@ -39,6 +39,9 @@ public class SignCastHoldProcedure {
 				if (entity instanceof LivingEntity _livEnt2 && _livEnt2.hasEffect(WitchercraftModMobEffects.QUEN_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesExploadingShield) {
 					AltQuenCastProcedure.execute(entity);
 				}
+				if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftSignKeyHoldTime % 20 == 0) {
+					SignCastHoldCostTickProcedure.execute(entity);
+				}
 			} else {
 				SignCastKeyReleaseProcedure.execute(world, x, y, z, entity);
 				if (entity instanceof LivingEntity _entity)

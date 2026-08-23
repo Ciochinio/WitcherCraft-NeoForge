@@ -153,7 +153,7 @@ carry in is its own small decision before the fight.
 
 ### Cost, Cooldown, and Stamina
 
-Two things gate a cast:
+Two things gate a cast, and a third governs the ones you hold:
 
 - **Stamina.** Signs run off the stamina bar, which is Minecraft's hunger bar reskinned as a
   white stamina meter. A cast needs a minimum amount available; below that, it's refused ("not
@@ -162,6 +162,14 @@ Two things gate a cast:
 - **Cooldown.** After a cast, a short shared cooldown (around **two seconds**) runs on the
   HUD. Cast during it and you get "can't cast yet." It covers every Sign, so switching doesn't
   dodge it.
+- **Upkeep.** Some alternates aren't cast and forgotten, they're *held*: keep the Sign key down
+  and the Sign keeps running. Those bill a per-second upkeep out of stamina for as long as they
+  last. Holding for the first second is the wind-up that tells a hold apart from a tap, the
+  second after that is free, and every second beyond it costs. Each held Sign sets its own rate
+  - **Fire Stream 4/second**, **Active Shield 2/second** - and falling to the stamina minimum
+  ends the hold on its own with "not enough stamina hold." A held Sign is bounded by your bar
+  rather than by a timer, so keeping one up is a live decision about what you won't be able to
+  cast afterwards.
 
 If a Sign can't find anything to act on, it refunds its cost where that makes sense - Axii, for
 instance, gives it back when there's no target.

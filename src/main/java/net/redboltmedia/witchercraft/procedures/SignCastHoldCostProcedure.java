@@ -33,7 +33,7 @@ public class SignCastHoldCostProcedure {
 				SignCost = SignCost + 4;
 			}
 			if (entity instanceof LivingEntity _livEnt1 && _livEnt1.hasEffect(WitchercraftModMobEffects.QUEN_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesExploadingShield) {
-				SignCost = SignCost + 4;
+				SignCost = SignCost + 2;
 			}
 		}
 		{
