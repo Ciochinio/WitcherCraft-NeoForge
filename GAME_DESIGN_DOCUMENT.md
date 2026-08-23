@@ -366,7 +366,7 @@ drink pushes it up; sit too high and it starts killing you.
   **25** (Swallow, Thunderbolt, Full Moon, White Raffard's). It's tracked as a single global
   value and shown on a dedicated HUD bar, sitting above the hunger bar, that fills as you climb
   and turns red once you cross the Overdose Threshold.
-- **Losing it.** Toxicity decays on its own, ticking down by **1** at a steady interval, so
+- **Losing it.** Toxicity decays on its own, ticking down by **1** every **3 seconds**, so
   it's a temporary debt rather than a permanent one. Stop drinking and it drains back to zero.
 - **The Overdose Threshold.** This is your ceiling. Stay under it and there's no penalty. Reach
   or pass it and you overdose: every tick you take magic damage that scales with how far over
@@ -439,6 +439,31 @@ The character screen surfaces the full stat line:
 | Dodge Chance | Percent chance to fully negate an incoming hit |
 | Reflect Damage | Returns a share of damage taken to the attacker |
 
+### Passive regeneration
+
+Health and stamina both trickle back on their own, and both are live-aggregated the same way the
+combat stats are: a base value you can tune directly, plus whatever is currently boosting it.
+
+- **It's a rate, not a lump.** Both are expressed as **per second** and paid out once a second,
+  so the bars creep rather than jump. Each contributing source is worth **0.3333/second** -
+  **Swallow**, **Troll Decoction**, and **Sun and Stars** in daylight for health; **Gourmet**,
+  **Tawny Owl**, **Sun and Stars** after dark, and **Werewolf Decoction** on a clear night for
+  stamina. **Grave Hag Decoction** is the odd one out: it scales with kills, adding
+  `round(kills / 2) x 0.3333` per second, and only while you're in combat.
+- **Combat halves it.** Being in combat multiplies the finished rate by **0.5**, for health and
+  stamina alike. Regeneration never stops entirely, it just slows to where it can't out-heal a
+  fight, so disengaging is still the way to recover.
+- **Base rates are a tuning knob.** Base health and stamina regeneration both sit at **0**, so
+  today every point of regen is something you earned from a perk, potion, or decoction. They
+  exist so flat regen can be dialled in globally later without touching any of the sources.
+- **Stamina banks its fractions.** The stamina bar is Minecraft's hunger bar, which only holds
+  whole points, so fractional regeneration accumulates in a buffer and is spent a point at a
+  time, at most one per second. The buffer empties whenever the bar is full, so stamina can
+  never be banked past the cap and then dumped in all at once.
+
+The character screen reads these straight off the live values, so the **hp/s** and stamina
+figures it shows are the actual per-second rates, combat multiplier included.
+
 ### Oils in combat
 
 This is where the oils from [Alchemy](#oils) pay off. When you hit a monster whose category
@@ -457,8 +482,11 @@ so it can't fire on every incoming blow.
 
 Bleed is a damage-over-time status that ticks on its own, independent of your swings. It's applied
 on hit by certain sources - for example the **Crippling Strikes** perk bleeds the target for
-**100 ticks (5 seconds)** - with a cooldown to stop it being re-applied every frame. Other combat
-statuses come from their own sources: burning from Igni, slows from Yrden and Axii, and the
+**100 ticks (5 seconds)** - and deals `1 + level` magic damage once per second for as long as it
+lasts. The damage is driven by the status's own remaining duration, so re-applying Bleed mid-fight
+refreshes the wound and restarts its clock rather than stacking a second source of damage. Because
+it rides on the status effect itself, Bleed works identically on monsters and on players. Other
+combat statuses come from their own sources: burning from Igni, slows from Yrden and Axii, and the
 payloads of individual bombs and decoctions.
 
 ### Reflect

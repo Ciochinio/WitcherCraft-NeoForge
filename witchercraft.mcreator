@@ -5583,11 +5583,11 @@
       "path": "~/StatusEffects/Bleed"
     },
     {
-      "name": "BleedEffectStart",
+      "name": "BleedTick",
       "type": "procedure",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "bleed_effect_start",
+      "registry_name": "bleed_tick",
       "metadata": {
         "dependencies": [
           {
@@ -5600,20 +5600,7 @@
           }
         ],
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/BleedEffectStartProcedure.java"
-        ]
-      },
-      "path": "~/StatusEffects/Bleed"
-    },
-    {
-      "name": "BleedCooldown",
-      "type": "potioneffect",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "bleed_cooldown",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/potion/BleedCooldownMobEffect.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/BleedTickProcedure.java"
         ]
       },
       "path": "~/StatusEffects/Bleed"
@@ -10834,7 +10821,7 @@
       "value": "false"
     },
     {
-      "name": "witchercraftTick",
+      "name": "witchercraftStaminaRegenBuffer",
       "type": "number",
       "scope": "player_lifetime",
       "value": "0"
@@ -11170,7 +11157,6 @@
       "gui.witchercraft.player_stats_overlay.label_additionaldamage": "IncreasedDamage",
       "gui.witchercraft.player_stats_overlay.label_additionaldamgeflat": "AdditionalDamge",
       "effect.witchercraft.bleed": "Bleed",
-      "effect.witchercraft.bleed_cooldown": "Bleed Cooldown",
       "effect.witchercraft.enemy_nearby": "Enemy Nearby",
       "effect.witchercraft.undying_cooldown": "Undying Cooldown",
       "gui.witchercraft.player_stats_overlay.label_dodge_chance": "Dodge Chance",

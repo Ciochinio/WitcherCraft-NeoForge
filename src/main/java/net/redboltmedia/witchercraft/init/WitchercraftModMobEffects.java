@@ -45,7 +45,6 @@ public class WitchercraftModMobEffects {
 	public static final DeferredHolder<MobEffect, MobEffect> QUEN_SIGN = REGISTRY.register("quen_sign", QuenSignMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> DEV_LOG = REGISTRY.register("dev_log", DevLogMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> BLEED = REGISTRY.register("bleed", BleedMobEffect::new);
-	public static final DeferredHolder<MobEffect, MobEffect> BLEED_COOLDOWN = REGISTRY.register("bleed_cooldown", BleedCooldownMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> ENEMY_NEARBY = REGISTRY.register("enemy_nearby", EnemyNearbyMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> UNDYING_COOLDOWN = REGISTRY.register("undying_cooldown", UndyingCooldownMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> DODGE_COOLDOWN = REGISTRY.register("dodge_cooldown", DodgeCooldownMobEffect::new);

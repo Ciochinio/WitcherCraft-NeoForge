@@ -155,7 +155,7 @@ public class WitchercraftModVariables {
 			clone.witchercraftGraveHagDecoctionKill = original.witchercraftGraveHagDecoctionKill;
 			clone.witchercraftSignKeyHoldTime = original.witchercraftSignKeyHoldTime;
 			clone.witchercraftSignKeyHold = original.witchercraftSignKeyHold;
-			clone.witchercraftTick = original.witchercraftTick;
+			clone.witchercraftStaminaRegenBuffer = original.witchercraftStaminaRegenBuffer;
 			clone.witchercraftSignNoCast = original.witchercraftSignNoCast;
 			clone.witchercraftSignHoldCostPerSecond = original.witchercraftSignHoldCostPerSecond;
 		}
@@ -247,7 +247,7 @@ public class WitchercraftModVariables {
 		public double witchercraftGraveHagDecoctionKill = 0;
 		public double witchercraftSignKeyHoldTime = 0;
 		public boolean witchercraftSignKeyHold = false;
-		public double witchercraftTick = 0;
+		public double witchercraftStaminaRegenBuffer = 0;
 		public boolean witchercraftSignNoCast = false;
 		public double witchercraftSignHoldCostPerSecond = 0;
 
@@ -336,7 +336,7 @@ public class WitchercraftModVariables {
 			output.putDouble("witchercraftGraveHagDecoctionKill", witchercraftGraveHagDecoctionKill);
 			output.putDouble("witchercraftSignKeyHoldTime", witchercraftSignKeyHoldTime);
 			output.putBoolean("witchercraftSignKeyHold", witchercraftSignKeyHold);
-			output.putDouble("witchercraftTick", witchercraftTick);
+			output.putDouble("witchercraftStaminaRegenBuffer", witchercraftStaminaRegenBuffer);
 			output.putBoolean("witchercraftSignNoCast", witchercraftSignNoCast);
 			output.putDouble("witchercraftSignHoldCostPerSecond", witchercraftSignHoldCostPerSecond);
 		}
@@ -426,7 +426,7 @@ public class WitchercraftModVariables {
 			witchercraftGraveHagDecoctionKill = input.getDoubleOr("witchercraftGraveHagDecoctionKill", 0);
 			witchercraftSignKeyHoldTime = input.getDoubleOr("witchercraftSignKeyHoldTime", 0);
 			witchercraftSignKeyHold = input.getBooleanOr("witchercraftSignKeyHold", false);
-			witchercraftTick = input.getDoubleOr("witchercraftTick", 0);
+			witchercraftStaminaRegenBuffer = input.getDoubleOr("witchercraftStaminaRegenBuffer", 0);
 			witchercraftSignNoCast = input.getBooleanOr("witchercraftSignNoCast", false);
 			witchercraftSignHoldCostPerSecond = input.getDoubleOr("witchercraftSignHoldCostPerSecond", 0);
 		}

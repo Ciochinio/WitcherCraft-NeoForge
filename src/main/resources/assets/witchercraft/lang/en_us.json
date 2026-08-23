@@ -225,7 +225,6 @@
   "gui.witchercraft.player_stats_overlay.label_additionaldamage": "IncreasedDamage",
   "gui.witchercraft.player_stats_overlay.label_additionaldamgeflat": "AdditionalDamge",
   "effect.witchercraft.bleed": "Bleed",
-  "effect.witchercraft.bleed_cooldown": "Bleed Cooldown",
   "effect.witchercraft.enemy_nearby": "Enemy Nearby",
   "effect.witchercraft.undying_cooldown": "Undying Cooldown",
   "gui.witchercraft.player_stats_overlay.label_dodge_chance": "Dodge Chance",
