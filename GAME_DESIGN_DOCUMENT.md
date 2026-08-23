@@ -282,6 +282,23 @@ They cover the situational toolkit a witcher expects: emergency healing, Sign po
 sight, elemental protection, and so on. The full roster and per-potion effects are in the
 appendix.
 
+**Cat is deliberately not night vision.** Vanilla night vision lies about light level: it
+flattens the world to maximum brightness, kills the atmosphere, and there is already a potion
+for it. Cat instead re-grades what your eyes already receive - the whole view collapses to
+greyscale and exposure is pushed hard, so dark terrain lifts into readable mid-greys while
+anything already bright clips to white. It never changes light levels, mob spawning, or fog, so
+it stays weaker than night vision in true darkness and reads as a different tool rather than a
+reskin. It costs you colour for the duration, which is the point: you see shapes and movement,
+not detail. Because it is a camera grade, it is drawn on your client only and cannot be seen by
+other players.
+
+Its drawback is enforced by the same grade rather than by a separate rule. The exposure lift is
+a flat multiplier, so in daylight everything above roughly a third brightness clips out and the
+screen washes to near-white: you are genuinely blinded outdoors during the day, exactly as Cat
+blinds Geralt. This is intended and is the reason Cat needs no Toxicity surcharge or timer
+penalty on top of its **10**. It is a night-and-underground potion, and drinking it at the wrong
+time punishes you immediately and obviously.
+
 ### Decoctions
 
 Decoctions are the heavy, long-haul version of a potion. They last **7200 ticks (6 minutes)**
@@ -635,7 +652,7 @@ drinking any potion also heals **10%** of max health.
 | **Full Moon** | +**25** | +**4** maximum health (2 hearts) |
 | **Blizzard** | +**15** | +**55%** attack speed and +**5** dodge chance |
 | **Black Blood** | +**20** | Reflects damage to attackers as thorns; +**15%** extra reflected against Necrophages and Vampires |
-| **Cat** | +**10** | Outlines every monster within **50** blocks with a glow, even through walls |
+| **Cat** | +**10** | Collapses your view to high-contrast monochrome so dark terrain becomes readable, at the cost of being blinded by daylight; outlines every monster within **50** blocks with a glow, even through walls |
 | **Killer Whale** | +**20** | Underwater sight and breath (effect still being finalized) |
 | **Golden Oriole** | +**15** | Poison and toxin resistance (effect still being finalized) |
 | **Tawny Owl** | +**0** | Passive stamina regeneration (currently applies no Toxicity - likely an oversight) |

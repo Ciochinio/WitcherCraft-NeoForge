@@ -1384,6 +1384,19 @@
       "path": "~/Character Stats/Stats/Gui"
     },
     {
+      "name": "CatVision",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "cat_vision",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/CatVision.java"
+        ]
+      },
+      "path": "~/Alchemy/Potions/Cat"
+    },
+    {
       "name": "CatEffect",
       "type": "potioneffect",
       "compiles": true,
@@ -4928,11 +4941,11 @@
       "path": "~/Signs/Quen"
     },
     {
-      "name": "QuenHudFill",
+      "name": "QuenHudPool",
       "type": "procedure",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "quen_hud_fill",
+      "registry_name": "quen_hud_pool",
       "metadata": {
         "dependencies": [
           {
@@ -4942,7 +4955,7 @@
         ],
         "return_type": "number",
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/QuenHudFillProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/QuenHudPoolProcedure.java"
         ]
       },
       "path": "~/Signs/Quen"
