@@ -1,6 +1,7 @@
 package net.redboltmedia.witchercraft.procedures;
 
 import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
+import net.redboltmedia.witchercraft.init.WitchercraftModAttributes;
 import net.redboltmedia.witchercraft.init.WitchercraftModMobEffects;
 import net.redboltmedia.witchercraft.WitchercraftMod;
 
@@ -50,7 +51,7 @@ public class DamageCalculatorProcedure {
 					if (sourceentity instanceof ServerPlayer _player)
 						_player.sendSystemMessage(Component.literal(("Steal:"
 								+ (amount + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAdditionalDamage) * (1 + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftIncreasedDamage * 0.01)
-										* sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftCritDamage * 0.01 * sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftLifeSteal * 0.01)),
+										* sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftCritDamage * 0.01 * (sourceentity instanceof LivingEntity _livingEntityLS && _livingEntityLS.getAttributes().hasAttribute(WitchercraftModAttributes.LIFE_STEAL) ? _livingEntityLS.getAttribute(WitchercraftModAttributes.LIFE_STEAL).getValue() : 0) * 0.01)),
 								false);
 				}
 				WitchercraftMod.queueServerWork(1, () -> {
@@ -64,7 +65,7 @@ public class DamageCalculatorProcedure {
 					if (sourceentity instanceof LivingEntity _entity)
 						_entity.setHealth((float) ((sourceentity instanceof LivingEntity _livEnt ? _livEnt.getHealth() : -1)
 								+ (amount + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAdditionalDamage) * (1 + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftIncreasedDamage * 0.01)
-										* sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftCritDamage * 0.01 * sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftLifeSteal * 0.01));
+										* sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftCritDamage * 0.01 * (sourceentity instanceof LivingEntity _livingEntityLS && _livingEntityLS.getAttributes().hasAttribute(WitchercraftModAttributes.LIFE_STEAL) ? _livingEntityLS.getAttribute(WitchercraftModAttributes.LIFE_STEAL).getValue() : 0) * 0.01));
 				});
 			}
 		} else {
@@ -79,7 +80,7 @@ public class DamageCalculatorProcedure {
 							false);
 				if (sourceentity instanceof ServerPlayer _player)
 					_player.sendSystemMessage(Component.literal(("Steal:" + (amount + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAdditionalDamage)
-							* (1 + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftIncreasedDamage * 0.01) * sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftLifeSteal * 0.01)), false);
+							* (1 + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftIncreasedDamage * 0.01) * (sourceentity instanceof LivingEntity _livingEntityLS && _livingEntityLS.getAttributes().hasAttribute(WitchercraftModAttributes.LIFE_STEAL) ? _livingEntityLS.getAttribute(WitchercraftModAttributes.LIFE_STEAL).getValue() : 0) * 0.01)), false);
 			}
 			WitchercraftMod.queueServerWork(1, () -> {
 				{
@@ -91,7 +92,7 @@ public class DamageCalculatorProcedure {
 				}
 				if (sourceentity instanceof LivingEntity _entity)
 					_entity.setHealth((float) ((sourceentity instanceof LivingEntity _livEnt ? _livEnt.getHealth() : -1) + (amount + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAdditionalDamage)
-							* (1 + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftIncreasedDamage * 0.01) * sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftLifeSteal * 0.01));
+							* (1 + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftIncreasedDamage * 0.01) * (sourceentity instanceof LivingEntity _livingEntityLS && _livingEntityLS.getAttributes().hasAttribute(WitchercraftModAttributes.LIFE_STEAL) ? _livingEntityLS.getAttribute(WitchercraftModAttributes.LIFE_STEAL).getValue() : 0) * 0.01));
 			});
 		}
 	}

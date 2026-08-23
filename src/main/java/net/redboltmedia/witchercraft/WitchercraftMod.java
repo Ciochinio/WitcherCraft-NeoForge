@@ -56,6 +56,7 @@ public class WitchercraftMod {
 		WitchercraftModMobEffects.REGISTRY.register(modEventBus);
 		WitchercraftModMenus.REGISTRY.register(modEventBus);
 		WitchercraftModParticleTypes.REGISTRY.register(modEventBus);
+		WitchercraftModAttributes.REGISTRY.register(modEventBus);
 		// Start of user code block mod init
 		// End of user code block mod init
 	}

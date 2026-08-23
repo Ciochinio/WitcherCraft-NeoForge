@@ -146,7 +146,6 @@ public class WitchercraftModVariables {
 			clone.witchercraftPotionDuration = original.witchercraftPotionDuration;
 			clone.witchercraftSignIntensity = original.witchercraftSignIntensity;
 			clone.witchercraftOilDamage = original.witchercraftOilDamage;
-			clone.witchercraftLifeSteal = original.witchercraftLifeSteal;
 			clone.witchercraftBaseCritChance = original.witchercraftBaseCritChance;
 			clone.witchercraftBaseCritDamage = original.witchercraftBaseCritDamage;
 			clone.witchercraftReflectDamage = original.witchercraftReflectDamage;
@@ -238,7 +237,6 @@ public class WitchercraftModVariables {
 		public double witchercraftPotionDuration = 0;
 		public double witchercraftSignIntensity = 0;
 		public double witchercraftOilDamage = 0;
-		public double witchercraftLifeSteal = 0;
 		public double witchercraftBaseCritChance = 0;
 		public double witchercraftBaseCritDamage = 0;
 		public double witchercraftReflectDamage = 0;
@@ -327,7 +325,6 @@ public class WitchercraftModVariables {
 			output.putDouble("witchercraftPotionDuration", witchercraftPotionDuration);
 			output.putDouble("witchercraftSignIntensity", witchercraftSignIntensity);
 			output.putDouble("witchercraftOilDamage", witchercraftOilDamage);
-			output.putDouble("witchercraftLifeSteal", witchercraftLifeSteal);
 			output.putDouble("witchercraftBaseCritChance", witchercraftBaseCritChance);
 			output.putDouble("witchercraftBaseCritDamage", witchercraftBaseCritDamage);
 			output.putDouble("witchercraftReflectDamage", witchercraftReflectDamage);
@@ -417,7 +414,6 @@ public class WitchercraftModVariables {
 			witchercraftPotionDuration = input.getDoubleOr("witchercraftPotionDuration", 0);
 			witchercraftSignIntensity = input.getDoubleOr("witchercraftSignIntensity", 0);
 			witchercraftOilDamage = input.getDoubleOr("witchercraftOilDamage", 0);
-			witchercraftLifeSteal = input.getDoubleOr("witchercraftLifeSteal", 0);
 			witchercraftBaseCritChance = input.getDoubleOr("witchercraftBaseCritChance", 0);
 			witchercraftBaseCritDamage = input.getDoubleOr("witchercraftBaseCritDamage", 0);
 			witchercraftReflectDamage = input.getDoubleOr("witchercraftReflectDamage", 0);

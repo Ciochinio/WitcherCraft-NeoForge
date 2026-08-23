@@ -7336,19 +7336,13 @@
     },
     {
       "name": "LifeSteal",
-      "type": "procedure",
+      "type": "attribute",
       "compiles": true,
       "locked_code": false,
       "registry_name": "life_steal",
       "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/LifeStealProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
         ]
       },
       "path": "~/Character Stats/Stats/VariableStats/LifeSteal"
@@ -10754,12 +10748,6 @@
       "value": "0"
     },
     {
-      "name": "witchercraftLifeSteal",
-      "type": "number",
-      "scope": "player_lifetime",
-      "value": "0"
-    },
-    {
       "name": "witchercraftBaseCritChance",
       "type": "number",
       "scope": "player_lifetime",
@@ -11144,6 +11132,7 @@
       "gui.witchercraft.player_stats_overlay.label_additionaldamage": "IncreasedDamage",
       "gui.witchercraft.player_stats_overlay.label_additionaldamgeflat": "AdditionalDamge",
       "effect.witchercraft.bleed": "Bleed",
+      "attribute.witchercraft.life_steal": "Life Steal",
       "effect.witchercraft.enemy_nearby": "Enemy Nearby",
       "effect.witchercraft.undying_cooldown": "Undying Cooldown",
       "gui.witchercraft.player_stats_overlay.label_dodge_chance": "Dodge Chance",
@@ -11219,6 +11208,7 @@
   },
   "metadata": {
     "files": [
+      "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModScreens.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModMenus.java",
       "src/main/java/net/redboltmedia/witchercraft/network/MenuStateUpdateMessage.java",
