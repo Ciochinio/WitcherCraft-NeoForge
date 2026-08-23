@@ -9833,22 +9833,6 @@
           {
             "name": "entity",
             "type": "entity"
-          },
-          {
-            "name": "x",
-            "type": "number"
-          },
-          {
-            "name": "y",
-            "type": "number"
-          },
-          {
-            "name": "z",
-            "type": "number"
-          },
-          {
-            "name": "world",
-            "type": "world"
           }
         ],
         "files": [
@@ -11160,7 +11144,8 @@
       "gui.witchercraft.drowner_gui.label_weak_to_igni": "Weak to: Igni",
       "gui.witchercraft.drowner_gui.label_spawning_swamp": "Spawning: Swamp",
       "gui.witchercraft.drowner_gui.label_loot_monster_brain_monster_too": "Loot: Monster Brain",
-      "effect.witchercraft.damage_blocked": "Damage Blocked Double DMG Fix"
+      "effect.witchercraft.damage_blocked": "Damage Blocked Double DMG Fix",
+      "gui.witchercraft.player_stats_overlay.label_signholdcost": "SignHoldCost"
     }
   },
   "metadata": {

@@ -107,6 +107,10 @@ public class PlayerStatsOverlayOverlay {
 			event.getGuiGraphics().text(Minecraft.getInstance().font,
 
 					SignKeyHoldTimeProcedure.execute(entity), w / 2 + -108, h / 2 + 50, -1, false);
+			event.getGuiGraphics().text(Minecraft.getInstance().font, Component.translatable("gui.witchercraft.player_stats_overlay.label_signholdcost"), w / 2 + -207, h / 2 + 59, -1, false);
+			event.getGuiGraphics().text(Minecraft.getInstance().font,
+
+					SignCastHoldCostProcedure.execute(entity), w / 2 + -108, h / 2 + 59, -1, false);
 		}
 	}
 }

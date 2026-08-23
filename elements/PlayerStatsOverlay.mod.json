@@ -706,6 +706,43 @@
           "y": 170,
           "locked": false
         }
+      },
+      {
+        "type": "label",
+        "data": {
+          "name": "label_signholdcost",
+          "text": {
+            "fixedValue": "SignHoldCost"
+          },
+          "color": {
+            "value": -1,
+            "falpha": 0.0
+          },
+          "hasShadow": false,
+          "anchorPoint": "CENTER",
+          "x": 6,
+          "y": 179,
+          "locked": false
+        }
+      },
+      {
+        "type": "label",
+        "data": {
+          "name": "label_proc_sign_cast_hold_cost",
+          "text": {
+            "fixedValue": "",
+            "name": "SignCastHoldCost"
+          },
+          "color": {
+            "value": -1,
+            "falpha": 0.0
+          },
+          "hasShadow": false,
+          "anchorPoint": "CENTER",
+          "x": 105,
+          "y": 179,
+          "locked": false
+        }
       }
     ],
     "baseTexture": "",

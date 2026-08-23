@@ -37,7 +37,7 @@ public class SignCastHoldProcedure {
 					AltIgniCastProcedure.execute(entity);
 				}
 				if (entity instanceof LivingEntity _livEnt2 && _livEnt2.hasEffect(WitchercraftModMobEffects.QUEN_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesExploadingShield) {
-					AltQuenCastProcedure.execute(world, x, y, z, entity);
+					AltQuenCastProcedure.execute(entity);
 				}
 			} else {
 				SignCastKeyReleaseProcedure.execute(world, x, y, z, entity);
