@@ -17,7 +17,7 @@ public class QuenCastProcedure {
 			_player.sendSystemMessage(Component.literal("QUEN"), false);
 		{
 			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-			_vars.witchercraftQuenShieldMax = 8 * (1 + entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftSignIntensity * 0.01);
+			_vars.witchercraftQuenShieldMax = (entity instanceof LivingEntity _livEnt ? _livEnt.getMaxHealth() : -1) * 0.4 * (1 + entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftSignIntensity * 0.01);
 			_vars.witchercraftQuenShield = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftQuenShieldMax;
 			_vars.markSyncDirty();
 		}
