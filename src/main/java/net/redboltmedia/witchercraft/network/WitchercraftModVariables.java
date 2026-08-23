@@ -128,8 +128,6 @@ public class WitchercraftModVariables {
 			clone.witchercraftHealth = original.witchercraftHealth;
 			clone.witchercraftArmor = original.witchercraftArmor;
 			clone.witchercraftAdditionalDamage = original.witchercraftAdditionalDamage;
-			clone.witchercraftCritChance = original.witchercraftCritChance;
-			clone.witchercraftCritDamage = original.witchercraftCritDamage;
 			clone.witchercraftAttackSpeed = original.witchercraftAttackSpeed;
 			clone.witchercraftPassiveHealthRegeneration = original.witchercraftPassiveHealthRegeneration;
 			clone.witchercraftBasePassiveHealthRegeneration = original.witchercraftBasePassiveHealthRegeneration;
@@ -143,8 +141,6 @@ public class WitchercraftModVariables {
 			clone.witchercraftBasePassiveStaminaRegeneration = original.witchercraftBasePassiveStaminaRegeneration;
 			clone.witchercraftSignIntensity = original.witchercraftSignIntensity;
 			clone.witchercraftOilDamage = original.witchercraftOilDamage;
-			clone.witchercraftBaseCritChance = original.witchercraftBaseCritChance;
-			clone.witchercraftBaseCritDamage = original.witchercraftBaseCritDamage;
 			clone.witchercraftWyvernDecoctionHit = original.witchercraftWyvernDecoctionHit;
 			clone.witchercraftSuccubusDecoctionTick = original.witchercraftSuccubusDecoctionTick;
 			clone.witchercraftGraveHagDecoctionKill = original.witchercraftGraveHagDecoctionKill;
@@ -163,8 +159,6 @@ public class WitchercraftModVariables {
 		public double witchercraftHealth = 0.0;
 		public double witchercraftArmor = 0.0;
 		public double witchercraftAdditionalDamage = 0.0;
-		public double witchercraftCritChance = 0.0;
-		public double witchercraftCritDamage = 0.0;
 		public double witchercraftAttackSpeed = 0;
 		public double witchercraftPassiveHealthRegeneration = 0;
 		public double witchercraftBasePassiveHealthRegeneration = 0;
@@ -230,8 +224,6 @@ public class WitchercraftModVariables {
 		public double witchercraftBasePassiveStaminaRegeneration = 0;
 		public double witchercraftSignIntensity = 0;
 		public double witchercraftOilDamage = 0;
-		public double witchercraftBaseCritChance = 0;
-		public double witchercraftBaseCritDamage = 0;
 		public double witchercraftWyvernDecoctionHit = 0;
 		public double witchercraftSuccubusDecoctionTick = 0;
 		public double witchercraftGraveHagDecoctionKill = 0;
@@ -247,8 +239,6 @@ public class WitchercraftModVariables {
 			output.putDouble("witchercraftHealth", witchercraftHealth);
 			output.putDouble("witchercraftArmor", witchercraftArmor);
 			output.putDouble("witchercraftAdditionalDamage", witchercraftAdditionalDamage);
-			output.putDouble("witchercraftCritChance", witchercraftCritChance);
-			output.putDouble("witchercraftCritDamage", witchercraftCritDamage);
 			output.putDouble("witchercraftAttackSpeed", witchercraftAttackSpeed);
 			output.putDouble("witchercraftPassiveHealthRegeneration", witchercraftPassiveHealthRegeneration);
 			output.putDouble("witchercraftBasePassiveHealthRegeneration", witchercraftBasePassiveHealthRegeneration);
@@ -314,8 +304,6 @@ public class WitchercraftModVariables {
 			output.putDouble("witchercraftBasePassiveStaminaRegeneration", witchercraftBasePassiveStaminaRegeneration);
 			output.putDouble("witchercraftSignIntensity", witchercraftSignIntensity);
 			output.putDouble("witchercraftOilDamage", witchercraftOilDamage);
-			output.putDouble("witchercraftBaseCritChance", witchercraftBaseCritChance);
-			output.putDouble("witchercraftBaseCritDamage", witchercraftBaseCritDamage);
 			output.putDouble("witchercraftWyvernDecoctionHit", witchercraftWyvernDecoctionHit);
 			output.putDouble("witchercraftSuccubusDecoctionTick", witchercraftSuccubusDecoctionTick);
 			output.putDouble("witchercraftGraveHagDecoctionKill", witchercraftGraveHagDecoctionKill);
@@ -332,8 +320,6 @@ public class WitchercraftModVariables {
 			witchercraftHealth = input.getDoubleOr("witchercraftHealth", 0);
 			witchercraftArmor = input.getDoubleOr("witchercraftArmor", 0);
 			witchercraftAdditionalDamage = input.getDoubleOr("witchercraftAdditionalDamage", 0);
-			witchercraftCritChance = input.getDoubleOr("witchercraftCritChance", 0);
-			witchercraftCritDamage = input.getDoubleOr("witchercraftCritDamage", 0);
 			witchercraftAttackSpeed = input.getDoubleOr("witchercraftAttackSpeed", 0);
 			witchercraftPassiveHealthRegeneration = input.getDoubleOr("witchercraftPassiveHealthRegeneration", 0);
 			witchercraftBasePassiveHealthRegeneration = input.getDoubleOr("witchercraftBasePassiveHealthRegeneration", 0);
@@ -399,8 +385,6 @@ public class WitchercraftModVariables {
 			witchercraftBasePassiveStaminaRegeneration = input.getDoubleOr("witchercraftBasePassiveStaminaRegeneration", 0);
 			witchercraftSignIntensity = input.getDoubleOr("witchercraftSignIntensity", 0);
 			witchercraftOilDamage = input.getDoubleOr("witchercraftOilDamage", 0);
-			witchercraftBaseCritChance = input.getDoubleOr("witchercraftBaseCritChance", 0);
-			witchercraftBaseCritDamage = input.getDoubleOr("witchercraftBaseCritDamage", 0);
 			witchercraftWyvernDecoctionHit = input.getDoubleOr("witchercraftWyvernDecoctionHit", 0);
 			witchercraftSuccubusDecoctionTick = input.getDoubleOr("witchercraftSuccubusDecoctionTick", 0);
 			witchercraftGraveHagDecoctionKill = input.getDoubleOr("witchercraftGraveHagDecoctionKill", 0);

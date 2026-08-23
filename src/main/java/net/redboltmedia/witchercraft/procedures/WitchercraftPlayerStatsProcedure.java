@@ -1,5 +1,6 @@
 package net.redboltmedia.witchercraft.procedures;
 
+import net.redboltmedia.witchercraft.init.WitchercraftModAttributes;
 import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
 
 import net.minecraft.world.entity.LivingEntity;
@@ -20,9 +21,9 @@ public class WitchercraftPlayerStatsProcedure {
 		if (entity instanceof ServerPlayer _player)
 			_player.sendSystemMessage(Component.literal(("Attack Speed" + entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAttackSpeed)), false);
 		if (entity instanceof ServerPlayer _player)
-			_player.sendSystemMessage(Component.literal(("Crit Rate" + (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftCritChance + "%"))), false);
+			_player.sendSystemMessage(Component.literal(("Crit Rate" + ((entity instanceof LivingEntity _livingEntityCC && _livingEntityCC.getAttributes().hasAttribute(WitchercraftModAttributes.CRIT_CHANCE) ? _livingEntityCC.getAttribute(WitchercraftModAttributes.CRIT_CHANCE).getValue() : 0) + "%"))), false);
 		if (entity instanceof ServerPlayer _player)
-			_player.sendSystemMessage(Component.literal(("Crit Damage" + (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftCritDamage + "%"))), false);
+			_player.sendSystemMessage(Component.literal(("Crit Damage" + ((entity instanceof LivingEntity _livingEntityCD && _livingEntityCD.getAttributes().hasAttribute(WitchercraftModAttributes.CRIT_DAMAGE) ? _livingEntityCD.getAttribute(WitchercraftModAttributes.CRIT_DAMAGE).getValue() : 0) + "%"))), false);
 		if (entity instanceof ServerPlayer _player)
 			_player.sendSystemMessage(Component.literal(("Passive Health Regeneration" + (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPassiveHealthRegeneration + "Hp/2s"))), false);
 		if (entity instanceof ServerPlayer _player)

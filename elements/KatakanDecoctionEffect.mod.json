@@ -14,6 +14,12 @@
     "renderStatusInInventory": true,
     "renderStatusInHUD": true,
     "isCuredbyHoney": false,
-    "modifiers": []
+    "modifiers": [
+      {
+        "attribute": "CUSTOM:CritChance",
+        "amount": 10.0,
+        "operation": "ADD_VALUE"
+      }
+    ]
   }
 }

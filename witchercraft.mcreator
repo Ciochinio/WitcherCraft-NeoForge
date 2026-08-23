@@ -1226,23 +1226,13 @@
     },
     {
       "name": "CritChance",
-      "type": "procedure",
+      "type": "attribute",
       "compiles": true,
       "locked_code": false,
       "registry_name": "crit_chance",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CritChanceProcedure.java"
-        ],
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
+          "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
         ]
       },
       "path": "~/Character Stats/Stats/VariableStats/CritChance"
@@ -1289,19 +1279,13 @@
     },
     {
       "name": "CritDamage",
-      "type": "procedure",
+      "type": "attribute",
       "compiles": true,
       "locked_code": false,
       "registry_name": "crit_damage",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CritDamageProcedure.java"
-        ],
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
+          "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
         ]
       },
       "path": "~/Character Stats/Stats/VariableStats/CritDamage"
@@ -5707,6 +5691,29 @@
         ]
       },
       "path": "~/Character Abilities/CombatPerks/UNDYING/Undying"
+    },
+    {
+      "name": "ConditionalModifiers",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "conditional_modifiers",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/ConditionalModifiersProcedure.java"
+        ]
+      },
+      "path": "~/Character Stats"
     },
     {
       "name": "PerkModifiers",
@@ -10327,18 +10334,6 @@
       "value": "0.0"
     },
     {
-      "name": "witchercraftCritChance",
-      "type": "number",
-      "scope": "player_lifetime",
-      "value": "0.0"
-    },
-    {
-      "name": "witchercraftCritDamage",
-      "type": "number",
-      "scope": "player_lifetime",
-      "value": "0.0"
-    },
-    {
       "name": "witchercraftAttackSpeed",
       "type": "number",
       "scope": "player_lifetime",
@@ -10729,18 +10724,6 @@
       "value": "0"
     },
     {
-      "name": "witchercraftBaseCritChance",
-      "type": "number",
-      "scope": "player_lifetime",
-      "value": "0"
-    },
-    {
-      "name": "witchercraftBaseCritDamage",
-      "type": "number",
-      "scope": "player_lifetime",
-      "value": "0"
-    },
-    {
       "name": "witchercraftWyvernDecoctionHit",
       "type": "number",
       "scope": "player_lifetime",
@@ -11112,6 +11095,8 @@
       "attribute.witchercraft.instant_kill_chance": "Instant Kill Chance",
       "attribute.witchercraft.dodge_chance": "Dodge Chance",
       "attribute.witchercraft.potion_duration": "Potion Duration",
+      "attribute.witchercraft.crit_chance": "Crit Chance",
+      "attribute.witchercraft.crit_damage": "Crit Damage",
       "effect.witchercraft.enemy_nearby": "Enemy Nearby",
       "effect.witchercraft.undying_cooldown": "Undying Cooldown",
       "gui.witchercraft.player_stats_overlay.label_dodge_chance": "Dodge Chance",

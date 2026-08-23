@@ -1,6 +1,6 @@
 package net.redboltmedia.witchercraft.procedures;
 
-import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
+import net.redboltmedia.witchercraft.init.WitchercraftModMobEffects;
 import net.redboltmedia.witchercraft.init.WitchercraftModAttributes;
 
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
@@ -9,8 +9,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.bus.api.Event;
 
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.LivingEntity;
@@ -21,7 +20,7 @@ import net.minecraft.core.Holder;
 import javax.annotation.Nullable;
 
 @EventBusSubscriber
-public class PerkModifiersProcedure {
+public class ConditionalModifiersProcedure {
 	@SubscribeEvent
 	public static void onPlayerTick(PlayerTickEvent.Post event) {
 		execute(event, event.getEntity().level(), event.getEntity());
@@ -48,17 +47,7 @@ public class PerkModifiersProcedure {
 			return;
 		if (world.isClientSide())
 			return;
-		WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-		ItemStack _hand = entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY;
-		boolean bowHeld = _hand.getItem() == Items.CROSSBOW || _hand.getItem() == Items.BOW;
-		sync(entity, _vars.witchercraftAbilitiesDeadlyPrecision, "perk_deadly_precision", WitchercraftModAttributes.INSTANT_KILL_CHANCE, 1);
-		sync(entity, _vars.witchercraftAbilitiesGriffinSchool, "perk_griffin_school", WitchercraftModAttributes.POTION_DURATION, 20);
-		sync(entity, _vars.witchercraftAbilitiesRazorFocus, "perk_razor_focus", WitchercraftModAttributes.DODGE_CHANCE, 10);
-		sync(entity, _vars.witchercraftAbilitiesPreciseBlows, "perk_precise_blows", WitchercraftModAttributes.CRIT_CHANCE, 12);
-		sync(entity, _vars.witchercraftAbilitiesPreciseBlows, "perk_precise_blows", WitchercraftModAttributes.CRIT_DAMAGE, 75);
-		sync(entity, _vars.witchercraftAbilitiesCrushingBlows, "perk_crushing_blows", WitchercraftModAttributes.CRIT_CHANCE, 8);
-		sync(entity, _vars.witchercraftAbilitiesCrushingBlows, "perk_crushing_blows", WitchercraftModAttributes.CRIT_DAMAGE, 50);
-		sync(entity, _vars.witchercraftAbilitiesAnatomicalKnowledge && bowHeld, "perk_anatomical_knowledge", WitchercraftModAttributes.CRIT_CHANCE, 10);
-		sync(entity, _vars.witchercraftAbilitiesCripplingShot && bowHeld, "perk_crippling_shot", WitchercraftModAttributes.CRIT_DAMAGE, 50);
+		boolean thunderboltStorm = entity instanceof LivingEntity _livEnt0 && _livEnt0.hasEffect(WitchercraftModMobEffects.THUNDERBOLT_EFFECT) && world instanceof Level _lvl0 && _lvl0.isThundering();
+		sync(entity, thunderboltStorm, "effect_thunderbolt_storm", WitchercraftModAttributes.CRIT_CHANCE, 100);
 	}
 }
