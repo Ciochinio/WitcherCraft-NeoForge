@@ -1,5 +1,6 @@
 package net.redboltmedia.witchercraft.procedures;
 
+import net.redboltmedia.witchercraft.init.WitchercraftModAttributes;
 import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
 import net.redboltmedia.witchercraft.init.WitchercraftModMobEffects;
 
@@ -12,7 +13,7 @@ public class EkimmaraDecoctionUsedProcedure {
 		if (entity == null)
 			return;
 		if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
-			_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.EKIMMARA_DECOCTION_EFFECT, (int) (7200 * (1 + entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPotionDuration * 0.01)), 0));
+			_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.EKIMMARA_DECOCTION_EFFECT, (int) (7200 * (1 + (entity instanceof LivingEntity _livingEntityPD && _livingEntityPD.getAttributes().hasAttribute(WitchercraftModAttributes.POTION_DURATION) ? _livingEntityPD.getAttribute(WitchercraftModAttributes.POTION_DURATION).getValue() : 0) * 0.01)), 0));
 		{
 			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 			_vars.witchercraftToxicity = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftToxicity + 50;

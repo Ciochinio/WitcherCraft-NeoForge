@@ -1,5 +1,6 @@
 package net.redboltmedia.witchercraft.procedures;
 
+import net.redboltmedia.witchercraft.init.WitchercraftModAttributes;
 import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
 import net.redboltmedia.witchercraft.init.WitchercraftModMobEffects;
 
@@ -46,9 +47,9 @@ public class InstantKillProcedure {
 			if (sourceentity instanceof ServerPlayer _player)
 				_player.sendSystemMessage(Component.literal(("instant kill roll>>>" + instantKillRoll)), false);
 			if (sourceentity instanceof ServerPlayer _player)
-				_player.sendSystemMessage(Component.literal(("instant kill chance>>>" + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftInstantKillChance)), false);
+				_player.sendSystemMessage(Component.literal(("instant kill chance>>>" + (sourceentity instanceof LivingEntity _livingEntityIK && _livingEntityIK.getAttributes().hasAttribute(WitchercraftModAttributes.INSTANT_KILL_CHANCE) ? _livingEntityIK.getAttribute(WitchercraftModAttributes.INSTANT_KILL_CHANCE).getValue() : 0))), false);
 		}
-		if (!entity.is(TagKey.create(Registries.ENTITY_TYPE, Identifier.parse("minecraft:enderdragon"))) && instantKillRoll <= sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftInstantKillChance) {
+		if (!entity.is(TagKey.create(Registries.ENTITY_TYPE, Identifier.parse("minecraft:enderdragon"))) && instantKillRoll <= (sourceentity instanceof LivingEntity _livingEntityIK && _livingEntityIK.getAttributes().hasAttribute(WitchercraftModAttributes.INSTANT_KILL_CHANCE) ? _livingEntityIK.getAttribute(WitchercraftModAttributes.INSTANT_KILL_CHANCE).getValue() : 0)) {
 			if (!damagesource.is(DamageTypes.ARROW)) {
 				if (sourceentity instanceof LivingEntity _livEnt6 && _livEnt6.hasEffect(WitchercraftModMobEffects.DEV_LOG)) {
 					if (sourceentity instanceof ServerPlayer _player)

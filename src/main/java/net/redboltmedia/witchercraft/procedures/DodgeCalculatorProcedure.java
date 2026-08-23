@@ -1,5 +1,6 @@
 package net.redboltmedia.witchercraft.procedures;
 
+import net.redboltmedia.witchercraft.init.WitchercraftModAttributes;
 import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
 import net.redboltmedia.witchercraft.init.WitchercraftModMobEffects;
 
@@ -41,9 +42,9 @@ public class DodgeCalculatorProcedure {
 			if (entity instanceof ServerPlayer _player)
 				_player.sendSystemMessage(Component.literal(("dodge roll:" + dodgeRoll)), false);
 			if (entity instanceof ServerPlayer _player)
-				_player.sendSystemMessage(Component.literal(("dodge chance:" + entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftDodgeChance)), false);
+				_player.sendSystemMessage(Component.literal(("dodge chance:" + (entity instanceof LivingEntity _livingEntityDC && _livingEntityDC.getAttributes().hasAttribute(WitchercraftModAttributes.DODGE_CHANCE) ? _livingEntityDC.getAttribute(WitchercraftModAttributes.DODGE_CHANCE).getValue() : 0))), false);
 		}
-		if (!(entity instanceof LivingEntity _livEnt4 && _livEnt4.hasEffect(WitchercraftModMobEffects.DODGE_COOLDOWN)) && dodgeRoll <= entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftDodgeChance) {
+		if (!(entity instanceof LivingEntity _livEnt4 && _livEnt4.hasEffect(WitchercraftModMobEffects.DODGE_COOLDOWN)) && dodgeRoll <= (entity instanceof LivingEntity _livingEntityDC && _livingEntityDC.getAttributes().hasAttribute(WitchercraftModAttributes.DODGE_CHANCE) ? _livingEntityDC.getAttribute(WitchercraftModAttributes.DODGE_CHANCE).getValue() : 0)) {
 			if (event instanceof ICancellableEvent _cancellable) {
 				_cancellable.setCanceled(true);
 			}

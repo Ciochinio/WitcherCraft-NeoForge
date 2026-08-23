@@ -21,7 +21,6 @@ public class WitchercraftPlayerBaseStatsProcedure {
 			_vars.witchercraftAdditionalDamage = 0;
 			_vars.witchercraftIncreasedDamage = 0;
 			_vars.witchercraftToxicityOverdoseThreshold = 70;
-			_vars.witchercraftDodgeChance = 0;
 			_vars.markSyncDirty();
 		}
 	}

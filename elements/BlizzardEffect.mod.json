@@ -14,6 +14,12 @@
     "renderStatusInInventory": true,
     "renderStatusInHUD": true,
     "isCuredbyHoney": false,
-    "modifiers": []
+    "modifiers": [
+      {
+        "attribute": "CUSTOM:DodgeChance",
+        "amount": 5.0,
+        "operation": "ADD_VALUE"
+      }
+    ]
   }
 }

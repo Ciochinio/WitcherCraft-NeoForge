@@ -5709,20 +5709,37 @@
       "path": "~/Character Abilities/CombatPerks/UNDYING/Undying"
     },
     {
-      "name": "DodgeChance",
+      "name": "PerkModifiers",
       "type": "procedure",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "dodge_chance",
+      "registry_name": "perk_modifiers",
       "metadata": {
         "dependencies": [
           {
             "name": "entity",
             "type": "entity"
+          },
+          {
+            "name": "world",
+            "type": "world"
           }
         ],
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/DodgeChanceProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/PerkModifiersProcedure.java"
+        ]
+      },
+      "path": "~/Character Abilities"
+    },
+    {
+      "name": "DodgeChance",
+      "type": "attribute",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "dodge_chance",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
         ]
       },
       "path": "~/Character Stats/Stats/VariableStats/DodgeChance"
@@ -5780,19 +5797,13 @@
     },
     {
       "name": "InstantKillChance",
-      "type": "procedure",
+      "type": "attribute",
       "compiles": true,
       "locked_code": false,
       "registry_name": "instant_kill_chance",
       "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/InstantKillChanceProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
         ]
       },
       "path": "~/Character Stats/Stats/VariableStats/InstantKillChance"
@@ -5882,19 +5893,13 @@
     },
     {
       "name": "PotionDuration",
-      "type": "procedure",
+      "type": "attribute",
       "compiles": true,
       "locked_code": false,
       "registry_name": "potion_duration",
       "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/PotionDurationProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
         ]
       },
       "path": "~/Character Stats/Stats/VariableStats/PotionDuration"
@@ -7463,19 +7468,13 @@
     },
     {
       "name": "ReflectDamage",
-      "type": "procedure",
+      "type": "attribute",
       "compiles": true,
       "locked_code": false,
       "registry_name": "reflect_damage",
       "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/ReflectDamageProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
         ]
       },
       "path": "~/Character Stats/Stats/VariableStats/ReflectDamage"
@@ -10700,12 +10699,6 @@
       "value": "false"
     },
     {
-      "name": "witchercraftDodgeChance",
-      "type": "number",
-      "scope": "player_lifetime",
-      "value": "0"
-    },
-    {
       "name": "witchercraftQuenShield",
       "type": "number",
       "scope": "player_lifetime",
@@ -10718,19 +10711,7 @@
       "value": "0"
     },
     {
-      "name": "witchercraftInstantKillChance",
-      "type": "number",
-      "scope": "player_lifetime",
-      "value": "0"
-    },
-    {
       "name": "witchercraftBasePassiveStaminaRegeneration",
-      "type": "number",
-      "scope": "player_lifetime",
-      "value": "0"
-    },
-    {
-      "name": "witchercraftPotionDuration",
       "type": "number",
       "scope": "player_lifetime",
       "value": "0"
@@ -10755,12 +10736,6 @@
     },
     {
       "name": "witchercraftBaseCritDamage",
-      "type": "number",
-      "scope": "player_lifetime",
-      "value": "0"
-    },
-    {
-      "name": "witchercraftReflectDamage",
       "type": "number",
       "scope": "player_lifetime",
       "value": "0"
@@ -11133,6 +11108,10 @@
       "gui.witchercraft.player_stats_overlay.label_additionaldamgeflat": "AdditionalDamge",
       "effect.witchercraft.bleed": "Bleed",
       "attribute.witchercraft.life_steal": "Life Steal",
+      "attribute.witchercraft.reflect_damage": "Reflect Damage",
+      "attribute.witchercraft.instant_kill_chance": "Instant Kill Chance",
+      "attribute.witchercraft.dodge_chance": "Dodge Chance",
+      "attribute.witchercraft.potion_duration": "Potion Duration",
       "effect.witchercraft.enemy_nearby": "Enemy Nearby",
       "effect.witchercraft.undying_cooldown": "Undying Cooldown",
       "gui.witchercraft.player_stats_overlay.label_dodge_chance": "Dodge Chance",
