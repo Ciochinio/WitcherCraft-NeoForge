@@ -10,7 +10,7 @@ public class DevClearProcedure {
 			return;
 		{
 			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-			_vars.witchercraftAbiltiesGourmet = false;
+			_vars.witchercraftAbilitiesGourmet = false;
 			_vars.witchercraftAbilitiesSurvivalInstinct = false;
 			_vars.witchercraftAbilitiesSunAndStars = false;
 			_vars.witchercraftAbilitiesCatSchool = false;
@@ -21,20 +21,20 @@ public class DevClearProcedure {
 			_vars.witchercraftAbilitiesSideEffects = false;
 			_vars.witchercraftAbilitiesPoisonedBlades = false;
 			_vars.witchercraftAbilitiesProtectiveCoating = false;
-			_vars.witchercraftAbilitiesHunterInstincts = false;
+			_vars.witchercraftAbilitiesHunterInstinct = false;
 			_vars.witchercraftAbilitiesPyrotechnics = false;
 			_vars.witchercraftAbilitiesEfficiency = false;
 			_vars.witchercraftAbilitiesClusterBombs = false;
 			_vars.witchercraftAbilitiesFarReachingAard = false;
 			_vars.witchercraftAbilitiesAardIntensity = false;
 			_vars.witchercraftAbilitiesShockWave = false;
-			_vars.witchercraftAbilitiesFireStream = false;
+			_vars.witchercraftAbilitiesFirestream = false;
 			_vars.witchercraftAbilitiesIgniIntensity = false;
 			_vars.witchercraftAbilitiesPyromaniac = false;
 			_vars.witchercraftAbilitiesSustainedGlyphs = false;
 			_vars.witchercraftAbilitiesYrdenIntensity = false;
 			_vars.witchercraftAbilitiesMagicTrap = false;
-			_vars.witchercraftAbilitiesExploadingShield = false;
+			_vars.witchercraftAbilitiesExplodingShield = false;
 			_vars.witchercraftAbilitiesQuenIntensity = false;
 			_vars.witchercraftAbilitiesQuenDischarge = false;
 			_vars.witchercraftAbilitiesDelusion = false;
@@ -48,7 +48,7 @@ public class DevClearProcedure {
 			_vars.witchercraftAbilitiesSunderArmor = false;
 			_vars.witchercraftAbilitiesFleetFooted = false;
 			_vars.witchercraftAbilitiesDefence = false;
-			_vars.witchercraftAbilitiesDeadlyPresicion = false;
+			_vars.witchercraftAbilitiesDeadlyPrecision = false;
 			_vars.witchercraftAbilitiesColdBlood = false;
 			_vars.witchercraftAbilitiesAnatomicalKnowledge = false;
 			_vars.witchercraftAbilitiesCripplingShot = false;
@@ -59,9 +59,9 @@ public class DevClearProcedure {
 			_vars.witchercraftAbilitiesAlchemySkillPointsUsed = 0;
 			_vars.witchercraftAbilitiesSignsSkillPointsUsed = 0;
 			_vars.witchercraftAbilitiesLearned = 0;
-			_vars.wichercraftPlayerLevel = 0;
-			_vars.wichercraftPlayerExperience = 0;
-			_vars.wichercraftAbilitesExperienceRequirement = 100;
+			_vars.witchercraftPlayerLevel = 0;
+			_vars.witchercraftPlayerExperience = 0;
+			_vars.witchercraftPlayerExperienceRequirement = 100;
 			_vars.markSyncDirty();
 		}
 	}

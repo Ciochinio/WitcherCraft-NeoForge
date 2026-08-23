@@ -11,7 +11,7 @@ public class GourmetEffectProcedure {
 		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
 			{
 				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-				_vars.witchercraftAbiltiesGourmet = true;
+				_vars.witchercraftAbilitiesGourmet = true;
 				_vars.markSyncDirty();
 			}
 			CharacterAbilitiesSkillPointUsedProcedure.execute(entity);

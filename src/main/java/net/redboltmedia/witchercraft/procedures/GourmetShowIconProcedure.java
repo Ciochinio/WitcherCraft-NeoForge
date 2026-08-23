@@ -8,7 +8,7 @@ public class GourmetShowIconProcedure {
 	public static boolean execute(Entity entity) {
 		if (entity == null)
 			return false;
-		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbiltiesGourmet == true) {
+		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesGourmet == true) {
 			return false;
 		}
 		return true;

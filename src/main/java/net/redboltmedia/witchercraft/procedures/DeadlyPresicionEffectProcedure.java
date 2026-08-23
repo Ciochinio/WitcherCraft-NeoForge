@@ -12,7 +12,7 @@ public class DeadlyPresicionEffectProcedure {
 			if (CharacterAbilitiesCombatTier3Procedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-					_vars.witchercraftAbilitiesDeadlyPresicion = true;
+					_vars.witchercraftAbilitiesDeadlyPrecision = true;
 					_vars.markSyncDirty();
 				}
 				CharacterAbilitiesCombatSkillPointsUsedProcedure.execute(entity);

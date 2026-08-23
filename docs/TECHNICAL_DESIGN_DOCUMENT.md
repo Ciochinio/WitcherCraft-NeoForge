@@ -114,7 +114,7 @@ hotbar. `WitcherHud` replicates that gate at the top of the handler. Do not remo
 | [QuenHudShow](../elements/QuenHudShow.mod.json) | procedure, logic | `~/Signs/Quen` | Is the Quen bar visible: `witchercraftQuenShield > 0` |
 | [QuenHudPool](../elements/QuenHudPool.mod.json) | procedure, number | `~/Signs/Quen` | The raw remaining pool in points. The icon maths lives beside the rendering. |
 | [ToxicityHudFill](../elements/ToxicityHudFill.mod.json) | procedure, number | `~/Alchemy/ Toxicity` | Fill fraction 0..1: `witchercraftToxicity / 100` |
-| [ToxicityHudOverdose](../elements/ToxicityHudOverdose.mod.json) | procedure, logic | `~/Alchemy/ Toxicity` | Use the overdose colour: toxicity at or past `ToxicityOverdoseThreshold` |
+| [ToxicityHudOverdose](../elements/ToxicityHudOverdose.mod.json) | procedure, logic | `~/Alchemy/ Toxicity` | Use the overdose colour: toxicity at or past `witchercraftToxicityOverdoseThreshold` |
 
 **The separation is the point.** The locked file contains no tuning values that describe game state -
 only geometry. Everything a designer would want to change lives in ordinary block-based procedures
@@ -136,7 +136,7 @@ Supporting state:
   (shattered) and `MobEffectEvent.Expired` (timed out), so it covers every way the shield can end.
   Note that this is a state fix, not a display fix: gameplay was never wrong, since `QuenBlock`
   independently gates on `hasEffect(QUEN_EFFECT)`.
-- `ToxicityOverdoseThreshold` already exists and is initialised to **70** by
+- `witchercraftToxicityOverdoseThreshold` already exists and is initialised to **70** by
   `WitchercraftPlayerBaseStats`. It is `0` before that runs, which is why `ToxicityHudOverdose`
   refuses to report an overdose while the threshold is still zero.
 

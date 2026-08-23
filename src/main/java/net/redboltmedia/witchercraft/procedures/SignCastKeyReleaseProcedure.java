@@ -50,11 +50,11 @@ public class SignCastKeyReleaseProcedure {
 						if (entity instanceof ServerPlayer _player)
 							_player.sendSystemMessage(Component.literal("Not enough stamina for alternate sign"), true);
 					}
-					if (entity instanceof LivingEntity _livEnt13 && _livEnt13.hasEffect(WitchercraftModMobEffects.QUEN_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesExploadingShield) {
+					if (entity instanceof LivingEntity _livEnt13 && _livEnt13.hasEffect(WitchercraftModMobEffects.QUEN_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesExplodingShield) {
 						if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
 							_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.SIGN_COOLDOWN, 40, 0));
 					}
-					if (entity instanceof LivingEntity _livEnt15 && _livEnt15.hasEffect(WitchercraftModMobEffects.IGNI_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesFireStream) {
+					if (entity instanceof LivingEntity _livEnt15 && _livEnt15.hasEffect(WitchercraftModMobEffects.IGNI_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesFirestream) {
 						if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
 							_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.SIGN_COOLDOWN, 40, 0));
 					}
@@ -67,7 +67,7 @@ public class SignCastKeyReleaseProcedure {
 							if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
 								_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.SIGN_COOLDOWN, 40, 0));
 						}
-						if (entity instanceof LivingEntity _livEnt20 && _livEnt20.hasEffect(WitchercraftModMobEffects.QUEN_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesExploadingShield) {
+						if (entity instanceof LivingEntity _livEnt20 && _livEnt20.hasEffect(WitchercraftModMobEffects.QUEN_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesExplodingShield) {
 							SignCostProcedure.execute(entity);
 							QuenCastProcedure.execute(entity);
 							if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
@@ -79,7 +79,7 @@ public class SignCastKeyReleaseProcedure {
 							if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
 								_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.SIGN_COOLDOWN, 40, 1));
 						}
-						if (entity instanceof LivingEntity _livEnt24 && _livEnt24.hasEffect(WitchercraftModMobEffects.IGNI_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesFireStream) {
+						if (entity instanceof LivingEntity _livEnt24 && _livEnt24.hasEffect(WitchercraftModMobEffects.IGNI_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesFirestream) {
 							SignCostProcedure.execute(entity);
 							IgniCastProcedure.execute(entity);
 							if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())

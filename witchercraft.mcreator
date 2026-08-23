@@ -10402,7 +10402,7 @@
       "value": "0.0"
     },
     {
-      "name": "witchercraftAbiltiesGourmet",
+      "name": "witchercraftAbilitiesGourmet",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
@@ -10468,7 +10468,7 @@
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesHunterInstincts",
+      "name": "witchercraftAbilitiesHunterInstinct",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
@@ -10510,7 +10510,7 @@
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesFireStream",
+      "name": "witchercraftAbilitiesFirestream",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
@@ -10546,7 +10546,7 @@
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesExploadingShield",
+      "name": "witchercraftAbilitiesExplodingShield",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
@@ -10630,7 +10630,7 @@
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesDeadlyPresicion",
+      "name": "witchercraftAbilitiesDeadlyPrecision",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
@@ -10672,19 +10672,19 @@
       "value": "false"
     },
     {
-      "name": "wichercraftPlayerLevel",
+      "name": "witchercraftPlayerLevel",
       "type": "number",
       "scope": "player_persistent",
       "value": "0"
     },
     {
-      "name": "wichercraftPlayerExperience",
+      "name": "witchercraftPlayerExperience",
       "type": "number",
       "scope": "player_persistent",
       "value": "0"
     },
     {
-      "name": "wichercraftAbilitesExperienceRequirement",
+      "name": "witchercraftPlayerExperienceRequirement",
       "type": "number",
       "scope": "player_persistent",
       "value": "0.0"
@@ -10696,7 +10696,7 @@
       "value": "0"
     },
     {
-      "name": "ToxicityOverdoseThreshold",
+      "name": "witchercraftToxicityOverdoseThreshold",
       "type": "number",
       "scope": "player_lifetime",
       "value": "0.0"
@@ -10804,7 +10804,7 @@
       "value": "0"
     },
     {
-      "name": "witchercraftWyvenDecoctionHit",
+      "name": "witchercraftWyvernDecoctionHit",
       "type": "number",
       "scope": "player_lifetime",
       "value": "0"
@@ -10840,13 +10840,13 @@
       "value": "0"
     },
     {
-      "name": "sekund",
+      "name": "witchercraftSeconds",
       "type": "number",
       "scope": "global",
       "value": "0"
     },
     {
-      "name": "minut",
+      "name": "witchercraftMinutes",
       "type": "number",
       "scope": "global",
       "value": "0"

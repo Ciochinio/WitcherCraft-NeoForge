@@ -26,7 +26,7 @@ public class InstantKillChanceProcedure {
 		if (entity == null)
 			return;
 		double sumInstantKillChance = 0;
-		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesDeadlyPresicion == true) {
+		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesDeadlyPrecision == true) {
 			sumInstantKillChance = sumInstantKillChance + 1;
 		}
 		{

@@ -18,7 +18,7 @@ public class PassiveStaminaRegenStartProcedure {
 			_vars.witchercraftPassiveStaminaRegeneration = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftBasePassiveStaminaRegeneration;
 			_vars.markSyncDirty();
 		}
-		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbiltiesGourmet == true) {
+		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesGourmet == true) {
 			{
 				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 				_vars.witchercraftPassiveStaminaRegeneration = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPassiveStaminaRegeneration + 1;

@@ -8,8 +8,8 @@ public class ToxicityHudOverdoseProcedure {
 	public static boolean execute(Entity entity) {
 		if (entity == null)
 			return false;
-		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).ToxicityOverdoseThreshold > 0) {
-			return entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftToxicity >= entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).ToxicityOverdoseThreshold;
+		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftToxicityOverdoseThreshold > 0) {
+			return entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftToxicity >= entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftToxicityOverdoseThreshold;
 		}
 		return false;
 	}

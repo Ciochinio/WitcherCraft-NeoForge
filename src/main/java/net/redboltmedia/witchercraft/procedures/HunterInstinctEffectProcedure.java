@@ -12,7 +12,7 @@ public class HunterInstinctEffectProcedure {
 			if (CharacterAbilitiesAlchemyTier3Procedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-					_vars.witchercraftAbilitiesHunterInstincts = true;
+					_vars.witchercraftAbilitiesHunterInstinct = true;
 					_vars.markSyncDirty();
 				}
 				CharacterAbilitiesAlchemySkillPointsUsedProcedure.execute(entity);

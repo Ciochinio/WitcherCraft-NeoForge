@@ -30,17 +30,17 @@ public class WyvernDecoctionHitProcedure {
 		if (sourceentity == null)
 			return;
 		if (sourceentity instanceof LivingEntity _livEnt0 && _livEnt0.hasEffect(WitchercraftModMobEffects.WYVERN_DECOCTION_EFFECT) && sourceentity instanceof LivingEntity _livEnt1 && _livEnt1.hasEffect(WitchercraftModMobEffects.IN_COMBAT)) {
-			if (sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftWyvenDecoctionHit < 10) {
+			if (sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftWyvernDecoctionHit < 10) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-					_vars.witchercraftWyvenDecoctionHit = sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftWyvenDecoctionHit + 1;
+					_vars.witchercraftWyvernDecoctionHit = sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftWyvernDecoctionHit + 1;
 					_vars.markSyncDirty();
 				}
 			}
 		} else {
 			{
 				WitchercraftModVariables.PlayerVariables _vars = sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-				_vars.witchercraftWyvenDecoctionHit = 0;
+				_vars.witchercraftWyvernDecoctionHit = 0;
 				_vars.markSyncDirty();
 			}
 		}

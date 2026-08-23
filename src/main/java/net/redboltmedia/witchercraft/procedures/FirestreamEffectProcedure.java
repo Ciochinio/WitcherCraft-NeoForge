@@ -11,7 +11,7 @@ public class FirestreamEffectProcedure {
 		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
 			{
 				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-				_vars.witchercraftAbilitiesFireStream = true;
+				_vars.witchercraftAbilitiesFirestream = true;
 				_vars.markSyncDirty();
 			}
 			CharacterAbilitiesSignsSkillPointsUsedProcedure.execute(entity);
