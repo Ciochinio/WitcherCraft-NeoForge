@@ -9842,6 +9842,103 @@
       "path": "~/Signs/Quen/AltQuen"
     },
     {
+      "name": "QuenActiveShield",
+      "type": "potioneffect",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "quen_active_shield",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/potion/QuenActiveShieldMobEffect.java"
+        ]
+      },
+      "path": "~/Signs/Quen/AltQuen"
+    },
+    {
+      "name": "QuenActiveShieldTick",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "quen_active_shield_tick",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/QuenActiveShieldTickProcedure.java"
+        ]
+      },
+      "path": "~/Signs/Quen/AltQuen"
+    },
+    {
+      "name": "QuenActiveShieldAura",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "quen_active_shield_aura",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/QuenActiveShieldAuraProcedure.java"
+        ]
+      },
+      "path": "~/Signs/Quen/AltQuen"
+    },
+    {
+      "name": "QuenActiveShieldDrop",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "quen_active_shield_drop",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/QuenActiveShieldDropProcedure.java"
+        ]
+      },
+      "path": "~/Signs/Quen/AltQuen"
+    },
+    {
+      "name": "QuenActiveShieldEnd",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "quen_active_shield_end",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/QuenActiveShieldEndProcedure.java"
+        ]
+      },
+      "path": "~/Signs/Quen/AltQuen"
+    },
+    {
       "name": "AltAardCast",
       "type": "procedure",
       "compiles": true,
@@ -10761,7 +10858,7 @@
       "value": "false"
     },
     {
-      "name": "witchercraftSignCastHoldCost",
+      "name": "witchercraftSignHoldCostPerSecond",
       "type": "number",
       "scope": "player_lifetime",
       "value": "0"

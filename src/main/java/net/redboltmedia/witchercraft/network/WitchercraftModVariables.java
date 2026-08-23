@@ -157,7 +157,7 @@ public class WitchercraftModVariables {
 			clone.witchercraftSignKeyHold = original.witchercraftSignKeyHold;
 			clone.witchercraftTick = original.witchercraftTick;
 			clone.witchercraftSignNoCast = original.witchercraftSignNoCast;
-			clone.witchercraftSignCastHoldCost = original.witchercraftSignCastHoldCost;
+			clone.witchercraftSignHoldCostPerSecond = original.witchercraftSignHoldCostPerSecond;
 		}
 		event.getEntity().setData(PLAYER_VARIABLES, clone);
 	}
@@ -249,7 +249,7 @@ public class WitchercraftModVariables {
 		public boolean witchercraftSignKeyHold = false;
 		public double witchercraftTick = 0;
 		public boolean witchercraftSignNoCast = false;
-		public double witchercraftSignCastHoldCost = 0;
+		public double witchercraftSignHoldCostPerSecond = 0;
 
 		@Override
 		public void serialize(ValueOutput output) {
@@ -338,7 +338,7 @@ public class WitchercraftModVariables {
 			output.putBoolean("witchercraftSignKeyHold", witchercraftSignKeyHold);
 			output.putDouble("witchercraftTick", witchercraftTick);
 			output.putBoolean("witchercraftSignNoCast", witchercraftSignNoCast);
-			output.putDouble("witchercraftSignCastHoldCost", witchercraftSignCastHoldCost);
+			output.putDouble("witchercraftSignHoldCostPerSecond", witchercraftSignHoldCostPerSecond);
 		}
 
 		@Override
@@ -428,7 +428,7 @@ public class WitchercraftModVariables {
 			witchercraftSignKeyHold = input.getBooleanOr("witchercraftSignKeyHold", false);
 			witchercraftTick = input.getDoubleOr("witchercraftTick", 0);
 			witchercraftSignNoCast = input.getBooleanOr("witchercraftSignNoCast", false);
-			witchercraftSignCastHoldCost = input.getDoubleOr("witchercraftSignCastHoldCost", 0);
+			witchercraftSignHoldCostPerSecond = input.getDoubleOr("witchercraftSignHoldCostPerSecond", 0);
 		}
 
 		public void markSyncDirty() {

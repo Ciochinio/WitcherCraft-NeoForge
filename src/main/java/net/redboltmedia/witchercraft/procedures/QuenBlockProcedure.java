@@ -46,7 +46,8 @@ public class QuenBlockProcedure {
 		if (entity == null)
 			return;
 		double overflow = 0;
-		if ((entity instanceof LivingEntity _livEnt0 && _livEnt0.hasEffect(WitchercraftModMobEffects.QUEN_EFFECT))
+		if (((entity instanceof LivingEntity _livEnt0 && _livEnt0.hasEffect(WitchercraftModMobEffects.QUEN_EFFECT))
+				|| (entity instanceof LivingEntity _livEntShield && _livEntShield.hasEffect(WitchercraftModMobEffects.QUEN_ACTIVE_SHIELD)))
 				&& entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftQuenShield > 0
 				&& !(damagesource.is(TagKey.create(Registries.DAMAGE_TYPE, Identifier.parse("minecraft:is_fall")))
 						|| damagesource.is(TagKey.create(Registries.DAMAGE_TYPE, Identifier.parse("minecraft:is_freezing")))

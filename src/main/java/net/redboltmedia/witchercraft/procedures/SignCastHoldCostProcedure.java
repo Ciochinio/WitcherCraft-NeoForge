@@ -28,7 +28,8 @@ public class SignCastHoldCostProcedure {
 		if (entity == null)
 			return "";
 		double SignCost = 0;
-		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftSignKeyHoldTime > 20) {
+		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftSignKeyHoldTime > 20
+				&& (entity instanceof LivingEntity _livEntHold && _livEntHold.hasEffect(WitchercraftModMobEffects.SIGN_HOLD))) {
 			if (entity instanceof LivingEntity _livEnt0 && _livEnt0.hasEffect(WitchercraftModMobEffects.IGNI_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesFireStream) {
 				SignCost = SignCost + 4;
 			}
@@ -38,9 +39,9 @@ public class SignCastHoldCostProcedure {
 		}
 		{
 			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-			_vars.witchercraftSignCastHoldCost = SignCost;
+			_vars.witchercraftSignHoldCostPerSecond = SignCost;
 			_vars.markSyncDirty();
 		}
-		return new java.text.DecimalFormat("##.##").format(entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftSignCastHoldCost);
+		return new java.text.DecimalFormat("##.##").format(entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftSignHoldCostPerSecond);
 	}
 }

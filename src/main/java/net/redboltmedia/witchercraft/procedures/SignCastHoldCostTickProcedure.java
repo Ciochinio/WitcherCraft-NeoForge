@@ -10,10 +10,10 @@ public class SignCastHoldCostTickProcedure {
 		if (entity == null)
 			return;
 		if (entity.isAlive()
-				&& (entity instanceof Player _plr ? _plr.getFoodData().getFoodLevel() : 0) > entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftSignCastHoldCost) {
+				&& (entity instanceof Player _plr ? _plr.getFoodData().getFoodLevel() : 0) > entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftSignHoldCostPerSecond) {
 			if (entity instanceof Player _player)
 				_player.getFoodData().setFoodLevel(
-						(int) ((entity instanceof Player _plr ? _plr.getFoodData().getFoodLevel() : 0) - entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftSignCastHoldCost));
+						(int) ((entity instanceof Player _plr ? _plr.getFoodData().getFoodLevel() : 0) - entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftSignHoldCostPerSecond));
 		}
 	}
 }

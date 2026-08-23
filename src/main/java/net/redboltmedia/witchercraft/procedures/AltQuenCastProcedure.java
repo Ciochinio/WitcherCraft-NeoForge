@@ -1,18 +1,34 @@
 package net.redboltmedia.witchercraft.procedures;
 
+import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
+import net.redboltmedia.witchercraft.init.WitchercraftModMobEffects;
+
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.network.chat.Component;
+import net.minecraft.world.effect.MobEffectInstance;
 
 public class AltQuenCastProcedure {
 	public static void execute(Entity entity) {
 		if (entity == null)
 			return;
-		double xRadius = 0;
-		double loop = 0;
-		double zRadius = 0;
-		double particleAmount = 0;
-		if (entity instanceof ServerPlayer _player)
-			_player.sendSystemMessage(Component.literal("ALT QUEN"), false);
+		if (!(entity instanceof LivingEntity _livEnt0 && _livEnt0.hasEffect(WitchercraftModMobEffects.QUEN_ACTIVE_SHIELD))) {
+			if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
+				_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.QUEN_ACTIVE_SHIELD, 5, 0));
+			if (entity instanceof LivingEntity _entity)
+				_entity.removeEffect(WitchercraftModMobEffects.QUEN_EFFECT);
+			if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftQuenShield < 2) {
+				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+				_vars.witchercraftQuenShield = 2;
+				_vars.markSyncDirty();
+			}
+		}
+		if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
+			_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.QUEN_ACTIVE_SHIELD, 5, 0));
+		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftSignKeyHoldTime % 20 == 0) {
+			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+			_vars.witchercraftQuenShield = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftQuenShield
+					+ 2 * (1 + entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftSignIntensity * 0.01);
+			_vars.markSyncDirty();
+		}
 	}
 }

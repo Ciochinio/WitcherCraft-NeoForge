@@ -239,12 +239,25 @@ a Sign plays rather than just pushing its numbers, and they're still being final
 |-----------|-----------|--------------------|
 | Aard | **Far-Reaching Aard** | Widens Aard from a frontal cone into a full 360-degree radial blast, shoving every nearby enemy away from the caster at once to clear space on all sides. |
 | Igni | **Fire Stream** | An enhanced, sustained flame projection. |
-| Quen | **Active Shield** | A held, channeled shield you keep raised at will, like in the games, instead of the fire-and-forget timed pool. |
+| Quen | **Active Shield** | A held, channeled shield that starts small and charges the longer you keep it raised, paid for in stamina, instead of the fire-and-forget timed pool. |
 | Yrden | **Magic Trap** | An upgraded trap variant of the Yrden zone. |
 | Axii | **Alternate Axii** | An upgraded charm; like base Axii, it refunds its cost when it finds no target. |
 
 Because the alternates sit behind perks, they double as build payoffs: go deep into the Signs
 tree and you don't just get stronger Signs, you get ones that do something new.
+
+**Active Shield** is the one built out in full so far, and it inverts how Quen is played. Hold
+the Sign key and the shield goes up small - **2** points of absorption - then adds **2** more
+every second you keep it raised, scaling with Sign Intensity the way the base Sign does. It
+draws on the same shield pool as normal Quen and reads on the same bubble HUD, so raising it
+while a normal Quen is still up tops that shield up instead of throwing it away. Blocking is
+identical to the base Sign: hits eat into the pool, which then charges back up, and a hit
+bigger than what's left shatters it and lets the remainder through. What bounds it is stamina:
+**2 per second** for as long as you hold. That's the trade - your entire stamina bar for a wall
+that keeps getting stronger as long as you can pay for it, where base Quen is a fixed buffer
+you throw up and forget. Let go, run dry, or eat a hit bigger than the pool and it drops with an "Active Shield
+down" message. A shattered shield ends the hold outright rather than popping straight back up,
+so recovering from a break costs you a fresh press of the key.
 
 ---
 
@@ -750,7 +763,7 @@ Perks are switches the combat, Sign, and alchemy systems read live (see
 | **Far-Reaching Aard** | Swaps Aard for its radial knockback alternate (pushes all nearby enemies away) |
 | **Fire Stream** | Swaps Igni for its sustained-stream alternate |
 | **Magic Trap** | Swaps Yrden for its upgraded trap alternate |
-| **Active Shield** | Swaps Quen for its held/channeled shield alternate |
+| **Active Shield** | Swaps Quen for its held, charging shield alternate |
 
 **Alchemy**
 

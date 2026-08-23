@@ -1,0 +1,21 @@
+{
+  "_fv": 89,
+  "_type": "potioneffect",
+  "definition": {
+    "effectName": "Quen Active Shield",
+    "icon": "quen_sign",
+    "color": {
+      "value": -1,
+      "falpha": 0.0
+    },
+    "onAddedSound": "",
+    "isInstant": false,
+    "mobEffectCategory": "NEUTRAL",
+    "renderStatusInInventory": false,
+    "renderStatusInHUD": false,
+    "isCuredbyHoney": false,
+    "modifiers": [],
+    "onActiveTick": "QuenActiveShieldTick",
+    "onExpired": "QuenActiveShieldDrop"
+  }
+}
