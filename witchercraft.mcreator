@@ -9045,11 +9045,11 @@
       "path": "~/Alchemy/Decoctions/Succubus Decoction"
     },
     {
-      "name": "SuccubusDecoctionTickStart",
+      "name": "SuccubusDecoctionTick",
       "type": "procedure",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "succubus_decoction_tick_start",
+      "registry_name": "succubus_decoction_tick",
       "metadata": {
         "dependencies": [
           {
@@ -9062,30 +9062,17 @@
           }
         ],
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/SuccubusDecoctionTickStartProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/SuccubusDecoctionTickProcedure.java"
         ]
       },
       "path": "~/Alchemy/Decoctions/Succubus Decoction"
     },
     {
-      "name": "SuccubusDecoctionTick",
-      "type": "potioneffect",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "succubus_decoction_tick",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/potion/SuccubusDecoctionTickMobEffect.java"
-        ]
-      },
-      "path": "~/Alchemy/Decoctions/Succubus Decoction"
-    },
-    {
-      "name": "SuccubusDecoctionCheck",
+      "name": "SuccubusDecoctionEnd",
       "type": "procedure",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "succubus_decoction_check",
+      "registry_name": "succubus_decoction_end",
       "metadata": {
         "dependencies": [
           {
@@ -9094,7 +9081,7 @@
           }
         ],
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/SuccubusDecoctionCheckProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/SuccubusDecoctionEndProcedure.java"
         ]
       },
       "path": "~/Alchemy/Decoctions/Succubus Decoction"
@@ -11212,7 +11199,6 @@
       "effect.witchercraft.wyvern_decoction_effect": "Wyvern Decoction ",
       "item.witchercraft.succubus_decoction": "Succubus Decoction",
       "effect.witchercraft.succubus_decoction_effect": "Succubus Decoction ",
-      "effect.witchercraft.succubus_decoction_tick": "Succubus Decoction Tick",
       "item.witchercraft.grave_hag_decoction": "Grave Hag Decoction",
       "effect.witchercraft.grave_hag_decoction_effect": "Grave Hag Decoction ",
       "death.attack.bomb": "%1$s exploded",
