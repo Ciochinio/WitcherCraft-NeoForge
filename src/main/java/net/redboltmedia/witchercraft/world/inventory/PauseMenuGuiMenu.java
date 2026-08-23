@@ -31,7 +31,7 @@ import java.util.HashMap;
 import java.util.Collections;
 
 @EventBusSubscriber
-public class PauseMenuGUIMenu extends AbstractContainerMenu implements WitchercraftModMenus.MenuAccessor {
+public class PauseMenuGuiMenu extends AbstractContainerMenu implements WitchercraftModMenus.MenuAccessor {
 	public final Map<String, Object> menuState = new HashMap<>() {
 		@Override
 		public Object put(String key, Object value) {
@@ -51,7 +51,7 @@ public class PauseMenuGUIMenu extends AbstractContainerMenu implements Witchercr
 	private Entity boundEntity = null;
 	private BlockEntity boundBlockEntity = null;
 
-	public PauseMenuGUIMenu(int id, Inventory inv, FriendlyByteBuf extraData) {
+	public PauseMenuGuiMenu(int id, Inventory inv, FriendlyByteBuf extraData) {
 		super(WitchercraftModMenus.PAUSE_MENU_GUI.get(), id);
 		this.entity = inv.player;
 		this.world = inv.player.level();
@@ -119,7 +119,7 @@ public class PauseMenuGUIMenu extends AbstractContainerMenu implements Witchercr
 	@SubscribeEvent
 	public static void onContainerOpen(PlayerContainerEvent.Open event) {
 		Player entity = event.getEntity();
-		if (event.getContainer() instanceof PauseMenuGUIMenu menu) {
+		if (event.getContainer() instanceof PauseMenuGuiMenu menu) {
 			Level world = menu.world;
 			double x = menu.x;
 			double y = menu.y;

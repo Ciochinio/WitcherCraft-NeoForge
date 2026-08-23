@@ -23,7 +23,7 @@ public class CatEffectActiveProcedure {
 		double particleRadius = 0;
 		double particleAmount = 0;
 		if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
-			_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.TA_POTKA_MUSI_TU_BYC_ZEBY_GRA_WIEDZIALA_GDZIE_JEST_GRACZ, 10, 0));
+			_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.PLAYER_TRACKER, 10, 0));
 		{
 			final Vec3 _center = new Vec3(x, y, z);
 			for (Entity entityiterator : world.getEntitiesOfClass(Entity.class, new AABB(_center, _center).inflate(50 / 2d), e -> true).stream().sorted(Comparator.comparingDouble(_entcnd -> _entcnd.distanceToSqr(_center))).toList()) {

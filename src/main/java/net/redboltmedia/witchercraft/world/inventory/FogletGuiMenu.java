@@ -25,11 +25,11 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Collections;
 
-public class CharactersAbilietesGeneralGuiMenu extends AbstractContainerMenu implements WitchercraftModMenus.MenuAccessor {
+public class FogletGuiMenu extends AbstractContainerMenu implements WitchercraftModMenus.MenuAccessor {
 	public final Map<String, Object> menuState = new HashMap<>() {
 		@Override
 		public Object put(String key, Object value) {
-			if (!this.containsKey(key) && this.size() >= 25)
+			if (!this.containsKey(key) && this.size() >= 12)
 				return null;
 			return super.put(key, value);
 		}
@@ -45,8 +45,8 @@ public class CharactersAbilietesGeneralGuiMenu extends AbstractContainerMenu imp
 	private Entity boundEntity = null;
 	private BlockEntity boundBlockEntity = null;
 
-	public CharactersAbilietesGeneralGuiMenu(int id, Inventory inv, FriendlyByteBuf extraData) {
-		super(WitchercraftModMenus.CHARACTERS_ABILIETES_GENERAL_GUI.get(), id);
+	public FogletGuiMenu(int id, Inventory inv, FriendlyByteBuf extraData) {
+		super(WitchercraftModMenus.FOGLET_GUI.get(), id);
 		this.entity = inv.player;
 		this.world = inv.player.level();
 		this.internal = new ItemStacksResourceHandler(0);

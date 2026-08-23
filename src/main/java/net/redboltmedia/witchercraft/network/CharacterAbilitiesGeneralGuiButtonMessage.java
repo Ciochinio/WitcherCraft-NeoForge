@@ -19,21 +19,21 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.core.SectionPos;
 
 @EventBusSubscriber
-public record CharactersAbilietesGeneralGuiButtonMessage(int buttonID, int x, int y, int z) implements CustomPacketPayload {
-	public static final Type<CharactersAbilietesGeneralGuiButtonMessage> TYPE = new Type<>(Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "characters_abilietes_general_gui_buttons"));
-	public static final StreamCodec<RegistryFriendlyByteBuf, CharactersAbilietesGeneralGuiButtonMessage> STREAM_CODEC = StreamCodec.of((RegistryFriendlyByteBuf buffer, CharactersAbilietesGeneralGuiButtonMessage message) -> {
+public record CharacterAbilitiesGeneralGuiButtonMessage(int buttonID, int x, int y, int z) implements CustomPacketPayload {
+	public static final Type<CharacterAbilitiesGeneralGuiButtonMessage> TYPE = new Type<>(Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "character_abilities_general_gui_buttons"));
+	public static final StreamCodec<RegistryFriendlyByteBuf, CharacterAbilitiesGeneralGuiButtonMessage> STREAM_CODEC = StreamCodec.of((RegistryFriendlyByteBuf buffer, CharacterAbilitiesGeneralGuiButtonMessage message) -> {
 		buffer.writeInt(message.buttonID);
 		buffer.writeInt(message.x);
 		buffer.writeInt(message.y);
 		buffer.writeInt(message.z);
-	}, (RegistryFriendlyByteBuf buffer) -> new CharactersAbilietesGeneralGuiButtonMessage(buffer.readInt(), buffer.readInt(), buffer.readInt(), buffer.readInt()));
+	}, (RegistryFriendlyByteBuf buffer) -> new CharacterAbilitiesGeneralGuiButtonMessage(buffer.readInt(), buffer.readInt(), buffer.readInt(), buffer.readInt()));
 
 	@Override
-	public Type<CharactersAbilietesGeneralGuiButtonMessage> type() {
+	public Type<CharacterAbilitiesGeneralGuiButtonMessage> type() {
 		return TYPE;
 	}
 
-	public static void handleData(final CharactersAbilietesGeneralGuiButtonMessage message, final IPayloadContext context) {
+	public static void handleData(final CharacterAbilitiesGeneralGuiButtonMessage message, final IPayloadContext context) {
 		if (context.flow() == PacketFlow.SERVERBOUND) {
 			context.enqueueWork(() -> handleButtonAction(context.player(), message.buttonID, message.x, message.y, message.z)).exceptionally(e -> {
 				context.connection().disconnect(Component.literal(e.getMessage()));
@@ -95,6 +95,6 @@ public record CharactersAbilietesGeneralGuiButtonMessage(int buttonID, int x, in
 
 	@SubscribeEvent
 	public static void registerMessage(FMLCommonSetupEvent event) {
-		WitchercraftMod.addNetworkMessage(CharactersAbilietesGeneralGuiButtonMessage.TYPE, CharactersAbilietesGeneralGuiButtonMessage.STREAM_CODEC, CharactersAbilietesGeneralGuiButtonMessage::handleData);
+		WitchercraftMod.addNetworkMessage(CharacterAbilitiesGeneralGuiButtonMessage.TYPE, CharacterAbilitiesGeneralGuiButtonMessage.STREAM_CODEC, CharacterAbilitiesGeneralGuiButtonMessage::handleData);
 	}
 }

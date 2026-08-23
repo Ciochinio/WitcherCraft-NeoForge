@@ -1,6 +1,6 @@
 {
   "description": {
-    "translate": "enchantment.witchercraft.relic_oil_enchantment"
+    "translate": "enchantment.witchercraft.relict_oil_enchantment"
   },
   "supported_items": "#minecraft:swords",
   "weight": 1,

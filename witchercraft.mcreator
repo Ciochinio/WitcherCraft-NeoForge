@@ -14,16 +14,16 @@
       "path": "~/Pause Menu "
     },
     {
-      "name": "PauseMenuGUI",
+      "name": "PauseMenuGui",
       "type": "gui",
       "compiles": true,
       "locked_code": false,
       "registry_name": "pause_menu_gui",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/client/gui/PauseMenuGUIScreen.java",
-          "src/main/java/net/redboltmedia/witchercraft/network/PauseMenuGUIButtonMessage.java",
-          "src/main/java/net/redboltmedia/witchercraft/world/inventory/PauseMenuGUIMenu.java"
+          "src/main/java/net/redboltmedia/witchercraft/client/gui/PauseMenuGuiScreen.java",
+          "src/main/java/net/redboltmedia/witchercraft/network/PauseMenuGuiButtonMessage.java",
+          "src/main/java/net/redboltmedia/witchercraft/world/inventory/PauseMenuGuiMenu.java"
         ]
       },
       "path": "~/Pause Menu "
@@ -754,16 +754,16 @@
       "path": "~/Items"
     },
     {
-      "name": "Saletpeter",
+      "name": "Saltpeter",
       "type": "item",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "saletpeter",
+      "registry_name": "saltpeter",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/item/SaletpeterItem.java",
-          "src/main/resources/assets/witchercraft/items/saletpeter.json",
-          "src/main/resources/assets/witchercraft/models/item/saletpeter.json"
+          "src/main/java/net/redboltmedia/witchercraft/item/SaltpeterItem.java",
+          "src/main/resources/assets/witchercraft/items/saltpeter.json",
+          "src/main/resources/assets/witchercraft/models/item/saltpeter.json"
         ]
       },
       "path": "~/Items"
@@ -1071,14 +1071,14 @@
       "path": "~/Commands"
     },
     {
-      "name": "Witchercraftstats",
+      "name": "WitchercraftStats",
       "type": "command",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "witchercraftstats",
+      "registry_name": "witchercraft_stats",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/command/WitchercraftstatsCommand.java"
+          "src/main/java/net/redboltmedia/witchercraft/command/WitchercraftStatsCommand.java"
         ]
       },
       "path": "~/Commands"
@@ -2557,16 +2557,16 @@
       "path": "~/Character Abilities/GeneralPerks"
     },
     {
-      "name": "CharactersAbilietesGeneralGui",
+      "name": "CharacterAbilitiesGeneralGui",
       "type": "gui",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "characters_abilietes_general_gui",
+      "registry_name": "character_abilities_general_gui",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/network/CharactersAbilietesGeneralGuiButtonMessage.java",
-          "src/main/java/net/redboltmedia/witchercraft/client/gui/CharactersAbilietesGeneralGuiScreen.java",
-          "src/main/java/net/redboltmedia/witchercraft/world/inventory/CharactersAbilietesGeneralGuiMenu.java"
+          "src/main/java/net/redboltmedia/witchercraft/network/CharacterAbilitiesGeneralGuiButtonMessage.java",
+          "src/main/java/net/redboltmedia/witchercraft/client/gui/CharacterAbilitiesGeneralGuiScreen.java",
+          "src/main/java/net/redboltmedia/witchercraft/world/inventory/CharacterAbilitiesGeneralGuiMenu.java"
         ]
       },
       "path": "~/Character Abilities/GeneralPerks"
@@ -4530,14 +4530,14 @@
       "path": "~/Admin/Commands"
     },
     {
-      "name": "Lvlfix",
+      "name": "LevelFix",
       "type": "command",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "lvlfix",
+      "registry_name": "level_fix",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/command/LvlfixCommand.java"
+          "src/main/java/net/redboltmedia/witchercraft/command/LevelFixCommand.java"
         ]
       },
       "path": "~/Admin/Commands"
@@ -4643,16 +4643,16 @@
       "path": "~/Bestiary/Necrophages/Rotfiend"
     },
     {
-      "name": "Foglet",
+      "name": "FogletGui",
       "type": "gui",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "foglet",
+      "registry_name": "foglet_gui",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/client/gui/FogletScreen.java",
-          "src/main/java/net/redboltmedia/witchercraft/world/inventory/FogletMenu.java",
-          "src/main/java/net/redboltmedia/witchercraft/network/FogletButtonMessage.java"
+          "src/main/java/net/redboltmedia/witchercraft/client/gui/FogletGuiScreen.java",
+          "src/main/java/net/redboltmedia/witchercraft/world/inventory/FogletGuiMenu.java",
+          "src/main/java/net/redboltmedia/witchercraft/network/FogletGuiButtonMessage.java"
         ]
       },
       "path": "~/Bestiary/Necrophages/foglet"
@@ -6062,14 +6062,14 @@
       "path": "~/Alchemy/Potions/Cat"
     },
     {
-      "name": "TaPotkaMusiTuBycZebyGraWiedzialaGdzieJestGracz",
+      "name": "PlayerTracker",
       "type": "potioneffect",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "ta_potka_musi_tu_byc_zeby_gra_wiedziala_gdzie_jest_gracz",
+      "registry_name": "player_tracker",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/potion/TaPotkaMusiTuBycZebyGraWiedzialaGdzieJestGraczMobEffect.java"
+          "src/main/java/net/redboltmedia/witchercraft/potion/PlayerTrackerMobEffect.java"
         ]
       },
       "path": "~/Admin"
@@ -6773,14 +6773,14 @@
       "path": "~/Alchemy/Oils/DraconidOil"
     },
     {
-      "name": "RelicOilEnchantment",
+      "name": "RelictOilEnchantment",
       "type": "enchantment",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "relic_oil_enchantment",
+      "registry_name": "relict_oil_enchantment",
       "metadata": {
         "files": [
-          "src/main/resources/data/witchercraft/enchantment/relic_oil_enchantment.json"
+          "src/main/resources/data/witchercraft/enchantment/relict_oil_enchantment.json"
         ]
       },
       "path": "~/Alchemy/Oils/RelictOil"
@@ -9606,15 +9606,15 @@
       "path": "~/Alchemy"
     },
     {
-      "name": "YrdenParticle",
+      "name": "YrdenParticles",
       "type": "particle",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "yrden_particle",
+      "registry_name": "yrden_particles",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/client/particle/YrdenParticleParticle.java",
-          "src/main/resources/assets/witchercraft/particles/yrden_particle.json"
+          "src/main/java/net/redboltmedia/witchercraft/client/particle/YrdenParticlesParticle.java",
+          "src/main/resources/assets/witchercraft/particles/yrden_particles.json"
         ]
       },
       "path": "~/Signs/Yrden"
@@ -10931,7 +10931,7 @@
     "ENCHANTMENTS:minecraft:treasure": [
       "~NecrophageOilEnchantment@CUSTOM:NecrophageOilEnchantment",
       "~CursedOilEnchantment@CUSTOM:CursedOilEnchantment",
-      "~RelicOilEnchantment@CUSTOM:RelicOilEnchantment",
+      "~RelictOilEnchantment@CUSTOM:RelictOilEnchantment",
       "~DraconidOilEnchantment@CUSTOM:DraconidOilEnchantment",
       "~BeastOilEnchantment@CUSTOM:BeastOilEnchantment",
       "~OgroidOilEnchantment@CUSTOM:OgroidOilEnchantment",
@@ -10951,7 +10951,7 @@
       "item.witchercraft.white_raffards_decoction": "White Raffards Decoction",
       "item.witchercraft.rebis": "Rebis",
       "gui.witchercraft.character_abilities_combat_gui.tooltip_if_killed_restore_hp_to_50_onc": " IF KILLED RESTORE HP TO 50% ONCE EVERY 15 MINUTES",
-      "gui.witchercraft.characters_abilietes_general_gui.tooltip_increases_max_hp_by_15": "INCREASES MAX HP BY 15%",
+      "gui.witchercraft.character_abilities_general_gui.tooltip_increases_max_hp_by_15": "INCREASES MAX HP BY 15%",
       "gui.witchercraft.character_gui.label_crit_damage": "Crit Damage",
       "item.witchercraft.hanged_mans_venom": "Hanged Mans Venom",
       "gui.witchercraft.rotfiend_gui.label_rotfiend": "Rotfiend",
@@ -10969,11 +10969,11 @@
       "gui.witchercraft.character_abilities_alchemy_gui.button_general": "General",
       "effect.witchercraft.golden_oriole_effect": "Golden Oriole",
       "item.witchercraft.white_gull": "White Gull",
-      "gui.witchercraft.foglet.label_type_hostal": "Type: Hostile",
+      "gui.witchercraft.foglet_gui.label_type_hostal": "Type: Hostile",
       "item.witchercraft.tallow": "Tallow",
       "gui.witchercraft.character_abilities_alchemy_gui.tooltip_increases_potion_duration_time_b": "INCREASES POTION DURATION TIME BY 20% ",
       "gui.witchercraft.character_abilities_signs_gui.tooltip_aard_deals_x_damage": "AARD DEALS X DAMAGE ",
-      "gui.witchercraft.characters_abilietes_general_gui.button_alchemy": "Alchemy",
+      "gui.witchercraft.character_abilities_general_gui.button_alchemy": "Alchemy",
       "item.witchercraft.feline_armor_helmet": "Feline Armor Helmet",
       "gui.witchercraft.character_abilities_signs_gui.tooltip_increases_slow": "INCREASES SLOW",
       "gui.witchercraft.graveir_gui.label_type_hostal": "Type: Hostile",
@@ -10990,10 +10990,10 @@
       "gui.witchercraft.glossary_menu_gui.tooltip_cwel": "cwel",
       "item.witchercraft.golden_oriole": "Golden Oriole",
       "effect.witchercraft.school_of_the_griffin": "School Of The Griffin",
-      "gui.witchercraft.characters_abilietes_general_gui.tooltip_1_to_stamina_regen": "+1 TO STAMINA REGEN ",
+      "gui.witchercraft.character_abilities_general_gui.tooltip_1_to_stamina_regen": "+1 TO STAMINA REGEN ",
       "gui.witchercraft.sign_gui.button_aard": "AARD",
       "gui.witchercraft.character_abilities_alchemy_gui.tooltip_reduces_damage_taken_from_mob_ty": "REDUCES DAMAGE TAKEN FROM MOB TYPE THE OIL IN MAIN HAND TARGETS ",
-      "gui.witchercraft.characters_abilietes_general_gui.button_general": "General",
+      "gui.witchercraft.character_abilities_general_gui.button_general": "General",
       "gui.witchercraft.drowner_gui.label_health_20": "Health: 20",
       "gui.witchercraft.character_abilities_alchemy_gui.button_signs": " Signs ",
       "item.witchercraft.relict_oil": "Relict Oil",
@@ -11010,7 +11010,7 @@
       "gui.witchercraft.meditation_gui.button_sunset": "Sunset",
       "item.witchercraft.wolven_armor_boots": "Wolven Armor Boots",
       "gui.witchercraft.pause_menu_gui.button_skill_tree": "Skill Tree",
-      "gui.witchercraft.characters_abilietes_general_gui.tooltip_while_school_of_the_bear_effec": "WHILE \"SCHOOL OF THE BEAR\" EFFECT, INCREASE MAX HP BY 20% ",
+      "gui.witchercraft.character_abilities_general_gui.tooltip_while_school_of_the_bear_effec": "WHILE \"SCHOOL OF THE BEAR\" EFFECT, INCREASE MAX HP BY 20% ",
       "item.witchercraft.griffin_armor_boots": "Griffin Armor Boots",
       "item.witchercraft.wolven_armor_helmet": "Wolven Armor Helmet",
       "item.witchercraft.dancing_star": "Dancing Star",
@@ -11025,7 +11025,7 @@
       "item.witchercraft.ursine_armor_leggings": "Ursine Armor Leggings",
       "item.witchercraft.ursine_armor_boots": "Ursine Armor Boots",
       "item.witchercraft.griffin_armor_leggings": "Griffin Armor Leggings",
-      "item.witchercraft.saletpeter": "Saletpeter",
+      "item.witchercraft.saltpeter": "Saltpeter",
       "item.witchercraft.viper_armor_leggings": "Viper Armor Leggings",
       "item.witchercraft.manticore_armor_chestplate": "Manticore Armor Chestplate",
       "gui.witchercraft.alchemy_gui.button_potions": "Potions",
@@ -11037,7 +11037,7 @@
       "item.witchercraft.specter_oil": "Specter Oil",
       "gui.witchercraft.bestiary_menu_gui.button_foglet": "foglet",
       "gui.witchercraft.character_gui.tooltip_123": "123",
-      "gui.witchercraft.foglet.label_drowner": "Foglet",
+      "gui.witchercraft.foglet_gui.label_drowner": "Foglet",
       "effect.witchercraft.school_of_the_wolf": "School Of The Wolf",
       "item.witchercraft.hydragenum": "Hydragenum",
       "item.witchercraft.thunderbolt": "Thunderbolt",
@@ -11051,14 +11051,14 @@
       "item.witchercraft.aether": "Aether",
       "item.witchercraft.beast_oil": "Beast Oil",
       "effect.witchercraft.axii_sign": "Axii Sign",
-      "gui.witchercraft.characters_abilietes_general_gui.button_signs": " Signs ",
+      "gui.witchercraft.character_abilities_general_gui.button_signs": " Signs ",
       "gui.witchercraft.character_abilities_alchemy_gui.button_back": "Back",
       "gui.witchercraft.rotfiend_gui.label_health_40": "Health: 40",
       "gui.witchercraft.character_abilities_signs_gui.tooltip_increases_burning_duration": "INCREASES BURNING DURATION ",
-      "gui.witchercraft.characters_abilietes_general_gui.button_combat": " Combat",
+      "gui.witchercraft.character_abilities_general_gui.button_combat": " Combat",
       "item.witchercraft.wolven_armor_chestplate": "Wolven Armor Chestplate",
       "effect.witchercraft.quen_sign": "Quen Sign",
-      "gui.witchercraft.characters_abilietes_general_gui.button_back": "Back",
+      "gui.witchercraft.character_abilities_general_gui.button_back": "Back",
       "item_group.witchercraft.witcher_craft": "Witcher Craft",
       "effect.witchercraft.yrden_sign": "Yrden Sign",
       "item.witchercraft.ursine_armor_helmet": "Ursine Armor Helmet",
@@ -11090,13 +11090,13 @@
       "gui.witchercraft.character_abilities_combat_gui.tooltip_add_1_chance_to_insta_kill": "ADD 1% CHANCE TO INSTA KILL",
       "gui.witchercraft.character_abilities_signs_gui.button_combat": " Combat",
       "item.witchercraft.ursine_armor_chestplate": "Ursine Armor Chestplate",
-      "gui.witchercraft.foglet.label_atack_damage_5": "Atack Damage: 5",
+      "gui.witchercraft.foglet_gui.label_atack_damage_5": "Atack Damage: 5",
       "gui.witchercraft.sign_gui.button_yrden": "YRDEN",
       "gui.witchercraft.meditation_gui.button_back": "Back",
       "gui.witchercraft.character_abilities_combat_gui.button_general": "General",
       "gui.witchercraft.pause_menu_gui.button_bestiary": "Bestiary",
       "gui.witchercraft.character_abilities_combat_gui.tooltip_if_main_hand_weapon_ranged_add": " IF MAIN HAND WEAPON RANGED ADD 10% TO CRIT RATE",
-      "gui.witchercraft.characters_abilietes_general_gui.tooltip_while_school_of_the_griffin_ef": "WHILE \"SCHOOL OF THE GRIFFIN\" EFFECT, SIGN INTENSITY INCREASES BY 20%",
+      "gui.witchercraft.character_abilities_general_gui.tooltip_while_school_of_the_griffin_ef": "WHILE \"SCHOOL OF THE GRIFFIN\" EFFECT, SIGN INTENSITY INCREASES BY 20%",
       "gui.witchercraft.character_abilities_combat_gui.tooltip_if_main_hand_weapon_ranged_add1": " IF MAIN HAND WEAPON RANGED ADD 50% TO CRIT DAMAGE",
       "gui.witchercraft.sign_gui.label_sign_menu": "sign menu",
       "gui.witchercraft.bestiary_menu_gui.button_rotfiend": "Rotfiend",
@@ -11118,14 +11118,14 @@
       "item.witchercraft.quebrith": "Quebrith",
       "gui.witchercraft.graveir_gui.label_atack_damage_5": "Atack Damage: 4",
       "gui.witchercraft.glossary_menu_gui.button_back": "Back",
-      "gui.witchercraft.characters_abilietes_general_gui.tooltip_while_school_of_the_cat_effect": "WHILE \"SCHOOL OF THE CAT\" EFFECT, CRIT DAMAGE INCREASES BY 50% ",
+      "gui.witchercraft.character_abilities_general_gui.tooltip_while_school_of_the_cat_effect": "WHILE \"SCHOOL OF THE CAT\" EFFECT, CRIT DAMAGE INCREASES BY 50% ",
       "gui.witchercraft.alchemy_gui.button_oils": " Oils  ",
       "gui.witchercraft.character_abilities_signs_gui.tooltip_increases_sign_duration_by_5_sec": "INCREASES SIGN DURATION BY 5 SECONDS.",
       "item.witchercraft.feline_armor_leggings": "Feline Armor Leggings",
       "gui.witchercraft.character_abilities_alchemy_gui.tooltip_deals_additional_damage_to_mob": " DEALS ADDITIONAL DAMAGE TO MOB TYPE THE OIL IN MAIN HAND TARGETS",
-      "gui.witchercraft.characters_abilietes_general_gui.tooltip_during_day_add_1_to_health_rege": "DURING DAY ADD +1 TO HEALTH REGEN, DURING NIGHT +1 TO STAMINA REGENERATION",
+      "gui.witchercraft.character_abilities_general_gui.tooltip_during_day_add_1_to_health_rege": "DURING DAY ADD +1 TO HEALTH REGEN, DURING NIGHT +1 TO STAMINA REGENERATION",
       "gui.witchercraft.character_abilities_signs_gui.tooltip_deals_absorbet_amount_of_dmg_to": "DEALS ABSORBET AMOUNT OF DMG TO ATTACKER",
-      "gui.witchercraft.foglet.label_health_20": "Health: 30",
+      "gui.witchercraft.foglet_gui.label_health_20": "Health: 30",
       "item.witchercraft.viper_armor_chestplate": "Viper Armor Chestplate",
       "item.witchercraft.vermilion": "Vermilion",
       "effect.witchercraft.white_raffards_decoction_effect": "White Raffards Decoction",
@@ -11179,7 +11179,7 @@
       "gui.witchercraft.player_stats_overlay.label_potion_duration": "Potion Duration",
       "effect.witchercraft.petris_philter_effect": "Petris Philter",
       "gui.witchercraft.player_stats_overlay.label_sign_intensity": "Sign Intensity",
-      "effect.witchercraft.ta_potka_musi_tu_byc_zeby_gra_wiedziala_gdzie_jest_gracz": "Ta Potka Musi Tu Byc Zeby Gra Wiedziala Gdzie Jest Gracz",
+      "effect.witchercraft.player_tracker": "Ta Potka Musi Tu Byc Zeby Gra Wiedziala Gdzie Jest Gracz",
       "effect.witchercraft.correct_oil": "Correct Oil",
       "enchantment.witchercraft.insectoid_oil_enchantment": "Insectoid Oil",
       "enchantment.witchercraft.vampire_oil_enchantment": "Vampire Oil",
@@ -11188,7 +11188,7 @@
       "enchantment.witchercraft.ogroid_oil_enchantment": "Ogroid Oil",
       "enchantment.witchercraft.beast_oil_enchantment": "Beast Oil",
       "enchantment.witchercraft.draconid_oil_enchantment": "Draconid Oil",
-      "enchantment.witchercraft.relic_oil_enchantment": "Relic Oil",
+      "enchantment.witchercraft.relict_oil_enchantment": "Relic Oil",
       "enchantment.witchercraft.cursed_oil_enchantment": "Cursed Oil ",
       "enchantment.witchercraft.necrophage_oil_enchantment": "Necrophages Oil",
       "gui.witchercraft.player_stats_overlay.label_oildamage": "OilDamage",

@@ -1,6 +1,6 @@
 package net.redboltmedia.witchercraft.command;
 
-import net.redboltmedia.witchercraft.procedures.WitchercraftPlayerStatsProcedure;
+import net.redboltmedia.witchercraft.procedures.ExperienceFixProcedure;
 
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.common.util.FakePlayerFactory;
@@ -14,10 +14,10 @@ import net.minecraft.core.Direction;
 import net.minecraft.commands.Commands;
 
 @EventBusSubscriber
-public class WitchercraftstatsCommand {
+public class LevelFixCommand {
 	@SubscribeEvent
 	public static void registerCommand(RegisterCommandsEvent event) {
-		event.getDispatcher().register(Commands.literal("witchercraftstats")
+		event.getDispatcher().register(Commands.literal("lvlfix")
 
 				.executes(arguments -> {
 					Level world = arguments.getSource().getUnsidedLevel();
@@ -31,7 +31,7 @@ public class WitchercraftstatsCommand {
 					if (entity != null)
 						direction = entity.getDirection();
 
-					WitchercraftPlayerStatsProcedure.execute(entity);
+					ExperienceFixProcedure.execute(entity);
 					return 0;
 				}));
 	}

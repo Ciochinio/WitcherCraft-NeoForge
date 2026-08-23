@@ -47,7 +47,7 @@ public class WitchercraftModTabs {
 				tabData.accept(WitchercraftModItems.VERMILION.get());
 				tabData.accept(WitchercraftModItems.VITRIOL.get());
 				tabData.accept(WitchercraftModItems.WHITE_GULL.get());
-				tabData.accept(WitchercraftModItems.SALETPETER.get());
+				tabData.accept(WitchercraftModItems.SALTPETER.get());
 				tabData.accept(WitchercraftModItems.TALLOW.get());
 				tabData.accept(WitchercraftModItems.RELICT_OIL.get());
 				tabData.accept(WitchercraftModItems.CURSED_OIL.get());

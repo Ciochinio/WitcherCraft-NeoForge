@@ -8,26 +8,26 @@ import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.multiplayer.ClientLevel;
 
-public class YrdenParticleParticle extends SingleQuadParticle {
-	public static YrdenParticleParticleProvider provider(SpriteSet spriteSet) {
-		return new YrdenParticleParticleProvider(spriteSet);
+public class YrdenParticlesParticle extends SingleQuadParticle {
+	public static YrdenParticlesParticleProvider provider(SpriteSet spriteSet) {
+		return new YrdenParticlesParticleProvider(spriteSet);
 	}
 
-	public static class YrdenParticleParticleProvider implements ParticleProvider<SimpleParticleType> {
+	public static class YrdenParticlesParticleProvider implements ParticleProvider<SimpleParticleType> {
 		private final SpriteSet spriteSet;
 
-		public YrdenParticleParticleProvider(SpriteSet spriteSet) {
+		public YrdenParticlesParticleProvider(SpriteSet spriteSet) {
 			this.spriteSet = spriteSet;
 		}
 
 		public Particle createParticle(SimpleParticleType typeIn, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random) {
-			return new YrdenParticleParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed, this.spriteSet);
+			return new YrdenParticlesParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed, this.spriteSet);
 		}
 	}
 
 	private final SpriteSet spriteSet;
 
-	protected YrdenParticleParticle(ClientLevel world, double x, double y, double z, double vx, double vy, double vz, SpriteSet spriteSet) {
+	protected YrdenParticlesParticle(ClientLevel world, double x, double y, double z, double vx, double vy, double vz, SpriteSet spriteSet) {
 		super(world, x, y, z, spriteSet.first());
 		this.spriteSet = spriteSet;
 		this.setSize(0.2f, 0.4f);

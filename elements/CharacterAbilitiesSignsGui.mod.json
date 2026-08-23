@@ -145,7 +145,7 @@
         "type": "imagebutton",
         "data": {
           "name": "imagebutton_explodingshield",
-          "image": "exploadingshield.png",
+          "image": "explodingshield.png",
           "hoveredImage": "",
           "onClick": "ExplodingShieldEffect",
           "displayCondition": "ExplodingShieldShow",

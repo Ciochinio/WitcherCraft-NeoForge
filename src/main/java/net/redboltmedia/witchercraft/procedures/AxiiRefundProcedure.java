@@ -14,7 +14,7 @@ public class AxiiRefundProcedure {
 		if (entity == null)
 			return;
 		if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
-			_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.TA_POTKA_MUSI_TU_BYC_ZEBY_GRA_WIEDZIALA_GDZIE_JEST_GRACZ, 5, 0));
+			_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.PLAYER_TRACKER, 5, 0));
 		if (entity instanceof Player _player)
 			_player.getFoodData().setFoodLevel((entity instanceof Player _plr ? _plr.getFoodData().getFoodLevel() : 0) + 4);
 		WitchercraftMod.queueServerWork(1, () -> {

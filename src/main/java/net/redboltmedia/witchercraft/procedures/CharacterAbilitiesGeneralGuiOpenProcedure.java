@@ -1,6 +1,6 @@
 package net.redboltmedia.witchercraft.procedures;
 
-import net.redboltmedia.witchercraft.world.inventory.CharactersAbilietesGeneralGuiMenu;
+import net.redboltmedia.witchercraft.world.inventory.CharacterAbilitiesGeneralGuiMenu;
 
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -24,7 +24,7 @@ public class CharacterAbilitiesGeneralGuiOpenProcedure {
 			_ent.openMenu(new MenuProvider() {
 				@Override
 				public Component getDisplayName() {
-					return Component.literal("CharactersAbilietesGeneralGui");
+					return Component.literal("CharacterAbilitiesGeneralGui");
 				}
 
 				@Override
@@ -34,7 +34,7 @@ public class CharacterAbilitiesGeneralGuiOpenProcedure {
 
 				@Override
 				public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
-					return new CharactersAbilietesGeneralGuiMenu(id, inventory, new FriendlyByteBuf(Unpooled.buffer()).writeBlockPos(_bpos));
+					return new CharacterAbilitiesGeneralGuiMenu(id, inventory, new FriendlyByteBuf(Unpooled.buffer()).writeBlockPos(_bpos));
 				}
 			}, _bpos);
 		}

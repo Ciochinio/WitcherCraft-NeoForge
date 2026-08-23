@@ -3,12 +3,12 @@
   "_type": "item",
   "definition": {
     "renderType": 0,
-    "texture": "saletpeter",
+    "texture": "saltpeter",
     "customModelName": "Normal",
     "customProperties": {},
     "states": [],
     "animations": [],
-    "name": "Saletpeter",
+    "name": "Saltpeter",
     "rarity": "COMMON",
     "creativeTabs": [
       "CUSTOM:WitcherCraft"

@@ -349,7 +349,7 @@ public class CharacterAbilitiesSignsGuiScreen extends AbstractContainerScreen<Ch
 		};
 		this.addRenderableWidget(imagebutton_magictrap);
 		imagebutton_explodingshield = new ImageButton(this.leftPos + 112, this.topPos + 7, 32, 32,
-				new WidgetSprites(Identifier.parse("witchercraft:textures/screens/exploadingshield.png"), Identifier.parse("witchercraft:textures/screens/exploadingshield.png")), e -> {
+				new WidgetSprites(Identifier.parse("witchercraft:textures/screens/explodingshield.png"), Identifier.parse("witchercraft:textures/screens/explodingshield.png")), e -> {
 					int x = CharacterAbilitiesSignsGuiScreen.this.x;
 					int y = CharacterAbilitiesSignsGuiScreen.this.y;
 					if (ExplodingShieldShowProcedure.execute(entity)) {

@@ -1,8 +1,8 @@
 package net.redboltmedia.witchercraft.client.gui;
 
-import net.redboltmedia.witchercraft.world.inventory.CharactersAbilietesGeneralGuiMenu;
+import net.redboltmedia.witchercraft.world.inventory.CharacterAbilitiesGeneralGuiMenu;
 import net.redboltmedia.witchercraft.procedures.*;
-import net.redboltmedia.witchercraft.network.CharactersAbilietesGeneralGuiButtonMessage;
+import net.redboltmedia.witchercraft.network.CharacterAbilitiesGeneralGuiButtonMessage;
 import net.redboltmedia.witchercraft.init.WitchercraftModScreens;
 
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
@@ -25,7 +25,7 @@ import java.util.Arrays;
 
 import com.mojang.blaze3d.platform.InputConstants;
 
-public class CharactersAbilietesGeneralGuiScreen extends AbstractContainerScreen<CharactersAbilietesGeneralGuiMenu> implements WitchercraftModScreens.ScreenAccessor {
+public class CharacterAbilitiesGeneralGuiScreen extends AbstractContainerScreen<CharacterAbilitiesGeneralGuiMenu> implements WitchercraftModScreens.ScreenAccessor {
 	private final Level world;
 	private final int x, y, z;
 	private final Player entity;
@@ -41,7 +41,7 @@ public class CharactersAbilietesGeneralGuiScreen extends AbstractContainerScreen
 	private ImageButton imagebutton_catschooltechniques;
 	private ImageButton imagebutton_griffinschool;
 	private ImageButton imagebutton_bearschool;
-	private static final Identifier BACKGROUND = Identifier.parse("witchercraft:textures/screens/characters_abilietes_general_gui.png");
+	private static final Identifier BACKGROUND = Identifier.parse("witchercraft:textures/screens/character_abilities_general_gui.png");
 	private static final Identifier IMAGE_0 = Identifier.parse("witchercraft:textures/screens/sunandstarsbought.png");
 	private static final Identifier IMAGE_1 = Identifier.parse("witchercraft:textures/screens/survivalinstinctsbought.png");
 	private static final Identifier IMAGE_2 = Identifier.parse("witchercraft:textures/screens/gourmentbought.png");
@@ -50,7 +50,7 @@ public class CharactersAbilietesGeneralGuiScreen extends AbstractContainerScreen
 	private static final Identifier IMAGE_5 = Identifier.parse("witchercraft:textures/screens/bearschoolbought.png");
 	private static final Identifier IMAGE_6 = Identifier.parse("witchercraft:textures/screens/skillpoint.png");
 
-	public CharactersAbilietesGeneralGuiScreen(CharactersAbilietesGeneralGuiMenu container, Inventory inventory, Component text) {
+	public CharacterAbilitiesGeneralGuiScreen(CharacterAbilitiesGeneralGuiMenu container, Inventory inventory, Component text) {
 		super(container, inventory, text, 176, 166);
 		this.world = container.world;
 		this.x = container.x;
@@ -68,19 +68,19 @@ public class CharactersAbilietesGeneralGuiScreen extends AbstractContainerScreen
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
 		if (mouseX > leftPos + 69 && mouseX < leftPos + 93 && mouseY > topPos + 25 && mouseY < topPos + 49) {
-			guiGraphics.setTooltipForNextFrame(font, Component.translatable("gui.witchercraft.characters_abilietes_general_gui.tooltip_increases_max_hp_by_15"), mouseX, mouseY);
+			guiGraphics.setTooltipForNextFrame(font, Component.translatable("gui.witchercraft.character_abilities_general_gui.tooltip_increases_max_hp_by_15"), mouseX, mouseY);
 		}
 		if (mouseX > leftPos + 123 && mouseX < leftPos + 147 && mouseY > topPos + 25 && mouseY < topPos + 49) {
-			guiGraphics.setTooltipForNextFrame(font, Component.translatable("gui.witchercraft.characters_abilietes_general_gui.tooltip_1_to_stamina_regen"), mouseX, mouseY);
+			guiGraphics.setTooltipForNextFrame(font, Component.translatable("gui.witchercraft.character_abilities_general_gui.tooltip_1_to_stamina_regen"), mouseX, mouseY);
 		}
 		if (mouseX > leftPos + 6 && mouseX < leftPos + 30 && mouseY > topPos + 70 && mouseY < topPos + 94) {
-			guiGraphics.setTooltipForNextFrame(font, Component.translatable("gui.witchercraft.characters_abilietes_general_gui.tooltip_while_school_of_the_cat_effect"), mouseX, mouseY);
+			guiGraphics.setTooltipForNextFrame(font, Component.translatable("gui.witchercraft.character_abilities_general_gui.tooltip_while_school_of_the_cat_effect"), mouseX, mouseY);
 		}
 		if (mouseX > leftPos + 69 && mouseX < leftPos + 93 && mouseY > topPos + 70 && mouseY < topPos + 94) {
-			guiGraphics.setTooltipForNextFrame(font, Component.translatable("gui.witchercraft.characters_abilietes_general_gui.tooltip_while_school_of_the_griffin_ef"), mouseX, mouseY);
+			guiGraphics.setTooltipForNextFrame(font, Component.translatable("gui.witchercraft.character_abilities_general_gui.tooltip_while_school_of_the_griffin_ef"), mouseX, mouseY);
 		}
 		if (mouseX > leftPos + 123 && mouseX < leftPos + 147 && mouseY > topPos + 70 && mouseY < topPos + 94) {
-			guiGraphics.setTooltipForNextFrame(font, Component.translatable("gui.witchercraft.characters_abilietes_general_gui.tooltip_while_school_of_the_bear_effec"), mouseX, mouseY);
+			guiGraphics.setTooltipForNextFrame(font, Component.translatable("gui.witchercraft.character_abilities_general_gui.tooltip_while_school_of_the_bear_effec"), mouseX, mouseY);
 		}
 		if (mouseX > leftPos + 7 && mouseX < leftPos + 37 && mouseY > topPos + 25 && mouseY < topPos + 56) {
 			String hoverText = SunAndStarsTooltipProcedure.execute();
@@ -122,58 +122,58 @@ public class CharactersAbilietesGeneralGuiScreen extends AbstractContainerScreen
 	@Override
 	public void init() {
 		super.init();
-		button_back = Button.builder(Component.translatable("gui.witchercraft.characters_abilietes_general_gui.button_back"), e -> {
-			int x = CharactersAbilietesGeneralGuiScreen.this.x;
-			int y = CharactersAbilietesGeneralGuiScreen.this.y;
+		button_back = Button.builder(Component.translatable("gui.witchercraft.character_abilities_general_gui.button_back"), e -> {
+			int x = CharacterAbilitiesGeneralGuiScreen.this.x;
+			int y = CharacterAbilitiesGeneralGuiScreen.this.y;
 			if (true) {
-				ClientPacketDistributor.sendToServer(new CharactersAbilietesGeneralGuiButtonMessage(0, x, y, z));
-				CharactersAbilietesGeneralGuiButtonMessage.handleButtonAction(entity, 0, x, y, z);
+				ClientPacketDistributor.sendToServer(new CharacterAbilitiesGeneralGuiButtonMessage(0, x, y, z));
+				CharacterAbilitiesGeneralGuiButtonMessage.handleButtonAction(entity, 0, x, y, z);
 			}
 		}).bounds(this.leftPos + 249, this.topPos + 169, 46, 20).build();
 		this.addRenderableWidget(button_back);
-		button_general = Button.builder(Component.translatable("gui.witchercraft.characters_abilietes_general_gui.button_general"), e -> {
-			int x = CharactersAbilietesGeneralGuiScreen.this.x;
-			int y = CharactersAbilietesGeneralGuiScreen.this.y;
+		button_general = Button.builder(Component.translatable("gui.witchercraft.character_abilities_general_gui.button_general"), e -> {
+			int x = CharacterAbilitiesGeneralGuiScreen.this.x;
+			int y = CharacterAbilitiesGeneralGuiScreen.this.y;
 			if (true) {
-				ClientPacketDistributor.sendToServer(new CharactersAbilietesGeneralGuiButtonMessage(1, x, y, z));
-				CharactersAbilietesGeneralGuiButtonMessage.handleButtonAction(entity, 1, x, y, z);
+				ClientPacketDistributor.sendToServer(new CharacterAbilitiesGeneralGuiButtonMessage(1, x, y, z));
+				CharacterAbilitiesGeneralGuiButtonMessage.handleButtonAction(entity, 1, x, y, z);
 			}
 		}).bounds(this.leftPos + -66, this.topPos + -2, 61, 20).build();
 		this.addRenderableWidget(button_general);
-		button_alchemy = Button.builder(Component.translatable("gui.witchercraft.characters_abilietes_general_gui.button_alchemy"), e -> {
-			int x = CharactersAbilietesGeneralGuiScreen.this.x;
-			int y = CharactersAbilietesGeneralGuiScreen.this.y;
+		button_alchemy = Button.builder(Component.translatable("gui.witchercraft.character_abilities_general_gui.button_alchemy"), e -> {
+			int x = CharacterAbilitiesGeneralGuiScreen.this.x;
+			int y = CharacterAbilitiesGeneralGuiScreen.this.y;
 			if (true) {
-				ClientPacketDistributor.sendToServer(new CharactersAbilietesGeneralGuiButtonMessage(2, x, y, z));
-				CharactersAbilietesGeneralGuiButtonMessage.handleButtonAction(entity, 2, x, y, z);
+				ClientPacketDistributor.sendToServer(new CharacterAbilitiesGeneralGuiButtonMessage(2, x, y, z));
+				CharacterAbilitiesGeneralGuiButtonMessage.handleButtonAction(entity, 2, x, y, z);
 			}
 		}).bounds(this.leftPos + -66, this.topPos + 52, 61, 20).build();
 		this.addRenderableWidget(button_alchemy);
-		button_combat = Button.builder(Component.translatable("gui.witchercraft.characters_abilietes_general_gui.button_combat"), e -> {
-			int x = CharactersAbilietesGeneralGuiScreen.this.x;
-			int y = CharactersAbilietesGeneralGuiScreen.this.y;
+		button_combat = Button.builder(Component.translatable("gui.witchercraft.character_abilities_general_gui.button_combat"), e -> {
+			int x = CharacterAbilitiesGeneralGuiScreen.this.x;
+			int y = CharacterAbilitiesGeneralGuiScreen.this.y;
 			if (true) {
-				ClientPacketDistributor.sendToServer(new CharactersAbilietesGeneralGuiButtonMessage(3, x, y, z));
-				CharactersAbilietesGeneralGuiButtonMessage.handleButtonAction(entity, 3, x, y, z);
+				ClientPacketDistributor.sendToServer(new CharacterAbilitiesGeneralGuiButtonMessage(3, x, y, z));
+				CharacterAbilitiesGeneralGuiButtonMessage.handleButtonAction(entity, 3, x, y, z);
 			}
 		}).bounds(this.leftPos + -66, this.topPos + 25, 61, 20).build();
 		this.addRenderableWidget(button_combat);
-		button_signs = Button.builder(Component.translatable("gui.witchercraft.characters_abilietes_general_gui.button_signs"), e -> {
-			int x = CharactersAbilietesGeneralGuiScreen.this.x;
-			int y = CharactersAbilietesGeneralGuiScreen.this.y;
+		button_signs = Button.builder(Component.translatable("gui.witchercraft.character_abilities_general_gui.button_signs"), e -> {
+			int x = CharacterAbilitiesGeneralGuiScreen.this.x;
+			int y = CharacterAbilitiesGeneralGuiScreen.this.y;
 			if (true) {
-				ClientPacketDistributor.sendToServer(new CharactersAbilietesGeneralGuiButtonMessage(4, x, y, z));
-				CharactersAbilietesGeneralGuiButtonMessage.handleButtonAction(entity, 4, x, y, z);
+				ClientPacketDistributor.sendToServer(new CharacterAbilitiesGeneralGuiButtonMessage(4, x, y, z));
+				CharacterAbilitiesGeneralGuiButtonMessage.handleButtonAction(entity, 4, x, y, z);
 			}
 		}).bounds(this.leftPos + -66, this.topPos + 79, 61, 20).build();
 		this.addRenderableWidget(button_signs);
 		imagebutton_sunandstars = new ImageButton(this.leftPos + 6, this.topPos + 25, 32, 32, new WidgetSprites(Identifier.parse("witchercraft:textures/screens/sunandstars.png"), Identifier.parse("witchercraft:textures/screens/sunandstars.png")),
 				e -> {
-					int x = CharactersAbilietesGeneralGuiScreen.this.x;
-					int y = CharactersAbilietesGeneralGuiScreen.this.y;
+					int x = CharacterAbilitiesGeneralGuiScreen.this.x;
+					int y = CharacterAbilitiesGeneralGuiScreen.this.y;
 					if (SunAndStarsShowProcedure.execute(entity)) {
-						ClientPacketDistributor.sendToServer(new CharactersAbilietesGeneralGuiButtonMessage(5, x, y, z));
-						CharactersAbilietesGeneralGuiButtonMessage.handleButtonAction(entity, 5, x, y, z);
+						ClientPacketDistributor.sendToServer(new CharacterAbilitiesGeneralGuiButtonMessage(5, x, y, z));
+						CharacterAbilitiesGeneralGuiButtonMessage.handleButtonAction(entity, 5, x, y, z);
 					}
 				}) {
 			@Override
@@ -184,11 +184,11 @@ public class CharactersAbilietesGeneralGuiScreen extends AbstractContainerScreen
 		this.addRenderableWidget(imagebutton_sunandstars);
 		imagebutton_survivalinstict = new ImageButton(this.leftPos + 69, this.topPos + 25, 32, 32,
 				new WidgetSprites(Identifier.parse("witchercraft:textures/screens/survivalinstict.png"), Identifier.parse("witchercraft:textures/screens/survivalinstict.png")), e -> {
-					int x = CharactersAbilietesGeneralGuiScreen.this.x;
-					int y = CharactersAbilietesGeneralGuiScreen.this.y;
+					int x = CharacterAbilitiesGeneralGuiScreen.this.x;
+					int y = CharacterAbilitiesGeneralGuiScreen.this.y;
 					if (SurvivalInstinctShowProcedure.execute(entity)) {
-						ClientPacketDistributor.sendToServer(new CharactersAbilietesGeneralGuiButtonMessage(6, x, y, z));
-						CharactersAbilietesGeneralGuiButtonMessage.handleButtonAction(entity, 6, x, y, z);
+						ClientPacketDistributor.sendToServer(new CharacterAbilitiesGeneralGuiButtonMessage(6, x, y, z));
+						CharacterAbilitiesGeneralGuiButtonMessage.handleButtonAction(entity, 6, x, y, z);
 					}
 				}) {
 			@Override
@@ -198,11 +198,11 @@ public class CharactersAbilietesGeneralGuiScreen extends AbstractContainerScreen
 		};
 		this.addRenderableWidget(imagebutton_survivalinstict);
 		imagebutton_gourment = new ImageButton(this.leftPos + 123, this.topPos + 25, 32, 32, new WidgetSprites(Identifier.parse("witchercraft:textures/screens/gourment.png"), Identifier.parse("witchercraft:textures/screens/gourment.png")), e -> {
-			int x = CharactersAbilietesGeneralGuiScreen.this.x;
-			int y = CharactersAbilietesGeneralGuiScreen.this.y;
+			int x = CharacterAbilitiesGeneralGuiScreen.this.x;
+			int y = CharacterAbilitiesGeneralGuiScreen.this.y;
 			if (GourmetShowProcedure.execute(entity)) {
-				ClientPacketDistributor.sendToServer(new CharactersAbilietesGeneralGuiButtonMessage(7, x, y, z));
-				CharactersAbilietesGeneralGuiButtonMessage.handleButtonAction(entity, 7, x, y, z);
+				ClientPacketDistributor.sendToServer(new CharacterAbilitiesGeneralGuiButtonMessage(7, x, y, z));
+				CharacterAbilitiesGeneralGuiButtonMessage.handleButtonAction(entity, 7, x, y, z);
 			}
 		}) {
 			@Override
@@ -213,11 +213,11 @@ public class CharactersAbilietesGeneralGuiScreen extends AbstractContainerScreen
 		this.addRenderableWidget(imagebutton_gourment);
 		imagebutton_catschooltechniques = new ImageButton(this.leftPos + 6, this.topPos + 70, 32, 32, new WidgetSprites(Identifier.parse("witchercraft:textures/screens/catschool.png"), Identifier.parse("witchercraft:textures/screens/catschool.png")),
 				e -> {
-					int x = CharactersAbilietesGeneralGuiScreen.this.x;
-					int y = CharactersAbilietesGeneralGuiScreen.this.y;
+					int x = CharacterAbilitiesGeneralGuiScreen.this.x;
+					int y = CharacterAbilitiesGeneralGuiScreen.this.y;
 					if (CatSchoolShowProcedure.execute(entity)) {
-						ClientPacketDistributor.sendToServer(new CharactersAbilietesGeneralGuiButtonMessage(8, x, y, z));
-						CharactersAbilietesGeneralGuiButtonMessage.handleButtonAction(entity, 8, x, y, z);
+						ClientPacketDistributor.sendToServer(new CharacterAbilitiesGeneralGuiButtonMessage(8, x, y, z));
+						CharacterAbilitiesGeneralGuiButtonMessage.handleButtonAction(entity, 8, x, y, z);
 					}
 				}) {
 			@Override
@@ -228,11 +228,11 @@ public class CharactersAbilietesGeneralGuiScreen extends AbstractContainerScreen
 		this.addRenderableWidget(imagebutton_catschooltechniques);
 		imagebutton_griffinschool = new ImageButton(this.leftPos + 69, this.topPos + 70, 32, 32,
 				new WidgetSprites(Identifier.parse("witchercraft:textures/screens/griffinschool.png"), Identifier.parse("witchercraft:textures/screens/griffinschool.png")), e -> {
-					int x = CharactersAbilietesGeneralGuiScreen.this.x;
-					int y = CharactersAbilietesGeneralGuiScreen.this.y;
+					int x = CharacterAbilitiesGeneralGuiScreen.this.x;
+					int y = CharacterAbilitiesGeneralGuiScreen.this.y;
 					if (GriffinSchoolShowProcedure.execute(entity)) {
-						ClientPacketDistributor.sendToServer(new CharactersAbilietesGeneralGuiButtonMessage(9, x, y, z));
-						CharactersAbilietesGeneralGuiButtonMessage.handleButtonAction(entity, 9, x, y, z);
+						ClientPacketDistributor.sendToServer(new CharacterAbilitiesGeneralGuiButtonMessage(9, x, y, z));
+						CharacterAbilitiesGeneralGuiButtonMessage.handleButtonAction(entity, 9, x, y, z);
 					}
 				}) {
 			@Override
@@ -243,11 +243,11 @@ public class CharactersAbilietesGeneralGuiScreen extends AbstractContainerScreen
 		this.addRenderableWidget(imagebutton_griffinschool);
 		imagebutton_bearschool = new ImageButton(this.leftPos + 123, this.topPos + 70, 32, 32, new WidgetSprites(Identifier.parse("witchercraft:textures/screens/bearschool.png"), Identifier.parse("witchercraft:textures/screens/bearschool.png")),
 				e -> {
-					int x = CharactersAbilietesGeneralGuiScreen.this.x;
-					int y = CharactersAbilietesGeneralGuiScreen.this.y;
+					int x = CharacterAbilitiesGeneralGuiScreen.this.x;
+					int y = CharacterAbilitiesGeneralGuiScreen.this.y;
 					if (BearSchoolShowProcedure.execute(entity)) {
-						ClientPacketDistributor.sendToServer(new CharactersAbilietesGeneralGuiButtonMessage(10, x, y, z));
-						CharactersAbilietesGeneralGuiButtonMessage.handleButtonAction(entity, 10, x, y, z);
+						ClientPacketDistributor.sendToServer(new CharacterAbilitiesGeneralGuiButtonMessage(10, x, y, z));
+						CharacterAbilitiesGeneralGuiButtonMessage.handleButtonAction(entity, 10, x, y, z);
 					}
 				}) {
 			@Override

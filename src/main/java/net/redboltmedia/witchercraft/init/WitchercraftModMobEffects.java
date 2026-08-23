@@ -50,8 +50,8 @@ public class WitchercraftModMobEffects {
 	public static final DeferredHolder<MobEffect, MobEffect> UNDYING_COOLDOWN = REGISTRY.register("undying_cooldown", UndyingCooldownMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> DODGE_COOLDOWN = REGISTRY.register("dodge_cooldown", DodgeCooldownMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> PETRIS_PHILTER_EFFECT = REGISTRY.register("petris_philter_effect", PetrisPhilterEffectMobEffect::new);
-	public static final DeferredHolder<MobEffect, MobEffect> TA_POTKA_MUSI_TU_BYC_ZEBY_GRA_WIEDZIALA_GDZIE_JEST_GRACZ = REGISTRY.register("ta_potka_musi_tu_byc_zeby_gra_wiedziala_gdzie_jest_gracz",
-			TaPotkaMusiTuBycZebyGraWiedzialaGdzieJestGraczMobEffect::new);
+	public static final DeferredHolder<MobEffect, MobEffect> PLAYER_TRACKER = REGISTRY.register("player_tracker",
+			PlayerTrackerMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> CORRECT_OIL = REGISTRY.register("correct_oil", CorrectOilMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> WATER_HAG_DECOCTION_EFFECT = REGISTRY.register("water_hag_decoction_effect", WaterHagDecoctionEffectMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> EKIMMARA_DECOCTION_EFFECT = REGISTRY.register("ekimmara_decoction_effect", EkimmaraDecoctionEffectMobEffect::new);

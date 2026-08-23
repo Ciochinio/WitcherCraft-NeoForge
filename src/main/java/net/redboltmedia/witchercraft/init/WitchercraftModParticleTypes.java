@@ -14,7 +14,7 @@ import net.minecraft.core.particles.ParticleType;
 
 public class WitchercraftModParticleTypes {
 	public static final DeferredRegister<ParticleType<?>> REGISTRY = DeferredRegister.create(Registries.PARTICLE_TYPE, WitchercraftMod.MODID);
-	public static final DeferredHolder<ParticleType<?>, SimpleParticleType> YRDEN_PARTICLE = REGISTRY.register("yrden_particle", () -> new SimpleParticleType(true));
+	public static final DeferredHolder<ParticleType<?>, SimpleParticleType> YRDEN_PARTICLES = REGISTRY.register("yrden_particles", () -> new SimpleParticleType(true));
 	public static final DeferredHolder<ParticleType<?>, SimpleParticleType> QUEN_HOLD_PARTICLES = REGISTRY.register("quen_hold_particles", () -> new SimpleParticleType(false));
 	public static final DeferredHolder<ParticleType<?>, SimpleParticleType> QUEN_PARTICLES = REGISTRY.register("quen_particles", () -> new SimpleParticleType(false));
 }

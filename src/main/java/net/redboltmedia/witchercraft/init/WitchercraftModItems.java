@@ -45,7 +45,7 @@ public class WitchercraftModItems {
 	public static final DeferredItem<Item> VERMILION;
 	public static final DeferredItem<Item> VITRIOL;
 	public static final DeferredItem<Item> WHITE_GULL;
-	public static final DeferredItem<Item> SALETPETER;
+	public static final DeferredItem<Item> SALTPETER;
 	public static final DeferredItem<Item> TALLOW;
 	public static final DeferredItem<Item> RELICT_OIL;
 	public static final DeferredItem<Item> CURSED_OIL;
@@ -119,7 +119,7 @@ public class WitchercraftModItems {
 		VERMILION = register("vermilion", VermilionItem::new);
 		VITRIOL = register("vitriol", VitriolItem::new);
 		WHITE_GULL = register("white_gull", WhiteGullItem::new);
-		SALETPETER = register("saletpeter", SaletpeterItem::new);
+		SALTPETER = register("saltpeter", SaltpeterItem::new);
 		TALLOW = register("tallow", TallowItem::new);
 		RELICT_OIL = register("relict_oil", RelictOilItem::new);
 		CURSED_OIL = register("cursed_oil", CursedOilItem::new);

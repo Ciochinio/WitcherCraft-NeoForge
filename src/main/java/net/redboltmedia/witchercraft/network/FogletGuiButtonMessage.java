@@ -1,6 +1,8 @@
 package net.redboltmedia.witchercraft.network;
 
-import net.redboltmedia.witchercraft.procedures.*;
+import net.redboltmedia.witchercraft.procedures.RotfiendGuiOpenProcedure;
+import net.redboltmedia.witchercraft.procedures.BruxaGuiOpenProcedure;
+import net.redboltmedia.witchercraft.procedures.BestiaryMenuGuiOpenProcedure;
 import net.redboltmedia.witchercraft.WitchercraftMod;
 
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -19,21 +21,21 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.core.SectionPos;
 
 @EventBusSubscriber
-public record PauseMenuGUIButtonMessage(int buttonID, int x, int y, int z) implements CustomPacketPayload {
-	public static final Type<PauseMenuGUIButtonMessage> TYPE = new Type<>(Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "pause_menu_gui_buttons"));
-	public static final StreamCodec<RegistryFriendlyByteBuf, PauseMenuGUIButtonMessage> STREAM_CODEC = StreamCodec.of((RegistryFriendlyByteBuf buffer, PauseMenuGUIButtonMessage message) -> {
+public record FogletGuiButtonMessage(int buttonID, int x, int y, int z) implements CustomPacketPayload {
+	public static final Type<FogletGuiButtonMessage> TYPE = new Type<>(Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "foglet_gui_buttons"));
+	public static final StreamCodec<RegistryFriendlyByteBuf, FogletGuiButtonMessage> STREAM_CODEC = StreamCodec.of((RegistryFriendlyByteBuf buffer, FogletGuiButtonMessage message) -> {
 		buffer.writeInt(message.buttonID);
 		buffer.writeInt(message.x);
 		buffer.writeInt(message.y);
 		buffer.writeInt(message.z);
-	}, (RegistryFriendlyByteBuf buffer) -> new PauseMenuGUIButtonMessage(buffer.readInt(), buffer.readInt(), buffer.readInt(), buffer.readInt()));
+	}, (RegistryFriendlyByteBuf buffer) -> new FogletGuiButtonMessage(buffer.readInt(), buffer.readInt(), buffer.readInt(), buffer.readInt()));
 
 	@Override
-	public Type<PauseMenuGUIButtonMessage> type() {
+	public Type<FogletGuiButtonMessage> type() {
 		return TYPE;
 	}
 
-	public static void handleData(final PauseMenuGUIButtonMessage message, final IPayloadContext context) {
+	public static void handleData(final FogletGuiButtonMessage message, final IPayloadContext context) {
 		if (context.flow() == PacketFlow.SERVERBOUND) {
 			context.enqueueWork(() -> handleButtonAction(context.player(), message.buttonID, message.x, message.y, message.z)).exceptionally(e -> {
 				context.connection().disconnect(Component.literal(e.getMessage()));
@@ -49,32 +51,20 @@ public record PauseMenuGUIButtonMessage(int buttonID, int x, int y, int z) imple
 			return;
 		if (buttonID == 0) {
 
-			MeditationGuiOpenProcedure.execute(world, x, y, z, entity);
+			BruxaGuiOpenProcedure.execute(world, x, y, z, entity);
 		}
 		if (buttonID == 1) {
-
-			CharacterGuiOpenProcedure.execute(world, x, y, z, entity);
-		}
-		if (buttonID == 2) {
-
-			AlchemyGuiOpenProcedure.execute(world, x, y, z, entity);
-		}
-		if (buttonID == 3) {
-
-			GlossaryMenuGuiOpenProcedure.execute(world, x, y, z, entity);
-		}
-		if (buttonID == 4) {
 
 			BestiaryMenuGuiOpenProcedure.execute(world, x, y, z, entity);
 		}
 		if (buttonID == 5) {
 
-			CharacterAbilitiesGeneralGuiOpenProcedure.execute(world, x, y, z, entity);
+			RotfiendGuiOpenProcedure.execute(world, x, y, z, entity);
 		}
 	}
 
 	@SubscribeEvent
 	public static void registerMessage(FMLCommonSetupEvent event) {
-		WitchercraftMod.addNetworkMessage(PauseMenuGUIButtonMessage.TYPE, PauseMenuGUIButtonMessage.STREAM_CODEC, PauseMenuGUIButtonMessage::handleData);
+		WitchercraftMod.addNetworkMessage(FogletGuiButtonMessage.TYPE, FogletGuiButtonMessage.STREAM_CODEC, FogletGuiButtonMessage::handleData);
 	}
 }

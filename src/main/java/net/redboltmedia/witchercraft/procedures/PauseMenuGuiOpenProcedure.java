@@ -1,6 +1,6 @@
 package net.redboltmedia.witchercraft.procedures;
 
-import net.redboltmedia.witchercraft.world.inventory.PauseMenuGUIMenu;
+import net.redboltmedia.witchercraft.world.inventory.PauseMenuGuiMenu;
 
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -24,7 +24,7 @@ public class PauseMenuGuiOpenProcedure {
 			_ent.openMenu(new MenuProvider() {
 				@Override
 				public Component getDisplayName() {
-					return Component.literal("PauseMenuGUI");
+					return Component.literal("PauseMenuGui");
 				}
 
 				@Override
@@ -34,7 +34,7 @@ public class PauseMenuGuiOpenProcedure {
 
 				@Override
 				public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
-					return new PauseMenuGUIMenu(id, inventory, new FriendlyByteBuf(Unpooled.buffer()).writeBlockPos(_bpos));
+					return new PauseMenuGuiMenu(id, inventory, new FriendlyByteBuf(Unpooled.buffer()).writeBlockPos(_bpos));
 				}
 			}, _bpos);
 		}

@@ -12,8 +12,8 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffect;
 
 @EventBusSubscriber
-public class TaPotkaMusiTuBycZebyGraWiedzialaGdzieJestGraczMobEffect extends MobEffect {
-	public TaPotkaMusiTuBycZebyGraWiedzialaGdzieJestGraczMobEffect() {
+public class PlayerTrackerMobEffect extends MobEffect {
+	public PlayerTrackerMobEffect() {
 		super(MobEffectCategory.NEUTRAL, -1);
 	}
 
@@ -24,6 +24,6 @@ public class TaPotkaMusiTuBycZebyGraWiedzialaGdzieJestGraczMobEffect extends Mob
 			public boolean isVisibleInGui(MobEffectInstance effect) {
 				return false;
 			}
-		}, WitchercraftModMobEffects.TA_POTKA_MUSI_TU_BYC_ZEBY_GRA_WIEDZIALA_GDZIE_JEST_GRACZ.get());
+		}, WitchercraftModMobEffects.PLAYER_TRACKER.get());
 	}
 }
