@@ -33,7 +33,7 @@ Two readouts exist today:
   extra rows stacking upward. Present only while a shield is up, in the same way the armor row is
   present only while you are wearing armor.
 - **Toxicity**, on the **right**, above hunger and below oxygen. Always present, filling smoothly
-  from empty to full like the experience bar, and switching to its overdose colour once you cross
+  from the screen edge inward toward the centre, and switching to its overdose colour once you cross
   the Overdose Threshold.
 
 The split is deliberate and is the convention future bars should follow: **the left column is
@@ -186,7 +186,20 @@ Two blits. The empty track at full width, then the fill row clipped to the fille
 
 ```java
 int filled = (int) Math.round(clamp(fill, 0, 1) * BAR_W);
+int offset = anchorRight ? BAR_W - filled : 0;   // source crop and destination offset are equal
 ```
+
+**Fill direction is a layout contract, not a preference.** Every vanilla readout is anchored at the
+**outer** edge of its column and moves toward the centre: hearts and armor run right from `xLeft`,
+food and air run left from `xRight`. A right-column bar that fills left to right therefore reads as
+starting in mid-screen, which is why toxicity passes `anchorRight = true`. Anything added to the left
+column passes `false`.
+
+The anchor carries position, not valence. Health, armor, food, and air all share the outer-edge
+anchor and mean completely different things; what distinguishes a resource you want full from one you
+want empty is its colour and its form, not the direction it grows. The useful side effect of
+mirroring toxicity is that hunger recedes away from the centre as it worsens while toxicity advances
+toward the centre as it worsens - same axis, opposite motion, both legible.
 
 The ten-argument `blit` overload takes the source region size and the destination size from the same
 `width`/`height` pair, so passing a smaller width crops the texture rather than squashing it. This is

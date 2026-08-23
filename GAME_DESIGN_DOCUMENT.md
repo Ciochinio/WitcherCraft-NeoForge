@@ -582,7 +582,9 @@ health and hunger read:
   rows stacking upward if a build ever pushes the pool that high. It only exists while a shield is
   up, the same way the armor row only exists while you're wearing armor.
 - **Toxicity**, on the **right**, stacked between hunger and oxygen. Always visible, filling
-  smoothly like the experience bar, and switching to a warning colour once you're overdosing.
+  smoothly inward from the screen edge and switching to a warning colour once you're overdosing.
+  Hunger below it shrinks back toward the edge as it empties; toxicity creeps the other way, in
+  toward you, so the two never read as the same thing despite sharing a side.
 
 The left column is defensive state and the right column is the alchemy resource. That split is the
 convention any future bar should follow. Both bars place themselves relative to whatever vanilla has

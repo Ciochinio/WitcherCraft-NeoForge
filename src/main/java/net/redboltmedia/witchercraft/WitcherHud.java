@@ -89,7 +89,7 @@ public class WitcherHud {
 		// rather than FOOD_LEVEL so that mounted horse hearts are also accounted for.
 		else if (event.getName().equals(VanillaGuiLayers.VEHICLE_HEALTH)) {
 			int fillRow = ToxicityHudOverdoseProcedure.execute(player) ? TOXICITY_ROW_OVERDOSE : TOXICITY_ROW_FILL;
-			drawBar(graphics, TOXICITY_BAR, TOXICITY_TEX_ROWS, xRight, graphics.guiHeight() - gui.rightHeight, fillRow, ToxicityHudFillProcedure.execute(player));
+			drawBar(graphics, TOXICITY_BAR, TOXICITY_TEX_ROWS, xRight, graphics.guiHeight() - gui.rightHeight, fillRow, ToxicityHudFillProcedure.execute(player), true);
 			gui.rightHeight += ROW;
 		}
 	}
@@ -131,12 +131,21 @@ public class WitcherHud {
 	 * Draws the empty track, then the fill row clipped to the filled width. Same
 	 * partial-width blit the vanilla experience bar uses, so the fill is smooth
 	 * rather than stepped.
+	 *
+	 * anchorRight grows the fill from the right edge leftward instead of the reverse.
+	 * Every vanilla readout is anchored at the OUTER edge of its column and moves toward
+	 * the centre (hearts and armor from xLeft, food and air from xRight), so a bar in the
+	 * right column has to fill right to left or it reads as starting in mid-screen.
+	 * Because the source crop and the destination offset are the same value, this is one
+	 * extra term in both.
 	 */
-	private static void drawBar(GuiGraphicsExtractor graphics, Identifier texture, int texRows, int x, int y, int fillRow, double fill) {
+	private static void drawBar(GuiGraphicsExtractor graphics, Identifier texture, int texRows, int x, int y, int fillRow, double fill, boolean anchorRight) {
 		int texH = texRows * BAR_H;
 		graphics.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, 0, ROW_EMPTY * BAR_H, BAR_W, BAR_H, BAR_W, texH);
 		int filled = (int) Math.round(Math.max(0.0, Math.min(1.0, fill)) * BAR_W);
-		if (filled > 0)
-			graphics.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, 0, fillRow * BAR_H, filled, BAR_H, BAR_W, texH);
+		if (filled <= 0)
+			return;
+		int offset = anchorRight ? BAR_W - filled : 0;
+		graphics.blit(RenderPipelines.GUI_TEXTURED, texture, x + offset, y, offset, fillRow * BAR_H, filled, BAR_H, BAR_W, texH);
 	}
 }
