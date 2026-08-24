@@ -658,6 +658,22 @@ The left column is defensive state and the right column is the alchemy resource.
 convention any future bar should follow. Both bars place themselves relative to whatever vanilla has
 already drawn, so they stay correct with any amount of armor, absorption, or bonus max health.
 
+Between them hangs the **witcher medallion**, dead centre, in the gap the vanilla HUD leaves empty.
+It is not a bar and it does not fill or drain - it is the instrument every witcher carries, and it
+does what it does in the books: it **shakes when there are monsters near you**. The shake tightens
+as they close in, at three distinct strengths, so a faint tremor while you're walking a road at
+night means something is out there, and a hard rattle means it is on top of you. It senses through
+walls, out to **24** blocks, which is the point of the thing - the warning has to arrive before you
+can see what it is about.
+
+What sets it off is monsters, not people. Bandits do not move a medallion. Beyond that it reacts to
+hostile creatures generally rather than only to a hand-written list, so monsters added by other mods
+set it off too.
+
+The medallion is intended to become the mod's identity item as well as its warning light: a School
+picker at the start of a run, and a medallion on the HUD that matches the School you chose. That
+part is not built yet.
+
 Alongside them, a player-stats overlay shows your live combat and Sign stats, and the Sign cooldown
 is shown while it's running.
 

@@ -4812,7 +4812,140 @@
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/WitcherHud.java"
         ]
-      }
+      },
+      "path": "~/Gui"
+    },
+    {
+      "name": "MedallionShow",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "medallion_show",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "return_type": "logic",
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/MedallionShowProcedure.java"
+        ]
+      },
+      "path": "~/Gui"
+    },
+    {
+      "name": "MedallionSenseRange",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "medallion_sense_range",
+      "metadata": {
+        "dependencies": [],
+        "return_type": "number",
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/MedallionSenseRangeProcedure.java"
+        ]
+      },
+      "path": "~/Gui"
+    },
+    {
+      "name": "MedallionStepNear",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "medallion_step_near",
+      "metadata": {
+        "dependencies": [],
+        "return_type": "number",
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/MedallionStepNearProcedure.java"
+        ]
+      },
+      "path": "~/Gui"
+    },
+    {
+      "name": "MedallionStepMid",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "medallion_step_mid",
+      "metadata": {
+        "dependencies": [],
+        "return_type": "number",
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/MedallionStepMidProcedure.java"
+        ]
+      },
+      "path": "~/Gui"
+    },
+    {
+      "name": "MedallionSenseAllHostiles",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "medallion_sense_all_hostiles",
+      "metadata": {
+        "dependencies": [],
+        "return_type": "logic",
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/MedallionSenseAllHostilesProcedure.java"
+        ]
+      },
+      "path": "~/Gui"
+    },
+    {
+      "name": "MedallionVariant",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "medallion_variant",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "return_type": "number",
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/MedallionVariantProcedure.java"
+        ]
+      },
+      "path": "~/Gui"
+    },
+    {
+      "name": "MedallionCycle",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "medallion_cycle",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/MedallionCycleProcedure.java"
+        ]
+      },
+      "path": "~/Gui"
+    },
+    {
+      "name": "MedallionCommand",
+      "type": "command",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "medallion_command",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/command/MedallionCommandCommand.java"
+        ]
+      },
+      "path": "~/Admin/Commands"
     },
     {
       "name": "QuenHudShow",
@@ -10609,6 +10742,12 @@
       "value": "0"
     },
     {
+      "name": "witchercraftMedallion",
+      "type": "number",
+      "scope": "player_persistent",
+      "value": "0"
+    },
+    {
       "name": "witchercraftPlayerExperience",
       "type": "number",
       "scope": "player_persistent",
@@ -11789,6 +11928,10 @@
       },
       {
         "name": "Weapons",
+        "children": []
+      },
+      {
+        "name": "Gui",
         "children": []
       }
     ]

@@ -41,6 +41,12 @@ The split is deliberate and is the convention future bars should follow: **the l
 defensive state, the right column is the alchemy and consumables resource**. Keeping the two on
 separate columns also means they never contend for the same vertical space (see 1.3).
 
+Alongside them sits one readout that is not a bar:
+
+- **The witcher medallion**, in the **centre**, which shakes when monsters are near. It is an
+  instrument, not a resource, so it deliberately takes no part in the cursor protocol below - it
+  is drawn at a fixed height in the empty column between the two bar stacks, and it never moves.
+
 ### 1.2 Why this is not an MCreator overlay
 
 MCreator's Overlay element is the obvious home for this and it cannot do the job. The reason is
@@ -89,6 +95,20 @@ layer order is `HOTBAR, PLAYER_HEALTH, ARMOR_LEVEL, FOOD_LEVEL, VEHICLE_HEALTH, 
 |---|---|---|---|
 | Quen | `VanillaGuiLayers.ARMOR_LEVEL` | `guiHeight() - gui.leftHeight` | `gui.leftHeight += (rows - 1) * rowHeight + 10` |
 | Toxicity | `VanillaGuiLayers.VEHICLE_HEALTH` | `guiHeight() - gui.rightHeight` | `gui.rightHeight += 10` |
+| Medallion | `VanillaGuiLayers.AIR_LEVEL` | `guiHeight() - 39 - 20`, fixed | nothing - it is not on a cursor |
+
+**The medallion is the exception, and it is allowed to be.** Both bar columns are 81 pixels wide
+and anchored at their outer edge: hearts and armor run right from `guiWidth() / 2 - 91`, food and
+air run left from `guiWidth() / 2 + 91`. That leaves a **20 pixel channel at dead centre that
+nothing ever draws in**, at every row, all the way up the screen. The medallion lives there at a
+constant y, which is why it needs no cursor, cannot be pushed around by armor or bonus max health,
+and cannot collide with anything stacking on either side.
+
+Two consequences worth knowing. `MEDALLION_W` **cannot exceed 20** without overlapping the heart
+and hunger rows; its height is unconstrained. And because y is a constant rather than a cursor read,
+the medallion does not strictly *need* the `canHurtPlayer()` gate the bars need - it would land
+correctly in creative. It shares that gate anyway, for looks rather than correctness: in creative the
+whole bar cluster is absent and a lone medallion hovering over empty ground reads as a bug.
 
 Two choices in that table are load-bearing:
 
@@ -111,11 +131,25 @@ hotbar. `WitcherHud` replicates that gate at the top of the handler. Do not remo
 
 | Element | Type | MCreator path | Role |
 |---|---|---|---|
-| [WitcherHud](../src/main/java/net/redboltmedia/witchercraft/WitcherHud.java) | code (locked) | `~/GUI` | The renderer. Decides where a bar goes and blits it. Nothing else. |
+| [WitcherHud](../src/main/java/net/redboltmedia/witchercraft/WitcherHud.java) | code (locked) | `~/Gui` | The renderer. Decides where a bar goes and blits it. Nothing else. |
 | [QuenHudShow](../elements/QuenHudShow.mod.json) | procedure, logic | `~/Signs/Quen` | Is the Quen bar visible: `witchercraftQuenShield > 0` |
 | [QuenHudPool](../elements/QuenHudPool.mod.json) | procedure, number | `~/Signs/Quen` | The raw remaining pool in points. The icon maths lives beside the rendering. |
 | [ToxicityHudFill](../elements/ToxicityHudFill.mod.json) | procedure, number | `~/Alchemy/ Toxicity` | Fill fraction 0..1: `witchercraftToxicity / 100` |
 | [ToxicityHudOverdose](../elements/ToxicityHudOverdose.mod.json) | procedure, logic | `~/Alchemy/ Toxicity` | Use the overdose colour: toxicity at or past `witchercraftToxicityOverdoseThreshold` |
+| [MedallionShow](../elements/MedallionShow.mod.json) | procedure, logic | `~/Gui` | Is the medallion drawn at all. Always true today - see the note below |
+| [MedallionSenseRange](../elements/MedallionSenseRange.mod.json) | procedure, number | `~/Gui` | **Tunable.** How far the medallion senses, in blocks. **24** |
+| [MedallionStepNear](../elements/MedallionStepNear.mod.json) | procedure, number | `~/Gui` | **Tunable.** Inside this distance the shake is at its strongest. **8** |
+| [MedallionStepMid](../elements/MedallionStepMid.mod.json) | procedure, number | `~/Gui` | **Tunable.** Inside this distance the shake is medium; beyond it, faint. **16** |
+| [MedallionSenseAllHostiles](../elements/MedallionSenseAllHostiles.mod.json) | procedure, logic | `~/Gui` | **Tunable.** Also sense anything in `MobCategory.MONSTER`, not just the tag. **true** |
+| [MedallionVariant](../elements/MedallionVariant.mod.json) | procedure, number | `~/Gui` | Which row of `medallion.png` to draw. Reads `witchercraftMedallion` |
+| [MedallionCycle](../elements/MedallionCycle.mod.json) | procedure, void | `~/Gui` | Advances `witchercraftMedallion` to the next row, wrapping. Called by `/medallion` |
+| [MedallionCommand](../elements/MedallionCommand.mod.json) | command | `~/Admin/Commands` | `/medallion` - cycles the medallion in game |
+
+`MedallionShow` returns `witchercraftPlayerLevel >= 0`, which is always true. That is deliberate,
+not a leftover: it makes the procedure genuinely depend on `entity`, so when the gate becomes real
+(a medallion item, or a perk) MCreator regenerates it with the same `execute(Entity)` signature and
+the call site in the locked renderer keeps compiling. A procedure that returned a bare `true` would
+have no dependency, and adding one later would silently break the build.
 
 **The separation is the point.** The locked file contains no tuning values that describe game state -
 only geometry. Everything a designer would want to change lives in ordinary block-based procedures
@@ -147,6 +181,19 @@ Textures live in `src/main/resources/assets/witchercraft/textures/screens/`:
 |---|---|---|
 | `quen_icons.png` | 18x9 | *columns*: 0 big bubble (2 points), 1 small bubble (1 point) |
 | `toxicity_bar.png` | 81x27 | *rows*: 0 empty track, 1 fill, 2 overdose fill |
+| `medallion.png` | 20x40 | *rows*: one square 20x20 cell per medallion. 0 gold, 1 steel |
+
+The medallion also reads two entity type tags in
+`src/main/resources/data/witchercraft/tags/entity_type/`:
+
+| Tag | Ships as | Role |
+|---|---|---|
+| `medallion_senses.json` | `zombie` | The explicit opt-in list. Anything here always sets the medallion off. |
+| `medallion_ignores.json` | empty | Subtracted from everything, tag and `MobCategory.MONSTER` alike. Populate it if the medallion should stay quiet around illagers, piglins, or anything else humanoid. |
+
+**These are deliberately not the `witchercraft:<category>` bestiary tags.** Those drive oil
+weaknesses, so widening them to make the medallion useful would silently rebalance every oil in
+the game. Keeping the medallion's senses on their own tags lets the two diverge.
 
 `81` is vanilla's icon-row width (10 icons x 8 + 1) and `9` is its icon height on a `10` pixel pitch,
 so both line up with hearts and armor. Quen icons are 9x9 cells with the art inset to 7x7 so that
@@ -207,7 +254,77 @@ The ten-argument `blit` overload takes the source region size and the destinatio
 the same technique the vanilla experience bar uses. The result is genuinely smooth - there is no
 frame quantisation, because this is real Java and not MCreator's declarative sprite component.
 
-### 1.7 How to change things
+### 1.7 How the medallion senses and shakes
+
+**The scan is client side, and that is the whole design.** The client already tracks every entity
+the server sends it, so `player.level().getEntities(...)` inside the renderer is free and needs no
+player variable, no procedure running on the server, and no packet. It therefore never goes near
+`markSyncDirty()`, which pushes all 86 player variables across the wire on every call.
+
+This matters because the obvious thing to reuse is
+[EnemyNearbyDetection](../elements/EnemyNearbyDetection.mod.json), the Cold Blood feeder, and it is
+not fit for it. That procedure runs a full AABB scan **every tick for every player** and calls
+`markSyncDirty()` once per entity found. It is also logically wrong: the flag is reassigned on each
+loop iteration, so the *farthest* entity in range decides the result. Fixing it is a separate job;
+do not build on it.
+
+The scan runs every `MEDALLION_SCAN_INTERVAL` ticks (**10**) and caches an intensity step:
+
+| Nearest sensed monster | Intensity | Frame time | Moves per second |
+|---|---|---|---|
+| none in range | 0 | still | - |
+| `MedallionStepMid`..`MedallionSenseRange` | 1 | 90ms | 11 |
+| `MedallionStepNear`..`MedallionStepMid` | 2 | 60ms | 17 |
+| closer than `MedallionStepNear` | 3 | 35ms | 29 |
+
+Two details in that scan are easy to get wrong. The scan box is a **cube** and the range is a
+**sphere**, so the result is re-tested against `range * range` afterwards - without it the medallion
+reaches about 1.7x further diagonally than straight ahead. And `player.tickCount` restarts at zero
+on respawn and on a dimension change, so the interval check treats any backwards jump as due rather
+than waiting out a stale interval.
+
+**Steps, not a continuous value.** A wobble that varies smoothly with distance reads as noise; three
+states read as information. `MedallionStepNear` and `MedallionStepMid` are the boundaries and are
+meant to be retuned.
+
+**The shake is pure translation, and there is one drawing per medallion.** `MEDALLION_SHAKE` is a
+list of x/y pixel offsets from rest and the renderer steps through it, moving the whole sprite one
+pixel in each direction. The list is deliberately **not** in ring order - stepping around a circle
+reads as an orbit, a scrambled order reads as a vibration. Full cycle time is 8 x the frame time.
+
+An earlier version used three pre-tilted frames swinging `1, 0, 1, 2` like a pendulum. Translation
+replaced it for two reasons: a pendulum only moves on one axis, and per-medallion art tripled with
+every variant added. One square cell per medallion is the whole sheet now.
+
+**Why not rotate the sprite.** `GuiGraphics.pose()` is a JOML `Matrix3x2fStack` in this generator, so
+rotation is genuinely available. It looks bad. GUI textures sample nearest neighbour, so a rotated
+20 pixel sprite lands source pixels unevenly on screen pixels and shimmers while it moves - exactly
+the case here. Whole-pixel translation keeps every frame pixel-exact.
+
+The frame clock is `Util.getMillis()`, not tick count, so the shake is smooth and independent of the
+10 tick sense clock.
+
+**Authoring the art: 1:1 with the drawn size, always.** The `blit` overload used here takes
+destination size separately from source size, so a bigger PNG scaled down does work mechanically -
+but it will shimmer. GUI textures sample nearest neighbour, and the destination is measured in GUI
+units while rasterisation happens in screen pixels, so a 20 unit sprite occupies `20 x guiScale`
+screen pixels. Only a source that is 20 pixels wide divides evenly into that at **every** GUI scale.
+A 40 pixel source is exact at scale 2 and uneven at scale 3; a 64 pixel source is uneven almost
+everywhere. On a sprite that is permanently in motion that unevenness is visible. Author at the
+drawn size. Current art is flat placeholder colour.
+
+**Leave the shake a pixel of margin.** The cell is 20 wide because the channel is 20 wide, but the
+sprite also moves one pixel each way. Art that fills the full 20 will poke into the health or hunger
+row at full lean. Keep the drawn shape inside the middle **18** columns. Vertically there is no such
+limit - nothing else draws in this column.
+
+**One trap, recorded because it cost a session.** The scan interval is checked as
+`player.tickCount - medallionLastScan`. Seeding `medallionLastScan` with `Integer.MIN_VALUE` as a
+"never scanned yet" sentinel overflows that subtraction, wraps it negative, and the check then
+passes on every frame - the medallion renders perfectly and silently never senses anything. It is
+seeded at `-MEDALLION_SCAN_INTERVAL` instead.
+
+### 1.8 How to change things
 
 **Retune when a bar appears, or what counts as full.** Edit the relevant `*Hud*` procedure in
 MCreator. No Java, no rebuild of the renderer. These run every frame, so keep them to plain variable
@@ -240,7 +357,47 @@ and it is exactly how the Quen branch behaves.
 `rightHeight` and the x anchor (`guiWidth() / 2 - 91` on the left, `guiWidth() / 2 + 91 - BAR_W` on
 the right).
 
-### 1.8 Known limitations
+**Move the medallion.** `MEDALLION_X_OFFSET` and `MEDALLION_Y_ORIGIN` in `WitcherHud`, and nothing
+else. x is an offset from screen centre; y counts up from the bottom edge on the same origin the
+cursors use, so **39** puts its base level with the top of the health row. Expect to need this:
+Tough As Nails draws an icon in the same centre channel.
+
+**Retune what the medallion senses.** Radius and the two step boundaries are the `Medallion*`
+procedures, editable in MCreator. What counts as a monster is the two tags plus
+`MedallionSenseAllHostiles`.
+
+**Add a medallion.** Three places, and they must agree:
+
+1. Append a 20x20 cell to the bottom of `medallion.png`.
+2. Bump `MEDALLION_VARIANTS` in `WitcherHud`. This is the texture height the blit divides by, so a
+   value that disagrees with the PNG makes **every** row sample wrong, not just the new one.
+3. Bump the wrap number in [MedallionCycle](../elements/MedallionCycle.mod.json), or `/medallion`
+   will never reach the new row.
+
+Two variants exist as a worked template: row **0** gold, row **1** steel, same shape. The renderer
+clamps the row, so a bad value cannot blit off the end of the texture - it just sticks on the last
+one.
+
+**How switching works at runtime.** `witchercraftMedallion` (number, **`player_persistent`**) holds
+the row index. `MedallionVariant` reads it, and the renderer calls that every frame, so the sprite
+swaps the instant the value changes - no reload, no relog. The value is written server side and
+reaches the client through the ordinary player variable sync, the same route `QuenHudShow` uses.
+
+`/medallion` cycles it. The command is [MedallionCommand](../elements/MedallionCommand.mod.json)
+calling [MedallionCycle](../elements/MedallionCycle.mod.json), which is just
+`(witchercraftMedallion + 1) % 2`.
+
+**When the School picker lands**, point it at this same variable rather than adding a second one, and
+keep the rule that **the variable is the row index** - 0 generic, 1-6 per School. No lookup table to
+keep in sync.
+
+Two things not to do. Do not read
+`witchercraftAbilitiesBearSchool` / `CatSchool` / `GriffinSchool`: they are **skill tree perks**, not
+identity, only three of the six exist, and nothing makes them exclusive. And do not use a
+`player_lifetime` variable, which resets on death and would wipe the player's School the first time
+something killed them.
+
+### 1.9 Known limitations
 
 - These bars are not previewable in MCreator's overlay editor, because they are not overlays. Layout
   is verified in game. In practice there is little to verify: y is computed, and x matches vanilla's
@@ -249,6 +406,15 @@ the right).
   thresholds. If maximum Toxicity ever becomes a stat, that divisor moves into a variable.
 - The older `ToxicityOverlay` element (five arrow images at fixed thresholds) is superseded by this
   system and is left in place only pending cleanup.
+- The medallion's reach is capped by entity tracking range, not by `MedallionSenseRange`. The client
+  is only told about entities the server is tracking for it, so a radius much past **24** will
+  quietly stop growing.
+- The medallion has no sound cue yet. A one-shot hum on entering detection, with a cooldown, is the
+  intended shape; a looping hum is not.
+- Places of power and other non-entity points of interest are not sensed. The cheap way in is to
+  make them block entities and query the client chunk cache, or to make them marker entities and put
+  them in `medallion_senses`; a radius block sweep is roughly 32,000 checks and is not an option.
+  The renderer computes one intensity value, so a second source can feed the same output later.
 
 ---
 

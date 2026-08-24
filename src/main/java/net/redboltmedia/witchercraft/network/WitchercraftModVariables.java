@@ -118,6 +118,7 @@ public class WitchercraftModVariables {
 		clone.witchercraftAbilitiesRazorFocus = original.witchercraftAbilitiesRazorFocus;
 		clone.witchercraftAbilitiesUndying = original.witchercraftAbilitiesUndying;
 		clone.witchercraftPlayerLevel = original.witchercraftPlayerLevel;
+		clone.witchercraftMedallion = original.witchercraftMedallion;
 		clone.witchercraftPlayerExperience = original.witchercraftPlayerExperience;
 		clone.witchercraftPlayerExperienceRequirement = original.witchercraftPlayerExperienceRequirement;
 		clone.witchercraftAbilitiesCombatSkillPointsUsed = original.witchercraftAbilitiesCombatSkillPointsUsed;
@@ -189,6 +190,7 @@ public class WitchercraftModVariables {
 		public boolean witchercraftAbilitiesRazorFocus = false;
 		public boolean witchercraftAbilitiesUndying = false;
 		public double witchercraftPlayerLevel = 0;
+		public double witchercraftMedallion = 0;
 		public double witchercraftPlayerExperience = 0;
 		public double witchercraftPlayerExperienceRequirement = 0.0;
 		public double witchercraftToxicity = 0;
@@ -256,6 +258,7 @@ public class WitchercraftModVariables {
 			output.putBoolean("witchercraftAbilitiesRazorFocus", witchercraftAbilitiesRazorFocus);
 			output.putBoolean("witchercraftAbilitiesUndying", witchercraftAbilitiesUndying);
 			output.putDouble("witchercraftPlayerLevel", witchercraftPlayerLevel);
+			output.putDouble("witchercraftMedallion", witchercraftMedallion);
 			output.putDouble("witchercraftPlayerExperience", witchercraftPlayerExperience);
 			output.putDouble("witchercraftPlayerExperienceRequirement", witchercraftPlayerExperienceRequirement);
 			output.putDouble("witchercraftToxicity", witchercraftToxicity);
@@ -324,6 +327,7 @@ public class WitchercraftModVariables {
 			witchercraftAbilitiesRazorFocus = input.getBooleanOr("witchercraftAbilitiesRazorFocus", false);
 			witchercraftAbilitiesUndying = input.getBooleanOr("witchercraftAbilitiesUndying", false);
 			witchercraftPlayerLevel = input.getDoubleOr("witchercraftPlayerLevel", 0);
+			witchercraftMedallion = input.getDoubleOr("witchercraftMedallion", 0);
 			witchercraftPlayerExperience = input.getDoubleOr("witchercraftPlayerExperience", 0);
 			witchercraftPlayerExperienceRequirement = input.getDoubleOr("witchercraftPlayerExperienceRequirement", 0);
 			witchercraftToxicity = input.getDoubleOr("witchercraftToxicity", 0);
