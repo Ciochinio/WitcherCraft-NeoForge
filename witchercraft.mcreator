@@ -761,9 +761,9 @@
       "registry_name": "saltpeter",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/item/SaltpeterItem.java",
+          "src/main/resources/assets/witchercraft/models/item/saltpeter.json",
           "src/main/resources/assets/witchercraft/items/saltpeter.json",
-          "src/main/resources/assets/witchercraft/models/item/saltpeter.json"
+          "src/main/java/net/redboltmedia/witchercraft/item/SaltpeterItem.java"
         ]
       },
       "path": "~/Items"
@@ -1193,9 +1193,7 @@
       "locked_code": false,
       "registry_name": "crit_chance",
       "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
-        ]
+        "files": []
       },
       "path": "~/Character Stats/Stats/VariableStats"
     },
@@ -1246,9 +1244,7 @@
       "locked_code": false,
       "registry_name": "crit_damage",
       "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
-        ]
+        "files": []
       },
       "path": "~/Character Stats/Stats/VariableStats"
     },
@@ -1511,10 +1507,6 @@
           {
             "name": "entity",
             "type": "entity"
-          },
-          {
-            "name": "world",
-            "type": "world"
           }
         ]
       },
@@ -1527,9 +1519,7 @@
       "locked_code": false,
       "registry_name": "passive_health_regen",
       "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
-        ]
+        "files": []
       },
       "path": "~/Character Stats/Stats/VariableStats"
     },
@@ -1579,10 +1569,6 @@
           {
             "name": "entity",
             "type": "entity"
-          },
-          {
-            "name": "world",
-            "type": "world"
           }
         ]
       },
@@ -2354,6 +2340,10 @@
       "metadata": {
         "dependencies": [
           {
+            "name": "damagesource",
+            "type": "damagesource"
+          },
+          {
             "name": "entity",
             "type": "entity"
           },
@@ -2364,10 +2354,6 @@
           {
             "name": "amount",
             "type": "number"
-          },
-          {
-            "name": "damagesource",
-            "type": "damagesource"
           },
           {
             "name": "world",
@@ -2458,8 +2444,8 @@
       "registry_name": "character_abilities_general_gui",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/network/CharacterAbilitiesGeneralGuiButtonMessage.java",
           "src/main/java/net/redboltmedia/witchercraft/client/gui/CharacterAbilitiesGeneralGuiScreen.java",
+          "src/main/java/net/redboltmedia/witchercraft/network/CharacterAbilitiesGeneralGuiButtonMessage.java",
           "src/main/java/net/redboltmedia/witchercraft/world/inventory/CharacterAbilitiesGeneralGuiMenu.java"
         ]
       },
@@ -4544,8 +4530,8 @@
       "registry_name": "foglet_gui",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/client/gui/FogletGuiScreen.java",
           "src/main/java/net/redboltmedia/witchercraft/world/inventory/FogletGuiMenu.java",
+          "src/main/java/net/redboltmedia/witchercraft/client/gui/FogletGuiScreen.java",
           "src/main/java/net/redboltmedia/witchercraft/network/FogletGuiButtonMessage.java"
         ]
       },
@@ -5207,9 +5193,7 @@
       "locked_code": false,
       "registry_name": "toxicity_overdose_threshold",
       "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
-        ]
+        "files": []
       },
       "path": "~/Character Stats/Stats/VariableStats"
     },
@@ -5220,9 +5204,7 @@
       "locked_code": false,
       "registry_name": "increased_damage",
       "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
-        ]
+        "files": []
       },
       "path": "~/Character Stats/Stats/VariableStats"
     },
@@ -5233,9 +5215,7 @@
       "locked_code": false,
       "registry_name": "additional_damage",
       "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
-        ]
+        "files": []
       },
       "path": "~/Character Stats/Stats/VariableStats"
     },
@@ -5789,9 +5769,7 @@
       "locked_code": false,
       "registry_name": "dodge_chance",
       "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
-        ]
+        "files": []
       },
       "path": "~/Character Stats/Stats/VariableStats"
     },
@@ -5822,9 +5800,7 @@
       "locked_code": false,
       "registry_name": "instant_kill_chance",
       "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
-        ]
+        "files": []
       },
       "path": "~/Character Stats/Stats/VariableStats"
     },
@@ -5918,9 +5894,7 @@
       "locked_code": false,
       "registry_name": "potion_duration",
       "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
-        ]
+        "files": []
       },
       "path": "~/Character Stats/Stats/VariableStats"
     },
@@ -5951,9 +5925,7 @@
       "locked_code": false,
       "registry_name": "sign_intensity",
       "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
-        ]
+        "files": []
       },
       "path": "~/Character Stats/Stats/VariableStats"
     },
@@ -7308,9 +7280,7 @@
       "locked_code": false,
       "registry_name": "oil_damage",
       "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
-        ]
+        "files": []
       },
       "path": "~/Character Stats/Stats/VariableStats"
     },
@@ -7388,9 +7358,7 @@
       "locked_code": false,
       "registry_name": "life_steal",
       "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
-        ]
+        "files": []
       },
       "path": "~/Character Stats/Stats/VariableStats"
     },
@@ -7515,9 +7483,7 @@
       "locked_code": false,
       "registry_name": "reflect_damage",
       "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
-        ]
+        "files": []
       },
       "path": "~/Character Stats/Stats/VariableStats"
     },
@@ -9062,10 +9028,6 @@
           {
             "name": "entity",
             "type": "entity"
-          },
-          {
-            "name": "world",
-            "type": "world"
           }
         ],
         "files": [
@@ -9132,10 +9094,6 @@
           {
             "name": "entity",
             "type": "entity"
-          },
-          {
-            "name": "world",
-            "type": "world"
           }
         ],
         "files": [
@@ -9259,10 +9217,6 @@
           {
             "name": "entity",
             "type": "entity"
-          },
-          {
-            "name": "world",
-            "type": "world"
           }
         ],
         "files": [
@@ -10157,7 +10111,6 @@
             "type": "world"
           }
         ],
-        "return_type": "string",
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/procedures/TimeTickProcedure.java"
         ]
@@ -11251,7 +11204,8 @@
       "gui.witchercraft.drowner_gui.label_spawning_swamp": "Spawning: Swamp",
       "gui.witchercraft.drowner_gui.label_loot_monster_brain_monster_too": "Loot: Monster Brain",
       "effect.witchercraft.damage_blocked": "Damage Blocked Double DMG Fix",
-      "gui.witchercraft.player_stats_overlay.label_signholdcost": "SignHoldCost"
+      "gui.witchercraft.player_stats_overlay.label_signholdcost": "SignHoldCost",
+      "effect.witchercraft.quen_active_shield": "Quen Active Shield"
     }
   },
   "metadata": {

@@ -1,7 +1,6 @@
 package net.redboltmedia.witchercraft.procedures;
 
 import net.redboltmedia.witchercraft.init.WitchercraftModAttributes;
-import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
 
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -27,6 +26,8 @@ public class CharacterGuiPassiveStaminaRegenProcedure {
 	private static String execute(@Nullable Event event, Entity entity) {
 		if (entity == null)
 			return "";
-		return new java.text.DecimalFormat("##.##").format((entity instanceof LivingEntity _livingEntityPSR && _livingEntityPSR.getAttributes().hasAttribute(WitchercraftModAttributes.PASSIVE_STAMINA_REGEN) ? _livingEntityPSR.getAttribute(WitchercraftModAttributes.PASSIVE_STAMINA_REGEN).getValue() : 0)) + "stamina/s";
+		return (new java.text.DecimalFormat("##.##").format(entity instanceof LivingEntity _livingEntity0 && _livingEntity0.getAttributes().hasAttribute(WitchercraftModAttributes.PASSIVE_STAMINA_REGEN)
+				? _livingEntity0.getAttribute(WitchercraftModAttributes.PASSIVE_STAMINA_REGEN).getValue()
+				: 0)) + "stamina/s";
 	}
 }

@@ -1,8 +1,8 @@
 package net.redboltmedia.witchercraft.procedures;
 
-import net.redboltmedia.witchercraft.init.WitchercraftModAttributes;
 import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
 import net.redboltmedia.witchercraft.init.WitchercraftModMobEffects;
+import net.redboltmedia.witchercraft.init.WitchercraftModAttributes;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
@@ -18,7 +18,9 @@ public class QuenCastProcedure {
 			_player.sendSystemMessage(Component.literal("QUEN"), false);
 		{
 			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-			_vars.witchercraftQuenShieldMax = (entity instanceof LivingEntity _livEnt ? _livEnt.getMaxHealth() : -1) * 0.4 * (1 + (entity instanceof LivingEntity _livingEntitySI && _livingEntitySI.getAttributes().hasAttribute(WitchercraftModAttributes.SIGN_INTENSITY) ? _livingEntitySI.getAttribute(WitchercraftModAttributes.SIGN_INTENSITY).getValue() : 0) * 0.01);
+			_vars.witchercraftQuenShieldMax = (entity instanceof LivingEntity _livEnt ? _livEnt.getMaxHealth() : -1) * 0.4
+					* (1 + (entity instanceof LivingEntity _livingEntity2 && _livingEntity2.getAttributes().hasAttribute(WitchercraftModAttributes.SIGN_INTENSITY) ? _livingEntity2.getAttribute(WitchercraftModAttributes.SIGN_INTENSITY).getValue() : 0)
+							* 0.01);
 			_vars.witchercraftQuenShield = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftQuenShieldMax;
 			_vars.markSyncDirty();
 		}

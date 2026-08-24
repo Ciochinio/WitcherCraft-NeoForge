@@ -3,9 +3,9 @@
   "_type": "attribute",
   "definition": {
     "name": "Oil Damage",
-    "defaultValue": 0.0,
     "minValue": 0.0,
     "maxValue": 1000.0,
+    "defaultValue": 0.0,
     "sentiment": "POSITIVE",
     "addToAllEntities": false,
     "addToPlayers": true,

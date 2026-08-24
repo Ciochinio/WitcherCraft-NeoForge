@@ -3,9 +3,9 @@
   "_type": "attribute",
   "definition": {
     "name": "Crit Chance",
-    "defaultValue": 5.0,
     "minValue": 0.0,
     "maxValue": 100.0,
+    "defaultValue": 5.0,
     "sentiment": "POSITIVE",
     "addToAllEntities": false,
     "addToPlayers": true,

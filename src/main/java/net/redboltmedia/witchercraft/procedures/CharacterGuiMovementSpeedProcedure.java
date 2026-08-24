@@ -1,7 +1,5 @@
 package net.redboltmedia.witchercraft.procedures;
 
-import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
-
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -28,6 +26,7 @@ public class CharacterGuiMovementSpeedProcedure {
 		if (entity == null)
 			return "";
 		String MovementSpeed = "";
-		return new java.text.DecimalFormat("##.##").format((entity instanceof LivingEntity _livingEntityMS && _livingEntityMS.getAttributes().hasAttribute(Attributes.MOVEMENT_SPEED) ? _livingEntityMS.getAttribute(Attributes.MOVEMENT_SPEED).getValue() : 0));
+		return new java.text.DecimalFormat("##.##")
+				.format(entity instanceof LivingEntity _livingEntity0 && _livingEntity0.getAttributes().hasAttribute(Attributes.MOVEMENT_SPEED) ? _livingEntity0.getAttribute(Attributes.MOVEMENT_SPEED).getValue() : 0);
 	}
 }

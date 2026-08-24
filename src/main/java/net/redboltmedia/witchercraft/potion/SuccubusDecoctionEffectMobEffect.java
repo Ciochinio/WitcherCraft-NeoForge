@@ -19,7 +19,7 @@ public class SuccubusDecoctionEffectMobEffect extends MobEffect {
 
 	@Override
 	public boolean applyEffectTick(ServerLevel level, LivingEntity entity, int amplifier) {
-		SuccubusDecoctionTickProcedure.execute(level, entity);
+		SuccubusDecoctionTickProcedure.execute(entity);
 		return super.applyEffectTick(level, entity, amplifier);
 	}
 }

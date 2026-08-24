@@ -1,7 +1,6 @@
 package net.redboltmedia.witchercraft.procedures;
 
 import net.redboltmedia.witchercraft.init.WitchercraftModAttributes;
-import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
 
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -27,6 +26,7 @@ public class CharacterGuiCritChanceProcedure {
 	private static String execute(@Nullable Event event, Entity entity) {
 		if (entity == null)
 			return "";
-		return new java.text.DecimalFormat("##.##").format((entity instanceof LivingEntity _livingEntityCC && _livingEntityCC.getAttributes().hasAttribute(WitchercraftModAttributes.CRIT_CHANCE) ? _livingEntityCC.getAttribute(WitchercraftModAttributes.CRIT_CHANCE).getValue() : 0)) + "%";
+		return (new java.text.DecimalFormat("##.##")
+				.format(entity instanceof LivingEntity _livingEntity0 && _livingEntity0.getAttributes().hasAttribute(WitchercraftModAttributes.CRIT_CHANCE) ? _livingEntity0.getAttribute(WitchercraftModAttributes.CRIT_CHANCE).getValue() : 0)) + "%";
 	}
 }

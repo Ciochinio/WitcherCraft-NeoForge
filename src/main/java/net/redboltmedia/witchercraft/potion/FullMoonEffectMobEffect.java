@@ -11,6 +11,6 @@ import net.minecraft.resources.Identifier;
 public class FullMoonEffectMobEffect extends MobEffect {
 	public FullMoonEffectMobEffect() {
 		super(MobEffectCategory.NEUTRAL, -1);
-		this.addAttributeModifier(Attributes.MAX_HEALTH, Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "effect.full_moon_effect_0"), 4.0, AttributeModifier.Operation.ADD_VALUE);
+		this.addAttributeModifier(Attributes.MAX_HEALTH, Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "effect.full_moon_effect_0"), 4, AttributeModifier.Operation.ADD_VALUE);
 	}
 }

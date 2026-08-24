@@ -1,7 +1,6 @@
 package net.redboltmedia.witchercraft.procedures;
 
 import net.redboltmedia.witchercraft.init.WitchercraftModAttributes;
-import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
 
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -27,6 +26,8 @@ public class CharacterGuiToxicityOverdoseThresholdProcedure {
 	private static String execute(@Nullable Event event, Entity entity) {
 		if (entity == null)
 			return "";
-		return new java.text.DecimalFormat("##.##").format((entity instanceof LivingEntity _livingEntityTOT && _livingEntityTOT.getAttributes().hasAttribute(WitchercraftModAttributes.TOXICITY_OVERDOSE_THRESHOLD) ? _livingEntityTOT.getAttribute(WitchercraftModAttributes.TOXICITY_OVERDOSE_THRESHOLD).getValue() : 0));
+		return new java.text.DecimalFormat("##.##").format(entity instanceof LivingEntity _livingEntity0 && _livingEntity0.getAttributes().hasAttribute(WitchercraftModAttributes.TOXICITY_OVERDOSE_THRESHOLD)
+				? _livingEntity0.getAttribute(WitchercraftModAttributes.TOXICITY_OVERDOSE_THRESHOLD).getValue()
+				: 0);
 	}
 }

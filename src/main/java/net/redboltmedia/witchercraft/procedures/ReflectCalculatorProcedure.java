@@ -1,8 +1,7 @@
 package net.redboltmedia.witchercraft.procedures;
 
-import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
-import net.redboltmedia.witchercraft.init.WitchercraftModAttributes;
 import net.redboltmedia.witchercraft.init.WitchercraftModMobEffects;
+import net.redboltmedia.witchercraft.init.WitchercraftModAttributes;
 
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -46,25 +45,35 @@ public class ReflectCalculatorProcedure {
 			if ((sourceentity.is(TagKey.create(Registries.ENTITY_TYPE, Identifier.parse("witchercraft:necrophage"))) || sourceentity.is(TagKey.create(Registries.ENTITY_TYPE, Identifier.parse("witchercraft:vampire"))))
 					&& entity instanceof LivingEntity _livEnt4 && _livEnt4.hasEffect(WitchercraftModMobEffects.BLACK_BLOOD_EFFECT)) {
 				if (entity instanceof ServerPlayer _player)
-					_player.sendSystemMessage(Component.literal(("reflect damage" + amount * ((entity instanceof LivingEntity _livingEntityRD && _livingEntityRD.getAttributes().hasAttribute(WitchercraftModAttributes.REFLECT_DAMAGE) ? _livingEntityRD.getAttribute(WitchercraftModAttributes.REFLECT_DAMAGE).getValue() : 0) + 15) * 0.01)), false);
+					_player.sendSystemMessage(Component.literal(("reflect damage" + (amount * ((entity instanceof LivingEntity _livingEntity5 && _livingEntity5.getAttributes().hasAttribute(WitchercraftModAttributes.REFLECT_DAMAGE)
+							? _livingEntity5.getAttribute(WitchercraftModAttributes.REFLECT_DAMAGE).getValue()
+							: 0) + 15) * 0.01))), false);
 			} else {
 				if (entity instanceof ServerPlayer _player)
-					_player.sendSystemMessage(Component.literal(("reflect damage" + amount * (entity instanceof LivingEntity _livingEntityRD && _livingEntityRD.getAttributes().hasAttribute(WitchercraftModAttributes.REFLECT_DAMAGE) ? _livingEntityRD.getAttribute(WitchercraftModAttributes.REFLECT_DAMAGE).getValue() : 0) * 0.01)), false);
+					_player.sendSystemMessage(Component.literal(("reflect damage" + (amount * (entity instanceof LivingEntity _livingEntity7 && _livingEntity7.getAttributes().hasAttribute(WitchercraftModAttributes.REFLECT_DAMAGE)
+							? _livingEntity7.getAttribute(WitchercraftModAttributes.REFLECT_DAMAGE).getValue()
+							: 0) * 0.01))), false);
 			}
 		}
 		if ((sourceentity.is(TagKey.create(Registries.ENTITY_TYPE, Identifier.parse("witchercraft:necrophage"))) || sourceentity.is(TagKey.create(Registries.ENTITY_TYPE, Identifier.parse("witchercraft:vampire"))))
-				&& entity instanceof LivingEntity _livEnt9 && _livEnt9.hasEffect(WitchercraftModMobEffects.BLACK_BLOOD_EFFECT)) {
+				&& entity instanceof LivingEntity _livEnt11 && _livEnt11.hasEffect(WitchercraftModMobEffects.BLACK_BLOOD_EFFECT)) {
 			{
 				Entity _ent = sourceentity;
 				if (_ent.level() instanceof ServerLevel _serverLevel) {
-					_ent.hurtServer(_serverLevel, new DamageSource(world.holderOrThrow(DamageTypes.THORNS)), (float) (amount * ((entity instanceof LivingEntity _livingEntityRD && _livingEntityRD.getAttributes().hasAttribute(WitchercraftModAttributes.REFLECT_DAMAGE) ? _livingEntityRD.getAttribute(WitchercraftModAttributes.REFLECT_DAMAGE).getValue() : 0) + 15) * 0.01));
+					_ent.hurtServer(_serverLevel, new DamageSource(world.holderOrThrow(DamageTypes.THORNS)),
+							(float) (amount * ((entity instanceof LivingEntity _livingEntity12 && _livingEntity12.getAttributes().hasAttribute(WitchercraftModAttributes.REFLECT_DAMAGE)
+									? _livingEntity12.getAttribute(WitchercraftModAttributes.REFLECT_DAMAGE).getValue()
+									: 0) + 15) * 0.01));
 				}
 			}
 		} else {
 			{
 				Entity _ent = sourceentity;
 				if (_ent.level() instanceof ServerLevel _serverLevel) {
-					_ent.hurtServer(_serverLevel, new DamageSource(world.holderOrThrow(DamageTypes.THORNS)), (float) (amount * (entity instanceof LivingEntity _livingEntityRD && _livingEntityRD.getAttributes().hasAttribute(WitchercraftModAttributes.REFLECT_DAMAGE) ? _livingEntityRD.getAttribute(WitchercraftModAttributes.REFLECT_DAMAGE).getValue() : 0) * 0.01));
+					_ent.hurtServer(_serverLevel, new DamageSource(world.holderOrThrow(DamageTypes.THORNS)),
+							(float) (amount * (entity instanceof LivingEntity _livingEntity15 && _livingEntity15.getAttributes().hasAttribute(WitchercraftModAttributes.REFLECT_DAMAGE)
+									? _livingEntity15.getAttribute(WitchercraftModAttributes.REFLECT_DAMAGE).getValue()
+									: 0) * 0.01));
 				}
 			}
 		}

@@ -1,7 +1,6 @@
 package net.redboltmedia.witchercraft.procedures;
 
 import net.redboltmedia.witchercraft.init.WitchercraftModAttributes;
-import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
 
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -27,6 +26,8 @@ public class CharacterGuiPotionDurationProcedure {
 	private static String execute(@Nullable Event event, Entity entity) {
 		if (entity == null)
 			return "";
-		return new java.text.DecimalFormat("##").format(100 + (entity instanceof LivingEntity _livingEntityPD && _livingEntityPD.getAttributes().hasAttribute(WitchercraftModAttributes.POTION_DURATION) ? _livingEntityPD.getAttribute(WitchercraftModAttributes.POTION_DURATION).getValue() : 0)) + "%";
+		return (new java.text.DecimalFormat("##").format(
+				100 + (entity instanceof LivingEntity _livingEntity0 && _livingEntity0.getAttributes().hasAttribute(WitchercraftModAttributes.POTION_DURATION) ? _livingEntity0.getAttribute(WitchercraftModAttributes.POTION_DURATION).getValue() : 0)))
+				+ "%";
 	}
 }

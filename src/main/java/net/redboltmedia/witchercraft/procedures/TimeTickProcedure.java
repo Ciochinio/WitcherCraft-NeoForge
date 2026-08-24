@@ -24,12 +24,12 @@ public class TimeTickProcedure {
 	private static void execute(@Nullable Event event, LevelAccessor world, Entity entity) {
 		if (entity == null)
 			return;
-		if (!(world.isClientSide())) {
-			if ((entity.tickCount) % 20 == 0) {
-				PassiveHealthRegenStartProcedure.execute(world, entity);
-				PassiveStaminaRegenStartProcedure.execute(world, entity);
+		if (!world.isClientSide()) {
+			if (entity.tickCount % 20 == 0) {
+				PassiveHealthRegenStartProcedure.execute(entity);
+				PassiveStaminaRegenStartProcedure.execute(entity);
 			}
-			if ((entity.tickCount) % 60 == 0) {
+			if (entity.tickCount % 60 == 0) {
 				ToxicityTickStartProcedure.execute(world, entity);
 			}
 		}

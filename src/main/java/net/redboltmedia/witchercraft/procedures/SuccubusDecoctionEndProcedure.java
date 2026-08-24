@@ -11,7 +11,7 @@ public class SuccubusDecoctionEndProcedure {
 	public static void execute(Entity entity) {
 		if (entity == null)
 			return;
-		if (entity instanceof LivingEntity _livingEntityID && _livingEntityID.getAttributes().hasAttribute(WitchercraftModAttributes.INCREASED_DAMAGE)) {
+		if (entity instanceof LivingEntity _livingEntity0 && _livingEntity0.getAttributes().hasAttribute(WitchercraftModAttributes.INCREASED_DAMAGE)) {
 			{
 				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 				_vars.witchercraftSuccubusDecoctionTick = 0;

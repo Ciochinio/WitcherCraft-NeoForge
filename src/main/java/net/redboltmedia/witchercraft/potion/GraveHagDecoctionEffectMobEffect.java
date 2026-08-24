@@ -19,7 +19,7 @@ public class GraveHagDecoctionEffectMobEffect extends MobEffect {
 
 	@Override
 	public boolean applyEffectTick(ServerLevel level, LivingEntity entity, int amplifier) {
-		GraveHagDecoctionTickProcedure.execute(level, entity);
+		GraveHagDecoctionTickProcedure.execute(entity);
 		return super.applyEffectTick(level, entity, amplifier);
 	}
 }

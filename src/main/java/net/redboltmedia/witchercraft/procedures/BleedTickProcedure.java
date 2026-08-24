@@ -18,7 +18,7 @@ public class BleedTickProcedure {
 				Entity _ent = entity;
 				if (_ent.level() instanceof ServerLevel _serverLevel) {
 					_ent.hurtServer(_serverLevel, new DamageSource(world.holderOrThrow(DamageTypes.MAGIC)),
-							1 + (entity instanceof LivingEntity _livEnt0 && _livEnt0.hasEffect(WitchercraftModMobEffects.BLEED) ? _livEnt0.getEffect(WitchercraftModMobEffects.BLEED).getAmplifier() : 0));
+							1 + (entity instanceof LivingEntity _livEnt && _livEnt.hasEffect(WitchercraftModMobEffects.BLEED) ? _livEnt.getEffect(WitchercraftModMobEffects.BLEED).getAmplifier() : 0));
 				}
 			}
 		}

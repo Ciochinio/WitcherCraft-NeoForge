@@ -1,7 +1,6 @@
 package net.redboltmedia.witchercraft.procedures;
 
 import net.redboltmedia.witchercraft.init.WitchercraftModAttributes;
-import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
 
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -27,6 +26,8 @@ public class CharacterGuiOilDamageProcedure {
 	private static String execute(@Nullable Event event, Entity entity) {
 		if (entity == null)
 			return "";
-		return new java.text.DecimalFormat("##").format(100 + (entity instanceof LivingEntity _livingEntityOD && _livingEntityOD.getAttributes().hasAttribute(WitchercraftModAttributes.OIL_DAMAGE) ? _livingEntityOD.getAttribute(WitchercraftModAttributes.OIL_DAMAGE).getValue() : 0)) + "%";
+		return (new java.text.DecimalFormat("##")
+				.format(100 + (entity instanceof LivingEntity _livingEntity0 && _livingEntity0.getAttributes().hasAttribute(WitchercraftModAttributes.OIL_DAMAGE) ? _livingEntity0.getAttribute(WitchercraftModAttributes.OIL_DAMAGE).getValue() : 0)))
+				+ "%";
 	}
 }

@@ -1,8 +1,8 @@
 package net.redboltmedia.witchercraft.procedures;
 
-import net.redboltmedia.witchercraft.init.WitchercraftModAttributes;
 import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
 import net.redboltmedia.witchercraft.init.WitchercraftModMobEffects;
+import net.redboltmedia.witchercraft.init.WitchercraftModAttributes;
 
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.entity.LivingEntity;
@@ -29,18 +29,25 @@ public class ToxicityTickStartProcedure {
 					_player.sendSystemMessage(Component.literal("tox -1"), false);
 			}
 		}
-		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftToxicity >= (entity instanceof LivingEntity _livingEntityTOT && _livingEntityTOT.getAttributes().hasAttribute(WitchercraftModAttributes.TOXICITY_OVERDOSE_THRESHOLD) ? _livingEntityTOT.getAttribute(WitchercraftModAttributes.TOXICITY_OVERDOSE_THRESHOLD).getValue() : 0)) {
+		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftToxicity >= (entity instanceof LivingEntity _livingEntity2 && _livingEntity2.getAttributes().hasAttribute(WitchercraftModAttributes.TOXICITY_OVERDOSE_THRESHOLD)
+				? _livingEntity2.getAttribute(WitchercraftModAttributes.TOXICITY_OVERDOSE_THRESHOLD).getValue()
+				: 0)) {
 			{
 				Entity _ent = entity;
 				if (_ent.level() instanceof ServerLevel _serverLevel) {
 					_ent.hurtServer(_serverLevel, new DamageSource(world.holderOrThrow(DamageTypes.MAGIC)),
-							1 + Math.round(entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftToxicity / (entity instanceof LivingEntity _livingEntityTOT && _livingEntityTOT.getAttributes().hasAttribute(WitchercraftModAttributes.TOXICITY_OVERDOSE_THRESHOLD) ? _livingEntityTOT.getAttribute(WitchercraftModAttributes.TOXICITY_OVERDOSE_THRESHOLD).getValue() : 0)));
+							1 + Math.round(entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftToxicity
+									/ (entity instanceof LivingEntity _livingEntity3 && _livingEntity3.getAttributes().hasAttribute(WitchercraftModAttributes.TOXICITY_OVERDOSE_THRESHOLD)
+											? _livingEntity3.getAttribute(WitchercraftModAttributes.TOXICITY_OVERDOSE_THRESHOLD).getValue()
+											: 0)));
 				}
 			}
-			if (entity instanceof LivingEntity _livEnt4 && _livEnt4.hasEffect(WitchercraftModMobEffects.DEV_LOG)) {
+			if (entity instanceof LivingEntity _livEnt6 && _livEnt6.hasEffect(WitchercraftModMobEffects.DEV_LOG)) {
 				if (entity instanceof ServerPlayer _player)
-					_player.sendSystemMessage(
-							Component.literal(("overdose za " + (1 + Math.round(entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftToxicity / (entity instanceof LivingEntity _livingEntityTOT && _livingEntityTOT.getAttributes().hasAttribute(WitchercraftModAttributes.TOXICITY_OVERDOSE_THRESHOLD) ? _livingEntityTOT.getAttribute(WitchercraftModAttributes.TOXICITY_OVERDOSE_THRESHOLD).getValue() : 0))))),
+					_player.sendSystemMessage(Component.literal(("overdose za " + (1 + Math.round(entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftToxicity
+							/ (entity instanceof LivingEntity _livingEntity7 && _livingEntity7.getAttributes().hasAttribute(WitchercraftModAttributes.TOXICITY_OVERDOSE_THRESHOLD)
+									? _livingEntity7.getAttribute(WitchercraftModAttributes.TOXICITY_OVERDOSE_THRESHOLD).getValue()
+									: 0))))),
 							false);
 			}
 		}

@@ -26,6 +26,8 @@ public class CharacterGuiReflectDamageProcedure {
 	private static String execute(@Nullable Event event, Entity entity) {
 		if (entity == null)
 			return "";
-		return new java.text.DecimalFormat("##.##").format((entity instanceof LivingEntity _livingEntityRD && _livingEntityRD.getAttributes().hasAttribute(WitchercraftModAttributes.REFLECT_DAMAGE) ? _livingEntityRD.getAttribute(WitchercraftModAttributes.REFLECT_DAMAGE).getValue() : 0)) + "%";
+		return (new java.text.DecimalFormat("##.##")
+				.format(entity instanceof LivingEntity _livingEntity0 && _livingEntity0.getAttributes().hasAttribute(WitchercraftModAttributes.REFLECT_DAMAGE) ? _livingEntity0.getAttribute(WitchercraftModAttributes.REFLECT_DAMAGE).getValue() : 0))
+				+ "%";
 	}
 }

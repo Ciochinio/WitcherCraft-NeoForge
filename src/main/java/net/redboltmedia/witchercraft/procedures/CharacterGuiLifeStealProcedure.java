@@ -26,6 +26,7 @@ public class CharacterGuiLifeStealProcedure {
 	private static String execute(@Nullable Event event, Entity entity) {
 		if (entity == null)
 			return "";
-		return new java.text.DecimalFormat("##.##").format((entity instanceof LivingEntity _livingEntityLS && _livingEntityLS.getAttributes().hasAttribute(WitchercraftModAttributes.LIFE_STEAL) ? _livingEntityLS.getAttribute(WitchercraftModAttributes.LIFE_STEAL).getValue() : 0)) + "%";
+		return (new java.text.DecimalFormat("##.##")
+				.format(entity instanceof LivingEntity _livingEntity0 && _livingEntity0.getAttributes().hasAttribute(WitchercraftModAttributes.LIFE_STEAL) ? _livingEntity0.getAttribute(WitchercraftModAttributes.LIFE_STEAL).getValue() : 0)) + "%";
 	}
 }

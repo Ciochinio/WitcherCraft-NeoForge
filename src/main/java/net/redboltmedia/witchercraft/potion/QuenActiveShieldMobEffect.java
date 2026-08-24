@@ -22,6 +22,17 @@ public class QuenActiveShieldMobEffect extends MobEffect {
 		super(MobEffectCategory.NEUTRAL, -1);
 	}
 
+	@Override
+	public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
+		return true;
+	}
+
+	@Override
+	public boolean applyEffectTick(ServerLevel level, LivingEntity entity, int amplifier) {
+		QuenActiveShieldTickProcedure.execute(level, entity);
+		return super.applyEffectTick(level, entity, amplifier);
+	}
+
 	@SubscribeEvent
 	public static void registerMobEffectExtensions(RegisterClientExtensionsEvent event) {
 		event.registerMobEffect(new IClientMobEffectExtensions() {
@@ -40,16 +51,5 @@ public class QuenActiveShieldMobEffect extends MobEffect {
 				return false;
 			}
 		}, WitchercraftModMobEffects.QUEN_ACTIVE_SHIELD.get());
-	}
-
-	@Override
-	public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
-		return true;
-	}
-
-	@Override
-	public boolean applyEffectTick(ServerLevel level, LivingEntity entity, int amplifier) {
-		QuenActiveShieldTickProcedure.execute(level, entity);
-		return super.applyEffectTick(level, entity, amplifier);
 	}
 }

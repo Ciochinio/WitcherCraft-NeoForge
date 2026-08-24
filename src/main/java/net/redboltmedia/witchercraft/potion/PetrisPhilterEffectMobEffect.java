@@ -11,7 +11,6 @@ import net.minecraft.resources.Identifier;
 public class PetrisPhilterEffectMobEffect extends MobEffect {
 	public PetrisPhilterEffectMobEffect() {
 		super(MobEffectCategory.NEUTRAL, -1);
-		this.addAttributeModifier(WitchercraftModAttributes.SIGN_INTENSITY, Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "effect.petris_philter_effect_0"), 20.0,
-				AttributeModifier.Operation.ADD_VALUE);
+		this.addAttributeModifier(WitchercraftModAttributes.SIGN_INTENSITY, Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "effect.petris_philter_effect_0"), 20, AttributeModifier.Operation.ADD_VALUE);
 	}
 }

@@ -19,7 +19,7 @@ public class WyvernDecoctionEffectMobEffect extends MobEffect {
 
 	@Override
 	public boolean applyEffectTick(ServerLevel level, LivingEntity entity, int amplifier) {
-		WyvernDecoctionTickProcedure.execute(level, entity);
+		WyvernDecoctionTickProcedure.execute(entity);
 		return super.applyEffectTick(level, entity, amplifier);
 	}
 }

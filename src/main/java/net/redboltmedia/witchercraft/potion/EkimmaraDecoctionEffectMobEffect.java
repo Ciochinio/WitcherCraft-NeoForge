@@ -11,7 +11,6 @@ import net.minecraft.resources.Identifier;
 public class EkimmaraDecoctionEffectMobEffect extends MobEffect {
 	public EkimmaraDecoctionEffectMobEffect() {
 		super(MobEffectCategory.NEUTRAL, -1);
-		this.addAttributeModifier(WitchercraftModAttributes.LIFE_STEAL, Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "effect.ekimmara_decoction_effect_0"), 10.0,
-				AttributeModifier.Operation.ADD_VALUE);
+		this.addAttributeModifier(WitchercraftModAttributes.LIFE_STEAL, Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "effect.ekimmara_decoction_effect_0"), 10, AttributeModifier.Operation.ADD_VALUE);
 	}
 }

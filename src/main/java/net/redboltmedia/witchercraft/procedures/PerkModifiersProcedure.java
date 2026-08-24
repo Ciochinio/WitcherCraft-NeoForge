@@ -78,12 +78,6 @@ public class PerkModifiersProcedure {
 						_entity.getAttribute(WitchercraftModAttributes.CRIT_CHANCE).addTransientModifier(modifier);
 					}
 				}
-			} else {
-				if (entity instanceof LivingEntity _entity) {
-					_entity.getAttribute(WitchercraftModAttributes.CRIT_CHANCE).removeModifier(Identifier.parse("witchercraft:perk_precise_blows"));
-				}
-			}
-			if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesPreciseBlows == true) {
 				if (entity instanceof LivingEntity _entity) {
 					AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:perk_precise_blows"), 75, AttributeModifier.Operation.ADD_VALUE);
 					if (!_entity.getAttribute(WitchercraftModAttributes.CRIT_DAMAGE).hasModifier(modifier.id())) {
@@ -91,6 +85,9 @@ public class PerkModifiersProcedure {
 					}
 				}
 			} else {
+				if (entity instanceof LivingEntity _entity) {
+					_entity.getAttribute(WitchercraftModAttributes.CRIT_CHANCE).removeModifier(Identifier.parse("witchercraft:perk_precise_blows"));
+				}
 				if (entity instanceof LivingEntity _entity) {
 					_entity.getAttribute(WitchercraftModAttributes.CRIT_DAMAGE).removeModifier(Identifier.parse("witchercraft:perk_precise_blows"));
 				}
@@ -102,12 +99,6 @@ public class PerkModifiersProcedure {
 						_entity.getAttribute(WitchercraftModAttributes.CRIT_CHANCE).addTransientModifier(modifier);
 					}
 				}
-			} else {
-				if (entity instanceof LivingEntity _entity) {
-					_entity.getAttribute(WitchercraftModAttributes.CRIT_CHANCE).removeModifier(Identifier.parse("witchercraft:perk_crushing_blows"));
-				}
-			}
-			if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesCrushingBlows == true) {
 				if (entity instanceof LivingEntity _entity) {
 					AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:perk_crushing_blows"), 50, AttributeModifier.Operation.ADD_VALUE);
 					if (!_entity.getAttribute(WitchercraftModAttributes.CRIT_DAMAGE).hasModifier(modifier.id())) {
@@ -116,10 +107,14 @@ public class PerkModifiersProcedure {
 				}
 			} else {
 				if (entity instanceof LivingEntity _entity) {
+					_entity.getAttribute(WitchercraftModAttributes.CRIT_CHANCE).removeModifier(Identifier.parse("witchercraft:perk_crushing_blows"));
+				}
+				if (entity instanceof LivingEntity _entity) {
 					_entity.getAttribute(WitchercraftModAttributes.CRIT_DAMAGE).removeModifier(Identifier.parse("witchercraft:perk_crushing_blows"));
 				}
 			}
-			if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesAnatomicalKnowledge == true && ((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY).getItem() == Items.CROSSBOW || (entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY).getItem() == Items.BOW)) {
+			if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesAnatomicalKnowledge == true && ((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY).getItem() == Items.CROSSBOW
+					|| (entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY).getItem() == Items.BOW)) {
 				if (entity instanceof LivingEntity _entity) {
 					AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:perk_anatomical_knowledge"), 10, AttributeModifier.Operation.ADD_VALUE);
 					if (!_entity.getAttribute(WitchercraftModAttributes.CRIT_CHANCE).hasModifier(modifier.id())) {
@@ -131,7 +126,8 @@ public class PerkModifiersProcedure {
 					_entity.getAttribute(WitchercraftModAttributes.CRIT_CHANCE).removeModifier(Identifier.parse("witchercraft:perk_anatomical_knowledge"));
 				}
 			}
-			if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesCripplingShot == true && ((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY).getItem() == Items.CROSSBOW || (entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY).getItem() == Items.BOW)) {
+			if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesCripplingShot == true && ((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY).getItem() == Items.CROSSBOW
+					|| (entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY).getItem() == Items.BOW)) {
 				if (entity instanceof LivingEntity _entity) {
 					AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:perk_crippling_shot"), 50, AttributeModifier.Operation.ADD_VALUE);
 					if (!_entity.getAttribute(WitchercraftModAttributes.CRIT_DAMAGE).hasModifier(modifier.id())) {
@@ -203,7 +199,7 @@ public class PerkModifiersProcedure {
 					_entity.getAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE).removeModifier(Identifier.parse("witchercraft:perk_flood_of_anger"));
 				}
 			}
-			if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesSunAndStars == true && world instanceof Level _lvlD && _lvlD.isBrightOutside()) {
+			if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesSunAndStars == true && world instanceof Level _lvl37 && _lvl37.isBrightOutside()) {
 				if (entity instanceof LivingEntity _entity) {
 					AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:perk_sun_and_stars_day"), 0.3333, AttributeModifier.Operation.ADD_VALUE);
 					if (!_entity.getAttribute(WitchercraftModAttributes.PASSIVE_HEALTH_REGEN).hasModifier(modifier.id())) {
@@ -215,7 +211,7 @@ public class PerkModifiersProcedure {
 					_entity.getAttribute(WitchercraftModAttributes.PASSIVE_HEALTH_REGEN).removeModifier(Identifier.parse("witchercraft:perk_sun_and_stars_day"));
 				}
 			}
-			if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesSunAndStars == true && !(world instanceof Level _lvlN && _lvlN.isBrightOutside())) {
+			if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesSunAndStars == true && !(world instanceof Level _lvl40 && _lvl40.isBrightOutside())) {
 				if (entity instanceof LivingEntity _entity) {
 					AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:perk_sun_and_stars_night"), 0.3333, AttributeModifier.Operation.ADD_VALUE);
 					if (!_entity.getAttribute(WitchercraftModAttributes.PASSIVE_STAMINA_REGEN).hasModifier(modifier.id())) {

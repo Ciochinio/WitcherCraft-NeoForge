@@ -11,7 +11,6 @@ import net.minecraft.resources.Identifier;
 public class LeshenDecoctionEffectMobEffect extends MobEffect {
 	public LeshenDecoctionEffectMobEffect() {
 		super(MobEffectCategory.NEUTRAL, -1);
-		this.addAttributeModifier(WitchercraftModAttributes.REFLECT_DAMAGE, Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "effect.leshen_decoction_effect_0"), 20.0,
-				AttributeModifier.Operation.ADD_VALUE);
+		this.addAttributeModifier(WitchercraftModAttributes.REFLECT_DAMAGE, Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "effect.leshen_decoction_effect_0"), 20, AttributeModifier.Operation.ADD_VALUE);
 	}
 }

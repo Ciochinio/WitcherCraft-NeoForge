@@ -21,8 +21,8 @@ public class QuenActiveShieldAuraProcedure {
 		ringHeight = 1;
 		while (loop < particleAmount) {
 			if (world instanceof ServerLevel _level)
-				_level.sendParticles((SimpleParticleType) (WitchercraftModParticleTypes.QUEN_HOLD_PARTICLES.get()), (entity.getX() + Math.cos(((Math.PI * 2) / particleAmount) * loop) * ringRadius),
-						(entity.getY() + ringHeight), (entity.getZ() + Math.sin(((Math.PI * 2) / particleAmount) * loop) * ringRadius), 1, 0, 0, 0, 0);
+				_level.sendParticles((SimpleParticleType) (WitchercraftModParticleTypes.QUEN_HOLD_PARTICLES.get()), (entity.getX() + Math.cos(((Math.PI * 2) / particleAmount) * loop) * ringRadius), (entity.getY() + ringHeight),
+						(entity.getZ() + Math.sin(((Math.PI * 2) / particleAmount) * loop) * ringRadius), 1, 0, 0, 0, 0);
 			loop = loop + 1;
 		}
 	}
