@@ -132,8 +132,6 @@ public class WitchercraftModVariables {
 			clone.witchercraftEnemyNearby = original.witchercraftEnemyNearby;
 			clone.witchercraftQuenShield = original.witchercraftQuenShield;
 			clone.witchercraftQuenShieldMax = original.witchercraftQuenShieldMax;
-			clone.witchercraftSignIntensity = original.witchercraftSignIntensity;
-			clone.witchercraftOilDamage = original.witchercraftOilDamage;
 			clone.witchercraftWyvernDecoctionHit = original.witchercraftWyvernDecoctionHit;
 			clone.witchercraftSuccubusDecoctionTick = original.witchercraftSuccubusDecoctionTick;
 			clone.witchercraftGraveHagDecoctionKill = original.witchercraftGraveHagDecoctionKill;
@@ -208,8 +206,6 @@ public class WitchercraftModVariables {
 		public boolean witchercraftEnemyNearby = false;
 		public double witchercraftQuenShield = 0;
 		public double witchercraftQuenShieldMax = 0;
-		public double witchercraftSignIntensity = 0;
-		public double witchercraftOilDamage = 0;
 		public double witchercraftWyvernDecoctionHit = 0;
 		public double witchercraftSuccubusDecoctionTick = 0;
 		public double witchercraftGraveHagDecoctionKill = 0;
@@ -281,8 +277,6 @@ public class WitchercraftModVariables {
 			output.putBoolean("witchercraftEnemyNearby", witchercraftEnemyNearby);
 			output.putDouble("witchercraftQuenShield", witchercraftQuenShield);
 			output.putDouble("witchercraftQuenShieldMax", witchercraftQuenShieldMax);
-			output.putDouble("witchercraftSignIntensity", witchercraftSignIntensity);
-			output.putDouble("witchercraftOilDamage", witchercraftOilDamage);
 			output.putDouble("witchercraftWyvernDecoctionHit", witchercraftWyvernDecoctionHit);
 			output.putDouble("witchercraftSuccubusDecoctionTick", witchercraftSuccubusDecoctionTick);
 			output.putDouble("witchercraftGraveHagDecoctionKill", witchercraftGraveHagDecoctionKill);
@@ -355,8 +349,6 @@ public class WitchercraftModVariables {
 			witchercraftEnemyNearby = input.getBooleanOr("witchercraftEnemyNearby", false);
 			witchercraftQuenShield = input.getDoubleOr("witchercraftQuenShield", 0);
 			witchercraftQuenShieldMax = input.getDoubleOr("witchercraftQuenShieldMax", 0);
-			witchercraftSignIntensity = input.getDoubleOr("witchercraftSignIntensity", 0);
-			witchercraftOilDamage = input.getDoubleOr("witchercraftOilDamage", 0);
 			witchercraftWyvernDecoctionHit = input.getDoubleOr("witchercraftWyvernDecoctionHit", 0);
 			witchercraftSuccubusDecoctionTick = input.getDoubleOr("witchercraftSuccubusDecoctionTick", 0);
 			witchercraftGraveHagDecoctionKill = input.getDoubleOr("witchercraftGraveHagDecoctionKill", 0);

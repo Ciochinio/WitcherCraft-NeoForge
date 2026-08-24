@@ -15,7 +15,7 @@ public class CorrectOilStartProcedure {
 		if (entity instanceof LivingEntity _entity && _entity.getAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE) != null) {
 			_entity.getAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE).removeModifier(Identifier.parse("witchercraft:oil_correct"));
 			_entity.getAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE).addTransientModifier(new AttributeModifier(Identifier.parse("witchercraft:oil_correct"),
-					4 * (1 + entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftOilDamage * 0.01), AttributeModifier.Operation.ADD_VALUE));
+					4 * (1 + (entity instanceof LivingEntity _livingEntityOD && _livingEntityOD.getAttributes().hasAttribute(WitchercraftModAttributes.OIL_DAMAGE) ? _livingEntityOD.getAttribute(WitchercraftModAttributes.OIL_DAMAGE).getValue() : 0) * 0.01), AttributeModifier.Operation.ADD_VALUE));
 		}
 	}
 }

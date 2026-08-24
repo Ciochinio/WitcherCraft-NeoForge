@@ -237,6 +237,8 @@
   "attribute.witchercraft.toxicity_overdose_threshold": "Toxicity Overdose Threshold",
   "attribute.witchercraft.passive_health_regen": "Passive Health Regeneration",
   "attribute.witchercraft.passive_stamina_regen": "Passive Stamina Regeneration",
+  "attribute.witchercraft.oil_damage": "Oil Damage",
+  "attribute.witchercraft.sign_intensity": "Sign Intensity",
   "effect.witchercraft.enemy_nearby": "Enemy Nearby",
   "effect.witchercraft.undying_cooldown": "Undying Cooldown",
   "gui.witchercraft.player_stats_overlay.label_dodge_chance": "Dodge Chance",

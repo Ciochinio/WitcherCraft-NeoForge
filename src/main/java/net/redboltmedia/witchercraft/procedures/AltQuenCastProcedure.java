@@ -1,5 +1,6 @@
 package net.redboltmedia.witchercraft.procedures;
 
+import net.redboltmedia.witchercraft.init.WitchercraftModAttributes;
 import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
 import net.redboltmedia.witchercraft.init.WitchercraftModMobEffects;
 
@@ -27,7 +28,7 @@ public class AltQuenCastProcedure {
 		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftSignKeyHoldTime % 20 == 0) {
 			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 			_vars.witchercraftQuenShield = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftQuenShield
-					+ 2 * (1 + entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftSignIntensity * 0.01);
+					+ 2 * (1 + (entity instanceof LivingEntity _livingEntitySI && _livingEntitySI.getAttributes().hasAttribute(WitchercraftModAttributes.SIGN_INTENSITY) ? _livingEntitySI.getAttribute(WitchercraftModAttributes.SIGN_INTENSITY).getValue() : 0) * 0.01);
 			_vars.markSyncDirty();
 		}
 	}

@@ -5960,23 +5960,13 @@
     },
     {
       "name": "SignIntensity",
-      "type": "procedure",
+      "type": "attribute",
       "compiles": true,
       "locked_code": false,
       "registry_name": "sign_intensity",
       "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ],
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/SignIntensityProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
         ]
       },
       "path": "~/Character Stats/Stats/VariableStats/SignIntensity"
@@ -7327,19 +7317,13 @@
     },
     {
       "name": "OilDamage",
-      "type": "procedure",
+      "type": "attribute",
       "compiles": true,
       "locked_code": false,
       "registry_name": "oil_damage",
       "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/OilDamageProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
         ]
       },
       "path": "~/Character Stats/Stats/VariableStats/OilDamage"
@@ -10819,18 +10803,6 @@
       "value": "0"
     },
     {
-      "name": "witchercraftSignIntensity",
-      "type": "number",
-      "scope": "player_lifetime",
-      "value": "0"
-    },
-    {
-      "name": "witchercraftOilDamage",
-      "type": "number",
-      "scope": "player_lifetime",
-      "value": "0"
-    },
-    {
       "name": "witchercraftWyvernDecoctionHit",
       "type": "number",
       "scope": "player_lifetime",
@@ -11209,6 +11181,8 @@
       "attribute.witchercraft.toxicity_overdose_threshold": "Toxicity Overdose Threshold",
       "attribute.witchercraft.passive_health_regen": "Passive Health Regeneration",
       "attribute.witchercraft.passive_stamina_regen": "Passive Stamina Regeneration",
+      "attribute.witchercraft.oil_damage": "Oil Damage",
+      "attribute.witchercraft.sign_intensity": "Sign Intensity",
       "effect.witchercraft.enemy_nearby": "Enemy Nearby",
       "effect.witchercraft.undying_cooldown": "Undying Cooldown",
       "gui.witchercraft.player_stats_overlay.label_dodge_chance": "Dodge Chance",
