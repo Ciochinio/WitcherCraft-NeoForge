@@ -1154,44 +1154,6 @@
       "path": "~/Character Stats/Stats/Gui"
     },
     {
-      "name": "MovementSpeed",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "movement_speed",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/MovementSpeedProcedure.java"
-        ],
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ]
-      },
-      "path": "~/Character Stats/Stats/VariableStats/MovementSpeed"
-    },
-    {
-      "name": "AttackSpeed",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "attack_speed",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/AttackSpeedProcedure.java"
-        ],
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ]
-      },
-      "path": "~/Character Stats/Stats/VariableStats/AttackSpeed"
-    },
-    {
       "name": "BlizzardEffect",
       "type": "potioneffect",
       "compiles": true,
@@ -1291,63 +1253,6 @@
       "path": "~/Character Stats/Stats/VariableStats/CritDamage"
     },
     {
-      "name": "WitchercraftPlayerBaseStats",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "witchercraft_player_base_stats",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftPlayerBaseStatsProcedure.java"
-        ],
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ]
-      },
-      "path": "~/Character Stats/Stats/Stat Reload"
-    },
-    {
-      "name": "WitchercraftPlayerStatCheck",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "witchercraft_player_stat_check",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftPlayerStatCheckProcedure.java"
-        ],
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ]
-      },
-      "path": "~/Character Stats/Stats/Stat Reload"
-    },
-    {
-      "name": "WitchercraftPlayerStatReload",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "witchercraft_player_stat_reload",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftPlayerStatReloadProcedure.java"
-        ],
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ]
-      },
-      "path": "~/Character Stats/Stats/Stat Reload"
-    },
-    {
       "name": "PlayerModelDisplay",
       "type": "procedure",
       "compiles": true,
@@ -1443,25 +1348,6 @@
         ]
       },
       "path": "~/Alchemy/Potions/FullMoon"
-    },
-    {
-      "name": "Health",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "health",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/HealthProcedure.java"
-        ],
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ]
-      },
-      "path": "~/Character Stats/Stats/VariableStats/Health"
     },
     {
       "name": "CharacterGuiHealth",
@@ -10442,30 +10328,6 @@
     }
   ],
   "variable_elements": [
-    {
-      "name": "witchercraftMovementSpeed",
-      "type": "number",
-      "scope": "player_lifetime",
-      "value": "0.0"
-    },
-    {
-      "name": "witchercraftHealth",
-      "type": "number",
-      "scope": "player_lifetime",
-      "value": "0.0"
-    },
-    {
-      "name": "witchercraftArmor",
-      "type": "number",
-      "scope": "player_lifetime",
-      "value": "0.0"
-    },
-    {
-      "name": "witchercraftAttackSpeed",
-      "type": "number",
-      "scope": "player_lifetime",
-      "value": "0"
-    },
     {
       "name": "witchercraftAbilitiesLearned",
       "type": "number",

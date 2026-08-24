@@ -414,9 +414,11 @@ doesn't take this damage type correctly.)
 
 ### Stats are always live
 
-Every combat stat is recomputed each tick from a base value plus whatever is boosting it right
-now - perks, School armor, and active potions or decoctions - the same live-aggregation model as
-[Sign Intensity](#sign-intensity). A few current examples:
+Every combat stat is a base value plus whatever is boosting it right now - perks, School armor,
+and active potions or decoctions - the same live-aggregation model as
+[Sign Intensity](#sign-intensity). Each stat is a real attribute the game itself tracks, so a
+bonus applies the moment its source does and disappears the moment the source does, with no
+recalculation step in between and nothing to fall out of sync. A few current examples:
 
 - **Precise Blows** adds **12** crit chance, **Crushing Blows** adds **8**, and **Anatomical
   Knowledge** adds **10** while you're holding a bow or crossbow.

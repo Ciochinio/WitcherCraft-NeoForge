@@ -14,6 +14,12 @@
     "renderStatusInInventory": true,
     "renderStatusInHUD": true,
     "isCuredbyHoney": false,
-    "modifiers": []
+    "modifiers": [
+      {
+        "attribute": "MOVEMENT_SPEED",
+        "amount": -0.5,
+        "operation": "ADD_MULTIPLIED_TOTAL"
+      }
+    ]
   }
 }

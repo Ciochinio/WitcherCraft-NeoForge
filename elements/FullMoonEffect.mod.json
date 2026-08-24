@@ -14,6 +14,12 @@
     "renderStatusInInventory": true,
     "renderStatusInHUD": true,
     "isCuredbyHoney": false,
-    "modifiers": []
+    "modifiers": [
+      {
+        "attribute": "MAX_HEALTH",
+        "amount": 4.0,
+        "operation": "ADD_VALUE"
+      }
+    ]
   }
 }

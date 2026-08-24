@@ -7,6 +7,8 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.bus.api.Event;
 
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
 
 import javax.annotation.Nullable;
@@ -26,6 +28,6 @@ public class CharacterGuiMovementSpeedProcedure {
 		if (entity == null)
 			return "";
 		String MovementSpeed = "";
-		return new java.text.DecimalFormat("##.##").format(entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftMovementSpeed);
+		return new java.text.DecimalFormat("##.##").format((entity instanceof LivingEntity _livingEntityMS && _livingEntityMS.getAttributes().hasAttribute(Attributes.MOVEMENT_SPEED) ? _livingEntityMS.getAttribute(Attributes.MOVEMENT_SPEED).getValue() : 0));
 	}
 }

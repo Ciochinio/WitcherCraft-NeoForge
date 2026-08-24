@@ -124,10 +124,6 @@ public class WitchercraftModVariables {
 		clone.witchercraftAbilitiesAlchemySkillPointsUsed = original.witchercraftAbilitiesAlchemySkillPointsUsed;
 		clone.witchercraftAbilitiesSignsSkillPointsUsed = original.witchercraftAbilitiesSignsSkillPointsUsed;
 		if (!event.isWasDeath()) {
-			clone.witchercraftMovementSpeed = original.witchercraftMovementSpeed;
-			clone.witchercraftHealth = original.witchercraftHealth;
-			clone.witchercraftArmor = original.witchercraftArmor;
-			clone.witchercraftAttackSpeed = original.witchercraftAttackSpeed;
 			clone.witchercraftToxicity = original.witchercraftToxicity;
 			clone.witchercraftEnemyNearby = original.witchercraftEnemyNearby;
 			clone.witchercraftQuenShield = original.witchercraftQuenShield;
@@ -146,10 +142,6 @@ public class WitchercraftModVariables {
 
 	public static class PlayerVariables implements ValueIOSerializable {
 		boolean _syncDirty = false;
-		public double witchercraftMovementSpeed = 0.0;
-		public double witchercraftHealth = 0.0;
-		public double witchercraftArmor = 0.0;
-		public double witchercraftAttackSpeed = 0;
 		public double witchercraftAbilitiesLearned = 0.0;
 		public boolean witchercraftAbilitiesGourmet = false;
 		public boolean witchercraftAbilitiesSurvivalInstinct = false;
@@ -217,10 +209,6 @@ public class WitchercraftModVariables {
 
 		@Override
 		public void serialize(ValueOutput output) {
-			output.putDouble("witchercraftMovementSpeed", witchercraftMovementSpeed);
-			output.putDouble("witchercraftHealth", witchercraftHealth);
-			output.putDouble("witchercraftArmor", witchercraftArmor);
-			output.putDouble("witchercraftAttackSpeed", witchercraftAttackSpeed);
 			output.putDouble("witchercraftAbilitiesLearned", witchercraftAbilitiesLearned);
 			output.putBoolean("witchercraftAbilitiesGourmet", witchercraftAbilitiesGourmet);
 			output.putBoolean("witchercraftAbilitiesSurvivalInstinct", witchercraftAbilitiesSurvivalInstinct);
@@ -289,10 +277,6 @@ public class WitchercraftModVariables {
 
 		@Override
 		public void deserialize(ValueInput input) {
-			witchercraftMovementSpeed = input.getDoubleOr("witchercraftMovementSpeed", 0);
-			witchercraftHealth = input.getDoubleOr("witchercraftHealth", 0);
-			witchercraftArmor = input.getDoubleOr("witchercraftArmor", 0);
-			witchercraftAttackSpeed = input.getDoubleOr("witchercraftAttackSpeed", 0);
 			witchercraftAbilitiesLearned = input.getDoubleOr("witchercraftAbilitiesLearned", 0);
 			witchercraftAbilitiesGourmet = input.getBooleanOr("witchercraftAbilitiesGourmet", false);
 			witchercraftAbilitiesSurvivalInstinct = input.getBooleanOr("witchercraftAbilitiesSurvivalInstinct", false);

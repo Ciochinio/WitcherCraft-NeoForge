@@ -7,6 +7,8 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.bus.api.Event;
 
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
 
 import javax.annotation.Nullable;
@@ -25,6 +27,6 @@ public class CharacterGuiAttackSpeedProcedure {
 	private static String execute(@Nullable Event event, Entity entity) {
 		if (entity == null)
 			return "";
-		return new java.text.DecimalFormat("##.##").format(entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAttackSpeed);
+		return new java.text.DecimalFormat("##.##").format((entity instanceof LivingEntity _livingEntityAS && _livingEntityAS.getAttributes().hasAttribute(Attributes.ATTACK_SPEED) ? _livingEntityAS.getAttribute(Attributes.ATTACK_SPEED).getValue() : 0));
 	}
 }

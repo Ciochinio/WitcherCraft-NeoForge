@@ -14,6 +14,7 @@ Anything marked **tunable** is a value you are expected to change. Anything desc
 ## Table of Contents
 
 1. [GUI and HUD](#1-gui-and-hud)
+2. [Character Stats and Attributes](#2-character-stats-and-attributes)
 
 ---
 
@@ -248,3 +249,140 @@ the right).
   thresholds. If maximum Toxicity ever becomes a stat, that divisor moves into a variable.
 - The older `ToxicityOverlay` element (five arrow images at fixed thresholds) is superseded by this
   system and is left in place only pending cleanup.
+
+---
+
+## 2. Character Stats and Attributes
+
+### 2.1 What the system is for
+
+Every character stat - crit chance, life steal, potion duration, passive regeneration and the rest -
+is a **real Minecraft attribute**, not a number the mod recomputes. A source declares what it
+contributes, the game aggregates and caches, and everything that needs the value reads it back.
+
+The stat a source contributes to, and by how much, lives **with that source**. Katakan Decoction's
+crit chance is a row on the Katakan effect, not a branch inside a crit procedure. Adding a decoction
+touches one element.
+
+### 2.2 Why this is not per-tick recomputation
+
+The mod used to keep every stat as a player variable, recomputed each tick by a dedicated procedure
+that walked a chain of `if` checks. That model had three problems, and all three are structural
+rather than fixable in place:
+
+- **A per-stat procedure had to know about every source.** Ten decoctions meant ten branches in
+  every stat they touched, and adding one meant editing several unrelated procedures.
+- **Every write cost a full sync.** MCreator emits `markSyncDirty()` on *any* player-variable write,
+  changed or not, and that ships the entire `PlayerVariables` blob to the client. A stat procedure
+  writing one number per tick sent the whole blob twenty times a second, per player.
+- **Two of them ran on `EntityTickEvent`**, so they did that for every entity in the world, not just
+  players.
+
+Attributes solve all three: vanilla owns the aggregation, caches the result, recalculates only when a
+modifier is added or removed, and `setSyncable(true)` handles the client copy.
+
+### 2.3 The pieces
+
+**14 custom attributes**, registered in `WitchercraftModAttributes` from `attribute`-type elements:
+crit chance, crit damage, additional damage, increased damage, life steal, oil damage, dodge chance,
+potion duration, sign intensity, instant kill chance, reflect damage, toxicity overdose threshold,
+passive health regeneration, passive stamina regeneration.
+
+Health, movement speed and attack speed use **vanilla** `MAX_HEALTH`, `MOVEMENT_SPEED` and
+`ATTACK_SPEED`. Nothing is registered for them; only their sources live here.
+
+A stat's **base value is the attribute's `defaultValue`** - crit chance **5**, crit damage **115**,
+toxicity overdose threshold **70**, everything else **0**. These are *contract*: there is no longer a
+"base stats" procedure, and nothing seeds them at login or respawn.
+
+**Four ways a modifier reaches an attribute**, in order of preference:
+
+1. **Declarative, on the effect element.** A `modifiers` row on a potion effect. Zero code. Use this
+   whenever an effect grants a flat bonus unconditionally - Katakan, Ekimmara, Leshen, Blizzard,
+   Petri's Philter, Swallow, Troll, Tawny Owl, Thunderbolt, Full Moon, Sign Hold.
+2. **`PerkModifiers`** (`~/Character Abilities`). Anything gated on a perk boolean, including
+   perk-plus-condition like Anatomical Knowledge while a bow is held.
+3. **`ConditionalModifiers`** (`~/Character Stats`). Anything gated on effect-plus-world-state -
+   Thunderbolt during a storm, Water Hag at full health, Werewolf on a clear night, and the
+   in-combat regeneration penalty. Also vanilla effects we do not own, like `LUCK`.
+4. **Event-driven refresh.** Only for amounts that change at runtime: Wyvern's per-hit stack,
+   Succubus's per-2s stack, Grave Hag's per-kill regeneration.
+
+**The two watchers run every tick and write nothing.** `entity_add_modifier` self-guards with
+`hasModifier`, and `removeModifier` returns early without setting the dirty flag when the modifier is
+absent. So a stable perk loadout costs a map lookup per entry and no sync traffic at all.
+
+The in-combat regeneration penalty is an `ADD_MULTIPLIED_TOTAL` modifier of **-0.5**, which is
+exactly "half rate", rather than arithmetic in a procedure.
+
+### 2.4 Traps, and why things are shaped the way they are
+
+**Perk modifiers must be transient and re-applied by a watcher, never applied once at purchase.**
+`ServerPlayer.restoreFrom` only calls `assignPermanentModifiers` when its `restoreAll` flag is set,
+which is the dimension-change path - **not** death respawn. A modifier applied at purchase silently
+disappears the first time the player dies. The watcher re-adds it within a tick and needs no
+knowledge of which code paths clear attributes.
+
+**A computed local cannot be read inside a `wait` block.** MCreator emits procedure-locals as
+`double x = 0;` followed by reassignment, and `wait` compiles to `queueServerWork(n, () -> {...})`.
+Java refuses to capture a reassigned local in a lambda. `DamageCalculator` wraps its damage
+application in `wait(1)`, so anything it needs must come from an attribute, a player variable, or a
+procedure dependency - never a local. This is why the oil bonus is an attribute modifier rather than
+a term computed in the damage procedure.
+
+**`RangedAttribute` clamps to min/max.** This is load-bearing for Thunderbolt: "crit chance becomes
+100 during a storm" is expressed as **+100 clamped to a max of 100**, not as an assignment.
+
+**Effect modifiers scale with amplifier** - `amount * (amplifier + 1)`. Every decoction here is
+applied at level 0, so declared amounts carry through unchanged. Applying one at a higher level
+would silently multiply it.
+
+**A dynamic modifier needs an expiry hook.** `entity_add_modifier` only adds when absent; it cannot
+update an amount, so changing one means remove-then-add at the point the value changes. Because
+nothing removes it when the effect ends, each dynamic source also needs an `onExpired` procedure -
+`WyvernDecoctionEnd`, `SuccubusDecoctionEnd`, `GraveHagDecoctionEnd`, `CorrectOilEnd`. Declaring
+`onExpired` on the element is not enough on its own: the dispatch in `expireEffects` inside
+`WitchercraftModMobEffects` is hand-written and needs the matching branch.
+
+**A stack that only refreshes on hit goes stale.** Wyvern's counter used to reset on the *next* hit,
+so leaving combat left the old value showing and applying. Every dynamic source now also has an
+`onActiveTick` procedure that clears it once combat ends, guarded so it writes only on the
+transition.
+
+### 2.5 How to change things
+
+**Retune a bonus.** Edit the number where the source declares it - the `modifiers` row on the effect,
+or the `sync(...)` line in the relevant watcher. Nothing else needs touching.
+
+**Change a base value.** Edit the attribute element's **default value**. That is the whole knob.
+
+**Change a stat's ceiling.** Edit the attribute's min/max. Remember Thunderbolt relies on crit
+chance's max being exactly **100**.
+
+**Add a source to an existing stat.** Pick the lowest-numbered option in 2.3 that fits. If it is an
+effect with an unconditional flat bonus, add a `modifiers` row and write no code.
+
+**Add a whole new stat.** Create an `attribute` element, add it to `WitchercraftModAttributes` and to
+the `addAttributes` event, add an `attribute.witchercraft.<name>` lang string, then add sources and
+readers. Read it anywhere with `entity_get_attribute_value`, which already guards for entities that
+do not have the attribute and returns 0.
+
+**Read a stat.** `entity_get_attribute_value`. Do not reintroduce a mirror player variable for the
+character sheet - the attributes are syncable, so the client already has the value.
+
+### 2.6 Known limitations
+
+- **The oil bonus is still routed through a status effect.** `CorrectOil` is a 10-tick flag that the
+  oil-hit procedures set to signal "that hit was oil-matched". It works, but it depends on event
+  ordering between separately registered handlers, and the bonus can leak onto a different target
+  inside its window. `NOTES-oil-consolidation.txt` in the repo root has the full write-up and the
+  intended fix.
+- **`OilDamage` is read by `CorrectOilStart` at the moment the effect starts.** If oil damage changes
+  while `CorrectOil` is already active, the modifier keeps the old value until the effect is
+  re-applied. Harmless in practice, since the only source is the Luck effect.
+- **Six element files use unicode escapes and a BOM** (`AltQuenCast`, `QuenActiveShieldAura`,
+  `QuenActiveShieldTick`, `QuenBlock`, `SignCastHold`, `SignCastHoldCost`). They store `<` as a
+  literal escape sequence rather than the character, so ordinary text search and replace will not
+  match them. MCreator reads them fine; only tooling is affected.
+- **Armour is no longer tracked.** The old `witchercraftArmor` variable was written and never read,
+  and went with the base-stats procedure.

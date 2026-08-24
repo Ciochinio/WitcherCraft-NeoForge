@@ -19,6 +19,11 @@
         "attribute": "CUSTOM:DodgeChance",
         "amount": 5.0,
         "operation": "ADD_VALUE"
+      },
+      {
+        "attribute": "ATTACK_SPEED",
+        "amount": 0.55,
+        "operation": "ADD_MULTIPLIED_BASE"
       }
     ]
   }

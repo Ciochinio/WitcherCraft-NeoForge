@@ -3,6 +3,7 @@ package net.redboltmedia.witchercraft.procedures;
 import net.redboltmedia.witchercraft.init.WitchercraftModAttributes;
 import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
 
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.server.level.ServerPlayer;
@@ -13,13 +14,13 @@ public class WitchercraftPlayerStatsProcedure {
 		if (entity == null)
 			return;
 		if (entity instanceof ServerPlayer _player)
-			_player.sendSystemMessage(Component.literal(("Health" + entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftHealth)), false);
+			_player.sendSystemMessage(Component.literal(("Health" + (entity instanceof LivingEntity _livingEntityMH && _livingEntityMH.getAttributes().hasAttribute(Attributes.MAX_HEALTH) ? _livingEntityMH.getAttribute(Attributes.MAX_HEALTH).getValue() : 0))), false);
 		if (entity instanceof ServerPlayer _player)
-			_player.sendSystemMessage(Component.literal(("Movement Speed " + entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftMovementSpeed)), false);
+			_player.sendSystemMessage(Component.literal(("Movement Speed " + (entity instanceof LivingEntity _livingEntityMS && _livingEntityMS.getAttributes().hasAttribute(Attributes.MOVEMENT_SPEED) ? _livingEntityMS.getAttribute(Attributes.MOVEMENT_SPEED).getValue() : 0))), false);
 		if (entity instanceof ServerPlayer _player)
 			_player.sendSystemMessage(Component.literal(("Armor" + (entity instanceof LivingEntity _livEnt ? _livEnt.getArmorValue() : 0))), false);
 		if (entity instanceof ServerPlayer _player)
-			_player.sendSystemMessage(Component.literal(("Attack Speed" + entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAttackSpeed)), false);
+			_player.sendSystemMessage(Component.literal(("Attack Speed" + (entity instanceof LivingEntity _livingEntityAS && _livingEntityAS.getAttributes().hasAttribute(Attributes.ATTACK_SPEED) ? _livingEntityAS.getAttribute(Attributes.ATTACK_SPEED).getValue() : 0))), false);
 		if (entity instanceof ServerPlayer _player)
 			_player.sendSystemMessage(Component.literal(("Crit Rate" + ((entity instanceof LivingEntity _livingEntityCC && _livingEntityCC.getAttributes().hasAttribute(WitchercraftModAttributes.CRIT_CHANCE) ? _livingEntityCC.getAttribute(WitchercraftModAttributes.CRIT_CHANCE).getValue() : 0) + "%"))), false);
 		if (entity instanceof ServerPlayer _player)

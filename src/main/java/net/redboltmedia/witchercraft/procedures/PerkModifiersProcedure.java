@@ -12,6 +12,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.LivingEntity;
@@ -74,5 +75,8 @@ public class PerkModifiersProcedure {
 		sync(entity, _vars.witchercraftAbilitiesSunAndStars && bright, "perk_sun_and_stars_day", WitchercraftModAttributes.PASSIVE_HEALTH_REGEN, 0.3333);
 		sync(entity, _vars.witchercraftAbilitiesSunAndStars && !bright, "perk_sun_and_stars_night", WitchercraftModAttributes.PASSIVE_STAMINA_REGEN, 0.3333);
 		sync(entity, _vars.witchercraftAbilitiesGourmet, "perk_gourmet", WitchercraftModAttributes.PASSIVE_STAMINA_REGEN, 0.3333);
+		sync(entity, _vars.witchercraftAbilitiesSurvivalInstinct, "perk_survival_instinct", Attributes.MAX_HEALTH, 0.15, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+		sync(entity, _vars.witchercraftAbilitiesDefence, "perk_defence", Attributes.MAX_HEALTH, 4);
+		sync(entity, _vars.witchercraftAbilitiesFleetFooted, "perk_fleet_footed", Attributes.MOVEMENT_SPEED, 0.15, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
 	}
 }
