@@ -31,10 +31,14 @@ public class ConditionalModifiersProcedure {
 	}
 
 	private static void sync(Entity entity, boolean active, String id, Holder<Attribute> attribute, double amount) {
+		sync(entity, active, id, attribute, amount, AttributeModifier.Operation.ADD_VALUE);
+	}
+
+	private static void sync(Entity entity, boolean active, String id, Holder<Attribute> attribute, double amount, AttributeModifier.Operation op) {
 		if (!(entity instanceof LivingEntity _entity) || _entity.getAttribute(attribute) == null)
 			return;
 		if (active) {
-			AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:" + id), amount, AttributeModifier.Operation.ADD_VALUE);
+			AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:" + id), amount, op);
 			if (!_entity.getAttribute(attribute).hasModifier(modifier.id()))
 				_entity.getAttribute(attribute).addTransientModifier(modifier);
 		} else {
@@ -54,5 +58,11 @@ public class ConditionalModifiersProcedure {
 		sync(entity, waterHagFull, "effect_waterhag_fullhp", WitchercraftModAttributes.INCREASED_DAMAGE, 40);
 		boolean nekkerRiding = entity instanceof LivingEntity _livEnt2 && _livEnt2.hasEffect(WitchercraftModMobEffects.NEKKER_WARRIOR_DECOCTION_EFFECT) && entity.isPassenger();
 		sync(entity, nekkerRiding, "effect_nekker_riding", WitchercraftModAttributes.INCREASED_DAMAGE, 50);
+		boolean werewolfNight = entity instanceof LivingEntity _livEnt3 && _livEnt3.hasEffect(WitchercraftModMobEffects.WEREWOLF_DECOCTION_EFFECT) && !(world instanceof Level _lvlR && _lvlR.isRaining())
+				&& !(world instanceof Level _lvlB && _lvlB.isBrightOutside());
+		sync(entity, werewolfNight, "effect_werewolf_night", WitchercraftModAttributes.PASSIVE_STAMINA_REGEN, 0.3333);
+		boolean inCombat = entity instanceof LivingEntity _livEnt4 && _livEnt4.hasEffect(WitchercraftModMobEffects.IN_COMBAT);
+		sync(entity, inCombat, "combat_regen_penalty", WitchercraftModAttributes.PASSIVE_HEALTH_REGEN, -0.5, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+		sync(entity, inCombat, "combat_regen_penalty", WitchercraftModAttributes.PASSIVE_STAMINA_REGEN, -0.5, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
 	}
 }

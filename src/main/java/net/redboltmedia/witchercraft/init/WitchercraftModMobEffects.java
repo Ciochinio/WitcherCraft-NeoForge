@@ -3,11 +3,7 @@
  */
 package net.redboltmedia.witchercraft.init;
 
-import net.redboltmedia.witchercraft.procedures.WyvernDecoctionEndProcedure;
-import net.redboltmedia.witchercraft.procedures.SuccubusDecoctionEndProcedure;
-import net.redboltmedia.witchercraft.procedures.QuenBrokeProcedure;
-import net.redboltmedia.witchercraft.procedures.QuenActiveShieldDropProcedure;
-import net.redboltmedia.witchercraft.procedures.CorrectOilEndProcedure;
+import net.redboltmedia.witchercraft.procedures.*;
 import net.redboltmedia.witchercraft.potion.*;
 import net.redboltmedia.witchercraft.WitchercraftMod;
 
@@ -97,6 +93,8 @@ public class WitchercraftModMobEffects {
 			WyvernDecoctionEndProcedure.execute(entity);
 		} else if (effectInstance.is(SUCCUBUS_DECOCTION_EFFECT)) {
 			SuccubusDecoctionEndProcedure.execute(entity);
+		} else if (effectInstance.is(GRAVE_HAG_DECOCTION_EFFECT)) {
+			GraveHagDecoctionEndProcedure.execute(entity);
 		} else if (effectInstance.is(QUEN_ACTIVE_SHIELD)) {
 			QuenActiveShieldDropProcedure.execute(entity);
 		} else if (effectInstance.is(QUEN_EFFECT)) {

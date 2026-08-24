@@ -21,6 +21,10 @@ public class WitchercraftModAttributes {
 	public static final DeferredRegister<Attribute> REGISTRY = DeferredRegister.create(BuiltInRegistries.ATTRIBUTE, WitchercraftMod.MODID);
 	public static final DeferredHolder<Attribute, Attribute> CRIT_CHANCE = REGISTRY.register("crit_chance", () -> new RangedAttribute("attribute.witchercraft.crit_chance", 5d, 0d, 100d).setSyncable(true));
 	public static final DeferredHolder<Attribute, Attribute> CRIT_DAMAGE = REGISTRY.register("crit_damage", () -> new RangedAttribute("attribute.witchercraft.crit_damage", 115d, 0d, 1000d).setSyncable(true));
+	public static final DeferredHolder<Attribute, Attribute> PASSIVE_HEALTH_REGEN = REGISTRY.register("passive_health_regen", () -> new RangedAttribute("attribute.witchercraft.passive_health_regen", 0d, 0d, 100d).setSyncable(true));
+	public static final DeferredHolder<Attribute, Attribute> PASSIVE_STAMINA_REGEN = REGISTRY.register("passive_stamina_regen", () -> new RangedAttribute("attribute.witchercraft.passive_stamina_regen", 0d, 0d, 100d).setSyncable(true));
+	public static final DeferredHolder<Attribute, Attribute> TOXICITY_OVERDOSE_THRESHOLD = REGISTRY.register("toxicity_overdose_threshold",
+			() -> new RangedAttribute("attribute.witchercraft.toxicity_overdose_threshold", 70d, 0d, 1000d).setSyncable(true));
 	public static final DeferredHolder<Attribute, Attribute> INCREASED_DAMAGE = REGISTRY.register("increased_damage", () -> new RangedAttribute("attribute.witchercraft.increased_damage", 0d, -100d, 1000d).setSyncable(true));
 	public static final DeferredHolder<Attribute, Attribute> ADDITIONAL_DAMAGE = REGISTRY.register("additional_damage", () -> new RangedAttribute("attribute.witchercraft.additional_damage", 0d, 0d, 1000d).setSyncable(true));
 	public static final DeferredHolder<Attribute, Attribute> DODGE_CHANCE = REGISTRY.register("dodge_chance", () -> new RangedAttribute("attribute.witchercraft.dodge_chance", 0d, 0d, 100d).setSyncable(true));
@@ -33,6 +37,9 @@ public class WitchercraftModAttributes {
 	public static void addAttributes(EntityAttributeModificationEvent event) {
 		event.add(EntityType.PLAYER, CRIT_CHANCE);
 		event.add(EntityType.PLAYER, CRIT_DAMAGE);
+		event.add(EntityType.PLAYER, PASSIVE_HEALTH_REGEN);
+		event.add(EntityType.PLAYER, PASSIVE_STAMINA_REGEN);
+		event.add(EntityType.PLAYER, TOXICITY_OVERDOSE_THRESHOLD);
 		event.add(EntityType.PLAYER, INCREASED_DAMAGE);
 		event.add(EntityType.PLAYER, ADDITIONAL_DAMAGE);
 		event.add(EntityType.PLAYER, DODGE_CHANCE);

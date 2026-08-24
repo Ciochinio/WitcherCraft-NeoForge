@@ -25,8 +25,8 @@ public class WitchercraftPlayerStatsProcedure {
 		if (entity instanceof ServerPlayer _player)
 			_player.sendSystemMessage(Component.literal(("Crit Damage" + ((entity instanceof LivingEntity _livingEntityCD && _livingEntityCD.getAttributes().hasAttribute(WitchercraftModAttributes.CRIT_DAMAGE) ? _livingEntityCD.getAttribute(WitchercraftModAttributes.CRIT_DAMAGE).getValue() : 0) + "%"))), false);
 		if (entity instanceof ServerPlayer _player)
-			_player.sendSystemMessage(Component.literal(("Passive Health Regeneration" + (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPassiveHealthRegeneration + "Hp/2s"))), false);
+			_player.sendSystemMessage(Component.literal(("Passive Health Regeneration" + ((entity instanceof LivingEntity _livingEntityPHR && _livingEntityPHR.getAttributes().hasAttribute(WitchercraftModAttributes.PASSIVE_HEALTH_REGEN) ? _livingEntityPHR.getAttribute(WitchercraftModAttributes.PASSIVE_HEALTH_REGEN).getValue() : 0) + "Hp/2s"))), false);
 		if (entity instanceof ServerPlayer _player)
-			_player.sendSystemMessage(Component.literal(("Passive Stamina Regeneration" + (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPassiveStaminaRegeneration + "Stamina/2s"))), false);
+			_player.sendSystemMessage(Component.literal(("Passive Stamina Regeneration" + ((entity instanceof LivingEntity _livingEntityPSR && _livingEntityPSR.getAttributes().hasAttribute(WitchercraftModAttributes.PASSIVE_STAMINA_REGEN) ? _livingEntityPSR.getAttribute(WitchercraftModAttributes.PASSIVE_STAMINA_REGEN).getValue() : 0) + "Stamina/2s"))), false);
 	}
 }

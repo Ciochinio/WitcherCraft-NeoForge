@@ -9,6 +9,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.bus.api.Event;
 
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -32,10 +33,14 @@ public class PerkModifiersProcedure {
 	}
 
 	private static void sync(Entity entity, boolean active, String id, Holder<Attribute> attribute, double amount) {
+		sync(entity, active, id, attribute, amount, AttributeModifier.Operation.ADD_VALUE);
+	}
+
+	private static void sync(Entity entity, boolean active, String id, Holder<Attribute> attribute, double amount, AttributeModifier.Operation op) {
 		if (!(entity instanceof LivingEntity _entity) || _entity.getAttribute(attribute) == null)
 			return;
 		if (active) {
-			AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:" + id), amount, AttributeModifier.Operation.ADD_VALUE);
+			AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:" + id), amount, op);
 			if (!_entity.getAttribute(attribute).hasModifier(modifier.id()))
 				_entity.getAttribute(attribute).addTransientModifier(modifier);
 		} else {
@@ -65,5 +70,9 @@ public class PerkModifiersProcedure {
 		sync(entity, _vars.witchercraftAbilitiesMuscleMemory, "perk_muscle_memory", WitchercraftModAttributes.ADDITIONAL_DAMAGE, 3);
 		sync(entity, _vars.witchercraftAbilitiesColdBlood && !_vars.witchercraftEnemyNearby, "perk_cold_blood", WitchercraftModAttributes.ADDITIONAL_DAMAGE, 5);
 		sync(entity, _vars.witchercraftAbilitiesFloodOfAnger && _vars.witchercraftEnemyNearby, "perk_flood_of_anger", WitchercraftModAttributes.ADDITIONAL_DAMAGE, 5);
+		boolean bright = world instanceof Level _lvlD && _lvlD.isBrightOutside();
+		sync(entity, _vars.witchercraftAbilitiesSunAndStars && bright, "perk_sun_and_stars_day", WitchercraftModAttributes.PASSIVE_HEALTH_REGEN, 0.3333);
+		sync(entity, _vars.witchercraftAbilitiesSunAndStars && !bright, "perk_sun_and_stars_night", WitchercraftModAttributes.PASSIVE_STAMINA_REGEN, 0.3333);
+		sync(entity, _vars.witchercraftAbilitiesGourmet, "perk_gourmet", WitchercraftModAttributes.PASSIVE_STAMINA_REGEN, 0.3333);
 	}
 }

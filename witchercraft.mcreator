@@ -1635,6 +1635,19 @@
       "path": "~/Character Stats/Stats/VariableStats/PassiveRegeneration"
     },
     {
+      "name": "PassiveHealthRegen",
+      "type": "attribute",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "passive_health_regen",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
+        ]
+      },
+      "path": "~/Character Stats/Stats/VariableStats/PassiveRegeneration"
+    },
+    {
       "name": "TawnyOwlEffect",
       "type": "potioneffect",
       "compiles": true,
@@ -1685,6 +1698,19 @@
             "name": "world",
             "type": "world"
           }
+        ]
+      },
+      "path": "~/Character Stats/Stats/VariableStats/PassiveStaminaRegeneration"
+    },
+    {
+      "name": "PassiveStaminaRegen",
+      "type": "attribute",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "passive_stamina_regen",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
         ]
       },
       "path": "~/Character Stats/Stats/VariableStats/PassiveStaminaRegeneration"
@@ -5156,6 +5182,19 @@
         ]
       },
       "path": "~/Character Stats/Stats/Gui"
+    },
+    {
+      "name": "ToxicityOverdoseThreshold",
+      "type": "attribute",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "toxicity_overdose_threshold",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
+        ]
+      },
+      "path": "~/Alchemy/ Toxicity"
     },
     {
       "name": "IncreasedDamage",
@@ -9221,6 +9260,48 @@
       "path": "~/Alchemy/Decoctions/Grave Hag Decoction"
     },
     {
+      "name": "GraveHagDecoctionEnd",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "grave_hag_decoction_end",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/GraveHagDecoctionEndProcedure.java"
+        ]
+      },
+      "path": "~/Alchemy/Decoctions/Grave Hag Decoction"
+    },
+    {
+      "name": "GraveHagDecoctionTick",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "grave_hag_decoction_tick",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/GraveHagDecoctionTickProcedure.java"
+        ]
+      },
+      "path": "~/Alchemy/Decoctions/Grave Hag Decoction"
+    },
+    {
       "name": "CharacterAbilitiesCombatSkillPointsUsed",
       "type": "procedure",
       "compiles": true,
@@ -10402,24 +10483,6 @@
       "value": "0"
     },
     {
-      "name": "witchercraftPassiveHealthRegeneration",
-      "type": "number",
-      "scope": "player_lifetime",
-      "value": "0"
-    },
-    {
-      "name": "witchercraftBasePassiveHealthRegeneration",
-      "type": "number",
-      "scope": "player_lifetime",
-      "value": "0"
-    },
-    {
-      "name": "witchercraftPassiveStaminaRegeneration",
-      "type": "number",
-      "scope": "player_lifetime",
-      "value": "0"
-    },
-    {
       "name": "witchercraftAbilitiesLearned",
       "type": "number",
       "scope": "player_persistent",
@@ -10720,12 +10783,6 @@
       "value": "0"
     },
     {
-      "name": "witchercraftToxicityOverdoseThreshold",
-      "type": "number",
-      "scope": "player_lifetime",
-      "value": "0.0"
-    },
-    {
       "name": "witchercraftAbilitiesCombatSkillPointsUsed",
       "type": "number",
       "scope": "player_persistent",
@@ -10757,12 +10814,6 @@
     },
     {
       "name": "witchercraftQuenShieldMax",
-      "type": "number",
-      "scope": "player_lifetime",
-      "value": "0"
-    },
-    {
-      "name": "witchercraftBasePassiveStaminaRegeneration",
       "type": "number",
       "scope": "player_lifetime",
       "value": "0"
@@ -11155,6 +11206,9 @@
       "attribute.witchercraft.crit_damage": "Crit Damage",
       "attribute.witchercraft.increased_damage": "Increased Damage",
       "attribute.witchercraft.additional_damage": "Additional Damage",
+      "attribute.witchercraft.toxicity_overdose_threshold": "Toxicity Overdose Threshold",
+      "attribute.witchercraft.passive_health_regen": "Passive Health Regeneration",
+      "attribute.witchercraft.passive_stamina_regen": "Passive Stamina Regeneration",
       "effect.witchercraft.enemy_nearby": "Enemy Nearby",
       "effect.witchercraft.undying_cooldown": "Undying Cooldown",
       "gui.witchercraft.player_stats_overlay.label_dodge_chance": "Dodge Chance",
