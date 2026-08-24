@@ -11,12 +11,15 @@ public class GraveHagDecoctionEndProcedure {
 	public static void execute(Entity entity) {
 		if (entity == null)
 			return;
-		{
-			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-			_vars.witchercraftGraveHagDecoctionKill = 0;
-			_vars.markSyncDirty();
+		if (entity instanceof LivingEntity _livingEntityPHR && _livingEntityPHR.getAttributes().hasAttribute(WitchercraftModAttributes.PASSIVE_HEALTH_REGEN)) {
+			{
+				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+				_vars.witchercraftGraveHagDecoctionKill = 0;
+				_vars.markSyncDirty();
+			}
+			if (entity instanceof LivingEntity _entity) {
+				_entity.getAttribute(WitchercraftModAttributes.PASSIVE_HEALTH_REGEN).removeModifier(Identifier.parse("witchercraft:effect_grave_hag_kills"));
+			}
 		}
-		if (entity instanceof LivingEntity _entity && _entity.getAttribute(WitchercraftModAttributes.PASSIVE_HEALTH_REGEN) != null)
-			_entity.getAttribute(WitchercraftModAttributes.PASSIVE_HEALTH_REGEN).removeModifier(Identifier.parse("witchercraft:effect_grave_hag_kills"));
 	}
 }

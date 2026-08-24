@@ -29,27 +29,33 @@ public class GraveHagDecoctionHitProcedure {
 		execute(null, sourceentity);
 	}
 
-	public static void refresh(Entity sourceentity) {
-		if (!(sourceentity instanceof LivingEntity _entity) || _entity.getAttribute(WitchercraftModAttributes.PASSIVE_HEALTH_REGEN) == null)
-			return;
-		_entity.getAttribute(WitchercraftModAttributes.PASSIVE_HEALTH_REGEN).removeModifier(Identifier.parse("witchercraft:effect_grave_hag_kills"));
-		if (_entity.hasEffect(WitchercraftModMobEffects.GRAVE_HAG_DECOCTION_EFFECT) && _entity.hasEffect(WitchercraftModMobEffects.IN_COMBAT))
-			_entity.getAttribute(WitchercraftModAttributes.PASSIVE_HEALTH_REGEN)
-					.addTransientModifier(new AttributeModifier(Identifier.parse("witchercraft:effect_grave_hag_kills"),
-							Math.round(sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftGraveHagDecoctionKill / 2) * 0.3333, AttributeModifier.Operation.ADD_VALUE));
-	}
-
 	private static void execute(@Nullable Event event, Entity sourceentity) {
 		if (sourceentity == null)
 			return;
-		if (sourceentity instanceof LivingEntity _livEnt0 && _livEnt0.hasEffect(WitchercraftModMobEffects.GRAVE_HAG_DECOCTION_EFFECT) && sourceentity instanceof LivingEntity _livEnt1
-				&& _livEnt1.hasEffect(WitchercraftModMobEffects.IN_COMBAT)) {
-			if (sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftGraveHagDecoctionKill < 10) {
-				WitchercraftModVariables.PlayerVariables _vars = sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-				_vars.witchercraftGraveHagDecoctionKill = sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftGraveHagDecoctionKill + 1;
-				_vars.markSyncDirty();
+		if (sourceentity instanceof LivingEntity _livingEntitySRCPHR && _livingEntitySRCPHR.getAttributes().hasAttribute(WitchercraftModAttributes.PASSIVE_HEALTH_REGEN)) {
+			if (sourceentity instanceof LivingEntity _livEnt0 && _livEnt0.hasEffect(WitchercraftModMobEffects.GRAVE_HAG_DECOCTION_EFFECT) && sourceentity instanceof LivingEntity _livEnt1
+					&& _livEnt1.hasEffect(WitchercraftModMobEffects.IN_COMBAT)) {
+				if (sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftGraveHagDecoctionKill < 10) {
+					{
+						WitchercraftModVariables.PlayerVariables _vars = sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+						_vars.witchercraftGraveHagDecoctionKill = sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftGraveHagDecoctionKill + 1;
+						_vars.markSyncDirty();
+					}
+				}
+			}
+			if (sourceentity instanceof LivingEntity _entity) {
+				_entity.getAttribute(WitchercraftModAttributes.PASSIVE_HEALTH_REGEN).removeModifier(Identifier.parse("witchercraft:effect_grave_hag_kills"));
+			}
+			if (sourceentity instanceof LivingEntity _livEnt2 && _livEnt2.hasEffect(WitchercraftModMobEffects.GRAVE_HAG_DECOCTION_EFFECT) && sourceentity instanceof LivingEntity _livEnt3
+					&& _livEnt3.hasEffect(WitchercraftModMobEffects.IN_COMBAT)) {
+				if (sourceentity instanceof LivingEntity _entity) {
+					AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:effect_grave_hag_kills"),
+							Math.round(sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftGraveHagDecoctionKill / 2) * 0.3333, AttributeModifier.Operation.ADD_VALUE);
+					if (!_entity.getAttribute(WitchercraftModAttributes.PASSIVE_HEALTH_REGEN).hasModifier(modifier.id())) {
+						_entity.getAttribute(WitchercraftModAttributes.PASSIVE_HEALTH_REGEN).addTransientModifier(modifier);
+					}
+				}
 			}
 		}
-		refresh(sourceentity);
 	}
 }

@@ -32,30 +32,32 @@ public class WyvernDecoctionHitProcedure {
 	private static void execute(@Nullable Event event, Entity sourceentity) {
 		if (sourceentity == null)
 			return;
-		if (sourceentity instanceof LivingEntity _livEnt0 && _livEnt0.hasEffect(WitchercraftModMobEffects.WYVERN_DECOCTION_EFFECT)) {
-			if (sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftWyvernDecoctionHit < 10) {
+		if (sourceentity instanceof LivingEntity _livingEntitySRCID && _livingEntitySRCID.getAttributes().hasAttribute(WitchercraftModAttributes.INCREASED_DAMAGE)) {
+			if (sourceentity instanceof LivingEntity _livEnt0 && _livEnt0.hasEffect(WitchercraftModMobEffects.WYVERN_DECOCTION_EFFECT)) {
+				if (sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftWyvernDecoctionHit < 10) {
+					{
+						WitchercraftModVariables.PlayerVariables _vars = sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+						_vars.witchercraftWyvernDecoctionHit = sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftWyvernDecoctionHit + 1;
+						_vars.markSyncDirty();
+					}
+				}
+			} else {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-					_vars.witchercraftWyvernDecoctionHit = sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftWyvernDecoctionHit + 1;
+					_vars.witchercraftWyvernDecoctionHit = 0;
 					_vars.markSyncDirty();
 				}
 			}
-		} else {
-			{
-				WitchercraftModVariables.PlayerVariables _vars = sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-				_vars.witchercraftWyvernDecoctionHit = 0;
-				_vars.markSyncDirty();
-			}
-		}
-		if (sourceentity instanceof LivingEntity _entity) {
-			_entity.getAttribute(WitchercraftModAttributes.INCREASED_DAMAGE).removeModifier(Identifier.parse("witchercraft:effect_wyvern_hits"));
-		}
-		if (sourceentity instanceof LivingEntity _livEnt2 && _livEnt2.hasEffect(WitchercraftModMobEffects.WYVERN_DECOCTION_EFFECT)) {
 			if (sourceentity instanceof LivingEntity _entity) {
-				AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:effect_wyvern_hits"), sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftWyvernDecoctionHit,
-						AttributeModifier.Operation.ADD_VALUE);
-				if (!_entity.getAttribute(WitchercraftModAttributes.INCREASED_DAMAGE).hasModifier(modifier.id())) {
-					_entity.getAttribute(WitchercraftModAttributes.INCREASED_DAMAGE).addTransientModifier(modifier);
+				_entity.getAttribute(WitchercraftModAttributes.INCREASED_DAMAGE).removeModifier(Identifier.parse("witchercraft:effect_wyvern_hits"));
+			}
+			if (sourceentity instanceof LivingEntity _livEnt2 && _livEnt2.hasEffect(WitchercraftModMobEffects.WYVERN_DECOCTION_EFFECT)) {
+				if (sourceentity instanceof LivingEntity _entity) {
+					AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:effect_wyvern_hits"), sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftWyvernDecoctionHit,
+							AttributeModifier.Operation.ADD_VALUE);
+					if (!_entity.getAttribute(WitchercraftModAttributes.INCREASED_DAMAGE).hasModifier(modifier.id())) {
+						_entity.getAttribute(WitchercraftModAttributes.INCREASED_DAMAGE).addTransientModifier(modifier);
+					}
 				}
 			}
 		}
