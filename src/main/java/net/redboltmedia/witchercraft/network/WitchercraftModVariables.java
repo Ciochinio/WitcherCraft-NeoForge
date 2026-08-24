@@ -127,14 +127,12 @@ public class WitchercraftModVariables {
 			clone.witchercraftMovementSpeed = original.witchercraftMovementSpeed;
 			clone.witchercraftHealth = original.witchercraftHealth;
 			clone.witchercraftArmor = original.witchercraftArmor;
-			clone.witchercraftAdditionalDamage = original.witchercraftAdditionalDamage;
 			clone.witchercraftAttackSpeed = original.witchercraftAttackSpeed;
 			clone.witchercraftPassiveHealthRegeneration = original.witchercraftPassiveHealthRegeneration;
 			clone.witchercraftBasePassiveHealthRegeneration = original.witchercraftBasePassiveHealthRegeneration;
 			clone.witchercraftPassiveStaminaRegeneration = original.witchercraftPassiveStaminaRegeneration;
 			clone.witchercraftToxicity = original.witchercraftToxicity;
 			clone.witchercraftToxicityOverdoseThreshold = original.witchercraftToxicityOverdoseThreshold;
-			clone.witchercraftIncreasedDamage = original.witchercraftIncreasedDamage;
 			clone.witchercraftEnemyNearby = original.witchercraftEnemyNearby;
 			clone.witchercraftQuenShield = original.witchercraftQuenShield;
 			clone.witchercraftQuenShieldMax = original.witchercraftQuenShieldMax;
@@ -158,7 +156,6 @@ public class WitchercraftModVariables {
 		public double witchercraftMovementSpeed = 0.0;
 		public double witchercraftHealth = 0.0;
 		public double witchercraftArmor = 0.0;
-		public double witchercraftAdditionalDamage = 0.0;
 		public double witchercraftAttackSpeed = 0;
 		public double witchercraftPassiveHealthRegeneration = 0;
 		public double witchercraftBasePassiveHealthRegeneration = 0;
@@ -214,7 +211,6 @@ public class WitchercraftModVariables {
 		public double witchercraftPlayerExperienceRequirement = 0.0;
 		public double witchercraftToxicity = 0;
 		public double witchercraftToxicityOverdoseThreshold = 0.0;
-		public double witchercraftIncreasedDamage = 0;
 		public double witchercraftAbilitiesCombatSkillPointsUsed = 0;
 		public double witchercraftAbilitiesAlchemySkillPointsUsed = 0;
 		public double witchercraftAbilitiesSignsSkillPointsUsed = 0;
@@ -238,7 +234,6 @@ public class WitchercraftModVariables {
 			output.putDouble("witchercraftMovementSpeed", witchercraftMovementSpeed);
 			output.putDouble("witchercraftHealth", witchercraftHealth);
 			output.putDouble("witchercraftArmor", witchercraftArmor);
-			output.putDouble("witchercraftAdditionalDamage", witchercraftAdditionalDamage);
 			output.putDouble("witchercraftAttackSpeed", witchercraftAttackSpeed);
 			output.putDouble("witchercraftPassiveHealthRegeneration", witchercraftPassiveHealthRegeneration);
 			output.putDouble("witchercraftBasePassiveHealthRegeneration", witchercraftBasePassiveHealthRegeneration);
@@ -294,7 +289,6 @@ public class WitchercraftModVariables {
 			output.putDouble("witchercraftPlayerExperienceRequirement", witchercraftPlayerExperienceRequirement);
 			output.putDouble("witchercraftToxicity", witchercraftToxicity);
 			output.putDouble("witchercraftToxicityOverdoseThreshold", witchercraftToxicityOverdoseThreshold);
-			output.putDouble("witchercraftIncreasedDamage", witchercraftIncreasedDamage);
 			output.putDouble("witchercraftAbilitiesCombatSkillPointsUsed", witchercraftAbilitiesCombatSkillPointsUsed);
 			output.putDouble("witchercraftAbilitiesAlchemySkillPointsUsed", witchercraftAbilitiesAlchemySkillPointsUsed);
 			output.putDouble("witchercraftAbilitiesSignsSkillPointsUsed", witchercraftAbilitiesSignsSkillPointsUsed);
@@ -319,7 +313,6 @@ public class WitchercraftModVariables {
 			witchercraftMovementSpeed = input.getDoubleOr("witchercraftMovementSpeed", 0);
 			witchercraftHealth = input.getDoubleOr("witchercraftHealth", 0);
 			witchercraftArmor = input.getDoubleOr("witchercraftArmor", 0);
-			witchercraftAdditionalDamage = input.getDoubleOr("witchercraftAdditionalDamage", 0);
 			witchercraftAttackSpeed = input.getDoubleOr("witchercraftAttackSpeed", 0);
 			witchercraftPassiveHealthRegeneration = input.getDoubleOr("witchercraftPassiveHealthRegeneration", 0);
 			witchercraftBasePassiveHealthRegeneration = input.getDoubleOr("witchercraftBasePassiveHealthRegeneration", 0);
@@ -375,7 +368,6 @@ public class WitchercraftModVariables {
 			witchercraftPlayerExperienceRequirement = input.getDoubleOr("witchercraftPlayerExperienceRequirement", 0);
 			witchercraftToxicity = input.getDoubleOr("witchercraftToxicity", 0);
 			witchercraftToxicityOverdoseThreshold = input.getDoubleOr("witchercraftToxicityOverdoseThreshold", 0);
-			witchercraftIncreasedDamage = input.getDoubleOr("witchercraftIncreasedDamage", 0);
 			witchercraftAbilitiesCombatSkillPointsUsed = input.getDoubleOr("witchercraftAbilitiesCombatSkillPointsUsed", 0);
 			witchercraftAbilitiesAlchemySkillPointsUsed = input.getDoubleOr("witchercraftAbilitiesAlchemySkillPointsUsed", 0);
 			witchercraftAbilitiesSignsSkillPointsUsed = input.getDoubleOr("witchercraftAbilitiesSignsSkillPointsUsed", 0);

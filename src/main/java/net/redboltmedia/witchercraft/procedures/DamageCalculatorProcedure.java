@@ -41,16 +41,16 @@ public class DamageCalculatorProcedure {
 				if (sourceentity instanceof LivingEntity _livEnt5 && _livEnt5.hasEffect(WitchercraftModMobEffects.DEV_LOG)) {
 					if (sourceentity instanceof ServerPlayer _player)
 						_player.sendSystemMessage(Component.literal(("BAZA"
-								+ (amount + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAdditionalDamage) * (1 + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftIncreasedDamage * 0.01))),
+								+ (amount + (sourceentity instanceof LivingEntity _livingEntitySRCAD && _livingEntitySRCAD.getAttributes().hasAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE) ? _livingEntitySRCAD.getAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE).getValue() : 0)) * (1 + (sourceentity instanceof LivingEntity _livingEntitySRCID && _livingEntitySRCID.getAttributes().hasAttribute(WitchercraftModAttributes.INCREASED_DAMAGE) ? _livingEntitySRCID.getAttribute(WitchercraftModAttributes.INCREASED_DAMAGE).getValue() : 0) * 0.01))),
 								false);
 					if (sourceentity instanceof ServerPlayer _player)
 						_player.sendSystemMessage(
-								Component.literal(("CRIT!" + (amount + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAdditionalDamage)
-										* (1 + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftIncreasedDamage * 0.01) * (sourceentity instanceof LivingEntity _livingEntitySRCCD && _livingEntitySRCCD.getAttributes().hasAttribute(WitchercraftModAttributes.CRIT_DAMAGE) ? _livingEntitySRCCD.getAttribute(WitchercraftModAttributes.CRIT_DAMAGE).getValue() : 0) * 0.01)),
+								Component.literal(("CRIT!" + (amount + (sourceentity instanceof LivingEntity _livingEntitySRCAD && _livingEntitySRCAD.getAttributes().hasAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE) ? _livingEntitySRCAD.getAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE).getValue() : 0))
+										* (1 + (sourceentity instanceof LivingEntity _livingEntitySRCID && _livingEntitySRCID.getAttributes().hasAttribute(WitchercraftModAttributes.INCREASED_DAMAGE) ? _livingEntitySRCID.getAttribute(WitchercraftModAttributes.INCREASED_DAMAGE).getValue() : 0) * 0.01) * (sourceentity instanceof LivingEntity _livingEntitySRCCD && _livingEntitySRCCD.getAttributes().hasAttribute(WitchercraftModAttributes.CRIT_DAMAGE) ? _livingEntitySRCCD.getAttribute(WitchercraftModAttributes.CRIT_DAMAGE).getValue() : 0) * 0.01)),
 								false);
 					if (sourceentity instanceof ServerPlayer _player)
 						_player.sendSystemMessage(Component.literal(("Steal:"
-								+ (amount + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAdditionalDamage) * (1 + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftIncreasedDamage * 0.01)
+								+ (amount + (sourceentity instanceof LivingEntity _livingEntitySRCAD && _livingEntitySRCAD.getAttributes().hasAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE) ? _livingEntitySRCAD.getAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE).getValue() : 0)) * (1 + (sourceentity instanceof LivingEntity _livingEntitySRCID && _livingEntitySRCID.getAttributes().hasAttribute(WitchercraftModAttributes.INCREASED_DAMAGE) ? _livingEntitySRCID.getAttribute(WitchercraftModAttributes.INCREASED_DAMAGE).getValue() : 0) * 0.01)
 										* (sourceentity instanceof LivingEntity _livingEntitySRCCD && _livingEntitySRCCD.getAttributes().hasAttribute(WitchercraftModAttributes.CRIT_DAMAGE) ? _livingEntitySRCCD.getAttribute(WitchercraftModAttributes.CRIT_DAMAGE).getValue() : 0) * 0.01 * (sourceentity instanceof LivingEntity _livingEntityLS && _livingEntityLS.getAttributes().hasAttribute(WitchercraftModAttributes.LIFE_STEAL) ? _livingEntityLS.getAttribute(WitchercraftModAttributes.LIFE_STEAL).getValue() : 0) * 0.01)),
 								false);
 				}
@@ -58,13 +58,13 @@ public class DamageCalculatorProcedure {
 					{
 						Entity _ent = entity;
 						if (_ent.level() instanceof ServerLevel _serverLevel) {
-							_ent.hurtServer(_serverLevel, new DamageSource(world.holderOrThrow(DamageTypes.PLAYER_ATTACK)), (float) ((amount + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAdditionalDamage)
-									* (1 + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftIncreasedDamage * 0.01) * (sourceentity instanceof LivingEntity _livingEntitySRCCD && _livingEntitySRCCD.getAttributes().hasAttribute(WitchercraftModAttributes.CRIT_DAMAGE) ? _livingEntitySRCCD.getAttribute(WitchercraftModAttributes.CRIT_DAMAGE).getValue() : 0) * 0.01));
+							_ent.hurtServer(_serverLevel, new DamageSource(world.holderOrThrow(DamageTypes.PLAYER_ATTACK)), (float) ((amount + (sourceentity instanceof LivingEntity _livingEntitySRCAD && _livingEntitySRCAD.getAttributes().hasAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE) ? _livingEntitySRCAD.getAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE).getValue() : 0))
+									* (1 + (sourceentity instanceof LivingEntity _livingEntitySRCID && _livingEntitySRCID.getAttributes().hasAttribute(WitchercraftModAttributes.INCREASED_DAMAGE) ? _livingEntitySRCID.getAttribute(WitchercraftModAttributes.INCREASED_DAMAGE).getValue() : 0) * 0.01) * (sourceentity instanceof LivingEntity _livingEntitySRCCD && _livingEntitySRCCD.getAttributes().hasAttribute(WitchercraftModAttributes.CRIT_DAMAGE) ? _livingEntitySRCCD.getAttribute(WitchercraftModAttributes.CRIT_DAMAGE).getValue() : 0) * 0.01));
 						}
 					}
 					if (sourceentity instanceof LivingEntity _entity)
 						_entity.setHealth((float) ((sourceentity instanceof LivingEntity _livEnt ? _livEnt.getHealth() : -1)
-								+ (amount + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAdditionalDamage) * (1 + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftIncreasedDamage * 0.01)
+								+ (amount + (sourceentity instanceof LivingEntity _livingEntitySRCAD && _livingEntitySRCAD.getAttributes().hasAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE) ? _livingEntitySRCAD.getAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE).getValue() : 0)) * (1 + (sourceentity instanceof LivingEntity _livingEntitySRCID && _livingEntitySRCID.getAttributes().hasAttribute(WitchercraftModAttributes.INCREASED_DAMAGE) ? _livingEntitySRCID.getAttribute(WitchercraftModAttributes.INCREASED_DAMAGE).getValue() : 0) * 0.01)
 										* (sourceentity instanceof LivingEntity _livingEntitySRCCD && _livingEntitySRCCD.getAttributes().hasAttribute(WitchercraftModAttributes.CRIT_DAMAGE) ? _livingEntitySRCCD.getAttribute(WitchercraftModAttributes.CRIT_DAMAGE).getValue() : 0) * 0.01 * (sourceentity instanceof LivingEntity _livingEntityLS && _livingEntityLS.getAttributes().hasAttribute(WitchercraftModAttributes.LIFE_STEAL) ? _livingEntityLS.getAttribute(WitchercraftModAttributes.LIFE_STEAL).getValue() : 0) * 0.01));
 				});
 			}
@@ -73,26 +73,26 @@ public class DamageCalculatorProcedure {
 				if (sourceentity instanceof ServerPlayer _player)
 					_player.sendSystemMessage(Component.literal(("Baza" + amount)), false);
 				if (sourceentity instanceof ServerPlayer _player)
-					_player.sendSystemMessage(Component.literal(("Additional Flat" + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAdditionalDamage)), false);
+					_player.sendSystemMessage(Component.literal(("Additional Flat" + (sourceentity instanceof LivingEntity _livingEntitySRCAD && _livingEntitySRCAD.getAttributes().hasAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE) ? _livingEntitySRCAD.getAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE).getValue() : 0))), false);
 				if (sourceentity instanceof ServerPlayer _player)
 					_player.sendSystemMessage(Component.literal(("Combined Damage"
-							+ (amount + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAdditionalDamage) * (1 + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftIncreasedDamage * 0.01) * 1)),
+							+ (amount + (sourceentity instanceof LivingEntity _livingEntitySRCAD && _livingEntitySRCAD.getAttributes().hasAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE) ? _livingEntitySRCAD.getAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE).getValue() : 0)) * (1 + (sourceentity instanceof LivingEntity _livingEntitySRCID && _livingEntitySRCID.getAttributes().hasAttribute(WitchercraftModAttributes.INCREASED_DAMAGE) ? _livingEntitySRCID.getAttribute(WitchercraftModAttributes.INCREASED_DAMAGE).getValue() : 0) * 0.01) * 1)),
 							false);
 				if (sourceentity instanceof ServerPlayer _player)
-					_player.sendSystemMessage(Component.literal(("Steal:" + (amount + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAdditionalDamage)
-							* (1 + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftIncreasedDamage * 0.01) * (sourceentity instanceof LivingEntity _livingEntityLS && _livingEntityLS.getAttributes().hasAttribute(WitchercraftModAttributes.LIFE_STEAL) ? _livingEntityLS.getAttribute(WitchercraftModAttributes.LIFE_STEAL).getValue() : 0) * 0.01)), false);
+					_player.sendSystemMessage(Component.literal(("Steal:" + (amount + (sourceentity instanceof LivingEntity _livingEntitySRCAD && _livingEntitySRCAD.getAttributes().hasAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE) ? _livingEntitySRCAD.getAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE).getValue() : 0))
+							* (1 + (sourceentity instanceof LivingEntity _livingEntitySRCID && _livingEntitySRCID.getAttributes().hasAttribute(WitchercraftModAttributes.INCREASED_DAMAGE) ? _livingEntitySRCID.getAttribute(WitchercraftModAttributes.INCREASED_DAMAGE).getValue() : 0) * 0.01) * (sourceentity instanceof LivingEntity _livingEntityLS && _livingEntityLS.getAttributes().hasAttribute(WitchercraftModAttributes.LIFE_STEAL) ? _livingEntityLS.getAttribute(WitchercraftModAttributes.LIFE_STEAL).getValue() : 0) * 0.01)), false);
 			}
 			WitchercraftMod.queueServerWork(1, () -> {
 				{
 					Entity _ent = entity;
 					if (_ent.level() instanceof ServerLevel _serverLevel) {
-						_ent.hurtServer(_serverLevel, new DamageSource(world.holderOrThrow(DamageTypes.PLAYER_ATTACK)), (float) ((amount + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAdditionalDamage)
-								* (1 + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftIncreasedDamage * 0.01) * 1));
+						_ent.hurtServer(_serverLevel, new DamageSource(world.holderOrThrow(DamageTypes.PLAYER_ATTACK)), (float) ((amount + (sourceentity instanceof LivingEntity _livingEntitySRCAD && _livingEntitySRCAD.getAttributes().hasAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE) ? _livingEntitySRCAD.getAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE).getValue() : 0))
+								* (1 + (sourceentity instanceof LivingEntity _livingEntitySRCID && _livingEntitySRCID.getAttributes().hasAttribute(WitchercraftModAttributes.INCREASED_DAMAGE) ? _livingEntitySRCID.getAttribute(WitchercraftModAttributes.INCREASED_DAMAGE).getValue() : 0) * 0.01) * 1));
 					}
 				}
 				if (sourceentity instanceof LivingEntity _entity)
-					_entity.setHealth((float) ((sourceentity instanceof LivingEntity _livEnt ? _livEnt.getHealth() : -1) + (amount + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAdditionalDamage)
-							* (1 + sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftIncreasedDamage * 0.01) * (sourceentity instanceof LivingEntity _livingEntityLS && _livingEntityLS.getAttributes().hasAttribute(WitchercraftModAttributes.LIFE_STEAL) ? _livingEntityLS.getAttribute(WitchercraftModAttributes.LIFE_STEAL).getValue() : 0) * 0.01));
+					_entity.setHealth((float) ((sourceentity instanceof LivingEntity _livEnt ? _livEnt.getHealth() : -1) + (amount + (sourceentity instanceof LivingEntity _livingEntitySRCAD && _livingEntitySRCAD.getAttributes().hasAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE) ? _livingEntitySRCAD.getAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE).getValue() : 0))
+							* (1 + (sourceentity instanceof LivingEntity _livingEntitySRCID && _livingEntitySRCID.getAttributes().hasAttribute(WitchercraftModAttributes.INCREASED_DAMAGE) ? _livingEntitySRCID.getAttribute(WitchercraftModAttributes.INCREASED_DAMAGE).getValue() : 0) * 0.01) * (sourceentity instanceof LivingEntity _livingEntityLS && _livingEntityLS.getAttributes().hasAttribute(WitchercraftModAttributes.LIFE_STEAL) ? _livingEntityLS.getAttribute(WitchercraftModAttributes.LIFE_STEAL).getValue() : 0) * 0.01));
 			});
 		}
 	}

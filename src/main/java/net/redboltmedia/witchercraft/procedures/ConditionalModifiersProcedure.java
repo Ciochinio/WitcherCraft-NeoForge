@@ -49,5 +49,10 @@ public class ConditionalModifiersProcedure {
 			return;
 		boolean thunderboltStorm = entity instanceof LivingEntity _livEnt0 && _livEnt0.hasEffect(WitchercraftModMobEffects.THUNDERBOLT_EFFECT) && world instanceof Level _lvl0 && _lvl0.isThundering();
 		sync(entity, thunderboltStorm, "effect_thunderbolt_storm", WitchercraftModAttributes.CRIT_CHANCE, 100);
+		boolean waterHagFull = entity instanceof LivingEntity _livEnt1 && _livEnt1.hasEffect(WitchercraftModMobEffects.WATER_HAG_DECOCTION_EFFECT)
+				&& (entity instanceof LivingEntity _livHp ? _livHp.getHealth() : -1) == (entity instanceof LivingEntity _livHpM ? _livHpM.getMaxHealth() : -1);
+		sync(entity, waterHagFull, "effect_waterhag_fullhp", WitchercraftModAttributes.INCREASED_DAMAGE, 40);
+		boolean nekkerRiding = entity instanceof LivingEntity _livEnt2 && _livEnt2.hasEffect(WitchercraftModMobEffects.NEKKER_WARRIOR_DECOCTION_EFFECT) && entity.isPassenger();
+		sync(entity, nekkerRiding, "effect_nekker_riding", WitchercraftModAttributes.INCREASED_DAMAGE, 50);
 	}
 }

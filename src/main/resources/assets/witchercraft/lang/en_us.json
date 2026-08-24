@@ -232,6 +232,8 @@
   "attribute.witchercraft.potion_duration": "Potion Duration",
   "attribute.witchercraft.crit_chance": "Crit Chance",
   "attribute.witchercraft.crit_damage": "Crit Damage",
+  "attribute.witchercraft.increased_damage": "Increased Damage",
+  "attribute.witchercraft.additional_damage": "Additional Damage",
   "effect.witchercraft.enemy_nearby": "Enemy Nearby",
   "effect.witchercraft.undying_cooldown": "Undying Cooldown",
   "gui.witchercraft.player_stats_overlay.label_dodge_chance": "Dodge Chance",

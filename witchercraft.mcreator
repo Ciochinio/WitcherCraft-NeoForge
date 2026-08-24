@@ -5159,38 +5159,26 @@
     },
     {
       "name": "IncreasedDamage",
-      "type": "procedure",
+      "type": "attribute",
       "compiles": true,
       "locked_code": false,
       "registry_name": "increased_damage",
       "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/IncreasedDamageProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
         ]
       },
       "path": "~/Character Stats/Stats/VariableStats/AdditionalDamage"
     },
     {
       "name": "AdditionalDamage",
-      "type": "procedure",
+      "type": "attribute",
       "compiles": true,
       "locked_code": false,
       "registry_name": "additional_damage",
       "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/AdditionalDamageProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
         ]
       },
       "path": "~/Character Stats/Stats/VariableStats/AdditionalDamage"
@@ -6676,6 +6664,44 @@
       "metadata": {
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/potion/CorrectOilMobEffect.java"
+        ]
+      },
+      "path": "~/Alchemy/Oils"
+    },
+    {
+      "name": "CorrectOilEnd",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "correct_oil_end",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/CorrectOilEndProcedure.java"
+        ]
+      },
+      "path": "~/Alchemy/Oils"
+    },
+    {
+      "name": "CorrectOilStart",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "correct_oil_start",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/CorrectOilStartProcedure.java"
         ]
       },
       "path": "~/Alchemy/Oils"
@@ -8998,6 +9024,48 @@
       "path": "~/Alchemy/Decoctions/Wyvern Decoction"
     },
     {
+      "name": "WyvernDecoctionEnd",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "wyvern_decoction_end",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WyvernDecoctionEndProcedure.java"
+        ]
+      },
+      "path": "~/Alchemy/Decoctions/Wyvern Decoction"
+    },
+    {
+      "name": "WyvernDecoctionTick",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "wyvern_decoction_tick",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WyvernDecoctionTickProcedure.java"
+        ]
+      },
+      "path": "~/Alchemy/Decoctions/Wyvern Decoction"
+    },
+    {
       "name": "SuccubusDecoction",
       "type": "item",
       "compiles": true,
@@ -10328,12 +10396,6 @@
       "value": "0.0"
     },
     {
-      "name": "witchercraftAdditionalDamage",
-      "type": "number",
-      "scope": "player_lifetime",
-      "value": "0.0"
-    },
-    {
       "name": "witchercraftAttackSpeed",
       "type": "number",
       "scope": "player_lifetime",
@@ -10662,12 +10724,6 @@
       "type": "number",
       "scope": "player_lifetime",
       "value": "0.0"
-    },
-    {
-      "name": "witchercraftIncreasedDamage",
-      "type": "number",
-      "scope": "player_lifetime",
-      "value": "0"
     },
     {
       "name": "witchercraftAbilitiesCombatSkillPointsUsed",
@@ -11097,6 +11153,8 @@
       "attribute.witchercraft.potion_duration": "Potion Duration",
       "attribute.witchercraft.crit_chance": "Crit Chance",
       "attribute.witchercraft.crit_damage": "Crit Damage",
+      "attribute.witchercraft.increased_damage": "Increased Damage",
+      "attribute.witchercraft.additional_damage": "Additional Damage",
       "effect.witchercraft.enemy_nearby": "Enemy Nearby",
       "effect.witchercraft.undying_cooldown": "Undying Cooldown",
       "gui.witchercraft.player_stats_overlay.label_dodge_chance": "Dodge Chance",

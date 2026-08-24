@@ -3,9 +3,11 @@
  */
 package net.redboltmedia.witchercraft.init;
 
+import net.redboltmedia.witchercraft.procedures.WyvernDecoctionEndProcedure;
 import net.redboltmedia.witchercraft.procedures.SuccubusDecoctionEndProcedure;
 import net.redboltmedia.witchercraft.procedures.QuenBrokeProcedure;
 import net.redboltmedia.witchercraft.procedures.QuenActiveShieldDropProcedure;
+import net.redboltmedia.witchercraft.procedures.CorrectOilEndProcedure;
 import net.redboltmedia.witchercraft.potion.*;
 import net.redboltmedia.witchercraft.WitchercraftMod;
 
@@ -89,7 +91,11 @@ public class WitchercraftModMobEffects {
 	}
 
 	private static void expireEffects(Entity entity, MobEffectInstance effectInstance) {
-		if (effectInstance.is(SUCCUBUS_DECOCTION_EFFECT)) {
+		if (effectInstance.is(CORRECT_OIL)) {
+			CorrectOilEndProcedure.execute(entity);
+		} else if (effectInstance.is(WYVERN_DECOCTION_EFFECT)) {
+			WyvernDecoctionEndProcedure.execute(entity);
+		} else if (effectInstance.is(SUCCUBUS_DECOCTION_EFFECT)) {
 			SuccubusDecoctionEndProcedure.execute(entity);
 		} else if (effectInstance.is(QUEN_ACTIVE_SHIELD)) {
 			QuenActiveShieldDropProcedure.execute(entity);

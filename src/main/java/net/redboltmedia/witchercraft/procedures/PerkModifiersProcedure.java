@@ -60,5 +60,10 @@ public class PerkModifiersProcedure {
 		sync(entity, _vars.witchercraftAbilitiesCrushingBlows, "perk_crushing_blows", WitchercraftModAttributes.CRIT_DAMAGE, 50);
 		sync(entity, _vars.witchercraftAbilitiesAnatomicalKnowledge && bowHeld, "perk_anatomical_knowledge", WitchercraftModAttributes.CRIT_CHANCE, 10);
 		sync(entity, _vars.witchercraftAbilitiesCripplingShot && bowHeld, "perk_crippling_shot", WitchercraftModAttributes.CRIT_DAMAGE, 50);
+		sync(entity, _vars.witchercraftAbilitiesStrengthTraining, "perk_strength_training", WitchercraftModAttributes.INCREASED_DAMAGE, 10);
+		sync(entity, _vars.witchercraftAbilitiesSunderArmor, "perk_sunder_armor", WitchercraftModAttributes.INCREASED_DAMAGE, 20);
+		sync(entity, _vars.witchercraftAbilitiesMuscleMemory, "perk_muscle_memory", WitchercraftModAttributes.ADDITIONAL_DAMAGE, 3);
+		sync(entity, _vars.witchercraftAbilitiesColdBlood && !_vars.witchercraftEnemyNearby, "perk_cold_blood", WitchercraftModAttributes.ADDITIONAL_DAMAGE, 5);
+		sync(entity, _vars.witchercraftAbilitiesFloodOfAnger && _vars.witchercraftEnemyNearby, "perk_flood_of_anger", WitchercraftModAttributes.ADDITIONAL_DAMAGE, 5);
 	}
 }
