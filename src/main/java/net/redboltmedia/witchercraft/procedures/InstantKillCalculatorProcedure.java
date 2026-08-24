@@ -1,8 +1,7 @@
 package net.redboltmedia.witchercraft.procedures;
 
-import net.redboltmedia.witchercraft.init.WitchercraftModAttributes;
-import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
 import net.redboltmedia.witchercraft.init.WitchercraftModMobEffects;
+import net.redboltmedia.witchercraft.init.WitchercraftModAttributes;
 
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -26,7 +25,7 @@ import net.minecraft.core.registries.Registries;
 import javax.annotation.Nullable;
 
 @EventBusSubscriber
-public class InstantKillProcedure {
+public class InstantKillCalculatorProcedure {
 	@SubscribeEvent
 	public static void onEntityAttacked(LivingIncomingDamageEvent event) {
 		if (event.getEntity() != null) {
@@ -47,11 +46,16 @@ public class InstantKillProcedure {
 			if (sourceentity instanceof ServerPlayer _player)
 				_player.sendSystemMessage(Component.literal(("instant kill roll>>>" + instantKillRoll)), false);
 			if (sourceentity instanceof ServerPlayer _player)
-				_player.sendSystemMessage(Component.literal(("instant kill chance>>>" + (sourceentity instanceof LivingEntity _livingEntityIK && _livingEntityIK.getAttributes().hasAttribute(WitchercraftModAttributes.INSTANT_KILL_CHANCE) ? _livingEntityIK.getAttribute(WitchercraftModAttributes.INSTANT_KILL_CHANCE).getValue() : 0))), false);
+				_player.sendSystemMessage(Component.literal(("instant kill chance>>>" + (sourceentity instanceof LivingEntity _livingEntity3 && _livingEntity3.getAttributes().hasAttribute(WitchercraftModAttributes.INSTANT_KILL_CHANCE)
+						? _livingEntity3.getAttribute(WitchercraftModAttributes.INSTANT_KILL_CHANCE).getValue()
+						: 0))), false);
 		}
-		if (!entity.is(TagKey.create(Registries.ENTITY_TYPE, Identifier.parse("minecraft:enderdragon"))) && instantKillRoll <= (sourceentity instanceof LivingEntity _livingEntityIK && _livingEntityIK.getAttributes().hasAttribute(WitchercraftModAttributes.INSTANT_KILL_CHANCE) ? _livingEntityIK.getAttribute(WitchercraftModAttributes.INSTANT_KILL_CHANCE).getValue() : 0)) {
+		if (!entity.is(TagKey.create(Registries.ENTITY_TYPE, Identifier.parse("minecraft:enderdragon")))
+				&& instantKillRoll <= (sourceentity instanceof LivingEntity _livingEntity6 && _livingEntity6.getAttributes().hasAttribute(WitchercraftModAttributes.INSTANT_KILL_CHANCE)
+						? _livingEntity6.getAttribute(WitchercraftModAttributes.INSTANT_KILL_CHANCE).getValue()
+						: 0)) {
 			if (!damagesource.is(DamageTypes.ARROW)) {
-				if (sourceentity instanceof LivingEntity _livEnt6 && _livEnt6.hasEffect(WitchercraftModMobEffects.DEV_LOG)) {
+				if (sourceentity instanceof LivingEntity _livEnt8 && _livEnt8.hasEffect(WitchercraftModMobEffects.DEV_LOG)) {
 					if (sourceentity instanceof ServerPlayer _player)
 						_player.sendSystemMessage(Component.literal("BOMBA"), false);
 				}

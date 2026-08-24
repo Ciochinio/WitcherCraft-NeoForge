@@ -11,7 +11,7 @@
           "src/main/java/net/redboltmedia/witchercraft/network/PauseMenuKeybindPressMessage.java"
         ]
       },
-      "path": "~/Pause Menu "
+      "path": "~/Pause Menu"
     },
     {
       "name": "PauseMenuGui",
@@ -26,7 +26,7 @@
           "src/main/java/net/redboltmedia/witchercraft/world/inventory/PauseMenuGuiMenu.java"
         ]
       },
-      "path": "~/Pause Menu "
+      "path": "~/Pause Menu"
     },
     {
       "name": "MeditationGui",
@@ -111,7 +111,7 @@
           }
         ]
       },
-      "path": "~/Pause Menu "
+      "path": "~/Pause Menu"
     },
     {
       "name": "AlchemyGui",
@@ -180,7 +180,7 @@
           }
         ]
       },
-      "path": "~/Pause Menu "
+      "path": "~/Pause Menu"
     },
     {
       "name": "PauseMenuGuiBackButton",
@@ -215,7 +215,7 @@
           }
         ]
       },
-      "path": "~/Pause Menu "
+      "path": "~/Pause Menu"
     },
     {
       "name": "CraftPotion",
@@ -910,7 +910,7 @@
           }
         ]
       },
-      "path": "~/Pause Menu "
+      "path": "~/Pause Menu"
     },
     {
       "name": "BestiaryMenuGuiOpen",
@@ -1068,7 +1068,7 @@
           }
         ]
       },
-      "path": "~/Commands"
+      "path": "~/Admin/Commands"
     },
     {
       "name": "WitchercraftStats",
@@ -1081,7 +1081,7 @@
           "src/main/java/net/redboltmedia/witchercraft/command/WitchercraftStatsCommand.java"
         ]
       },
-      "path": "~/Commands"
+      "path": "~/Admin/Commands"
     },
     {
       "name": "CharacterGui",
@@ -1197,7 +1197,7 @@
           "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
         ]
       },
-      "path": "~/Character Stats/Stats/VariableStats/CritChance"
+      "path": "~/Character Stats/Stats/VariableStats"
     },
     {
       "name": "CharacterGuiCritChance",
@@ -1250,7 +1250,7 @@
           "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
         ]
       },
-      "path": "~/Character Stats/Stats/VariableStats/CritDamage"
+      "path": "~/Character Stats/Stats/VariableStats"
     },
     {
       "name": "PlayerModelDisplay",
@@ -1518,7 +1518,7 @@
           }
         ]
       },
-      "path": "~/Character Stats/Stats/VariableStats/PassiveRegeneration"
+      "path": "~/Character Stats/Regeneration"
     },
     {
       "name": "PassiveHealthRegen",
@@ -1531,7 +1531,7 @@
           "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
         ]
       },
-      "path": "~/Character Stats/Stats/VariableStats/PassiveRegeneration"
+      "path": "~/Character Stats/Stats/VariableStats"
     },
     {
       "name": "TawnyOwlEffect",
@@ -1586,7 +1586,7 @@
           }
         ]
       },
-      "path": "~/Character Stats/Stats/VariableStats/PassiveStaminaRegeneration"
+      "path": "~/Character Stats/Regeneration"
     },
     {
       "name": "PassiveStaminaRegen",
@@ -1595,11 +1595,9 @@
       "locked_code": false,
       "registry_name": "passive_stamina_regen",
       "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
-        ]
+        "files": []
       },
-      "path": "~/Character Stats/Stats/VariableStats/PassiveStaminaRegeneration"
+      "path": "~/Character Stats/Stats/VariableStats"
     },
     {
       "name": "FelineArmor",
@@ -2517,7 +2515,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/GeneralPerks/SURVIVAL INSINCT"
+      "path": "~/Character Abilities/GeneralPerks/Survival Instinct"
     },
     {
       "name": "SunAndStarsEffect",
@@ -2536,7 +2534,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/GeneralPerks/SUN AND STARS"
+      "path": "~/Character Abilities/GeneralPerks/Sun and Stars"
     },
     {
       "name": "CatSchoolEffect",
@@ -2555,7 +2553,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/GeneralPerks/CAT SCHOOL TECHNIQUES"
+      "path": "~/Character Abilities/GeneralPerks/Cat School Techniques"
     },
     {
       "name": "GriffinSchoolEffect",
@@ -2574,7 +2572,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/GeneralPerks/GRIFFIN SCHOOL TECHNIQUES"
+      "path": "~/Character Abilities/GeneralPerks/Griffin School Techniques"
     },
     {
       "name": "BearSchoolEffect",
@@ -2593,7 +2591,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/GeneralPerks/BEAR SCHOOL TECHNIQUES"
+      "path": "~/Character Abilities/GeneralPerks/Bear School Techniques"
     },
     {
       "name": "BearSchoolShow",
@@ -2613,7 +2611,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/GeneralPerks/BEAR SCHOOL TECHNIQUES"
+      "path": "~/Character Abilities/GeneralPerks/Bear School Techniques"
     },
     {
       "name": "GriffinSchoolShow",
@@ -2633,7 +2631,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/GeneralPerks/GRIFFIN SCHOOL TECHNIQUES"
+      "path": "~/Character Abilities/GeneralPerks/Griffin School Techniques"
     },
     {
       "name": "CatSchoolShow",
@@ -2653,7 +2651,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/GeneralPerks/CAT SCHOOL TECHNIQUES"
+      "path": "~/Character Abilities/GeneralPerks/Cat School Techniques"
     },
     {
       "name": "SunAndStarsShow",
@@ -2673,7 +2671,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/GeneralPerks/SUN AND STARS"
+      "path": "~/Character Abilities/GeneralPerks/Sun and Stars"
     },
     {
       "name": "CharacterAbilitiesCombatGui",
@@ -3154,7 +3152,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/MUSCLE MEMORY"
+      "path": "~/Character Abilities/CombatPerks/Muscle Memory"
     },
     {
       "name": "PreciseBlowsEffect",
@@ -3173,7 +3171,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/PRECISE BLOWS"
+      "path": "~/Character Abilities/CombatPerks/Precise Blows"
     },
     {
       "name": "CripplingStrikesEffect",
@@ -3192,7 +3190,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/CRIPPLING STRIKES"
+      "path": "~/Character Abilities/CombatPerks/Crippling Strikes"
     },
     {
       "name": "StrengthTrainingEffect",
@@ -3211,7 +3209,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/STRENGTH TRAINING"
+      "path": "~/Character Abilities/CombatPerks/Strength Training"
     },
     {
       "name": "CrushingBlowsEffect",
@@ -3230,7 +3228,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/CRUSHING BLOWS"
+      "path": "~/Character Abilities/CombatPerks/Crushing Blows"
     },
     {
       "name": "SunderArmorEffect",
@@ -3249,7 +3247,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/SUNDER ARMOR"
+      "path": "~/Character Abilities/CombatPerks/Sunder Armor"
     },
     {
       "name": "FleetFootedEffect",
@@ -3268,7 +3266,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/FLEET FOOTED"
+      "path": "~/Character Abilities/CombatPerks/Fleet Footed"
     },
     {
       "name": "DefenceEffect",
@@ -3287,7 +3285,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/DEFENCE"
+      "path": "~/Character Abilities/CombatPerks/Defence"
     },
     {
       "name": "DeadlyPrecisionEffect",
@@ -3306,7 +3304,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/DEADLY PRECISION"
+      "path": "~/Character Abilities/CombatPerks/Deadly Precision"
     },
     {
       "name": "ColdBloodEffect",
@@ -3325,7 +3323,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/COLD BLOOD"
+      "path": "~/Character Abilities/CombatPerks/Cold Blood"
     },
     {
       "name": "AnatomicalKnowledgeEffect",
@@ -3344,7 +3342,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/ANATOMICAL KNOWLEDGE"
+      "path": "~/Character Abilities/CombatPerks/Anatomical Knowledge"
     },
     {
       "name": "FloodOfAngerEffect",
@@ -3363,7 +3361,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/FLOOD OF ANGER"
+      "path": "~/Character Abilities/CombatPerks/Flood of Anger"
     },
     {
       "name": "RazorFocusEffect",
@@ -3382,7 +3380,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/RAZOR FOCUS"
+      "path": "~/Character Abilities/CombatPerks/Razor Focus"
     },
     {
       "name": "UndyingEffect",
@@ -3401,7 +3399,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/UNDYING"
+      "path": "~/Character Abilities/CombatPerks/Undying"
     },
     {
       "name": "MuscleMemoryShow",
@@ -3421,7 +3419,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/MUSCLE MEMORY"
+      "path": "~/Character Abilities/CombatPerks/Muscle Memory"
     },
     {
       "name": "PreciseBlowsShow",
@@ -3441,7 +3439,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/PRECISE BLOWS"
+      "path": "~/Character Abilities/CombatPerks/Precise Blows"
     },
     {
       "name": "CripplingStrikesShow",
@@ -3461,7 +3459,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/CRIPPLING STRIKES"
+      "path": "~/Character Abilities/CombatPerks/Crippling Strikes"
     },
     {
       "name": "StrengthTrainingShow",
@@ -3481,7 +3479,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/STRENGTH TRAINING"
+      "path": "~/Character Abilities/CombatPerks/Strength Training"
     },
     {
       "name": "CrushingBlowsShow",
@@ -3501,7 +3499,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/CRUSHING BLOWS"
+      "path": "~/Character Abilities/CombatPerks/Crushing Blows"
     },
     {
       "name": "SunderArmorShow",
@@ -3521,7 +3519,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/SUNDER ARMOR"
+      "path": "~/Character Abilities/CombatPerks/Sunder Armor"
     },
     {
       "name": "FleetFootedShow",
@@ -3541,7 +3539,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/FLEET FOOTED"
+      "path": "~/Character Abilities/CombatPerks/Fleet Footed"
     },
     {
       "name": "DefenceShow",
@@ -3561,7 +3559,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/DEFENCE"
+      "path": "~/Character Abilities/CombatPerks/Defence"
     },
     {
       "name": "DeadlyPrecisionShow",
@@ -3581,7 +3579,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/DEADLY PRECISION"
+      "path": "~/Character Abilities/CombatPerks/Deadly Precision"
     },
     {
       "name": "ColdBloodShow",
@@ -3601,7 +3599,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/COLD BLOOD"
+      "path": "~/Character Abilities/CombatPerks/Cold Blood"
     },
     {
       "name": "AnatomicalKnowledgeShow",
@@ -3621,7 +3619,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/ANATOMICAL KNOWLEDGE"
+      "path": "~/Character Abilities/CombatPerks/Anatomical Knowledge"
     },
     {
       "name": "CripplingShotShow",
@@ -3641,7 +3639,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/CRIPPLING SHOT"
+      "path": "~/Character Abilities/CombatPerks/Crippling Shot"
     },
     {
       "name": "FloodOfAngerShow",
@@ -3661,7 +3659,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/FLOOD OF ANGER"
+      "path": "~/Character Abilities/CombatPerks/Flood of Anger"
     },
     {
       "name": "RazorFocusShow",
@@ -3681,7 +3679,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/RAZOR FOCUS"
+      "path": "~/Character Abilities/CombatPerks/Razor Focus"
     },
     {
       "name": "UndyingShow",
@@ -3701,7 +3699,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/UNDYING"
+      "path": "~/Character Abilities/CombatPerks/Undying"
     },
     {
       "name": "FarReachingAardEffect",
@@ -3967,7 +3965,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/SignsPerks/Axii Intenity"
+      "path": "~/Character Abilities/SignsPerks/Axii Intensity"
     },
     {
       "name": "DominationEffect",
@@ -4266,7 +4264,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/SignsPerks/Axii Intenity"
+      "path": "~/Character Abilities/SignsPerks/Axii Intensity"
     },
     {
       "name": "DominationShow",
@@ -4385,7 +4383,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/CRIPPLING SHOT"
+      "path": "~/Character Abilities/CombatPerks/Crippling Shot"
     },
     {
       "name": "SurvivalInstinctEffect",
@@ -4404,7 +4402,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/GeneralPerks/SURVIVAL INSINCT"
+      "path": "~/Character Abilities/GeneralPerks/Survival Instinct"
     },
     {
       "name": "ExperienceFix",
@@ -4802,7 +4800,7 @@
           "src/main/java/net/redboltmedia/witchercraft/client/screens/ToxicityOverlayOverlay.java"
         ]
       },
-      "path": "~/Alchemy/ Toxicity"
+      "path": "~/Alchemy/Toxicity"
     },
     {
       "name": "WitcherHud",
@@ -4874,7 +4872,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/ToxicityHudFillProcedure.java"
         ]
       },
-      "path": "~/Alchemy/ Toxicity"
+      "path": "~/Alchemy/Toxicity"
     },
     {
       "name": "ToxicityHudOverdose",
@@ -4894,7 +4892,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/ToxicityHudOverdoseProcedure.java"
         ]
       },
-      "path": "~/Alchemy/ Toxicity"
+      "path": "~/Alchemy/Toxicity"
     },
     {
       "name": "Tox1",
@@ -4914,7 +4912,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/Tox1Procedure.java"
         ]
       },
-      "path": "~/Alchemy/ Toxicity"
+      "path": "~/Alchemy/Toxicity"
     },
     {
       "name": "Tox2",
@@ -4934,7 +4932,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/Tox2Procedure.java"
         ]
       },
-      "path": "~/Alchemy/ Toxicity"
+      "path": "~/Alchemy/Toxicity"
     },
     {
       "name": "Tox3",
@@ -4954,7 +4952,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/Tox3Procedure.java"
         ]
       },
-      "path": "~/Alchemy/ Toxicity"
+      "path": "~/Alchemy/Toxicity"
     },
     {
       "name": "PlayerStatsOverlay",
@@ -5027,7 +5025,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/Tox4Procedure.java"
         ]
       },
-      "path": "~/Alchemy/ Toxicity"
+      "path": "~/Alchemy/Toxicity"
     },
     {
       "name": "Tox5",
@@ -5047,7 +5045,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/Tox5Procedure.java"
         ]
       },
-      "path": "~/Alchemy/ Toxicity"
+      "path": "~/Alchemy/Toxicity"
     },
     {
       "name": "CharacterGuiToxicityOverdoseThreshold",
@@ -5080,7 +5078,7 @@
           "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
         ]
       },
-      "path": "~/Alchemy/ Toxicity"
+      "path": "~/Character Stats/Stats/VariableStats"
     },
     {
       "name": "IncreasedDamage",
@@ -5093,7 +5091,7 @@
           "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
         ]
       },
-      "path": "~/Character Stats/Stats/VariableStats/AdditionalDamage"
+      "path": "~/Character Stats/Stats/VariableStats"
     },
     {
       "name": "AdditionalDamage",
@@ -5106,7 +5104,7 @@
           "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
         ]
       },
-      "path": "~/Character Stats/Stats/VariableStats/AdditionalDamage"
+      "path": "~/Character Stats/Stats/VariableStats"
     },
     {
       "name": "CharacterGuiIncreasedDamage",
@@ -5209,7 +5207,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/GourmetShowProcedure.java"
         ]
       },
-      "path": "~/Character Abilities/GeneralPerks/GOURMET"
+      "path": "~/Character Abilities/GeneralPerks/Gourmet"
     },
     {
       "name": "GourmetEffect",
@@ -5228,7 +5226,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/GourmetEffectProcedure.java"
         ]
       },
-      "path": "~/Character Abilities/GeneralPerks/GOURMET"
+      "path": "~/Character Abilities/GeneralPerks/Gourmet"
     },
     {
       "name": "EfficiencyEffect",
@@ -5247,7 +5245,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/EfficiencyEffectProcedure.java"
         ]
       },
-      "path": "~/Character Abilities/AlchemyPerks/Efficency"
+      "path": "~/Character Abilities/AlchemyPerks/Efficiency"
     },
     {
       "name": "EfficiencyShow",
@@ -5267,7 +5265,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/EfficiencyShowProcedure.java"
         ]
       },
-      "path": "~/Character Abilities/AlchemyPerks/Efficency"
+      "path": "~/Character Abilities/AlchemyPerks/Efficiency"
     },
     {
       "name": "CharacterAbilitiesSkillPointCheck",
@@ -5584,7 +5582,7 @@
           "src/main/java/net/redboltmedia/witchercraft/potion/UndyingCooldownMobEffect.java"
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/UNDYING/Undying"
+      "path": "~/Character Abilities/CombatPerks/Undying"
     },
     {
       "name": "UndyingEffectActive",
@@ -5603,7 +5601,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/UndyingEffectActiveProcedure.java"
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/UNDYING/Undying"
+      "path": "~/Character Abilities/CombatPerks/Undying"
     },
     {
       "name": "ConditionalModifiers",
@@ -5626,7 +5624,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/ConditionalModifiersProcedure.java"
         ]
       },
-      "path": "~/Character Stats"
+      "path": "~/Character Stats/Modifiers"
     },
     {
       "name": "PerkModifiers",
@@ -5649,7 +5647,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/PerkModifiersProcedure.java"
         ]
       },
-      "path": "~/Character Abilities"
+      "path": "~/Character Stats/Modifiers"
     },
     {
       "name": "DodgeChance",
@@ -5662,7 +5660,7 @@
           "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
         ]
       },
-      "path": "~/Character Stats/Stats/VariableStats/DodgeChance"
+      "path": "~/Character Stats/Stats/VariableStats"
     },
     {
       "name": "CharacterGuiDodgeChance",
@@ -5685,37 +5683,6 @@
       "path": "~/Character Stats/Stats/Gui"
     },
     {
-      "name": "InstantKill",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "instant_kill",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "damagesource",
-            "type": "damagesource"
-          },
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "sourceentity",
-            "type": "entity"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/InstantKillProcedure.java"
-        ]
-      },
-      "path": "~/StatusEffects/InstantKill"
-    },
-    {
       "name": "InstantKillChance",
       "type": "attribute",
       "compiles": true,
@@ -5726,7 +5693,7 @@
           "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
         ]
       },
-      "path": "~/Character Stats/Stats/VariableStats/InstantKillChance"
+      "path": "~/Character Stats/Stats/VariableStats"
     },
     {
       "name": "CharacterGuiInstantKillChance",
@@ -5759,7 +5726,7 @@
           "src/main/java/net/redboltmedia/witchercraft/potion/DodgeCooldownMobEffect.java"
         ]
       },
-      "path": "~/Character Stats/Stats/VariableStats/DodgeChance"
+      "path": "~/Admin/Calc"
     },
     {
       "name": "DamageCalculator",
@@ -5822,7 +5789,7 @@
           "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
         ]
       },
-      "path": "~/Character Stats/Stats/VariableStats/PotionDuration"
+      "path": "~/Character Stats/Stats/VariableStats"
     },
     {
       "name": "CharacterGuiPotionDuration",
@@ -5855,7 +5822,7 @@
           "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
         ]
       },
-      "path": "~/Character Stats/Stats/VariableStats/SignIntensity"
+      "path": "~/Character Stats/Stats/VariableStats"
     },
     {
       "name": "KillerWhaleEffectActive",
@@ -7212,7 +7179,7 @@
           "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
         ]
       },
-      "path": "~/Character Stats/Stats/VariableStats/OilDamage"
+      "path": "~/Character Stats/Stats/VariableStats"
     },
     {
       "name": "CharacterGuiOilDamage",
@@ -7292,7 +7259,7 @@
           "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
         ]
       },
-      "path": "~/Character Stats/Stats/VariableStats/LifeSteal"
+      "path": "~/Character Stats/Stats/VariableStats"
     },
     {
       "name": "CharacterGuiLifeSteal",
@@ -7419,7 +7386,7 @@
           "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java"
         ]
       },
-      "path": "~/Character Stats/Stats/VariableStats/ReflectDamage"
+      "path": "~/Character Stats/Stats/VariableStats"
     },
     {
       "name": "CharacterGuiReflectDamage",
@@ -9558,7 +9525,7 @@
           "src/main/java/net/redboltmedia/witchercraft/potion/BlindnessMobEffect.java"
         ]
       },
-      "path": "~/StatusEffects/Blindness"
+      "path": "~/StatusEffects"
     },
     {
       "name": "PotionUsed",
@@ -9633,7 +9600,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/ToxicityTickStartProcedure.java"
         ]
       },
-      "path": "~/Alchemy/ Toxicity/ToxicityTick"
+      "path": "~/Alchemy/Toxicity"
     },
     {
       "name": "SignCooldown",
@@ -10077,7 +10044,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/SunAndStarsTooltipProcedure.java"
         ]
       },
-      "path": "~/Character Abilities/GeneralPerks/SUN AND STARS"
+      "path": "~/Character Abilities/GeneralPerks/Sun and Stars"
     },
     {
       "name": "AxiiGlow",
@@ -10325,6 +10292,37 @@
         ]
       },
       "path": "~/Admin"
+    },
+    {
+      "name": "InstantKillCalculator",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "instant_kill_calculator",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "damagesource",
+            "type": "damagesource"
+          },
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "sourceentity",
+            "type": "entity"
+          },
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/InstantKillCalculatorProcedure.java"
+        ]
+      },
+      "path": "~/Admin/Calc"
     }
   ],
   "variable_elements": [
@@ -10817,7 +10815,6 @@
       "item.witchercraft.hanged_mans_venom": "Hanged Mans Venom",
       "gui.witchercraft.rotfiend_gui.label_rotfiend": "Rotfiend",
       "gui.witchercraft.character_abilities_signs_gui.tooltip_increases_dmg_dealt_to_mob": "INCREASES DMG DEALT TO MOB ",
-      "effect.witchercraft.igni_sign_ready": "Igni Ready",
       "gui.witchercraft.character_abilities_combat_gui.tooltip_increase_crit_rate_by_8_and_cri": "INCREASE CRIT RATE BY 8% AND CRIT DAMAGE BY 50%",
       "item.witchercraft.necrophage_oil": "Necrophage Oil",
       "gui.witchercraft.alchemy_gui.button_bombs": " Bombs ",
@@ -11143,70 +11140,46 @@
     "name": "~",
     "children": [
       {
+        "name": "Admin",
+        "children": [
+          {
+            "name": "Calc",
+            "children": []
+          },
+          {
+            "name": "Commands",
+            "children": []
+          },
+          {
+            "name": "EnemyNearby",
+            "children": []
+          },
+          {
+            "name": "InCombat",
+            "children": []
+          }
+        ]
+      },
+      {
         "name": "Alchemy",
         "children": [
           {
-            "name": "Potions",
-            "children": [
-              {
-                "name": "GoldenOriole",
-                "children": []
-              },
-              {
-                "name": "WhiteHoney",
-                "children": []
-              },
-              {
-                "name": "Blizzard",
-                "children": []
-              },
-              {
-                "name": "Cat",
-                "children": []
-              },
-              {
-                "name": "Swallow",
-                "children": []
-              },
-              {
-                "name": "FullMoon",
-                "children": []
-              },
-              {
-                "name": "Thunderbolt",
-                "children": []
-              },
-              {
-                "name": "WhiteRaffardsDecoction",
-                "children": []
-              },
-              {
-                "name": "TawnyOwl",
-                "children": []
-              },
-              {
-                "name": "KillerWhale",
-                "children": []
-              },
-              {
-                "name": "PetrisPhilter",
-                "children": []
-              },
-              {
-                "name": "Black Blood",
-                "children": []
-              }
-            ]
+            "name": "AlchemyMenu",
+            "children": []
           },
           {
             "name": "Bombs",
             "children": [
               {
+                "name": "DancingStar",
+                "children": []
+              },
+              {
                 "name": "DevilsPuffball",
                 "children": []
               },
               {
-                "name": "DancingStar",
+                "name": "DimeritiumBomb",
                 "children": []
               },
               {
@@ -11220,68 +11193,6 @@
               {
                 "name": "Samum",
                 "children": []
-              },
-              {
-                "name": "DimeritiumBomb",
-                "children": []
-              }
-            ]
-          },
-          {
-            "name": "Oils",
-            "children": [
-              {
-                "name": "InsectoidOil",
-                "children": []
-              },
-              {
-                "name": "NecrophageOil",
-                "children": []
-              },
-              {
-                "name": "VampireOil",
-                "children": []
-              },
-              {
-                "name": "HangedMansVenom",
-                "children": []
-              },
-              {
-                "name": "SpecterOil",
-                "children": []
-              },
-              {
-                "name": "OgroidOil",
-                "children": []
-              },
-              {
-                "name": "BeastOil",
-                "children": []
-              },
-              {
-                "name": "DraconidOil",
-                "children": []
-              },
-              {
-                "name": "RelictOil",
-                "children": []
-              },
-              {
-                "name": "CursedOil",
-                "children": []
-              }
-            ]
-          },
-          {
-            "name": "AlchemyMenu",
-            "children": []
-          },
-          {
-            "name": " Toxicity",
-            "children": [
-              {
-                "name": "ToxicityTick",
-                "children": []
               }
             ]
           },
@@ -11289,11 +11200,15 @@
             "name": "Decoctions",
             "children": [
               {
-                "name": "Water Hag Decoction",
+                "name": "Ekimmara Decoction",
                 "children": []
               },
               {
-                "name": "Ekimmara Decoction",
+                "name": "Foglet Decoction",
+                "children": []
+              },
+              {
+                "name": "Grave Hag Decoction",
                 "children": []
               },
               {
@@ -11305,27 +11220,7 @@
                 "children": []
               },
               {
-                "name": "Foglet Decoction",
-                "children": []
-              },
-              {
                 "name": "Nekker Warrior Decoction",
-                "children": []
-              },
-              {
-                "name": "Troll Decoction",
-                "children": []
-              },
-              {
-                "name": "Wraith Decoction",
-                "children": []
-              },
-              {
-                "name": "Werewolf Decoction",
-                "children": []
-              },
-              {
-                "name": "Wyvern Decoction",
                 "children": []
               },
               {
@@ -11333,79 +11228,188 @@
                 "children": []
               },
               {
-                "name": "Grave Hag Decoction",
+                "name": "Troll Decoction",
+                "children": []
+              },
+              {
+                "name": "Water Hag Decoction",
+                "children": []
+              },
+              {
+                "name": "Werewolf Decoction",
+                "children": []
+              },
+              {
+                "name": "Wraith Decoction",
+                "children": []
+              },
+              {
+                "name": "Wyvern Decoction",
                 "children": []
               }
             ]
-          }
-        ]
-      },
-      {
-        "name": "Signs",
-        "children": [
-          {
-            "name": "SignMenu",
-            "children": []
           },
           {
-            "name": "SignCast",
-            "children": []
-          },
-          {
-            "name": "Igni",
-            "children": []
-          },
-          {
-            "name": "Yrden",
-            "children": []
-          },
-          {
-            "name": "Axii",
-            "children": []
-          },
-          {
-            "name": "Quen",
+            "name": "Oils",
             "children": [
               {
-                "name": "Quen Text",
+                "name": "BeastOil",
                 "children": []
               },
               {
-                "name": "DefQuen",
+                "name": "CursedOil",
                 "children": []
               },
               {
-                "name": "AltQuen",
+                "name": "DraconidOil",
+                "children": []
+              },
+              {
+                "name": "HangedMansVenom",
+                "children": []
+              },
+              {
+                "name": "InsectoidOil",
+                "children": []
+              },
+              {
+                "name": "NecrophageOil",
+                "children": []
+              },
+              {
+                "name": "OgroidOil",
+                "children": []
+              },
+              {
+                "name": "RelictOil",
+                "children": []
+              },
+              {
+                "name": "SpecterOil",
+                "children": []
+              },
+              {
+                "name": "VampireOil",
                 "children": []
               }
             ]
           },
           {
-            "name": "Aard",
+            "name": "Potions",
+            "children": [
+              {
+                "name": "Black Blood",
+                "children": []
+              },
+              {
+                "name": "Blizzard",
+                "children": []
+              },
+              {
+                "name": "Cat",
+                "children": []
+              },
+              {
+                "name": "FullMoon",
+                "children": []
+              },
+              {
+                "name": "GoldenOriole",
+                "children": []
+              },
+              {
+                "name": "KillerWhale",
+                "children": []
+              },
+              {
+                "name": "PetrisPhilter",
+                "children": []
+              },
+              {
+                "name": "Swallow",
+                "children": []
+              },
+              {
+                "name": "TawnyOwl",
+                "children": []
+              },
+              {
+                "name": "Thunderbolt",
+                "children": []
+              },
+              {
+                "name": "WhiteHoney",
+                "children": []
+              },
+              {
+                "name": "WhiteRaffardsDecoction",
+                "children": []
+              }
+            ]
+          },
+          {
+            "name": "Toxicity",
             "children": []
           }
         ]
       },
       {
-        "name": "Meditation",
+        "name": "Armor",
         "children": [
           {
-            "name": "MeditationHand",
+            "name": "BearGear",
             "children": []
           },
           {
-            "name": "MeditationHandTimeNow",
+            "name": "CatGear",
+            "children": []
+          },
+          {
+            "name": "GriffinGear",
+            "children": []
+          },
+          {
+            "name": "ManticoreGear",
+            "children": []
+          },
+          {
+            "name": "ViperGear",
+            "children": []
+          },
+          {
+            "name": "WolvenGear",
             "children": []
           }
         ]
-      },
-      {
-        "name": "Glossary",
-        "children": []
       },
       {
         "name": "Bestiary",
         "children": [
+          {
+            "name": "Beasts",
+            "children": []
+          },
+          {
+            "name": "Cursed Ones",
+            "children": []
+          },
+          {
+            "name": "Draconids",
+            "children": []
+          },
+          {
+            "name": "Humans",
+            "children": [
+              {
+                "name": "Bandit",
+                "children": []
+              }
+            ]
+          },
+          {
+            "name": "Insectoids",
+            "children": []
+          },
           {
             "name": "Necrophages",
             "children": [
@@ -11414,11 +11418,33 @@
                 "children": []
               },
               {
-                "name": "Rotfiend",
+                "name": "foglet",
                 "children": []
               },
               {
-                "name": "foglet",
+                "name": "Rotfiend",
+                "children": []
+              }
+            ]
+          },
+          {
+            "name": "Ogroids",
+            "children": [
+              {
+                "name": "Nekker",
+                "children": []
+              }
+            ]
+          },
+          {
+            "name": "Relics",
+            "children": []
+          },
+          {
+            "name": "Specters",
+            "children": [
+              {
+                "name": "Wraith",
                 "children": []
               }
             ]
@@ -11439,299 +11465,17 @@
                 "children": []
               }
             ]
-          },
-          {
-            "name": "Specters",
-            "children": [
-              {
-                "name": "Wraith",
-                "children": []
-              }
-            ]
-          },
-          {
-            "name": "Humans",
-            "children": [
-              {
-                "name": "Bandit",
-                "children": []
-              }
-            ]
-          },
-          {
-            "name": "Insectoids",
-            "children": []
-          },
-          {
-            "name": "Beasts",
-            "children": []
-          },
-          {
-            "name": "Relics",
-            "children": []
-          },
-          {
-            "name": "Coursed Ones",
-            "children": []
-          },
-          {
-            "name": "Draconids",
-            "children": []
-          },
-          {
-            "name": "Orgoids",
-            "children": [
-              {
-                "name": "Nekker",
-                "children": []
-              }
-            ]
           }
         ]
-      },
-      {
-        "name": "Weapons",
-        "children": []
-      },
-      {
-        "name": "Armor",
-        "children": [
-          {
-            "name": "CatGear",
-            "children": []
-          },
-          {
-            "name": "WolvenGear",
-            "children": []
-          },
-          {
-            "name": "BearGear",
-            "children": []
-          },
-          {
-            "name": "ViperGear",
-            "children": []
-          },
-          {
-            "name": "ManticoreGear",
-            "children": []
-          },
-          {
-            "name": "GriffinGear",
-            "children": []
-          }
-        ]
-      },
-      {
-        "name": "Mobs",
-        "children": []
-      },
-      {
-        "name": "Pause Menu ",
-        "children": []
-      },
-      {
-        "name": "Items",
-        "children": []
-      },
-      {
-        "name": "Character Stats",
-        "children": [
-          {
-            "name": "Stats",
-            "children": [
-              {
-                "name": "ConstStats",
-                "children": []
-              },
-              {
-                "name": "VariableStats",
-                "children": [
-                  {
-                    "name": "MovementSpeed",
-                    "children": []
-                  },
-                  {
-                    "name": "AttackSpeed",
-                    "children": []
-                  },
-                  {
-                    "name": "CritChance",
-                    "children": []
-                  },
-                  {
-                    "name": "CritDamage",
-                    "children": []
-                  },
-                  {
-                    "name": "Health",
-                    "children": []
-                  },
-                  {
-                    "name": "AdditionalDamage",
-                    "children": []
-                  },
-                  {
-                    "name": "PassiveRegeneration",
-                    "children": []
-                  },
-                  {
-                    "name": "PassiveStaminaRegeneration",
-                    "children": []
-                  },
-                  {
-                    "name": "DodgeChance",
-                    "children": []
-                  },
-                  {
-                    "name": "InstantKillChance",
-                    "children": []
-                  },
-                  {
-                    "name": "PotionDuration",
-                    "children": []
-                  },
-                  {
-                    "name": "SignIntensity",
-                    "children": []
-                  },
-                  {
-                    "name": "OilDamage",
-                    "children": []
-                  },
-                  {
-                    "name": "LifeSteal",
-                    "children": []
-                  },
-                  {
-                    "name": "ReflectDamage",
-                    "children": []
-                  }
-                ]
-              },
-              {
-                "name": "Stat Reload",
-                "children": []
-              },
-              {
-                "name": "Gui",
-                "children": []
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "name": "Commands",
-        "children": []
       },
       {
         "name": "Character Abilities",
         "children": [
           {
-            "name": "GeneralPerks",
-            "children": [
-              {
-                "name": "GOURMET",
-                "children": []
-              },
-              {
-                "name": "SURVIVAL INSINCT",
-                "children": []
-              },
-              {
-                "name": "SUN AND STARS",
-                "children": []
-              },
-              {
-                "name": "CAT SCHOOL TECHNIQUES",
-                "children": []
-              },
-              {
-                "name": "GRIFFIN SCHOOL TECHNIQUES",
-                "children": []
-              },
-              {
-                "name": "BEAR SCHOOL TECHNIQUES",
-                "children": []
-              }
-            ]
-          },
-          {
-            "name": "CombatPerks",
-            "children": [
-              {
-                "name": "MUSCLE MEMORY",
-                "children": []
-              },
-              {
-                "name": "PRECISE BLOWS",
-                "children": []
-              },
-              {
-                "name": "CRIPPLING STRIKES",
-                "children": []
-              },
-              {
-                "name": "STRENGTH TRAINING",
-                "children": []
-              },
-              {
-                "name": "CRUSHING BLOWS",
-                "children": []
-              },
-              {
-                "name": "SUNDER ARMOR",
-                "children": []
-              },
-              {
-                "name": "FLEET FOOTED",
-                "children": []
-              },
-              {
-                "name": "DEFENCE",
-                "children": []
-              },
-              {
-                "name": "DEADLY PRECISION",
-                "children": []
-              },
-              {
-                "name": "COLD BLOOD",
-                "children": []
-              },
-              {
-                "name": "ANATOMICAL KNOWLEDGE",
-                "children": []
-              },
-              {
-                "name": "CRIPPLING SHOT",
-                "children": []
-              },
-              {
-                "name": "FLOOD OF ANGER",
-                "children": []
-              },
-              {
-                "name": "RAZOR FOCUS",
-                "children": []
-              },
-              {
-                "name": "UNDYING",
-                "children": [
-                  {
-                    "name": "Undying",
-                    "children": []
-                  }
-                ]
-              }
-            ]
-          },
-          {
             "name": "AlchemyPerks",
             "children": [
               {
-                "name": "Refreshment",
+                "name": "Cluster Bombs",
                 "children": []
               },
               {
@@ -11739,7 +11483,11 @@
                 "children": []
               },
               {
-                "name": "Side Effects",
+                "name": "Efficiency",
+                "children": []
+              },
+              {
+                "name": "Hunter Instinct",
                 "children": []
               },
               {
@@ -11751,19 +11499,113 @@
                 "children": []
               },
               {
-                "name": "Hunter Instinct",
-                "children": []
-              },
-              {
                 "name": "Pyrotechnics",
                 "children": []
               },
               {
-                "name": "Efficency",
+                "name": "Refreshment",
                 "children": []
               },
               {
-                "name": "Cluster Bombs",
+                "name": "Side Effects",
+                "children": []
+              }
+            ]
+          },
+          {
+            "name": "CharacterAbilitiesExperience",
+            "children": []
+          },
+          {
+            "name": "CombatPerks",
+            "children": [
+              {
+                "name": "Anatomical Knowledge",
+                "children": []
+              },
+              {
+                "name": "Cold Blood",
+                "children": []
+              },
+              {
+                "name": "Crippling Shot",
+                "children": []
+              },
+              {
+                "name": "Crippling Strikes",
+                "children": []
+              },
+              {
+                "name": "Crushing Blows",
+                "children": []
+              },
+              {
+                "name": "Deadly Precision",
+                "children": []
+              },
+              {
+                "name": "Defence",
+                "children": []
+              },
+              {
+                "name": "Fleet Footed",
+                "children": []
+              },
+              {
+                "name": "Flood of Anger",
+                "children": []
+              },
+              {
+                "name": "Muscle Memory",
+                "children": []
+              },
+              {
+                "name": "Precise Blows",
+                "children": []
+              },
+              {
+                "name": "Razor Focus",
+                "children": []
+              },
+              {
+                "name": "Strength Training",
+                "children": []
+              },
+              {
+                "name": "Sunder Armor",
+                "children": []
+              },
+              {
+                "name": "Undying",
+                "children": []
+              }
+            ]
+          },
+          {
+            "name": "GeneralPerks",
+            "children": [
+              {
+                "name": "Bear School Techniques",
+                "children": []
+              },
+              {
+                "name": "Cat School Techniques",
+                "children": []
+              },
+              {
+                "name": "Gourmet",
+                "children": []
+              },
+              {
+                "name": "Griffin School Techniques",
+                "children": []
+              },
+              {
+                "name": "Sun and Stars",
+                "children": []
+              },
+              {
+                "name": "Survival Instinct",
                 "children": []
               }
             ]
@@ -11772,15 +11614,27 @@
             "name": "SignsPerks",
             "children": [
               {
-                "name": "FarReachingAard",
-                "children": []
-              },
-              {
                 "name": "Aard Intensity",
                 "children": []
               },
               {
-                "name": "Shock Wave",
+                "name": "Axii Intensity",
+                "children": []
+              },
+              {
+                "name": "Delusion",
+                "children": []
+              },
+              {
+                "name": "Domination",
+                "children": []
+              },
+              {
+                "name": "Exploding Shield",
+                "children": []
+              },
+              {
+                "name": "FarReachingAard",
                 "children": []
               },
               {
@@ -11792,7 +11646,23 @@
                 "children": []
               },
               {
+                "name": "Magic Trap",
+                "children": []
+              },
+              {
                 "name": "Pyromaniac",
+                "children": []
+              },
+              {
+                "name": "Quen Discharge",
+                "children": []
+              },
+              {
+                "name": "Quen Intensity",
+                "children": []
+              },
+              {
+                "name": "Shock Wave",
                 "children": []
               },
               {
@@ -11802,64 +11672,108 @@
               {
                 "name": "Yrden Intensity",
                 "children": []
-              },
-              {
-                "name": "Magic Trap",
-                "children": []
-              },
-              {
-                "name": "Exploding Shield",
-                "children": []
-              },
-              {
-                "name": "Quen Intensity",
-                "children": []
-              },
-              {
-                "name": "Quen Discharge",
-                "children": []
-              },
-              {
-                "name": "Delusion",
-                "children": []
-              },
-              {
-                "name": "Axii Intenity",
-                "children": []
-              },
-              {
-                "name": "Domination",
-                "children": []
               }
             ]
-          },
+          }
+        ]
+      },
+      {
+        "name": "Character Stats",
+        "children": [
           {
-            "name": "CharacterAbilitiesExperience",
+            "name": "Modifiers",
             "children": []
           },
           {
-            "name": "General",
+            "name": "Regeneration",
+            "children": []
+          },
+          {
+            "name": "Stats",
+            "children": [
+              {
+                "name": "Gui",
+                "children": []
+              },
+              {
+                "name": "VariableStats",
+                "children": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Glossary",
+        "children": []
+      },
+      {
+        "name": "Items",
+        "children": []
+      },
+      {
+        "name": "Meditation",
+        "children": [
+          {
+            "name": "MeditationHand",
+            "children": []
+          },
+          {
+            "name": "MeditationHandTimeNow",
             "children": []
           }
         ]
       },
       {
-        "name": "Admin",
+        "name": "Mobs",
+        "children": []
+      },
+      {
+        "name": "Pause Menu",
+        "children": []
+      },
+      {
+        "name": "Signs",
         "children": [
           {
-            "name": "EnemyNearby",
+            "name": "Aard",
             "children": []
           },
           {
-            "name": "Commands",
+            "name": "Axii",
             "children": []
           },
           {
-            "name": "Calc",
+            "name": "Igni",
             "children": []
           },
           {
-            "name": "InCombat",
+            "name": "Quen",
+            "children": [
+              {
+                "name": "AltQuen",
+                "children": []
+              },
+              {
+                "name": "DefQuen",
+                "children": []
+              },
+              {
+                "name": "Quen Text",
+                "children": []
+              }
+            ]
+          },
+          {
+            "name": "SignCast",
+            "children": []
+          },
+          {
+            "name": "SignMenu",
+            "children": []
+          },
+          {
+            "name": "Yrden",
             "children": []
           }
         ]
@@ -11870,16 +11784,12 @@
           {
             "name": "Bleed",
             "children": []
-          },
-          {
-            "name": "InstantKill",
-            "children": []
-          },
-          {
-            "name": "Blindness",
-            "children": []
           }
         ]
+      },
+      {
+        "name": "Weapons",
+        "children": []
       }
     ]
   },
