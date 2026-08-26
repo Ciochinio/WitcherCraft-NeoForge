@@ -198,9 +198,13 @@ doesn't depend on the tree revamp.
 - Step 0 (DONE): renamed `witchercraftAbilities<X>` -> `witchercraftPerks<X>`
   across elements, registry, and Java (806 refs). Gradle `compileJava` passed.
   Note: NBT keys changed, so existing test saves lose learned-perk state.
-- Step 1a: add the new vars (Section 3) + `RecomputeEquippedPerks` (menu close +
-  login): sets `witchercraftEquippedPerk<X>` from the perk-socket vars, and
-  applies/removes STATIC perk modifiers as permanent.
+- Step 1a (DONE - derivation): new vars added. `RecomputeEquippedPerks` is a
+  MASTER procedure that calls 4 per-branch procedures
+  (`RecomputeEquippedPerksCombat/Alchemy/Signs/General`), split for readability.
+  Each branch proc sets its perks' `witchercraftEquippedPerk<X>` = OR over
+  `PerkSocket1..12 == id`. Wired to a temporary `DebugRecomputePerksKeybind`
+  (key P) for testing; menu-close/login trigger + static-modifier application
+  still TODO.
 - Step 1b: split `PerkModifiersProcedure` - static branches move into the
   menu-close recompute; the ~5 conditional branches become `PerkModifiersConditional`
   (per-tick/event, gated on equipped).
@@ -292,6 +296,48 @@ Conditional perks (go in `PerkModifiersConditional`, not the static recompute):
 101 AnatomicalKnowledge, 103 CripplingShot (bow/crossbow in hand); 102 ColdBlood
 (no enemy nearby); 109 FloodOfAnger (enemy nearby); 405 SunAndStars (day/night).
 All others are static.
+
+## 13. How to add a new perk (checklist)
+
+The equip rework makes adding a perk more involved than before. Steps:
+
+1. **Branch + ID.** Decide the branch (Combat=red, Alchemy=green, Signs=blue,
+   General=neutral) and pick a free ID in that branch's hundreds range
+   (Section 12: red 100s, green 200s, blue 300s, neutral 400s).
+2. **Learned var** `witchercraftPerks<Name>` (logic, player_persistent, false) -
+   the "owned" flag. Set true by the buy logic.
+3. **Equipped var** `witchercraftEquippedPerk<Name>` (logic, player_persistent,
+   false) - the "active" flag, derived by the recompute.
+4. **Tree GUI button** - imagebutton with `onClick` = a `<Name>Effect` buy
+   procedure and `displayCondition` = a `<Name>Show` procedure (mirror an
+   existing perk in the same branch GUI).
+5. **Derivation line** - in the matching `RecomputeEquippedPerks<Branch>`
+   procedure, add: set `EquippedPerk<Name>` = OR over `PerkSocket1..12 == <id>`.
+   (Use the generator pattern; see block gotcha below.)
+6. **Apply its buff, gated on the EQUIPPED flag (not learned):**
+   - Static flat stat -> the menu-close static modifier application.
+   - Triggered/active mechanic -> its own event procedure, gated on
+     `witchercraftEquippedPerk<Name>`.
+   - Conditional -> `PerkModifiersConditional`, gated on equipped AND its
+     condition.
+7. **Registry table** - add name/ID/color to Section 12.
+8. **Icon** - a transparent inner-glyph PNG for the equip screen (frame is
+   drawn by color, Section 5).
+9. **GDD** - document the perk and its values.
+
+## 14. Block-type gotchas (learned the hard way)
+
+- **Comparing NUMBERS uses `math_binary_ops`** (OP=EQ/NEQ/GT/GTE/LT/LTE), NOT
+  `logic_binary_ops`. `logic_binary_ops` EQ is for BOOLEAN equality and will not
+  bind number inputs - MCreator silently spills the operands / orphans blocks.
+  The number comparison outputs a boolean, which you then feed into
+  `logic_binary_ops` OR/AND. (This is why the first recompute build failed.)
+- `logic_binary_ops` AND/OR conventionally carry `inline="false"` in this project
+  (vertical layout); omitting it renders inline/horizontal. Layout only - does not
+  affect connection validity.
+- Player-var reads/writes need `<mutation ... is_player_var="true"
+  has_entity="true">` plus a `<value name="entity"><block
+  type="entity_from_deps"></block></value>` child.
 
 ## 11. Project conventions to respect (from CLAUDE.md)
 

@@ -5763,6 +5763,108 @@
       "path": "~/Character Stats/Modifiers"
     },
     {
+      "name": "RecomputeEquippedPerks",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "recompute_equipped_perks",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/RecomputeEquippedPerksProcedure.java"
+        ]
+      }
+    },
+    {
+      "name": "RecomputeEquippedPerksCombat",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "recompute_equipped_perks_combat",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/RecomputeEquippedPerksCombatProcedure.java"
+        ]
+      }
+    },
+    {
+      "name": "RecomputeEquippedPerksAlchemy",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "recompute_equipped_perks_alchemy",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/RecomputeEquippedPerksAlchemyProcedure.java"
+        ]
+      }
+    },
+    {
+      "name": "RecomputeEquippedPerksSigns",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "recompute_equipped_perks_signs",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/RecomputeEquippedPerksSignsProcedure.java"
+        ]
+      }
+    },
+    {
+      "name": "RecomputeEquippedPerksGeneral",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "recompute_equipped_perks_general",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/RecomputeEquippedPerksGeneralProcedure.java"
+        ]
+      }
+    },
+    {
+      "name": "DebugRecomputePerksKeybind",
+      "type": "keybind",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "debug_recompute_perks_keybind",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/network/DebugRecomputePerksKeybindMessage.java"
+        ]
+      }
+    },
+    {
       "name": "DodgeChance",
       "type": "attribute",
       "compiles": true,
@@ -10428,7 +10530,7 @@
       "name": "witchercraftPerkSocket1",
       "type": "number",
       "scope": "player_persistent",
-      "value": "0"
+      "value": "0.0"
     },
     {
       "name": "witchercraftPerkSocket2",
@@ -11595,7 +11697,8 @@
       "gui.witchercraft.drowner_gui.label_loot_monster_brain_monster_too": "Loot: Monster Brain",
       "effect.witchercraft.damage_blocked": "Damage Blocked Double DMG Fix",
       "gui.witchercraft.player_stats_overlay.label_signholdcost": "SignHoldCost",
-      "effect.witchercraft.quen_active_shield": "Quen Active Shield"
+      "effect.witchercraft.quen_active_shield": "Quen Active Shield",
+      "key.witchercraft.debug_recompute_perks_keybind": "Debug Recompute Perks"
     }
   },
   "metadata": {

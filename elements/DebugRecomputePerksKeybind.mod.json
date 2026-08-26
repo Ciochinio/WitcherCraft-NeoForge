@@ -1,0 +1,10 @@
+{
+  "_fv": 89,
+  "_type": "keybind",
+  "definition": {
+    "triggerKey": "P",
+    "keyBindingName": "Debug Recompute Perks",
+    "keyBindingCategoryKey": "witchercraft",
+    "onKeyPressed": "RecomputeEquippedPerks"
+  }
+}

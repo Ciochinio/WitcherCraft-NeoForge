@@ -210,7 +210,7 @@ public class WitchercraftModVariables {
 		boolean _syncDirty = false;
 		public double witchercraftPerksLearned = 0.0;
 		public boolean witchercraftPerksGourmet = false;
-		public double witchercraftPerkSocket1 = 0;
+		public double witchercraftPerkSocket1 = 111.0;
 		public double witchercraftPerkSocket2 = 0;
 		public double witchercraftPerkSocket3 = 0;
 		public double witchercraftPerkSocket4 = 0;

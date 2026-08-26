@@ -309,5 +309,6 @@
   "gui.witchercraft.drowner_gui.label_loot_monster_brain_monster_too": "Loot: Monster Brain",
   "effect.witchercraft.damage_blocked": "Damage Blocked Double DMG Fix",
   "gui.witchercraft.player_stats_overlay.label_signholdcost": "SignHoldCost",
-  "effect.witchercraft.quen_active_shield": "Quen Active Shield"
+  "effect.witchercraft.quen_active_shield": "Quen Active Shield",
+  "key.witchercraft.debug_recompute_perks_keybind": "Debug Recompute Perks"
 }
