@@ -10,5 +10,6 @@ public class RecomputeEquippedPerksProcedure {
 		RecomputeEquippedPerksAlchemyProcedure.execute(entity);
 		RecomputeEquippedPerksSignsProcedure.execute(entity);
 		RecomputeEquippedPerksGeneralProcedure.execute(entity);
+		PerkModifiersProcedure.execute(entity);
 	}
 }

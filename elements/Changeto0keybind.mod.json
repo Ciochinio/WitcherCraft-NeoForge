@@ -1,0 +1,10 @@
+{
+  "_fv": 89,
+  "_type": "keybind",
+  "definition": {
+    "triggerKey": "V",
+    "keyBindingName": "Changeto 0keybing",
+    "keyBindingCategoryKey": "movement",
+    "onKeyPressed": "Changeto0"
+  }
+}

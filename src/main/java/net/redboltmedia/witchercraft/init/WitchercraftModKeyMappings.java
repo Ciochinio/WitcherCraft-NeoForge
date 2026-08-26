@@ -5,10 +5,7 @@ package net.redboltmedia.witchercraft.init;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.redboltmedia.witchercraft.network.SignGuiKeybindMessage;
-import net.redboltmedia.witchercraft.network.SignCastKeybindMessage;
-import net.redboltmedia.witchercraft.network.PauseMenuKeybindPressMessage;
-import net.redboltmedia.witchercraft.network.DebugRecomputePerksKeybindMessage;
+import net.redboltmedia.witchercraft.network.*;
 
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
@@ -81,6 +78,32 @@ public class WitchercraftModKeyMappings {
 			isDownOld = isDown;
 		}
 	};
+	public static final KeyMapping CHANGETO_111KEYBING = new KeyMapping("key.witchercraft.changeto_111keybing", GLFW.GLFW_KEY_X, KeyMapping.Category.MOVEMENT) {
+		private boolean isDownOld = false;
+
+		@Override
+		public void setDown(boolean isDown) {
+			super.setDown(isDown);
+			if (isDownOld != isDown && isDown) {
+				ClientPacketDistributor.sendToServer(new Changeto111keybingMessage(0, 0));
+				Changeto111keybingMessage.pressAction(Minecraft.getInstance().player, 0, 0);
+			}
+			isDownOld = isDown;
+		}
+	};
+	public static final KeyMapping CHANGETO_0KEYBIND = new KeyMapping("key.witchercraft.changeto_0keybind", GLFW.GLFW_KEY_V, KeyMapping.Category.MOVEMENT) {
+		private boolean isDownOld = false;
+
+		@Override
+		public void setDown(boolean isDown) {
+			super.setDown(isDown);
+			if (isDownOld != isDown && isDown) {
+				ClientPacketDistributor.sendToServer(new Changeto0keybindMessage(0, 0));
+				Changeto0keybindMessage.pressAction(Minecraft.getInstance().player, 0, 0);
+			}
+			isDownOld = isDown;
+		}
+	};
 	private static long SIGN_CAST_KEYBIND_LASTPRESS = 0;
 
 	@SubscribeEvent
@@ -90,6 +113,8 @@ public class WitchercraftModKeyMappings {
 		event.register(SIGN_GUI_KEYBIND);
 		event.register(SIGN_CAST_KEYBIND);
 		event.register(DEBUG_RECOMPUTE_PERKS_KEYBIND);
+		event.register(CHANGETO_111KEYBING);
+		event.register(CHANGETO_0KEYBIND);
 	}
 
 	@EventBusSubscriber(Dist.CLIENT)
@@ -101,6 +126,8 @@ public class WitchercraftModKeyMappings {
 				SIGN_GUI_KEYBIND.consumeClick();
 				SIGN_CAST_KEYBIND.consumeClick();
 				DEBUG_RECOMPUTE_PERKS_KEYBIND.consumeClick();
+				CHANGETO_111KEYBING.consumeClick();
+				CHANGETO_0KEYBIND.consumeClick();
 			}
 		}
 	}

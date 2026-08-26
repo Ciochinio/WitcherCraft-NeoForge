@@ -5750,6 +5750,25 @@
           {
             "name": "entity",
             "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/PerkModifiersProcedure.java"
+        ]
+      },
+      "path": "~/Character Stats/Modifiers"
+    },
+    {
+      "name": "PerkModifiersConditional",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "perk_modifiers_conditional",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
           },
           {
             "name": "world",
@@ -5757,7 +5776,7 @@
           }
         ],
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/PerkModifiersProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/PerkModifiersConditionalProcedure.java"
         ]
       },
       "path": "~/Character Stats/Modifiers"
@@ -10511,6 +10530,84 @@
         ]
       },
       "path": "~/Admin/Calc"
+    },
+    {
+      "name": "Testperk111",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "testperk_111",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/Testperk111Procedure.java"
+        ]
+      }
+    },
+    {
+      "name": "Changeto111",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "changeto_111",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/Changeto111Procedure.java"
+        ]
+      }
+    },
+    {
+      "name": "Changeto111keybing",
+      "type": "keybind",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "changeto_111keybing",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/network/Changeto111keybingMessage.java"
+        ]
+      }
+    },
+    {
+      "name": "Changeto0",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "changeto_0",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/Changeto0Procedure.java"
+        ]
+      }
+    },
+    {
+      "name": "Changeto0keybind",
+      "type": "keybind",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "changeto_0keybind",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/network/Changeto0keybindMessage.java"
+        ]
+      }
     }
   ],
   "variable_elements": [
@@ -11698,7 +11795,9 @@
       "effect.witchercraft.damage_blocked": "Damage Blocked Double DMG Fix",
       "gui.witchercraft.player_stats_overlay.label_signholdcost": "SignHoldCost",
       "effect.witchercraft.quen_active_shield": "Quen Active Shield",
-      "key.witchercraft.debug_recompute_perks_keybind": "Debug Recompute Perks"
+      "key.witchercraft.debug_recompute_perks_keybind": "Debug Recompute Perks",
+      "key.witchercraft.changeto_111keybing": "Changeto 1 1 1keybing",
+      "key.witchercraft.changeto_0keybind": "Changeto 0keybing"
     }
   },
   "metadata": {

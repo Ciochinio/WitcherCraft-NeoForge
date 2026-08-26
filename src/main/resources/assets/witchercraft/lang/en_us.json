@@ -310,5 +310,7 @@
   "effect.witchercraft.damage_blocked": "Damage Blocked Double DMG Fix",
   "gui.witchercraft.player_stats_overlay.label_signholdcost": "SignHoldCost",
   "effect.witchercraft.quen_active_shield": "Quen Active Shield",
-  "key.witchercraft.debug_recompute_perks_keybind": "Debug Recompute Perks"
+  "key.witchercraft.debug_recompute_perks_keybind": "Debug Recompute Perks",
+  "key.witchercraft.changeto_111keybing": "Changeto 1 1 1keybing",
+  "key.witchercraft.changeto_0keybind": "Changeto 0keybing"
 }

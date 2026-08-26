@@ -174,10 +174,13 @@ an explicit go-ahead.
 
 Perks fall in two buckets:
 
-- **Static perks (the majority):** unconditional flat buffs. Applied ONCE on menu
-  close (and login) as **permanent** modifiers (the `entity_add_modifier`
-  `permanent` flag = TRUE, so they persist in NBT across relog/respawn). Recompute
-  = remove-all-then-add-equipped. Zero per-tick cost.
+- **Static perks (the majority):** unconditional flat buffs. Applied on menu
+  close (and login) as **transient** modifiers (`permanent`=FALSE). Transient
+  adds are idempotent (replace by id, no stacking), survive gameplay after close,
+  and the login re-apply covers relog - simpler and safer than permanent (no
+  remove-then-add dance). Lives in the `PerkModifiers` procedure, now
+  `no_ext_trigger` and called by the master after the 4 branch derivations. Zero
+  per-tick cost.
 - **Conditional perks (~5):** buffs whose condition changes during play, so they
   can't be static. Minecraft attribute modifiers can't self-condition (a modifier
   is either present or absent), so these need a watcher. They live in
@@ -205,9 +208,21 @@ doesn't depend on the tree revamp.
   `PerkSocket1..12 == id`. Wired to a temporary `DebugRecomputePerksKeybind`
   (key P) for testing; menu-close/login trigger + static-modifier application
   still TODO.
-- Step 1b: split `PerkModifiersProcedure` - static branches move into the
-  menu-close recompute; the ~5 conditional branches become `PerkModifiersConditional`
-  (per-tick/event, gated on equipped).
+- Step 1b (DONE): split `PerkModifiers` - it now holds only the 12 STATIC
+  flat-stat perks, equipped-gated, `no_ext_trigger`, called by the master. The 5
+  CONDITIONAL perks moved to new `PerkModifiersConditional` (`player_ticks`,
+  isremote-guarded, equipped-gated, condition logic preserved verbatim).
+- Step 1b-tail (DONE): re-gated the triggered/active perks from learned ->
+  equipped. Finding: only 8 of the ~28 actually gate an effect on the learned
+  flag today - CripplingStrikes (`BleedHit`), Undying (`UndyingEffectActive`),
+  Refreshment (`DecoctionUsed`, `PotionUsed`), and the sign upgrades Delusion /
+  ExplodingShield / FarReachingAard / Firestream / MagicTrap (`SignCastKeyPress`,
+  `SignCastKeyRelease`, `SignCastHold`, `SignCastHoldCost`). Those reads were
+  swapped to `witchercraftEquippedPerk<X>`. The remaining ~20 (intensity perks
+  AardIntensity/IgniIntensity/QuenIntensity/... and school perks) have NO effect
+  gate wired yet - they appear only in `DevClear` (debug reset, correctly left on
+  learned) and their buy/show procs. When their effects get implemented, gate
+  them on equipped per Section 13.
 - Step 1c: mutagen bonus math (static -> menu-close recompute, Section 7).
 - Also: the perk -> ID -> color table (first artifact), used by the recompute,
   the screen, and the node-placer.
