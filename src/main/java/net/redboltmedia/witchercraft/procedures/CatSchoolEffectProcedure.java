@@ -11,7 +11,7 @@ public class CatSchoolEffectProcedure {
 		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
 			{
 				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-				_vars.witchercraftAbilitiesCatSchool = true;
+				_vars.witchercraftPerksCatSchool = true;
 				_vars.markSyncDirty();
 			}
 			CharacterAbilitiesSkillPointUsedProcedure.execute(entity);

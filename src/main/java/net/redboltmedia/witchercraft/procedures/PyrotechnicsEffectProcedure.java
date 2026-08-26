@@ -11,7 +11,7 @@ public class PyrotechnicsEffectProcedure {
 		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
 			{
 				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-				_vars.witchercraftAbilitiesPyrotechnics = true;
+				_vars.witchercraftPerksPyrotechnics = true;
 				_vars.markSyncDirty();
 			}
 			CharacterAbilitiesAlchemySkillPointsUsedProcedure.execute(entity);

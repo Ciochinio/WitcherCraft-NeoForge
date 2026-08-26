@@ -8,7 +8,7 @@ public class SustainedGlyphsShowProcedure {
 	public static boolean execute(Entity entity) {
 		if (entity == null)
 			return false;
-		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesSustainedGlyphs == true) {
+		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksSustainedGlyphs == true) {
 			return false;
 		}
 		return true;

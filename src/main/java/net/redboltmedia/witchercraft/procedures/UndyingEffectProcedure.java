@@ -12,7 +12,7 @@ public class UndyingEffectProcedure {
 			if (CharacterAbilitiesCombatTier3Procedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-					_vars.witchercraftAbilitiesUndying = true;
+					_vars.witchercraftPerksUndying = true;
 					_vars.markSyncDirty();
 				}
 				CharacterAbilitiesCombatSkillPointsUsedProcedure.execute(entity);

@@ -11,7 +11,7 @@ public class PoisonedBladesEffectProcedure {
 		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
 			{
 				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-				_vars.witchercraftAbilitiesPoisonedBlades = true;
+				_vars.witchercraftPerksPoisonedBlades = true;
 				_vars.markSyncDirty();
 			}
 			CharacterAbilitiesAlchemySkillPointsUsedProcedure.execute(entity);

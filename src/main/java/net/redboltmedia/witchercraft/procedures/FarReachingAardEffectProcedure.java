@@ -11,7 +11,7 @@ public class FarReachingAardEffectProcedure {
 		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
 			{
 				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-				_vars.witchercraftAbilitiesFarReachingAard = true;
+				_vars.witchercraftPerksFarReachingAard = true;
 				_vars.markSyncDirty();
 			}
 			CharacterAbilitiesSignsSkillPointsUsedProcedure.execute(entity);

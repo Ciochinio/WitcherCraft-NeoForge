@@ -8,6 +8,6 @@ public class CharacterAbilitiesSignsGuiSkillPointsUsedProcedure {
 	public static String execute(Entity entity) {
 		if (entity == null)
 			return "";
-		return "Signs SP used: " + new java.text.DecimalFormat("##.##").format(entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesSignsSkillPointsUsed);
+		return "Signs SP used: " + new java.text.DecimalFormat("##.##").format(entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksSignsSkillPointsUsed);
 	}
 }

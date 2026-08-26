@@ -8,7 +8,7 @@ public class IgniIntensityShowProcedure {
 	public static boolean execute(Entity entity) {
 		if (entity == null)
 			return false;
-		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesIgniIntensity == true) {
+		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksIgniIntensity == true) {
 			return false;
 		}
 		return true;

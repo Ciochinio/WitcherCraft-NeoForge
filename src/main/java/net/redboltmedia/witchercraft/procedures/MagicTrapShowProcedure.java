@@ -8,7 +8,7 @@ public class MagicTrapShowProcedure {
 	public static boolean execute(Entity entity) {
 		if (entity == null)
 			return false;
-		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesMagicTrap == true) {
+		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksMagicTrap == true) {
 			return false;
 		}
 		return true;

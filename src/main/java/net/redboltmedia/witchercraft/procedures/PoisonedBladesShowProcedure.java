@@ -8,7 +8,7 @@ public class PoisonedBladesShowProcedure {
 	public static boolean execute(Entity entity) {
 		if (entity == null)
 			return false;
-		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesPoisonedBlades == true) {
+		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksPoisonedBlades == true) {
 			return false;
 		}
 		return true;

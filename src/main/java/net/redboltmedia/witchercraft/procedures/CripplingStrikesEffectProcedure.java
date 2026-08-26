@@ -12,7 +12,7 @@ public class CripplingStrikesEffectProcedure {
 			if (CharacterAbilitiesCombatTier3Procedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-					_vars.witchercraftAbilitiesCripplingStrikes = true;
+					_vars.witchercraftPerksCripplingStrikes = true;
 					_vars.markSyncDirty();
 				}
 				CharacterAbilitiesCombatSkillPointsUsedProcedure.execute(entity);

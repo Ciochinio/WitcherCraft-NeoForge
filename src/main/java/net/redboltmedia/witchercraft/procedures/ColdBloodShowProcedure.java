@@ -8,7 +8,7 @@ public class ColdBloodShowProcedure {
 	public static boolean execute(Entity entity) {
 		if (entity == null)
 			return false;
-		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesColdBlood == true) {
+		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksColdBlood == true) {
 			return false;
 		}
 		return true;

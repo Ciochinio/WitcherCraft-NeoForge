@@ -8,7 +8,7 @@ public class GriffinSchoolShowProcedure {
 	public static boolean execute(Entity entity) {
 		if (entity == null)
 			return false;
-		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesGriffinSchool == true) {
+		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksGriffinSchool == true) {
 			return false;
 		}
 		return true;

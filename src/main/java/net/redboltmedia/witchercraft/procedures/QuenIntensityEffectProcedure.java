@@ -12,7 +12,7 @@ public class QuenIntensityEffectProcedure {
 			if (CharacterAbilitiesSignsTier2Procedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-					_vars.witchercraftAbilitiesQuenIntensity = true;
+					_vars.witchercraftPerksQuenIntensity = true;
 					_vars.markSyncDirty();
 				}
 				CharacterAbilitiesSignsSkillPointsUsedProcedure.execute(entity);

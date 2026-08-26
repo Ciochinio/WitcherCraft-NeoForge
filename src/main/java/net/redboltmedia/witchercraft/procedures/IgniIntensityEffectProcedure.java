@@ -12,7 +12,7 @@ public class IgniIntensityEffectProcedure {
 			if (CharacterAbilitiesSignsTier2Procedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-					_vars.witchercraftAbilitiesIgniIntensity = true;
+					_vars.witchercraftPerksIgniIntensity = true;
 					_vars.markSyncDirty();
 				}
 				CharacterAbilitiesSignsSkillPointsUsedProcedure.execute(entity);

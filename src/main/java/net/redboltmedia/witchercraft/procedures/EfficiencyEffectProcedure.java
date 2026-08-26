@@ -12,7 +12,7 @@ public class EfficiencyEffectProcedure {
 			if (CharacterAbilitiesAlchemyTier2Procedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-					_vars.witchercraftAbilitiesEfficiency = true;
+					_vars.witchercraftPerksEfficiency = true;
 					_vars.markSyncDirty();
 				}
 				CharacterAbilitiesAlchemySkillPointsUsedProcedure.execute(entity);

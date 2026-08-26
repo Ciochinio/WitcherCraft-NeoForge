@@ -8,7 +8,7 @@ public class QuenDischargeShowProcedure {
 	public static boolean execute(Entity entity) {
 		if (entity == null)
 			return false;
-		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesQuenDischarge == true) {
+		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksQuenDischarge == true) {
 			return false;
 		}
 		return true;

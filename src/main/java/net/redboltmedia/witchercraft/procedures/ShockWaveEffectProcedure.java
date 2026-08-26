@@ -12,7 +12,7 @@ public class ShockWaveEffectProcedure {
 			if (CharacterAbilitiesSignsTier3Procedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-					_vars.witchercraftAbilitiesShockWave = true;
+					_vars.witchercraftPerksShockWave = true;
 					_vars.markSyncDirty();
 				}
 				CharacterAbilitiesSignsSkillPointsUsedProcedure.execute(entity);

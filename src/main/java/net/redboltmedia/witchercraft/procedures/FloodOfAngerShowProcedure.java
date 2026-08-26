@@ -8,7 +8,7 @@ public class FloodOfAngerShowProcedure {
 	public static boolean execute(Entity entity) {
 		if (entity == null)
 			return false;
-		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesFloodOfAnger == true) {
+		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksFloodOfAnger == true) {
 			return false;
 		}
 		return true;

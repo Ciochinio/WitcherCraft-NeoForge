@@ -30,7 +30,7 @@ public class BleedHitProcedure {
 	private static void execute(@Nullable Event event, Entity entity, Entity sourceentity) {
 		if (entity == null || sourceentity == null)
 			return;
-		if (sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesCripplingStrikes) {
+		if (sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksCripplingStrikes) {
 			if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
 				_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.BLEED, 100, 1));
 		}

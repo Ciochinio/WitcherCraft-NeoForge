@@ -8,7 +8,7 @@ public class HunterInstinctShowProcedure {
 	public static boolean execute(Entity entity) {
 		if (entity == null)
 			return false;
-		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesHunterInstinct == true) {
+		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksHunterInstinct == true) {
 			return false;
 		}
 		return true;

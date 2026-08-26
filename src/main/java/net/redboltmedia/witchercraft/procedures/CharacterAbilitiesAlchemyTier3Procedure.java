@@ -10,7 +10,7 @@ public class CharacterAbilitiesAlchemyTier3Procedure {
 	public static boolean execute(Entity entity) {
 		if (entity == null)
 			return false;
-		if (entity instanceof LivingEntity _livEnt0 && _livEnt0.hasEffect(WitchercraftModMobEffects.DEV_LOG) || entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesAlchemySkillPointsUsed >= 5) {
+		if (entity instanceof LivingEntity _livEnt0 && _livEnt0.hasEffect(WitchercraftModMobEffects.DEV_LOG) || entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksAlchemySkillPointsUsed >= 5) {
 			return true;
 		}
 		return false;

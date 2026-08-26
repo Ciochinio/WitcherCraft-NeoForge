@@ -10,8 +10,8 @@ public class CharacterAbilitiesSignsSkillPointsUsedProcedure {
 			return;
 		{
 			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-			_vars.witchercraftAbilitiesSignsSkillPointsUsed = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesSignsSkillPointsUsed + 1;
-			_vars.witchercraftAbilitiesLearned = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesLearned + 1;
+			_vars.witchercraftPerksSignsSkillPointsUsed = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksSignsSkillPointsUsed + 1;
+			_vars.witchercraftPerksLearned = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksLearned + 1;
 			_vars.markSyncDirty();
 		}
 	}

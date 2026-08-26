@@ -12,7 +12,7 @@ public class YrdenIntensityEffectProcedure {
 			if (CharacterAbilitiesSignsTier2Procedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-					_vars.witchercraftAbilitiesYrdenIntensity = true;
+					_vars.witchercraftPerksYrdenIntensity = true;
 					_vars.markSyncDirty();
 				}
 				CharacterAbilitiesSignsSkillPointsUsedProcedure.execute(entity);

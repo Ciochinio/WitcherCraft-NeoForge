@@ -17,7 +17,7 @@ public class SignCastKeyReleaseProcedure {
 			return;
 		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftSignNoCast == false) {
 			if (!(entity instanceof LivingEntity _livEnt0 && _livEnt0.hasEffect(WitchercraftModMobEffects.SIGN_COOLDOWN))) {
-				if (entity instanceof LivingEntity _livEnt1 && _livEnt1.hasEffect(WitchercraftModMobEffects.AXII_SIGN) && !entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesDelusion) {
+				if (entity instanceof LivingEntity _livEnt1 && _livEnt1.hasEffect(WitchercraftModMobEffects.AXII_SIGN) && !entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksDelusion) {
 					AxiiCastProcedure.execute(world, entity);
 					SignCostProcedure.execute(entity);
 					if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
@@ -25,21 +25,21 @@ public class SignCastKeyReleaseProcedure {
 				}
 				if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftSignKeyHoldTime > 20) {
 					if ((entity instanceof Player _plr ? _plr.getFoodData().getFoodLevel() : 0) > 4) {
-						if (entity instanceof LivingEntity _livEnt4 && _livEnt4.hasEffect(WitchercraftModMobEffects.AARD_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesFarReachingAard) {
+						if (entity instanceof LivingEntity _livEnt4 && _livEnt4.hasEffect(WitchercraftModMobEffects.AARD_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksFarReachingAard) {
 							AltAardCastProcedure.execute(world, x, y, z, entity);
 							SignCostProcedure.execute(entity);
 							SignCostProcedure.execute(entity);
 							if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
 								_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.SIGN_COOLDOWN, 40, 0));
 						}
-						if (entity instanceof LivingEntity _livEnt6 && _livEnt6.hasEffect(WitchercraftModMobEffects.YRDEN_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesMagicTrap) {
+						if (entity instanceof LivingEntity _livEnt6 && _livEnt6.hasEffect(WitchercraftModMobEffects.YRDEN_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksMagicTrap) {
 							AltYrdenCastProcedure.execute(world, x, y, z, entity);
 							SignCostProcedure.execute(entity);
 							SignCostProcedure.execute(entity);
 							if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
 								_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.SIGN_COOLDOWN, 40, 0));
 						}
-						if (entity instanceof LivingEntity _livEnt8 && _livEnt8.hasEffect(WitchercraftModMobEffects.AXII_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesDelusion) {
+						if (entity instanceof LivingEntity _livEnt8 && _livEnt8.hasEffect(WitchercraftModMobEffects.AXII_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksDelusion) {
 							AltAxiiCastProcedure.execute(world, entity);
 							SignCostProcedure.execute(entity);
 							SignCostProcedure.execute(entity);
@@ -50,42 +50,42 @@ public class SignCastKeyReleaseProcedure {
 						if (entity instanceof ServerPlayer _player)
 							_player.sendSystemMessage(Component.literal("Not enough stamina for alternate sign"), true);
 					}
-					if (entity instanceof LivingEntity _livEnt13 && _livEnt13.hasEffect(WitchercraftModMobEffects.QUEN_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesExplodingShield) {
+					if (entity instanceof LivingEntity _livEnt13 && _livEnt13.hasEffect(WitchercraftModMobEffects.QUEN_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksExplodingShield) {
 						if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
 							_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.SIGN_COOLDOWN, 40, 0));
 					}
-					if (entity instanceof LivingEntity _livEnt15 && _livEnt15.hasEffect(WitchercraftModMobEffects.IGNI_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesFirestream) {
+					if (entity instanceof LivingEntity _livEnt15 && _livEnt15.hasEffect(WitchercraftModMobEffects.IGNI_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksFirestream) {
 						if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
 							_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.SIGN_COOLDOWN, 40, 0));
 					}
 				}
 				if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftSignKeyHoldTime <= 20) {
 					if ((entity instanceof Player _plr ? _plr.getFoodData().getFoodLevel() : 0) > 4) {
-						if (entity instanceof LivingEntity _livEnt18 && _livEnt18.hasEffect(WitchercraftModMobEffects.YRDEN_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesMagicTrap) {
+						if (entity instanceof LivingEntity _livEnt18 && _livEnt18.hasEffect(WitchercraftModMobEffects.YRDEN_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksMagicTrap) {
 							SignCostProcedure.execute(entity);
 							YrdenCastProcedure.execute(world, x, y, z, entity);
 							if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
 								_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.SIGN_COOLDOWN, 40, 0));
 						}
-						if (entity instanceof LivingEntity _livEnt20 && _livEnt20.hasEffect(WitchercraftModMobEffects.QUEN_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesExplodingShield) {
+						if (entity instanceof LivingEntity _livEnt20 && _livEnt20.hasEffect(WitchercraftModMobEffects.QUEN_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksExplodingShield) {
 							SignCostProcedure.execute(entity);
 							QuenCastProcedure.execute(entity);
 							if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
 								_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.SIGN_COOLDOWN, 40, 0));
 						}
-						if (entity instanceof LivingEntity _livEnt22 && _livEnt22.hasEffect(WitchercraftModMobEffects.AARD_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesFarReachingAard) {
+						if (entity instanceof LivingEntity _livEnt22 && _livEnt22.hasEffect(WitchercraftModMobEffects.AARD_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksFarReachingAard) {
 							SignCostProcedure.execute(entity);
 							AardCastProcedure.execute(world, x, y, z, entity);
 							if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
 								_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.SIGN_COOLDOWN, 40, 1));
 						}
-						if (entity instanceof LivingEntity _livEnt24 && _livEnt24.hasEffect(WitchercraftModMobEffects.IGNI_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesFirestream) {
+						if (entity instanceof LivingEntity _livEnt24 && _livEnt24.hasEffect(WitchercraftModMobEffects.IGNI_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksFirestream) {
 							SignCostProcedure.execute(entity);
 							IgniCastProcedure.execute(entity);
 							if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
 								_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.SIGN_COOLDOWN, 40, 1));
 						}
-						if (entity instanceof LivingEntity _livEnt26 && _livEnt26.hasEffect(WitchercraftModMobEffects.AXII_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesDelusion) {
+						if (entity instanceof LivingEntity _livEnt26 && _livEnt26.hasEffect(WitchercraftModMobEffects.AXII_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksDelusion) {
 							SignCostProcedure.execute(entity);
 							AxiiCastProcedure.execute(world, entity);
 							if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())

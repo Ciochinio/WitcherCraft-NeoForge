@@ -12,7 +12,7 @@ public class MagicTrapEffectProcedure {
 			if (CharacterAbilitiesSignsTier3Procedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-					_vars.witchercraftAbilitiesMagicTrap = true;
+					_vars.witchercraftPerksMagicTrap = true;
 					_vars.markSyncDirty();
 				}
 				CharacterAbilitiesSignsSkillPointsUsedProcedure.execute(entity);

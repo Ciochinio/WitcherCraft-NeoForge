@@ -11,7 +11,7 @@ public class SurvivalInstinctEffectProcedure {
 		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
 			{
 				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-				_vars.witchercraftAbilitiesSurvivalInstinct = true;
+				_vars.witchercraftPerksSurvivalInstinct = true;
 				_vars.markSyncDirty();
 			}
 			CharacterAbilitiesSkillPointUsedProcedure.execute(entity);

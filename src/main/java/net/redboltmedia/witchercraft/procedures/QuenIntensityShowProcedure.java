@@ -8,7 +8,7 @@ public class QuenIntensityShowProcedure {
 	public static boolean execute(Entity entity) {
 		if (entity == null)
 			return false;
-		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesQuenIntensity == true) {
+		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksQuenIntensity == true) {
 			return false;
 		}
 		return true;

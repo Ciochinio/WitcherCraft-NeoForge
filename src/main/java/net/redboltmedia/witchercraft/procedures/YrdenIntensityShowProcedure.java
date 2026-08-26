@@ -8,7 +8,7 @@ public class YrdenIntensityShowProcedure {
 	public static boolean execute(Entity entity) {
 		if (entity == null)
 			return false;
-		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesYrdenIntensity == true) {
+		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksYrdenIntensity == true) {
 			return false;
 		}
 		return true;

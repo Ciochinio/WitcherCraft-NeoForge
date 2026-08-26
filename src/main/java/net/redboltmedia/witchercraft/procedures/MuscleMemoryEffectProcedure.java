@@ -11,7 +11,7 @@ public class MuscleMemoryEffectProcedure {
 		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
 			{
 				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-				_vars.witchercraftAbilitiesMuscleMemory = true;
+				_vars.witchercraftPerksMuscleMemory = true;
 				_vars.markSyncDirty();
 			}
 			CharacterAbilitiesCombatSkillPointsUsedProcedure.execute(entity);

@@ -11,7 +11,7 @@ public class GriffinSchoolEffectProcedure {
 		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
 			{
 				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-				_vars.witchercraftAbilitiesGriffinSchool = true;
+				_vars.witchercraftPerksGriffinSchool = true;
 				_vars.markSyncDirty();
 			}
 			CharacterAbilitiesSkillPointUsedProcedure.execute(entity);

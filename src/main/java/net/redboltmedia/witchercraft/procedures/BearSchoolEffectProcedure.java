@@ -11,7 +11,7 @@ public class BearSchoolEffectProcedure {
 		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
 			{
 				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-				_vars.witchercraftAbilitiesBearSchool = true;
+				_vars.witchercraftPerksBearSchool = true;
 				_vars.markSyncDirty();
 			}
 			CharacterAbilitiesSkillPointUsedProcedure.execute(entity);

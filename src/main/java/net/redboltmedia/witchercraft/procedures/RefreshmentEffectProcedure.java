@@ -11,7 +11,7 @@ public class RefreshmentEffectProcedure {
 		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
 			{
 				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-				_vars.witchercraftAbilitiesRefreshment = true;
+				_vars.witchercraftPerksRefreshment = true;
 				_vars.markSyncDirty();
 			}
 			CharacterAbilitiesAlchemySkillPointsUsedProcedure.execute(entity);

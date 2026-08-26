@@ -11,7 +11,7 @@ public class FleetFootedEffectProcedure {
 		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
 			{
 				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-				_vars.witchercraftAbilitiesFleetFooted = true;
+				_vars.witchercraftPerksFleetFooted = true;
 				_vars.markSyncDirty();
 			}
 			CharacterAbilitiesCombatSkillPointsUsedProcedure.execute(entity);

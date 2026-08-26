@@ -11,7 +11,7 @@ public class FloodOfAngerEffectProcedure {
 		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
 			{
 				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-				_vars.witchercraftAbilitiesFloodOfAnger = true;
+				_vars.witchercraftPerksFloodOfAnger = true;
 				_vars.markSyncDirty();
 			}
 			CharacterAbilitiesCombatSkillPointsUsedProcedure.execute(entity);

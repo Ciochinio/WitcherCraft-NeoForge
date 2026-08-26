@@ -8,7 +8,7 @@ public class ProtectiveCoatingShowProcedure {
 	public static boolean execute(Entity entity) {
 		if (entity == null)
 			return false;
-		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesProtectiveCoating == true) {
+		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksProtectiveCoating == true) {
 			return false;
 		}
 		return true;

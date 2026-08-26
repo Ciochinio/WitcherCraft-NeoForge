@@ -12,7 +12,7 @@ public class RazorFocusEffectProcedure {
 			if (CharacterAbilitiesCombatTier2Procedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-					_vars.witchercraftAbilitiesRazorFocus = true;
+					_vars.witchercraftPerksRazorFocus = true;
 					_vars.markSyncDirty();
 				}
 				CharacterAbilitiesCombatSkillPointsUsedProcedure.execute(entity);

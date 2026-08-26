@@ -8,7 +8,7 @@ public class CripplingStrikesShowProcedure {
 	public static boolean execute(Entity entity) {
 		if (entity == null)
 			return false;
-		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesCripplingStrikes == true) {
+		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksCripplingStrikes == true) {
 			return false;
 		}
 		return true;

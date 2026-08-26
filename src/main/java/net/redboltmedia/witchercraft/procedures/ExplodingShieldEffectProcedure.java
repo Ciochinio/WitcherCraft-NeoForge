@@ -11,7 +11,7 @@ public class ExplodingShieldEffectProcedure {
 		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
 			{
 				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-				_vars.witchercraftAbilitiesExplodingShield = true;
+				_vars.witchercraftPerksExplodingShield = true;
 				_vars.markSyncDirty();
 			}
 			CharacterAbilitiesSignsSkillPointsUsedProcedure.execute(entity);

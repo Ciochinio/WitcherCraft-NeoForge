@@ -11,7 +11,7 @@ public class StrengthTrainingEffectProcedure {
 		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
 			{
 				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-				_vars.witchercraftAbilitiesStrengthTraining = true;
+				_vars.witchercraftPerksStrengthTraining = true;
 				_vars.markSyncDirty();
 			}
 			CharacterAbilitiesCombatSkillPointsUsedProcedure.execute(entity);

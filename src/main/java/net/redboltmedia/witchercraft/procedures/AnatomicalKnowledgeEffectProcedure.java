@@ -12,7 +12,7 @@ public class AnatomicalKnowledgeEffectProcedure {
 			if (CharacterAbilitiesCombatTier2Procedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-					_vars.witchercraftAbilitiesAnatomicalKnowledge = true;
+					_vars.witchercraftPerksAnatomicalKnowledge = true;
 					_vars.markSyncDirty();
 				}
 				CharacterAbilitiesCombatSkillPointsUsedProcedure.execute(entity);

@@ -8,6 +8,6 @@ public class CharacterAbilitiesCombatGuiSkillPointsUsedProcedure {
 	public static String execute(Entity entity) {
 		if (entity == null)
 			return "";
-		return "Combat SP used: " + new java.text.DecimalFormat("##.##").format(entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesCombatSkillPointsUsed);
+		return "Combat SP used: " + new java.text.DecimalFormat("##.##").format(entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksCombatSkillPointsUsed);
 	}
 }

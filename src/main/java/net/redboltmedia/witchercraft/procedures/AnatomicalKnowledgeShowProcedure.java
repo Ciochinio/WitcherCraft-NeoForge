@@ -8,7 +8,7 @@ public class AnatomicalKnowledgeShowProcedure {
 	public static boolean execute(Entity entity) {
 		if (entity == null)
 			return false;
-		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesAnatomicalKnowledge == true) {
+		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksAnatomicalKnowledge == true) {
 			return false;
 		}
 		return true;

@@ -8,7 +8,7 @@ public class DelayedRecoveryShowProcedure {
 	public static boolean execute(Entity entity) {
 		if (entity == null)
 			return false;
-		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesDelayedRecovery == true) {
+		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksDelayedRecovery == true) {
 			return false;
 		}
 		return true;

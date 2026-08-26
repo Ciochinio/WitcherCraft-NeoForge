@@ -12,7 +12,7 @@ public class DelayedRecoveryEffectProcedure {
 			if (CharacterAbilitiesAlchemyTier2Procedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-					_vars.witchercraftAbilitiesDelayedRecovery = true;
+					_vars.witchercraftPerksDelayedRecovery = true;
 					_vars.markSyncDirty();
 				}
 				CharacterAbilitiesAlchemySkillPointsUsedProcedure.execute(entity);

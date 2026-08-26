@@ -11,7 +11,7 @@ public class DelusionEffectProcedure {
 		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
 			{
 				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-				_vars.witchercraftAbilitiesDelusion = true;
+				_vars.witchercraftPerksDelusion = true;
 				_vars.markSyncDirty();
 			}
 			CharacterAbilitiesSignsSkillPointsUsedProcedure.execute(entity);

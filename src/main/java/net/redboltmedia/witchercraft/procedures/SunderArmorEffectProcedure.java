@@ -12,7 +12,7 @@ public class SunderArmorEffectProcedure {
 			if (CharacterAbilitiesCombatTier3Procedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-					_vars.witchercraftAbilitiesSunderArmor = true;
+					_vars.witchercraftPerksSunderArmor = true;
 					_vars.markSyncDirty();
 				}
 				CharacterAbilitiesCombatSkillPointsUsedProcedure.execute(entity);

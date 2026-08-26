@@ -10413,277 +10413,667 @@
   ],
   "variable_elements": [
     {
-      "name": "witchercraftAbilitiesLearned",
+      "name": "witchercraftPerksLearned",
       "type": "number",
       "scope": "player_persistent",
       "value": "0.0"
     },
     {
-      "name": "witchercraftAbilitiesGourmet",
+      "name": "witchercraftPerksGourmet",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesSurvivalInstinct",
+      "name": "witchercraftPerkSocket1",
+      "type": "number",
+      "scope": "player_persistent",
+      "value": "0"
+    },
+    {
+      "name": "witchercraftPerkSocket2",
+      "type": "number",
+      "scope": "player_persistent",
+      "value": "0"
+    },
+    {
+      "name": "witchercraftPerkSocket3",
+      "type": "number",
+      "scope": "player_persistent",
+      "value": "0"
+    },
+    {
+      "name": "witchercraftPerkSocket4",
+      "type": "number",
+      "scope": "player_persistent",
+      "value": "0"
+    },
+    {
+      "name": "witchercraftPerkSocket5",
+      "type": "number",
+      "scope": "player_persistent",
+      "value": "0"
+    },
+    {
+      "name": "witchercraftPerkSocket6",
+      "type": "number",
+      "scope": "player_persistent",
+      "value": "0"
+    },
+    {
+      "name": "witchercraftPerkSocket7",
+      "type": "number",
+      "scope": "player_persistent",
+      "value": "0"
+    },
+    {
+      "name": "witchercraftPerkSocket8",
+      "type": "number",
+      "scope": "player_persistent",
+      "value": "0"
+    },
+    {
+      "name": "witchercraftPerkSocket9",
+      "type": "number",
+      "scope": "player_persistent",
+      "value": "0"
+    },
+    {
+      "name": "witchercraftPerkSocket10",
+      "type": "number",
+      "scope": "player_persistent",
+      "value": "0"
+    },
+    {
+      "name": "witchercraftPerkSocket11",
+      "type": "number",
+      "scope": "player_persistent",
+      "value": "0"
+    },
+    {
+      "name": "witchercraftPerkSocket12",
+      "type": "number",
+      "scope": "player_persistent",
+      "value": "0"
+    },
+    {
+      "name": "witchercraftMutagenSocket1",
+      "type": "number",
+      "scope": "player_persistent",
+      "value": "0"
+    },
+    {
+      "name": "witchercraftMutagenSocket2",
+      "type": "number",
+      "scope": "player_persistent",
+      "value": "0"
+    },
+    {
+      "name": "witchercraftMutagenSocket3",
+      "type": "number",
+      "scope": "player_persistent",
+      "value": "0"
+    },
+    {
+      "name": "witchercraftMutagenSocket4",
+      "type": "number",
+      "scope": "player_persistent",
+      "value": "0"
+    },
+    {
+      "name": "witchercraftMutagenOwnedRed",
+      "type": "number",
+      "scope": "player_persistent",
+      "value": "0"
+    },
+    {
+      "name": "witchercraftMutagenOwnedGreen",
+      "type": "number",
+      "scope": "player_persistent",
+      "value": "0"
+    },
+    {
+      "name": "witchercraftMutagenOwnedBlue",
+      "type": "number",
+      "scope": "player_persistent",
+      "value": "0"
+    },
+    {
+      "name": "witchercraftSelectedPerk",
+      "type": "number",
+      "scope": "player_persistent",
+      "value": "0"
+    },
+    {
+      "name": "witchercraftEquippedPerkAnatomicalKnowledge",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesSunAndStars",
+      "name": "witchercraftEquippedPerkColdBlood",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesCatSchool",
+      "name": "witchercraftEquippedPerkCripplingShot",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesGriffinSchool",
+      "name": "witchercraftEquippedPerkCripplingStrikes",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesBearSchool",
+      "name": "witchercraftEquippedPerkCrushingBlows",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesRefreshment",
+      "name": "witchercraftEquippedPerkDeadlyPrecision",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesDelayedRecovery",
+      "name": "witchercraftEquippedPerkDefence",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesSideEffects",
+      "name": "witchercraftEquippedPerkFleetFooted",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesPoisonedBlades",
+      "name": "witchercraftEquippedPerkFloodOfAnger",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesProtectiveCoating",
+      "name": "witchercraftEquippedPerkMuscleMemory",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesHunterInstinct",
+      "name": "witchercraftEquippedPerkPreciseBlows",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesPyrotechnics",
+      "name": "witchercraftEquippedPerkRazorFocus",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesEfficiency",
+      "name": "witchercraftEquippedPerkStrengthTraining",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesClusterBombs",
+      "name": "witchercraftEquippedPerkSunderArmor",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesFarReachingAard",
+      "name": "witchercraftEquippedPerkUndying",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesAardIntensity",
+      "name": "witchercraftEquippedPerkClusterBombs",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesShockWave",
+      "name": "witchercraftEquippedPerkDelayedRecovery",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesFirestream",
+      "name": "witchercraftEquippedPerkEfficiency",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesIgniIntensity",
+      "name": "witchercraftEquippedPerkHunterInstinct",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesPyromaniac",
+      "name": "witchercraftEquippedPerkPoisonedBlades",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesSustainedGlyphs",
+      "name": "witchercraftEquippedPerkProtectiveCoating",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesYrdenIntensity",
+      "name": "witchercraftEquippedPerkPyrotechnics",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesMagicTrap",
+      "name": "witchercraftEquippedPerkRefreshment",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesExplodingShield",
+      "name": "witchercraftEquippedPerkSideEffects",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesQuenIntensity",
+      "name": "witchercraftEquippedPerkAardIntensity",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesQuenDischarge",
+      "name": "witchercraftEquippedPerkAxiiIntensity",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesDelusion",
+      "name": "witchercraftEquippedPerkDelusion",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesAxiiIntensity",
+      "name": "witchercraftEquippedPerkDomination",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesDomination",
+      "name": "witchercraftEquippedPerkExplodingShield",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesMuscleMemory",
+      "name": "witchercraftEquippedPerkFarReachingAard",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesPreciseBlows",
+      "name": "witchercraftEquippedPerkFirestream",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesCripplingStrikes",
+      "name": "witchercraftEquippedPerkIgniIntensity",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesStrengthTraining",
+      "name": "witchercraftEquippedPerkMagicTrap",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesCrushingBlows",
+      "name": "witchercraftEquippedPerkPyromaniac",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesSunderArmor",
+      "name": "witchercraftEquippedPerkQuenDischarge",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesFleetFooted",
+      "name": "witchercraftEquippedPerkQuenIntensity",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesDefence",
+      "name": "witchercraftEquippedPerkShockWave",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesDeadlyPrecision",
+      "name": "witchercraftEquippedPerkSustainedGlyphs",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesColdBlood",
+      "name": "witchercraftEquippedPerkYrdenIntensity",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesAnatomicalKnowledge",
+      "name": "witchercraftEquippedPerkBearSchool",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesCripplingShot",
+      "name": "witchercraftEquippedPerkCatSchool",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesFloodOfAnger",
+      "name": "witchercraftEquippedPerkGourmet",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesRazorFocus",
+      "name": "witchercraftEquippedPerkGriffinSchool",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
     },
     {
-      "name": "witchercraftAbilitiesUndying",
+      "name": "witchercraftEquippedPerkSunAndStars",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftEquippedPerkSurvivalInstinct",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksSurvivalInstinct",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksSunAndStars",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksCatSchool",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksGriffinSchool",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksBearSchool",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksRefreshment",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksDelayedRecovery",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksSideEffects",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksPoisonedBlades",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksProtectiveCoating",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksHunterInstinct",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksPyrotechnics",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksEfficiency",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksClusterBombs",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksFarReachingAard",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksAardIntensity",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksShockWave",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksFirestream",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksIgniIntensity",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksPyromaniac",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksSustainedGlyphs",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksYrdenIntensity",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksMagicTrap",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksExplodingShield",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksQuenIntensity",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksQuenDischarge",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksDelusion",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksAxiiIntensity",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksDomination",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksMuscleMemory",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksPreciseBlows",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksCripplingStrikes",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksStrengthTraining",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksCrushingBlows",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksSunderArmor",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksFleetFooted",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksDefence",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksDeadlyPrecision",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksColdBlood",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksAnatomicalKnowledge",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksCripplingShot",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksFloodOfAnger",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksRazorFocus",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftPerksUndying",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
@@ -10719,19 +11109,19 @@
       "value": "0"
     },
     {
-      "name": "witchercraftAbilitiesCombatSkillPointsUsed",
+      "name": "witchercraftPerksCombatSkillPointsUsed",
       "type": "number",
       "scope": "player_persistent",
       "value": "0"
     },
     {
-      "name": "witchercraftAbilitiesAlchemySkillPointsUsed",
+      "name": "witchercraftPerksAlchemySkillPointsUsed",
       "type": "number",
       "scope": "player_persistent",
       "value": "0"
     },
     {
-      "name": "witchercraftAbilitiesSignsSkillPointsUsed",
+      "name": "witchercraftPerksSignsSkillPointsUsed",
       "type": "number",
       "scope": "player_persistent",
       "value": "0"

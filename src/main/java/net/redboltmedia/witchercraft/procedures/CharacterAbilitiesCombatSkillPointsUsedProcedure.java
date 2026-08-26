@@ -10,8 +10,8 @@ public class CharacterAbilitiesCombatSkillPointsUsedProcedure {
 			return;
 		{
 			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-			_vars.witchercraftAbilitiesCombatSkillPointsUsed = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesCombatSkillPointsUsed + 1;
-			_vars.witchercraftAbilitiesLearned = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesLearned + 1;
+			_vars.witchercraftPerksCombatSkillPointsUsed = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksCombatSkillPointsUsed + 1;
+			_vars.witchercraftPerksLearned = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksLearned + 1;
 			_vars.markSyncDirty();
 		}
 	}

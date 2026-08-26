@@ -12,7 +12,7 @@ public class SideEffectsEffectProcedure {
 			if (CharacterAbilitiesAlchemyTier3Procedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-					_vars.witchercraftAbilitiesSideEffects = true;
+					_vars.witchercraftPerksSideEffects = true;
 					_vars.markSyncDirty();
 				}
 				CharacterAbilitiesAlchemySkillPointsUsedProcedure.execute(entity);

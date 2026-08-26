@@ -8,7 +8,7 @@ public class PyrotechnicsShowProcedure {
 	public static boolean execute(Entity entity) {
 		if (entity == null)
 			return false;
-		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesPyrotechnics == true) {
+		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksPyrotechnics == true) {
 			return false;
 		}
 		return true;

@@ -12,7 +12,7 @@ public class ProtectiveCoatingEffectProcedure {
 			if (CharacterAbilitiesAlchemyTier2Procedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-					_vars.witchercraftAbilitiesProtectiveCoating = true;
+					_vars.witchercraftPerksProtectiveCoating = true;
 					_vars.markSyncDirty();
 				}
 				CharacterAbilitiesAlchemySkillPointsUsedProcedure.execute(entity);

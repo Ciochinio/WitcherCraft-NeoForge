@@ -38,28 +38,28 @@ public class SignCastKeyPressProcedure {
 					_vars.markSyncDirty();
 				}
 				if ((entity instanceof Player _plr ? _plr.getFoodData().getFoodLevel() : 0) > 4) {
-					if (entity instanceof LivingEntity _livEnt5 && _livEnt5.hasEffect(WitchercraftModMobEffects.YRDEN_SIGN) && !entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesMagicTrap) {
+					if (entity instanceof LivingEntity _livEnt5 && _livEnt5.hasEffect(WitchercraftModMobEffects.YRDEN_SIGN) && !entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksMagicTrap) {
 						YrdenCastProcedure.execute(world, x, y, z, entity);
 						SignCostProcedure.execute(entity);
 						if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
 							_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.SIGN_COOLDOWN, 40, 0));
 						if (entity instanceof LivingEntity _entity)
 							_entity.removeEffect(WitchercraftModMobEffects.SIGN_HOLD);
-					} else if (entity instanceof LivingEntity _livEnt8 && _livEnt8.hasEffect(WitchercraftModMobEffects.QUEN_SIGN) && !entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesExplodingShield) {
+					} else if (entity instanceof LivingEntity _livEnt8 && _livEnt8.hasEffect(WitchercraftModMobEffects.QUEN_SIGN) && !entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksExplodingShield) {
 						QuenCastProcedure.execute(entity);
 						SignCostProcedure.execute(entity);
 						if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
 							_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.SIGN_COOLDOWN, 40, 0));
 						if (entity instanceof LivingEntity _entity)
 							_entity.removeEffect(WitchercraftModMobEffects.SIGN_HOLD);
-					} else if (entity instanceof LivingEntity _livEnt11 && _livEnt11.hasEffect(WitchercraftModMobEffects.AARD_SIGN) && !entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesFarReachingAard) {
+					} else if (entity instanceof LivingEntity _livEnt11 && _livEnt11.hasEffect(WitchercraftModMobEffects.AARD_SIGN) && !entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksFarReachingAard) {
 						AardCastProcedure.execute(world, x, y, z, entity);
 						SignCostProcedure.execute(entity);
 						if (entity instanceof LivingEntity _entity)
 							_entity.removeEffect(WitchercraftModMobEffects.SIGN_HOLD);
 						if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
 							_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.SIGN_COOLDOWN, 40, 0));
-					} else if (entity instanceof LivingEntity _livEnt14 && _livEnt14.hasEffect(WitchercraftModMobEffects.IGNI_SIGN) && !entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesFirestream) {
+					} else if (entity instanceof LivingEntity _livEnt14 && _livEnt14.hasEffect(WitchercraftModMobEffects.IGNI_SIGN) && !entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksFirestream) {
 						IgniCastProcedure.execute(entity);
 						SignCostProcedure.execute(entity);
 						if (entity instanceof LivingEntity _entity)

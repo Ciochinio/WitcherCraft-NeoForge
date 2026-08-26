@@ -12,7 +12,7 @@ public class ClusterBombsEffectProcedure {
 			if (CharacterAbilitiesAlchemyTier3Procedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-					_vars.witchercraftAbilitiesClusterBombs = true;
+					_vars.witchercraftPerksClusterBombs = true;
 					_vars.markSyncDirty();
 				}
 				CharacterAbilitiesAlchemySkillPointsUsedProcedure.execute(entity);

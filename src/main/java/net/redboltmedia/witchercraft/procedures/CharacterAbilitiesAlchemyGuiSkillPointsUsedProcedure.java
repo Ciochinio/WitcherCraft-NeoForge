@@ -8,6 +8,6 @@ public class CharacterAbilitiesAlchemyGuiSkillPointsUsedProcedure {
 	public static String execute(Entity entity) {
 		if (entity == null)
 			return "";
-		return "Alchemy SP used: " + new java.text.DecimalFormat("##.##").format(entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesAlchemySkillPointsUsed);
+		return "Alchemy SP used: " + new java.text.DecimalFormat("##.##").format(entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksAlchemySkillPointsUsed);
 	}
 }

@@ -8,7 +8,7 @@ public class ClusterBombsShowProcedure {
 	public static boolean execute(Entity entity) {
 		if (entity == null)
 			return false;
-		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftAbilitiesClusterBombs == true) {
+		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksClusterBombs == true) {
 			return false;
 		}
 		return true;
