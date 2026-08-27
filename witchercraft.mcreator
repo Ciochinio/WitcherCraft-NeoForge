@@ -5800,6 +5800,24 @@
       }
     },
     {
+      "name": "ApplyMutagenBonus",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "apply_mutagen_bonus",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/ApplyMutagenBonusProcedure.java"
+        ]
+      }
+    },
+    {
       "name": "RecomputeEquippedPerksCombat",
       "type": "procedure",
       "compiles": true,

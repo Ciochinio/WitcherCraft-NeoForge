@@ -1,3 +1,87 @@
+# Session handoff / TLDR (read this first)
+
+**Status: Phase 1's Blockly core is DONE and verified working in-game.** Every
+perk (static, conditional, triggered) now gates on EQUIPPED, not learned, and
+mutagen color synergy applies correctly. What's left in Phase 1 is the equip
+screen (custom Java) - a different, bigger kind of work, not yet started.
+
+**What got built, in order:**
+1. Renamed `witchercraftAbilities*` -> `witchercraftPerks*` (806 refs, verified
+   by `gradlew compileJava`).
+2. Added 65 new player vars: `witchercraftPerkSocket1..12`,
+   `witchercraftMutagenSocket1..4`, `witchercraftMutagenOwnedRed/Green/Blue`,
+   `witchercraftSelectedPerk`, `witchercraftEquippedPerk<Name>` x45.
+3. `RecomputeEquippedPerks<Combat/Alchemy/Signs/General>` (4 procedures, split
+   by branch for editor readability) - derive each perk's equipped flag from
+   whether its ID sits in any of the 12 perk-socket vars.
+4. Split old `PerkModifiers` into: `PerkModifiers` (12 STATIC flat-stat perks,
+   applied transiently on recompute, no_ext_trigger) + new
+   `PerkModifiersConditional` (5 perks whose condition changes live - bow-in-hand,
+   enemy-nearby, day/night - stays on player_ticks, condition logic copied
+   verbatim from the original).
+5. Re-gated the 8 triggered perks that had a real effect-gate (CripplingStrikes,
+   Undying, Refreshment x2, and 5 sign-upgrade perks in the SignCast* procedures)
+   from learned to equipped. Finding: ~20 other "perks" (intensity perks, school
+   perks) have NO effect implemented yet - only buy/show + debug reset exist.
+6. `ApplyMutagenBonus` - per mutagen group, counts equipped perks whose ID falls
+   in the socketed mutagen's color range and applies
+   `base + perNode * matchCount` to the color's attribute (red->IncreasedDamage,
+   green->MaxHealth, blue->SignIntensity).
+7. `RecomputeEquippedPerks` is now the MASTER: calls the 4 branch derivations,
+   then `PerkModifiers`, then `ApplyMutagenBonus` (6 calls total). Currently
+   fired only by a throwaway `DebugRecomputePerksKeybind` (key **P**) - this
+   needs to be replaced by real menu-close + player-login triggers once the
+   equip screen exists (they don't exist yet as an event source).
+
+**The one real bug hit and the lesson from it (Section 14 has the full
+writeup):** MCreator has TWO different "equals" blocks and they are NOT
+interchangeable - `logic_binary_ops` EQ is for BOOLEAN equality,
+`math_binary_ops` EQ is for NUMBER equality. Using the boolean one to compare
+numbers doesn't error, it just silently fails to bind the operands (floating
+blocks, empty comparison slots) when reopened in MCreator. Second, more subtle
+finding: a working procedure using ONLY constant-valued
+`entity_add_modifier`/`entity_remove_modifier` (like the original hand-written
+`PerkModifiers`) is safer than one that computes the value via a local variable
++ arithmetic (`math_dual_ops`) - the first `ApplyMutagenBonus` used a local
+accumulator and came out broken in MCreator even though the XML was byte-valid
+and pattern-matched proven code; rebuilding it with N separate constant-valued
+stacking modifiers instead of one computed value fixed it. **Lesson for future
+generated procedures: prefer stacking constant modifiers over local-var
+arithmetic when the value can be decomposed additively.** If you must compute a
+value, build a small isolated test procedure first and have the user verify it
+in MCreator before generating the full-size version.
+
+**Everything was generated with bash heredoc/sed scripts building Blockly XML
+by hand** (not typed in the MCreator GUI), then JSON-validated via PowerShell
+`ConvertFrom-Json`, then verified visually + live in-game by the user after
+each chunk. This is fast for repetitive perk-shaped logic but fragile - always
+verify counts (block/value tag balance, expected block-type counts) before
+declaring a generated procedure done, and always get an in-MCreator visual
+check before scaling a pattern up (4-perk proof before 45-perk; single-value
+test before the mutagen procedure).
+
+**Where to start next session:** the equip screen (Phase 1 Step 3). This is
+custom Java, not Blockly - a different mode of work. Needs: the single-GUI
+restructure (tabs for Combat/Alchemy/Signs/General/Mutagens + a fixed right
+panel), rendering 12 perk slots + 4 mutagen sockets with dynamic icons (inner
+glyph over a static colored frame per Section 5), left-click-hold /
+left-click-place / right-click-upgrade interaction with valid-slot highighting,
+rank pips (not used yet since perks are still binary), hover tooltips, and
+wiring `RecomputeEquippedPerks` to fire on menu-close + player-login instead of
+the debug keybind. The perk -> ID -> color table (Section 12) and the "add a
+perk" checklist (Section 13) are ready references for this and future perk work.
+Also still open: the mutagen ITEMS (learn from item, convert back) - deferred
+here because equipping them needs the screen anyway.
+
+**Housekeeping:** the `DebugRecomputePerksKeybind` (key P) is scaffolding -
+remove it once the screen provides a real trigger. `witchercraftAbilities*`
+named saves/worlds will have lost their perk state from the Step 0 rename (NBT
+keys changed) - expected, not a bug, in a dev/test context. Nothing has been
+committed to git this whole session (per project rule) - nothing was asked to
+be committed either.
+
+---
+
 # WitcherCraft - Skill Tree & Mutagen Rework Plan
 
 > Portable design plan. If a Claude session is lost, paste this whole file into a
@@ -223,7 +307,18 @@ doesn't depend on the tree revamp.
   gate wired yet - they appear only in `DevClear` (debug reset, correctly left on
   learned) and their buy/show procs. When their effects get implemented, gate
   them on equipped per Section 13.
-- Step 1c: mutagen bonus math (static -> menu-close recompute, Section 7).
+- Step 1c (DONE - bonus math): new `ApplyMutagenBonus` procedure, called by the
+  master after `PerkModifiers`. Mutagen socket encodes color (1 red / 2 green /
+  3 blue / 0 empty). Per group: removes its `mutagen_group<G>` modifier from all
+  3 attributes, then if a mutagen is socketed, counts group perks whose ID falls
+  in that color's hundreds range (matches, 0-3; neutrals never match) and adds
+  base + perNode*matches to the color's attribute (red->CUSTOM:IncreasedDamage,
+  green->MAX_HEALTH, blue->CUSTOM:SignIntensity). Values per Section 7.
+  Implementation note: uses only constant-valued add/remove modifiers (no local
+  var, no arithmetic) - base and each matching slot are SEPARATE stacking
+  modifiers (`mutagen_g<G>_base`, `_s1/_s2/_s3`); per group all 4 names are
+  removed from all 3 attributes each recompute, then the active color re-adds.
+  The mutagen ITEMS (learn/convert-back) are deferred to the equip-screen step.
 - Also: the perk -> ID -> color table (first artifact), used by the recompute,
   the screen, and the node-placer.
 - Step 3 of Phase 1: the equip screen - right panel (12 perk slots + 4 mutagen

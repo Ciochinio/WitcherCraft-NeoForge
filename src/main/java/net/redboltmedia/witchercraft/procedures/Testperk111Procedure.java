@@ -28,6 +28,9 @@ public class Testperk111Procedure {
 		if (entity == null)
 			return;
 		if (entity instanceof ServerPlayer _player)
-			_player.sendSystemMessage(Component.literal(("now equipped" + entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerkSocket1)), false);
+			_player.sendSystemMessage(Component.literal(("now equipped" + (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerkSocket1 + "" + entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerkSocket2))),
+					false);
+		if (entity instanceof ServerPlayer _player)
+			_player.sendSystemMessage(Component.literal(("mutagen" + entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftMutagenSocket1)), false);
 	}
 }

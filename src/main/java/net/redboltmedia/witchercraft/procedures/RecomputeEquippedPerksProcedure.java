@@ -11,5 +11,6 @@ public class RecomputeEquippedPerksProcedure {
 		RecomputeEquippedPerksSignsProcedure.execute(entity);
 		RecomputeEquippedPerksGeneralProcedure.execute(entity);
 		PerkModifiersProcedure.execute(entity);
+		ApplyMutagenBonusProcedure.execute(entity);
 	}
 }

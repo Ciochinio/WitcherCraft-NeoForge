@@ -16,3 +16,8 @@ build/
 
 # MacOS system files
 .DS_STORE
+
+# Claude Code project instructions
+CLAUDE.md
+.claude
+

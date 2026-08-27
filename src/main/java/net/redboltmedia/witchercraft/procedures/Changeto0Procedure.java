@@ -11,6 +11,8 @@ public class Changeto0Procedure {
 		{
 			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 			_vars.witchercraftPerkSocket1 = 0;
+			_vars.witchercraftPerkSocket2 = 0;
+			_vars.witchercraftMutagenSocket1 = 0;
 			_vars.markSyncDirty();
 		}
 	}

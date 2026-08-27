@@ -11,6 +11,8 @@ public class Changeto111Procedure {
 		{
 			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 			_vars.witchercraftPerkSocket1 = 111;
+			_vars.witchercraftPerkSocket2 = 112;
+			_vars.witchercraftMutagenSocket1 = 1;
 			_vars.markSyncDirty();
 		}
 	}
