@@ -85,11 +85,18 @@ public class PerkEquipGuiScreen extends AbstractContainerScreen<PerkEquipGuiMenu
 			int rx = PerkEquipLayout.paletteColX(i);
 			int ry = PerkEquipLayout.paletteRowY(i);
 			boolean held = id == heldPerk;
+			boolean equipped = PerkEquipVars.isPerkSocketed(entity, id);
 			if (held)
 				g.fill(rx - 1, ry - 1, rx + PerkEquipLayout.PALETTE_ROW_W, ry + PerkEquipLayout.PALETTE_ROW_H - 1, 0x66FFDD55);
-			int col = held ? TEXT_HELD : PerkRegistry.tint(PerkRegistry.color(id));
+			int base = PerkRegistry.tint(PerkRegistry.color(id));
+			// equipped perks show full-bright; unequipped are dimmed
+			int col = held ? TEXT_HELD : (equipped ? base : dim(base));
 			g.text(this.font, trim(PerkRegistry.NAMES[i], 15), rx, ry, col, false);
 		}
+
+		// mutagen connector lines (under the cells): each socketed mutagen links
+		// to the equipped perks in its group that MATCH its colour, in that colour.
+		drawConnectors(g);
 
 		// equip grid slots
 		for (int i = 0; i < PerkEquipVars.PERK_SLOTS; i++) {
@@ -121,9 +128,11 @@ public class PerkEquipGuiScreen extends AbstractContainerScreen<PerkEquipGuiMenu
 			}
 		}
 
-		// medallion + per-group synergy counts
-		drawCell(g, PerkEquipLayout.MEDALLION_X, PerkEquipLayout.MEDALLION_Y, PerkEquipLayout.MEDALLION_SIZE, 0xFF8A6D3B, 0xFF3A2E1C);
-		g.text(this.font, "MED", PerkEquipLayout.MEDALLION_X + 10, PerkEquipLayout.MEDALLION_Y + 16, 0xFFEEDDBB, false);
+		// medallion (optional, resizable rectangle) + per-group synergy counts
+		if (PerkEquipLayout.MEDALLION_ENABLED) {
+			drawRect(g, PerkEquipLayout.MEDALLION_X, PerkEquipLayout.MEDALLION_Y, PerkEquipLayout.MEDALLION_W, PerkEquipLayout.MEDALLION_H, 0xFF8A6D3B, 0xFF3A2E1C);
+			g.text(this.font, "MED", PerkEquipLayout.MEDALLION_X + PerkEquipLayout.MEDALLION_W / 2 - 8, PerkEquipLayout.MEDALLION_Y + PerkEquipLayout.MEDALLION_H / 2 - 4, 0xFFEEDDBB, false);
+		}
 		for (int gi = 0; gi < PerkEquipVars.MUTAGEN_GROUPS; gi++) {
 			int matches = groupMatchCount(gi);
 			int m = PerkEquipVars.getMutagenSocket(entity, gi);
@@ -149,9 +158,69 @@ public class PerkEquipGuiScreen extends AbstractContainerScreen<PerkEquipGuiMenu
 		super.extractRenderState(g, mouseX, mouseY, partialTicks);
 	}
 
+	private void drawConnectors(GuiGraphicsExtractor g) {
+		for (int gi = 0; gi < PerkEquipVars.MUTAGEN_GROUPS; gi++) {
+			int m = PerkEquipVars.getMutagenSocket(entity, gi);
+			if (m <= 0)
+				continue;
+			int col = withAlpha(PerkRegistry.tint(m), 0xCC);
+			int sox = PerkEquipLayout.SOCKET_X[gi];
+			int scx = sox + PerkEquipLayout.SOCKET_SIZE / 2;
+			int scy = PerkEquipLayout.SOCKET_Y[gi] + PerkEquipLayout.SOCKET_SIZE / 2;
+
+			// first pass: collect the matching equipped perks (correct colour),
+			// their average x (to place the trunk) and the y-span of the bus.
+			int matchCount = 0, sumCenterX = 0, yMin = scy, yMax = scy;
+			for (int s = gi * 3; s < gi * 3 + 3; s++) {
+				int id = PerkEquipVars.getPerkSocket(entity, s);
+				if (id <= 0 || PerkRegistry.color(id) != m)
+					continue;
+				int slcx = PerkEquipLayout.SLOT_X[s] + PerkEquipLayout.SLOT_SIZE / 2;
+				int slcy = PerkEquipLayout.SLOT_Y[s] + PerkEquipLayout.SLOT_SIZE / 2;
+				sumCenterX += slcx;
+				matchCount++;
+				yMin = Math.min(yMin, slcy);
+				yMax = Math.max(yMax, slcy);
+			}
+			if (matchCount == 0)
+				continue;
+
+			// trunk sits in the gap between the socket and the slot column, so it
+			// never overlaps intermediate boxes; stubs meet each box at its edge.
+			int trunkX = (scx + sumCenterX / matchCount) / 2;
+			vLine(g, trunkX, yMin, yMax, col);
+			hLine(g, edgeTowards(sox, PerkEquipLayout.SOCKET_SIZE, trunkX), trunkX, scy, col);
+			for (int s = gi * 3; s < gi * 3 + 3; s++) {
+				int id = PerkEquipVars.getPerkSocket(entity, s);
+				if (id <= 0 || PerkRegistry.color(id) != m)
+					continue;
+				int slx = PerkEquipLayout.SLOT_X[s];
+				int slcy = PerkEquipLayout.SLOT_Y[s] + PerkEquipLayout.SLOT_SIZE / 2;
+				hLine(g, edgeTowards(slx, PerkEquipLayout.SLOT_SIZE, trunkX), trunkX, slcy, col);
+			}
+		}
+	}
+
+	/** x of the box edge facing the trunk (right edge if the box is left of it). */
+	private int edgeTowards(int boxX, int boxSize, int trunkX) {
+		return (boxX + boxSize / 2) < trunkX ? boxX + boxSize : boxX;
+	}
+
+	private void hLine(GuiGraphicsExtractor g, int xa, int xb, int y, int col) {
+		g.fill(Math.min(xa, xb), y - 1, Math.max(xa, xb), y + 1, col);
+	}
+
+	private void vLine(GuiGraphicsExtractor g, int x, int ya, int yb, int col) {
+		g.fill(x - 1, Math.min(ya, yb), x + 1, Math.max(ya, yb), col);
+	}
+
 	private void drawCell(GuiGraphicsExtractor g, int x, int y, int size, int border, int inner) {
-		g.fill(x, y, x + size, y + size, border);
-		g.fill(x + 1, y + 1, x + size - 1, y + size - 1, inner);
+		drawRect(g, x, y, size, size, border, inner);
+	}
+
+	private void drawRect(GuiGraphicsExtractor g, int x, int y, int w, int h, int border, int inner) {
+		g.fill(x, y, x + w, y + h, border);
+		g.fill(x + 1, y + 1, x + w - 1, y + h - 1, inner);
 	}
 
 	// ---- input ---------------------------------------------------------------
@@ -180,6 +249,10 @@ public class PerkEquipGuiScreen extends AbstractContainerScreen<PerkEquipGuiMenu
 			int gi = hitSocket(lx, ly);
 			if (gi >= 0) {
 				sendAction(3000000 + gi); // cycle mutagen colour
+				return true;
+			}
+			if (hitMedallion(lx, ly)) {
+				sendAction(4000000); // medallion click (placeholder)
 				return true;
 			}
 		}
@@ -243,6 +316,13 @@ public class PerkEquipGuiScreen extends AbstractContainerScreen<PerkEquipGuiMenu
 		return -1;
 	}
 
+	private boolean hitMedallion(int lx, int ly) {
+		if (!PerkEquipLayout.MEDALLION_ENABLED)
+			return false;
+		return lx >= PerkEquipLayout.MEDALLION_X && lx < PerkEquipLayout.MEDALLION_X + PerkEquipLayout.MEDALLION_W
+				&& ly >= PerkEquipLayout.MEDALLION_Y && ly < PerkEquipLayout.MEDALLION_Y + PerkEquipLayout.MEDALLION_H;
+	}
+
 	private int hitSocket(int lx, int ly) {
 		for (int gi = 0; gi < PerkEquipVars.MUTAGEN_GROUPS; gi++) {
 			int sx = PerkEquipLayout.SOCKET_X[gi];
@@ -288,5 +368,13 @@ public class PerkEquipGuiScreen extends AbstractContainerScreen<PerkEquipGuiMenu
 
 	private static int withAlpha(int argb, int alpha) {
 		return (alpha << 24) | (argb & 0x00FFFFFF);
+	}
+
+	/** darken an opaque colour toward black (used to grey out equipped perks). */
+	private static int dim(int argb) {
+		int r = (argb >> 16 & 0xFF) * 42 / 100;
+		int g = (argb >> 8 & 0xFF) * 42 / 100;
+		int b = (argb & 0xFF) * 42 / 100;
+		return 0xFF000000 | (r << 16) | (g << 8) | b;
 	}
 }

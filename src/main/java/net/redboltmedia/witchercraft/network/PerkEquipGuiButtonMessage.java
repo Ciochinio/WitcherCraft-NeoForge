@@ -1,6 +1,8 @@
 package net.redboltmedia.witchercraft.network;
 
 import net.redboltmedia.witchercraft.WitchercraftMod;
+import net.redboltmedia.witchercraft.client.gui.PerkEquipLayout;
+import net.redboltmedia.witchercraft.procedures.MutagenMedallionClickProcedure;
 
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -27,6 +29,7 @@ import net.minecraft.core.SectionPos;
  *   1000000 + slotIdx*1000 + perkId   place perkId into perk slot slotIdx (0-11)
  *   2000000 + slotIdx                 clear perk slot slotIdx
  *   3000000 + group                   cycle mutagen colour of group (0-3)
+ *   4000000                           medallion click (placeholder button)
  * The server re-validates every action; it never trusts the client's view.
  */
 @EventBusSubscriber
@@ -58,7 +61,10 @@ public record PerkEquipGuiButtonMessage(int buttonID, int x, int y, int z) imple
 		// security measure to prevent arbitrary chunk generation
 		if (!world.getChunkSource().hasChunk(SectionPos.blockToSectionCoord(x), SectionPos.blockToSectionCoord(z)))
 			return;
-		if (buttonID >= 3000000) { // cycle mutagen colour: empty -> red -> green -> blue -> empty
+		if (buttonID >= 4000000) { // medallion click (placeholder button)
+			if (PerkEquipLayout.MEDALLION_ENABLED)
+				MutagenMedallionClickProcedure.execute(entity);
+		} else if (buttonID >= 3000000) { // cycle mutagen colour: empty -> red -> green -> blue -> empty
 			int group = buttonID - 3000000;
 			if (group < 0 || group >= PerkEquipVars.MUTAGEN_GROUPS)
 				return;
@@ -69,7 +75,7 @@ public record PerkEquipGuiButtonMessage(int buttonID, int x, int y, int z) imple
 			if (slot < 0 || slot >= PerkEquipVars.PERK_SLOTS)
 				return;
 			PerkEquipVars.setPerkSocket(entity, slot, 0);
-		} else if (buttonID >= 1000000) { // place a perk into a slot
+		} else if (buttonID >= 1000000) { // place / move a perk into a slot
 			int a = buttonID - 1000000;
 			int slot = a / 1000;
 			int perkId = a % 1000;
@@ -79,8 +85,12 @@ public record PerkEquipGuiButtonMessage(int buttonID, int x, int y, int z) imple
 				return;
 			if (PerkEquipVars.getPerkSocket(entity, slot) != 0)
 				return; // target must be empty
-			if (PerkEquipVars.isPerkSocketed(entity, perkId))
-				return; // a perk can only be equipped once
+			// move semantics: if this perk already sits in another slot, vacate
+			// it first so re-slotting an equipped perk moves it (never duplicates).
+			for (int i = 0; i < PerkEquipVars.PERK_SLOTS; i++) {
+				if (i != slot && PerkEquipVars.getPerkSocket(entity, i) == perkId)
+					PerkEquipVars.setPerkSocket(entity, i, 0);
+			}
 			PerkEquipVars.setPerkSocket(entity, slot, perkId);
 		}
 		// buttonID 0: reserved no-op. Recompute runs from PerkEquipGuiMenu.removed().

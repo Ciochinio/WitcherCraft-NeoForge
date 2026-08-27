@@ -5808,10 +5808,6 @@
       "metadata": {
         "dependencies": [
           {
-            "name": "world",
-            "type": "world"
-          },
-          {
             "name": "entity",
             "type": "entity"
           }
@@ -5836,6 +5832,24 @@
         ],
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/procedures/ApplyMutagenBonusProcedure.java"
+        ]
+      }
+    },
+    {
+      "name": "MutagenMedallionClick",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "mutagen_medallion_click",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/MutagenMedallionClickProcedure.java"
         ]
       }
     },

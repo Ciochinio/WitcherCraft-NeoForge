@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WitcherCraft - Equip Grid Placer</title>
+<style>
+  :root {
+    --bg: #14141a; --panel: #1e1e26; --ink: #e8e8ef; --dim: #9a9aa6;
+    --line: #33333d; --accent: #ffdd55;
+    --red: #ff5555; --green: #55ff55; --blue: #5599ff; --neutral: #cccccc; --med: #d8b366;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  header { padding: 10px 16px; border-bottom: 1px solid var(--line); display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;}
+  header h1 { font-size: 15px; margin: 0; font-weight: 600; }
+  header .hint { color: var(--dim); font-size: 12px; }
+  .wrap { display: flex; gap: 16px; padding: 16px; align-items: flex-start; flex-wrap: wrap; }
+  .stage-col { flex: 0 0 auto; }
+  .side { flex: 1 1 320px; min-width: 300px; max-width: 560px; }
+  #stage { position: relative; background: #0b0b0f; border: 1px solid var(--line);
+           background-image: linear-gradient(#ffffff08 1px, transparent 1px), linear-gradient(90deg, #ffffff08 1px, transparent 1px);
+           box-shadow: 0 6px 30px #0008; overflow: hidden; }
+  #bg { position:absolute; inset:0; width:100%; height:100%; object-fit:fill; pointer-events:none; z-index:0; }
+  #conn { position:absolute; inset:0; pointer-events:none; z-index:1; }
+  .box { position: absolute; border: 2px solid var(--dim); background: #ffffff14;
+         display:flex; align-items:center; justify-content:center; cursor: grab;
+         font-size: 11px; color: var(--ink); user-select:none; text-shadow: 0 1px 2px #000; z-index:2; }
+  .box.sel { outline: 2px solid var(--accent); outline-offset: 1px; z-index: 6; }
+  .box.slot.g0 { border-color: var(--red); }
+  .box.slot.g1 { border-color: var(--green); }
+  .box.slot.g2 { border-color: var(--blue); }
+  .box.slot.g3 { border-color: var(--neutral); }
+  .box.socket { border-style: dashed; border-color: var(--med); }
+  .box.med { border-color: var(--med); background: #d8b36622; border-radius: 8px; }
+  .box.med.off { opacity: .35; }
+  .rz { position:absolute; right:-4px; bottom:-4px; width:12px; height:12px; background:var(--accent);
+        border:1px solid #000; border-radius:2px; cursor: nwse-resize; z-index:7; }
+  fieldset { border: 1px solid var(--line); border-radius: 6px; margin: 0 0 12px; padding: 10px 12px; }
+  legend { color: var(--dim); padding: 0 6px; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+  label { display:inline-flex; align-items:center; gap:6px; margin: 3px 10px 3px 0; color: var(--dim); }
+  input[type=number] { width: 66px; background: #0e0e13; border: 1px solid var(--line); color: var(--ink);
+                       padding: 3px 5px; border-radius: 4px; font: inherit; }
+  input[type=checkbox]{ accent-color: var(--med); }
+  button { background: #2a2a34; color: var(--ink); border: 1px solid var(--line); border-radius: 5px;
+           padding: 6px 12px; cursor: pointer; font: inherit; }
+  button:hover { background: #34343f; }
+  button.primary { background: var(--med); color:#161009; border-color: var(--med); font-weight:600; }
+  .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:8px; }
+  textarea { width: 100%; height: 300px; background: #0e0e13; color: #cfe8cf; border: 1px solid var(--line);
+             border-radius: 6px; padding: 10px; font: 12px/1.45 ui-monospace, Consolas, monospace; resize: vertical; }
+  .selinfo { color: var(--dim); }
+  .selinfo b { color: var(--ink); }
+  .legend-swatch { display:inline-block; width:10px; height:10px; border:2px solid; margin-right:4px; vertical-align:middle; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Equip Grid Placer</h1>
+  <span class="hint">Drag boxes (resize the medallion by its corner handle). Output regenerates <code>PerkEquipLayout.java</code> live &rarr; copy &rarr; paste over the file. Coordinates are GUI-local (top-left origin), in Minecraft GUI pixels.</span>
+</header>
+
+<div class="wrap">
+  <div class="stage-col">
+    <div id="stage"></div>
+    <div style="margin-top:8px" class="selinfo" id="selinfo">Nothing selected. Click a box to select; drag to move. Arrow keys nudge (Shift = x5).</div>
+  </div>
+
+  <div class="side">
+    <fieldset>
+      <legend>Panel & sizes</legend>
+      <label>Panel W <input type="number" id="panelW"></label>
+      <label>Panel H <input type="number" id="panelH"></label>
+      <label>Zoom <input type="number" id="zoom" step="0.5" min="1" max="6"></label><br>
+      <label>Slot size <input type="number" id="slotSize"></label>
+      <label>Socket size <input type="number" id="socketSize"></label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Medallion</legend>
+      <label><input type="checkbox" id="medOn"> Render medallion in-game</label><br>
+      <label>Med W <input type="number" id="medW"></label>
+      <label>Med H <input type="number" id="medH"></label>
+      <div class="hint" style="color:var(--dim)">The medallion is just the decorative centre piece today - it does nothing. Turn it off to hide it, or repurpose it as a rectangular button later (position/size are exported either way). Drag its corner handle to resize.</div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Connectors & display</legend>
+      <label><input type="checkbox" id="showConn" checked> Show group connector lines</label>
+      <div class="hint" style="color:var(--dim)">Editor guide only - links each mutagen socket to its 3 slots. Not exported.</div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Snapping & background</legend>
+      <label><input type="checkbox" id="snapOn" checked> Snap to grid</label>
+      <label>Grid <input type="number" id="gridStep" value="2" min="1"></label><br>
+      <div class="row">
+        <button id="loadBg">Load background image…</button>
+        <button id="clearBg">Clear</button>
+        <label>Opacity <input type="number" id="bgOpacity" value="100" min="0" max="100" step="5"></label>
+        <input type="file" id="bgFile" accept="image/*" style="display:none">
+      </div>
+      <div class="hint" style="color:var(--dim)">Load your eventual panel art to place boxes against it. The image is only a visual guide - it is never exported.</div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Legend</legend>
+      <span class="legend-swatch" style="border-color:var(--red)"></span>Group 1 (slots 1-3)
+      <span class="legend-swatch" style="border-color:var(--green)"></span>Group 2 (4-6)
+      <span class="legend-swatch" style="border-color:var(--blue)"></span>Group 3 (7-9)
+      <span class="legend-swatch" style="border-color:var(--neutral)"></span>Group 4 (10-12)<br>
+      <span class="legend-swatch" style="border-color:var(--med);border-style:dashed"></span>Mutagen sockets M1-M4
+      <span class="legend-swatch" style="border-color:var(--med);border-radius:6px"></span>Medallion
+      <div class="hint" style="color:var(--dim);margin-top:6px">Slot index fixes its mutagen group (1-3&rarr;g1, 4-6&rarr;g2, 7-9&rarr;g3, 10-12&rarr;g4), matching ApplyMutagenBonus. Socket Mn belongs to group n.</div>
+    </fieldset>
+
+    <div class="row">
+      <button class="primary" id="copyBtn">Copy PerkEquipLayout.java</button>
+      <button id="resetBtn">Reset to seeded layout</button>
+    </div>
+    <textarea id="out" spellcheck="false" readonly></textarea>
+  </div>
+</div>
+
+<script>
+// ---- seeded defaults: current PerkEquipLayout.java values ----------------
+const SEED = {
+  PANEL_W: 360, PANEL_H: 230,
+  SLOT_SIZE: 24, SOCKET_SIZE: 24,
+  SLOT_X: [196,196,196,224,224,224,300,300,300,328,328,328],
+  SLOT_Y: [30,62,94,30,62,94,30,62,94,30,62,94],
+  SOCKET_X: [196,224,300,328], SOCKET_Y: [130,130,130,130],
+  MEDALLION_ENABLED: true, MEDALLION_X: 256, MEDALLION_Y: 46, MEDALLION_W: 40, MEDALLION_H: 40,
+};
+// palette-section constants are carried through verbatim (dev-only, removed in Phase 2)
+const PALETTE_BLOCK =
+`	// --- Debug palette (left half): every perk as a clickable text row, two
+	// sub-columns, in PerkRegistry order. Row i -> column i / ROWS_PER_COL.
+	public static final int[] PALETTE_X = {8, 100};
+	public static final int PALETTE_Y0 = 20;
+	public static final int PALETTE_ROW_H = 9;
+	public static final int PALETTE_ROW_W = 88;
+	public static final int PALETTE_ROWS_PER_COL = 23;`;
+
+const GROUP_STROKE = ['#ff5555','#55ff55','#5599ff','#cccccc'];
+let S = structuredClone(SEED);
+let zoom = 3;
+let selected = null; // {type:'slot'|'socket'|'med', idx}
+
+const stage = document.getElementById('stage');
+const out = document.getElementById('out');
+const $ = id => document.getElementById(id);
+const SVGNS = 'http://www.w3.org/2000/svg';
+
+function sizeOf(type){ return type==='slot'?S.SLOT_SIZE : type==='socket'?S.SOCKET_SIZE : null; }
+function dimsOf(type){ // [w,h]
+  if(type==='med') return [S.MEDALLION_W, S.MEDALLION_H];
+  const s = sizeOf(type); return [s,s];
+}
+function posOf(type,i){
+  if(type==='slot') return [S.SLOT_X[i], S.SLOT_Y[i]];
+  if(type==='socket') return [S.SOCKET_X[i], S.SOCKET_Y[i]];
+  return [S.MEDALLION_X, S.MEDALLION_Y];
+}
+function setPos(type,i,x,y){
+  if(type==='slot'){ S.SLOT_X[i]=x; S.SLOT_Y[i]=y; }
+  else if(type==='socket'){ S.SOCKET_X[i]=x; S.SOCKET_Y[i]=y; }
+  else { S.MEDALLION_X=x; S.MEDALLION_Y=y; }
+}
+function centerOf(type,i){ const [x,y]=posOf(type,i); const [w,h]=dimsOf(type); return [x+w/2, y+h/2]; }
+
+function build(){
+  stage.style.width = S.PANEL_W*zoom+'px';
+  stage.style.height = S.PANEL_H*zoom+'px';
+  stage.style.backgroundSize = (+$('gridStep').value||2)*zoom+'px '+(+$('gridStep').value||2)*zoom+'px';
+  const bg = document.getElementById('bg');
+  stage.querySelectorAll('.box').forEach(b=>b.remove());
+  let svg = document.getElementById('conn');
+  if(!svg){ svg=document.createElementNS(SVGNS,'svg'); svg.id='conn'; if(bg) bg.after(svg); else stage.prepend(svg); }
+  const boxes = [];
+  for(let i=0;i<12;i++) boxes.push({type:'slot', idx:i, cls:'slot g'+Math.floor(i/3), label:(i+1)});
+  for(let i=0;i<4;i++) boxes.push({type:'socket', idx:i, cls:'socket', label:'M'+(i+1)});
+  boxes.push({type:'med', idx:0, cls:'med'+(S.MEDALLION_ENABLED?'':' off'), label: S.MEDALLION_ENABLED?'MED':'MED (off)'});
+  for(const b of boxes){
+    const [x,y] = posOf(b.type,b.idx); const [w,h] = dimsOf(b.type);
+    const el = document.createElement('div');
+    el.className = 'box '+b.cls;
+    el.textContent = b.label;
+    el.style.left = x*zoom+'px'; el.style.top = y*zoom+'px';
+    el.style.width = w*zoom+'px'; el.style.height = h*zoom+'px';
+    el.dataset.type=b.type; el.dataset.idx=b.idx;
+    if(selected && selected.type===b.type && selected.idx===b.idx) el.classList.add('sel');
+    if(b.type==='med'){ const hz=document.createElement('div'); hz.className='rz'; el.appendChild(hz); attachResize(el,hz); }
+    stage.appendChild(el);
+    attachDrag(el);
+  }
+  redrawConnectors(); renderOut(); updateSelInfo();
+}
+
+function redrawConnectors(){
+  const svg = document.getElementById('conn'); if(!svg) return;
+  svg.setAttribute('width', S.PANEL_W*zoom); svg.setAttribute('height', S.PANEL_H*zoom);
+  svg.innerHTML='';
+  if(!$('showConn').checked) return;
+  for(let g=0; g<4; g++){
+    const sc = centerOf('socket', g);
+    const slots = [3*g,3*g+1,3*g+2].map(s=>centerOf('slot', s));
+    const pts = [sc, ...slots];
+    const trunkX = (sc[0] + (slots[0][0]+slots[1][0]+slots[2][0])/3) / 2;
+    const ys = pts.map(p=>p[1]);
+    const yMin = Math.min(...ys), yMax = Math.max(...ys);
+    line(svg, trunkX, yMin, trunkX, yMax, GROUP_STROKE[g]);       // vertical trunk
+    for(const p of pts) line(svg, p[0], p[1], trunkX, p[1], GROUP_STROKE[g]); // stubs
+  }
+}
+function line(svg,x1,y1,x2,y2,stroke){
+  const l=document.createElementNS(SVGNS,'line');
+  l.setAttribute('x1',x1*zoom); l.setAttribute('y1',y1*zoom);
+  l.setAttribute('x2',x2*zoom); l.setAttribute('y2',y2*zoom);
+  l.setAttribute('stroke',stroke); l.setAttribute('stroke-width','2'); l.setAttribute('stroke-opacity','0.7');
+  svg.appendChild(l);
+}
+
+function snap(v){ const step = $('snapOn').checked ? (+$('gridStep').value||1) : 1; return Math.round(v/step)*step; }
+
+function attachDrag(el){
+  el.addEventListener('pointerdown', e=>{
+    if(e.target.classList.contains('rz')) return; // resize handle owns this
+    e.preventDefault();
+    const type=el.dataset.type, idx=+el.dataset.idx;
+    selected={type,idx};
+    stage.querySelectorAll('.box').forEach(b=>b.classList.remove('sel'));
+    el.classList.add('sel'); updateSelInfo();
+    const rect = stage.getBoundingClientRect();
+    const [ox,oy]=posOf(type,idx); const [w,h]=dimsOf(type);
+    const grabX = (e.clientX-rect.left)/zoom - ox;
+    const grabY = (e.clientY-rect.top)/zoom - oy;
+    el.setPointerCapture(e.pointerId);
+    const move = ev=>{
+      let nx = snap((ev.clientX-rect.left)/zoom - grabX);
+      let ny = snap((ev.clientY-rect.top)/zoom - grabY);
+      nx = Math.max(0, Math.min(S.PANEL_W - w, nx));
+      ny = Math.max(0, Math.min(S.PANEL_H - h, ny));
+      setPos(type,idx,nx,ny);
+      el.style.left=nx*zoom+'px'; el.style.top=ny*zoom+'px';
+      redrawConnectors(); renderOut(); updateSelInfo();
+    };
+    const up = ()=>{ el.releasePointerCapture(e.pointerId); el.removeEventListener('pointermove',move); el.removeEventListener('pointerup',up); };
+    el.addEventListener('pointermove',move); el.addEventListener('pointerup',up);
+  });
+}
+
+function attachResize(el, handle){
+  handle.addEventListener('pointerdown', e=>{
+    e.preventDefault(); e.stopPropagation();
+    selected={type:'med',idx:0};
+    stage.querySelectorAll('.box').forEach(b=>b.classList.remove('sel')); el.classList.add('sel');
+    const rect = stage.getBoundingClientRect();
+    handle.setPointerCapture(e.pointerId);
+    const move = ev=>{
+      let w = snap((ev.clientX-rect.left)/zoom - S.MEDALLION_X);
+      let h = snap((ev.clientY-rect.top)/zoom - S.MEDALLION_Y);
+      w = Math.max(8, Math.min(S.PANEL_W - S.MEDALLION_X, w));
+      h = Math.max(8, Math.min(S.PANEL_H - S.MEDALLION_Y, h));
+      S.MEDALLION_W=w; S.MEDALLION_H=h;
+      $('medW').value=w; $('medH').value=h;
+      el.style.width=w*zoom+'px'; el.style.height=h*zoom+'px';
+      renderOut(); updateSelInfo();
+    };
+    const up = ()=>{ handle.releasePointerCapture(e.pointerId); handle.removeEventListener('pointermove',move); handle.removeEventListener('pointerup',up); };
+    handle.addEventListener('pointermove',move); handle.addEventListener('pointerup',up);
+  });
+}
+
+function updateSelInfo(){
+  const si=$('selinfo');
+  if(!selected){ si.innerHTML='Nothing selected. Click a box to select; drag to move. Arrow keys nudge (Shift = x5).'; return; }
+  const [x,y]=posOf(selected.type,selected.idx);
+  let name, extra='';
+  if(selected.type==='slot') name='Slot '+(selected.idx+1)+' (group '+(Math.floor(selected.idx/3)+1)+')';
+  else if(selected.type==='socket') name='Socket M'+(selected.idx+1);
+  else { name='Medallion'; extra=' &nbsp; w=<b>'+S.MEDALLION_W+'</b> h=<b>'+S.MEDALLION_H+'</b>'; }
+  si.innerHTML = 'Selected: <b>'+name+'</b> &nbsp; x=<b>'+x+'</b> y=<b>'+y+'</b>'+extra;
+}
+
+document.addEventListener('keydown', e=>{
+  if(!selected) return;
+  const d = {ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];
+  if(!d) return;
+  e.preventDefault();
+  const m = e.shiftKey?5:1;
+  let [x,y]=posOf(selected.type,selected.idx); const [w,h]=dimsOf(selected.type);
+  x=Math.max(0,Math.min(S.PANEL_W-w, x+d[0]*m));
+  y=Math.max(0,Math.min(S.PANEL_H-h, y+d[1]*m));
+  setPos(selected.type,selected.idx,x,y); build();
+});
+
+function arr(a){ return '{'+a.join(', ')+'}'; }
+function renderOut(){
+  const j =
+`package net.redboltmedia.witchercraft.client.gui;
+
+/**
+ * Data-driven geometry for the perk equip panel.
+ *
+ * All coordinates are GUI-LOCAL (relative to the screen's top-left), in the
+ * same space MCreator's extractLabels() uses, so they can be passed straight to
+ * guiGraphics.text / drawing calls. When blitting in extractBackground(), add
+ * leftPos / topPos yourself.
+ *
+ * Generated by tools/equip-grid-placer.html - paste this over the file wholesale.
+ * Keep it a dumb data holder (no logic) so the tool can overwrite it.
+ */
+public final class PerkEquipLayout {
+	private PerkEquipLayout() {
+	}
+
+	// Panel size (drives centering via leftPos/topPos in the Screen).
+	// Left half = debug perk palette (interim source, retired when the real
+	// left tree lands in Phase 2). Right half = the equip grid.
+	public static final int PANEL_W = ${S.PANEL_W};
+	public static final int PANEL_H = ${S.PANEL_H};
+
+	public static final int SLOT_SIZE = ${S.SLOT_SIZE};
+	public static final int SOCKET_SIZE = ${S.SOCKET_SIZE};
+
+	// --- Equip grid (right half): 12 perk slots, grouped 0-2 / 3-5 / 6-8 /
+	// 9-11 into the 4 mutagen groups. Two columns left of the central
+	// medallion, two columns right (W3 geometry).
+	public static final int[] SLOT_X = ${arr(S.SLOT_X)};
+	public static final int[] SLOT_Y = ${arr(S.SLOT_Y)};
+
+	// 4 mutagen sockets, one under each column.
+	public static final int[] SOCKET_X = ${arr(S.SOCKET_X)};
+	public static final int[] SOCKET_Y = ${arr(S.SOCKET_Y)};
+
+	// Central medallion: a resizable rectangular region (W3 decorative anchor by
+	// default; can be repurposed as a button later). Not drawn when disabled.
+	public static final boolean MEDALLION_ENABLED = ${S.MEDALLION_ENABLED};
+	public static final int MEDALLION_X = ${S.MEDALLION_X};
+	public static final int MEDALLION_Y = ${S.MEDALLION_Y};
+	public static final int MEDALLION_W = ${S.MEDALLION_W};
+	public static final int MEDALLION_H = ${S.MEDALLION_H};
+
+${PALETTE_BLOCK}
+
+	/** Which mutagen group (0-3) a perk slot index (0-11) belongs to. */
+	public static int groupOfSlot(int slotIndex) {
+		return slotIndex / 3;
+	}
+
+	/** Top-left of palette row for the given PerkRegistry index. */
+	public static int paletteColX(int registryIndex) {
+		return PALETTE_X[registryIndex / PALETTE_ROWS_PER_COL];
+	}
+
+	public static int paletteRowY(int registryIndex) {
+		return PALETTE_Y0 + (registryIndex % PALETTE_ROWS_PER_COL) * PALETTE_ROW_H;
+	}
+}
+`;
+  out.value = j;
+}
+
+// ---- controls ----
+function bindNum(id, key, rebuild=true){
+  const el=$(id); el.value=S[key]!==undefined?S[key]:SEED[key];
+  el.addEventListener('input', ()=>{ const v=parseInt(el.value,10); if(!isNaN(v)){ S[key]=v; if(rebuild) build(); else renderOut(); } });
+}
+bindNum('panelW','PANEL_W'); bindNum('panelH','PANEL_H');
+bindNum('slotSize','SLOT_SIZE'); bindNum('socketSize','SOCKET_SIZE');
+bindNum('medW','MEDALLION_W'); bindNum('medH','MEDALLION_H');
+$('medOn').checked = S.MEDALLION_ENABLED;
+$('medOn').addEventListener('change', ()=>{ S.MEDALLION_ENABLED=$('medOn').checked; build(); });
+$('showConn').addEventListener('change', redrawConnectors);
+$('zoom').value = zoom;
+$('zoom').addEventListener('input', ()=>{ const v=parseFloat($('zoom').value); if(v>=1){ zoom=v; build(); } });
+$('gridStep').addEventListener('input', build);
+
+$('copyBtn').addEventListener('click', async ()=>{
+  out.select();
+  try { await navigator.clipboard.writeText(out.value); flash($('copyBtn'),'Copied!'); }
+  catch { document.execCommand('copy'); flash($('copyBtn'),'Copied!'); }
+});
+function flash(btn,msg){ const t=btn.textContent; btn.textContent=msg; setTimeout(()=>btn.textContent=t,1200); }
+
+$('resetBtn').addEventListener('click', ()=>{ S=structuredClone(SEED); zoom=3; $('zoom').value=3;
+  ['panelW:PANEL_W','panelH:PANEL_H','slotSize:SLOT_SIZE','socketSize:SOCKET_SIZE','medW:MEDALLION_W','medH:MEDALLION_H'].forEach(p=>{const[a,b]=p.split(':');$(a).value=S[b];});
+  $('medOn').checked=S.MEDALLION_ENABLED; selected=null; build(); });
+
+// background image
+$('loadBg').addEventListener('click', ()=>$('bgFile').click());
+$('bgFile').addEventListener('change', e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const url=URL.createObjectURL(f);
+  let img=document.getElementById('bg');
+  if(!img){ img=document.createElement('img'); img.id='bg'; stage.prepend(img); }
+  img.src=url; img.style.opacity=(+$('bgOpacity').value/100);
+});
+$('clearBg').addEventListener('click', ()=>{ const img=document.getElementById('bg'); if(img) img.remove(); });
+$('bgOpacity').addEventListener('input', ()=>{ const img=document.getElementById('bg'); if(img) img.style.opacity=(+$('bgOpacity').value/100); });
+
+build();
+</script>
+</body>
+</html>
