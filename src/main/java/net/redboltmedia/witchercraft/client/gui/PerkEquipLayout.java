@@ -20,28 +20,48 @@ public final class PerkEquipLayout {
 	}
 
 	// Panel size (drives centering via leftPos/topPos in the Screen).
-	public static final int PANEL_W = 256;
-	public static final int PANEL_H = 200;
+	// Left half = debug perk palette (interim source, retired when the real
+	// left tree lands in Phase 2). Right half = the equip grid.
+	public static final int PANEL_W = 360;
+	public static final int PANEL_H = 230;
 
 	public static final int SLOT_SIZE = 24;
 	public static final int SOCKET_SIZE = 24;
 	public static final int MEDALLION_SIZE = 40;
 
-	// 12 perk slots, grouped 0-2 / 3-5 / 6-8 / 9-11 into the 4 mutagen groups.
-	// Two columns left of the central medallion, two columns right.
-	public static final int[] SLOT_X = {16, 16, 16, 52, 52, 52, 180, 180, 180, 216, 216, 216};
-	public static final int[] SLOT_Y = {40, 72, 104, 40, 72, 104, 40, 72, 104, 40, 72, 104};
+	// --- Equip grid (right half): 12 perk slots, grouped 0-2 / 3-5 / 6-8 /
+	// 9-11 into the 4 mutagen groups. Two columns left of the central
+	// medallion, two columns right (W3 geometry).
+	public static final int[] SLOT_X = {196, 196, 196, 224, 224, 224, 300, 300, 300, 328, 328, 328};
+	public static final int[] SLOT_Y = {30, 62, 94, 30, 62, 94, 30, 62, 94, 30, 62, 94};
 
 	// 4 mutagen sockets, one under each column.
-	public static final int[] SOCKET_X = {16, 52, 180, 216};
-	public static final int[] SOCKET_Y = {140, 140, 140, 140};
+	public static final int[] SOCKET_X = {196, 224, 300, 328};
+	public static final int[] SOCKET_Y = {130, 130, 130, 130};
 
 	// Central mutagen medallion (decorative anchor).
-	public static final int MEDALLION_X = 108;
-	public static final int MEDALLION_Y = 64;
+	public static final int MEDALLION_X = 256;
+	public static final int MEDALLION_Y = 46;
+
+	// --- Debug palette (left half): every perk as a clickable text row, two
+	// sub-columns, in PerkRegistry order. Row i -> column i / ROWS_PER_COL.
+	public static final int[] PALETTE_X = {8, 100};
+	public static final int PALETTE_Y0 = 20;
+	public static final int PALETTE_ROW_H = 9;
+	public static final int PALETTE_ROW_W = 88;
+	public static final int PALETTE_ROWS_PER_COL = 23;
 
 	/** Which mutagen group (0-3) a perk slot index (0-11) belongs to. */
 	public static int groupOfSlot(int slotIndex) {
 		return slotIndex / 3;
+	}
+
+	/** Top-left of palette row for the given PerkRegistry index. */
+	public static int paletteColX(int registryIndex) {
+		return PALETTE_X[registryIndex / PALETTE_ROWS_PER_COL];
+	}
+
+	public static int paletteRowY(int registryIndex) {
+		return PALETTE_Y0 + (registryIndex % PALETTE_ROWS_PER_COL) * PALETTE_ROW_H;
 	}
 }

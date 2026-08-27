@@ -20,10 +20,14 @@ import net.minecraft.core.SectionPos;
 /**
  * Perk equip screen button/action packet.
  *
- * HAND-MAINTAINED, locked_code=true. Slice 1a only defines button 0 (a
- * reserved no-op sent by Back). Slice 1b extends handleButtonAction with the
- * encoded place / remove / upgrade actions - see the buttonID encoding note
- * there when it lands.
+ * HAND-MAINTAINED, locked_code=true. The buttonID encodes the action so the
+ * fixed MCreator packet shape can carry all of them (the screen is client-only
+ * for selection; only these state changes are server-authoritative):
+ *   0                              reserved / no-op
+ *   1000000 + slotIdx*1000 + perkId   place perkId into perk slot slotIdx (0-11)
+ *   2000000 + slotIdx                 clear perk slot slotIdx
+ *   3000000 + group                   cycle mutagen colour of group (0-3)
+ * The server re-validates every action; it never trusts the client's view.
  */
 @EventBusSubscriber
 public record PerkEquipGuiButtonMessage(int buttonID, int x, int y, int z) implements CustomPacketPayload {
@@ -54,10 +58,32 @@ public record PerkEquipGuiButtonMessage(int buttonID, int x, int y, int z) imple
 		// security measure to prevent arbitrary chunk generation
 		if (!world.getChunkSource().hasChunk(SectionPos.blockToSectionCoord(x), SectionPos.blockToSectionCoord(z)))
 			return;
-		if (buttonID == 0) {
-			// Reserved: Back. Close is handled client-side; recompute runs from
-			// PerkEquipGuiMenu.removed(). Nothing to do server-side here.
+		if (buttonID >= 3000000) { // cycle mutagen colour: empty -> red -> green -> blue -> empty
+			int group = buttonID - 3000000;
+			if (group < 0 || group >= PerkEquipVars.MUTAGEN_GROUPS)
+				return;
+			int next = (PerkEquipVars.getMutagenSocket(entity, group) + 1) % 4;
+			PerkEquipVars.setMutagenSocket(entity, group, next);
+		} else if (buttonID >= 2000000) { // clear a perk slot
+			int slot = buttonID - 2000000;
+			if (slot < 0 || slot >= PerkEquipVars.PERK_SLOTS)
+				return;
+			PerkEquipVars.setPerkSocket(entity, slot, 0);
+		} else if (buttonID >= 1000000) { // place a perk into a slot
+			int a = buttonID - 1000000;
+			int slot = a / 1000;
+			int perkId = a % 1000;
+			if (slot < 0 || slot >= PerkEquipVars.PERK_SLOTS)
+				return;
+			if (perkId <= 0)
+				return;
+			if (PerkEquipVars.getPerkSocket(entity, slot) != 0)
+				return; // target must be empty
+			if (PerkEquipVars.isPerkSocketed(entity, perkId))
+				return; // a perk can only be equipped once
+			PerkEquipVars.setPerkSocket(entity, slot, perkId);
 		}
+		// buttonID 0: reserved no-op. Recompute runs from PerkEquipGuiMenu.removed().
 	}
 
 	@SubscribeEvent

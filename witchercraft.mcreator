@@ -5800,6 +5800,28 @@
       }
     },
     {
+      "name": "RecomputeEquippedPerksOnLogin",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "recompute_equipped_perks_on_login",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "world",
+            "type": "world"
+          },
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/RecomputeEquippedPerksOnLoginProcedure.java"
+        ]
+      }
+    },
+    {
       "name": "ApplyMutagenBonus",
       "type": "procedure",
       "compiles": true,
