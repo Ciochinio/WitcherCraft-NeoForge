@@ -3,8 +3,8 @@
   "_type": "keybind",
   "definition": {
     "triggerKey": "P",
-    "keyBindingName": "Debug Recompute Perks",
+    "keyBindingName": "Open Perk Equip Screen",
     "keyBindingCategoryKey": "witchercraft",
-    "onKeyPressed": "RecomputeEquippedPerks"
+    "onKeyPressed": "PerkEquipGuiOpen"
   }
 }

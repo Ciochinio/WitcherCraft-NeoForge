@@ -1,6 +1,6 @@
 package net.redboltmedia.witchercraft.network;
 
-import net.redboltmedia.witchercraft.procedures.RecomputeEquippedPerksProcedure;
+import net.redboltmedia.witchercraft.procedures.PerkEquipGuiOpenProcedure;
 import net.redboltmedia.witchercraft.WitchercraftMod;
 
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -52,7 +52,7 @@ public record DebugRecomputePerksKeybindMessage(int eventType, int pressedms) im
 			return;
 		if (type == 0) {
 
-			RecomputeEquippedPerksProcedure.execute(entity);
+			PerkEquipGuiOpenProcedure.execute(world, x, y, z, entity);
 		}
 	}
 

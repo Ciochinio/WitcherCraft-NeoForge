@@ -5902,6 +5902,54 @@
       }
     },
     {
+      "name": "PerkEquipGui",
+      "type": "gui",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "perk_equip_gui",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/client/gui/PerkEquipGuiScreen.java",
+          "src/main/java/net/redboltmedia/witchercraft/network/PerkEquipGuiButtonMessage.java",
+          "src/main/java/net/redboltmedia/witchercraft/world/inventory/PerkEquipGuiMenu.java"
+        ]
+      }
+    },
+    {
+      "name": "PerkEquipGuiOpen",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "perk_equip_gui_open",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/PerkEquipGuiOpenProcedure.java"
+        ],
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "x",
+            "type": "number"
+          },
+          {
+            "name": "y",
+            "type": "number"
+          },
+          {
+            "name": "z",
+            "type": "number"
+          },
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ]
+      }
+    },
+    {
       "name": "DodgeChance",
       "type": "attribute",
       "compiles": true,
