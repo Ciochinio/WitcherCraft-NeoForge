@@ -3,7 +3,11 @@ package net.redboltmedia.witchercraft.client.gui;
 import net.redboltmedia.witchercraft.world.inventory.PerkEquipGuiMenu;
 import net.redboltmedia.witchercraft.network.PerkEquipGuiButtonMessage;
 import net.redboltmedia.witchercraft.network.PerkEquipVars;
+import net.redboltmedia.witchercraft.network.PerkLearnedVars;
+import net.redboltmedia.witchercraft.procedures.CharacterAbilitiesSkillPointsAvailableProcedure;
 import net.redboltmedia.witchercraft.init.WitchercraftModScreens;
+
+import java.util.List;
 
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
@@ -29,10 +33,12 @@ import com.mojang.blaze3d.platform.InputConstants;
  * before any glyph/frame PNGs exist. When real art lands, swap the drawCell/
  * text calls for blit() at the same PerkEquipLayout coordinates.
  *
- * Left half = debug palette of all 45 perks (interim source; the real learned-
- * gated tree replaces it in Phase 2). Right half = the equip grid.
- * Selection ("held perk") is client-only state here; only placement/removal/
- * mutagen changes go to the server (authoritative) via PerkEquipGuiButtonMessage.
+ * Left half = the perk TREE for the active branch (SLICE 2a: Combat test
+ * topology from PerkTree; per-node prerequisites; right-click to learn, left-
+ * click a learned node to hold for equipping). Right half = the equip grid.
+ * Selection ("held perk") is client-only state here; learning, placement,
+ * removal and mutagen changes all go to the server (authoritative) via
+ * PerkEquipGuiButtonMessage.
  */
 public class PerkEquipGuiScreen extends AbstractContainerScreen<PerkEquipGuiMenu> implements WitchercraftModScreens.ScreenAccessor {
 	private final Level world;
@@ -42,6 +48,9 @@ public class PerkEquipGuiScreen extends AbstractContainerScreen<PerkEquipGuiMenu
 
 	// Client-only selection: the perk id currently "held" (0 = nothing).
 	private int heldPerk = 0;
+	// Active tree branch/tab colour (1 red / 2 green / 3 blue / 4 neutral).
+	// SLICE 2a: fixed to Combat; real tab switching lands next slice.
+	private int activeBranch = 1;
 
 	// Cell colours.
 	private static final int PANEL_BG = 0xC00E0E12;
@@ -51,6 +60,11 @@ public class PerkEquipGuiScreen extends AbstractContainerScreen<PerkEquipGuiMenu
 	private static final int CELL_VALID_BORDER = 0xFFFFDD55;
 	private static final int TEXT_DIM = 0xFF9A9AA2;
 	private static final int TEXT_HELD = 0xFFFFFFFF;
+
+	// Branch tabs (index i -> branch colour i+1: Combat/Alchemy/Signs/General).
+	private static final String[] TAB_LABELS = {"CMB", "ALC", "SGN", "GEN"};
+	private static final int[] TAB_X = {8, 52, 96, 140};
+	private static final int TAB_Y = 6, TAB_W = 40, TAB_H = 11;
 
 	public PerkEquipGuiScreen(PerkEquipGuiMenu container, Inventory inventory, Component text) {
 		super(container, inventory, text, PerkEquipLayout.PANEL_W, PerkEquipLayout.PANEL_H);
@@ -72,27 +86,17 @@ public class PerkEquipGuiScreen extends AbstractContainerScreen<PerkEquipGuiMenu
 		g.fill(0, 0, PerkEquipLayout.PANEL_W, PerkEquipLayout.PANEL_H, PANEL_BG);
 		g.fill(186, 0, 188, PerkEquipLayout.PANEL_H, DIVIDER);
 
-		g.text(this.font, "PERK EQUIP", 8, 6, 0xFFFFFFFF, false);
+		drawTabs(g);
+		g.text(this.font, "Pts:", 8, PerkEquipLayout.PANEL_H - 14, 0xFFDDDD88, false);
+		g.text(this.font, CharacterAbilitiesSkillPointsAvailableProcedure.execute(entity), 30, PerkEquipLayout.PANEL_H - 14, 0xFFDDDD88, false);
 		if (heldPerk != 0) {
-			g.text(this.font, "Holding: " + PerkRegistry.name(heldPerk), 8, PerkEquipLayout.PANEL_H - 14, TEXT_HELD, false);
+			g.text(this.font, "Holding: " + PerkRegistry.name(heldPerk), 60, PerkEquipLayout.PANEL_H - 14, TEXT_HELD, false);
 		} else {
-			g.text(this.font, "L-click perk to hold, then a slot. L-click slot to remove.", 8, PerkEquipLayout.PANEL_H - 14, TEXT_DIM, false);
+			g.text(this.font, "R-click=learn  L-click learned=hold", 60, PerkEquipLayout.PANEL_H - 14, TEXT_DIM, false);
 		}
 
-		// palette rows
-		for (int i = 0; i < PerkRegistry.IDS.length; i++) {
-			int id = PerkRegistry.IDS[i];
-			int rx = PerkEquipLayout.paletteColX(i);
-			int ry = PerkEquipLayout.paletteRowY(i);
-			boolean held = id == heldPerk;
-			boolean equipped = PerkEquipVars.isPerkSocketed(entity, id);
-			if (held)
-				g.fill(rx - 1, ry - 1, rx + PerkEquipLayout.PALETTE_ROW_W, ry + PerkEquipLayout.PALETTE_ROW_H - 1, 0x66FFDD55);
-			int base = PerkRegistry.tint(PerkRegistry.color(id));
-			// equipped perks show full-bright; unequipped are dimmed
-			int col = held ? TEXT_HELD : (equipped ? base : dim(base));
-			g.text(this.font, trim(PerkRegistry.NAMES[i], 15), rx, ry, col, false);
-		}
+		// left panel: the perk tree for the active branch
+		drawTree(g);
 
 		// mutagen connector lines (under the cells): each socketed mutagen links
 		// to the equipped perks in its group that MATCH its colour, in that colour.
@@ -145,9 +149,12 @@ public class PerkEquipGuiScreen extends AbstractContainerScreen<PerkEquipGuiMenu
 	public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTicks) {
 		int lx = mouseX - leftPos;
 		int ly = mouseY - topPos;
-		int pi = hitPalette(lx, ly);
-		if (pi >= 0) {
-			g.setTooltipForNextFrame(font, Component.literal(PerkRegistry.NAMES[pi] + "  (id " + PerkRegistry.IDS[pi] + ")"), mouseX, mouseY);
+		int np = hitNode(lx, ly);
+		if (np > 0) {
+			PerkTree.Node n = PerkTree.byId(np);
+			String state = PerkLearnedVars.isLearned(entity, np) ? "Learned"
+					: (n != null && prereqsMet(n) ? "Available - right-click to learn" : "Locked");
+			g.setTooltipForNextFrame(font, Component.literal(PerkRegistry.name(np) + " - " + state), mouseX, mouseY);
 		}
 		int si = hitSlot(lx, ly);
 		if (si >= 0) {
@@ -156,6 +163,79 @@ public class PerkEquipGuiScreen extends AbstractContainerScreen<PerkEquipGuiMenu
 				g.setTooltipForNextFrame(font, Component.literal(PerkRegistry.name(cur)), mouseX, mouseY);
 		}
 		super.extractRenderState(g, mouseX, mouseY, partialTicks);
+	}
+
+	// ---- left panel: perk tree ----------------------------------------------
+
+	private void drawTabs(GuiGraphicsExtractor g) {
+		for (int i = 0; i < TAB_LABELS.length; i++) {
+			boolean active = activeBranch == i + 1;
+			g.text(this.font, TAB_LABELS[i], TAB_X[i], TAB_Y, active ? 0xFFFFFFFF : TEXT_DIM, false);
+			if (active)
+				g.fill(TAB_X[i] - 1, TAB_Y + 9, TAB_X[i] + 22, TAB_Y + 10, PerkRegistry.tint(i + 1));
+		}
+	}
+
+	private int hitTab(int lx, int ly) {
+		for (int i = 0; i < TAB_LABELS.length; i++) {
+			if (lx >= TAB_X[i] - 2 && lx < TAB_X[i] + TAB_W && ly >= TAB_Y - 2 && ly < TAB_Y + TAB_H)
+				return i + 1;
+		}
+		return -1;
+	}
+
+	private void drawTree(GuiGraphicsExtractor g) {
+		List<PerkTree.Node> nodes = PerkTree.forColor(activeBranch);
+		int tint = PerkRegistry.tint(activeBranch);
+		// prerequisite connectors first (drawn under the nodes)
+		for (PerkTree.Node n : nodes) {
+			boolean childLearned = PerkLearnedVars.isLearned(entity, n.perkId);
+			boolean childMet = prereqsMet(n);
+			int col = childLearned ? withAlpha(tint, 0xCC) : (childMet ? withAlpha(tint, 0x77) : 0xFF3A3A42);
+			for (int pre : n.prereqs) {
+				PerkTree.Node p = PerkTree.byId(pre);
+				if (p == null)
+					continue;
+				hLine(g, p.cx(), n.cx(), p.cy(), col); // horizontal at prereq's y
+				vLine(g, n.cx(), p.cy(), n.cy(), col); // vertical at child's x
+			}
+		}
+		// nodes
+		for (PerkTree.Node n : nodes) {
+			boolean learned = PerkLearnedVars.isLearned(entity, n.perkId);
+			boolean equipped = learned && PerkEquipVars.isPerkSocketed(entity, n.perkId);
+			boolean met = prereqsMet(n);
+			int t = PerkRegistry.tint(PerkRegistry.color(n.perkId));
+			if (heldPerk == n.perkId) // held-for-equip highlight ring
+				drawRect(g, n.x - 2, n.y - 2, PerkTree.NODE_SIZE + 4, PerkTree.NODE_SIZE + 4, CELL_VALID_BORDER, CELL_VALID_BORDER);
+			int border, inner, textCol;
+			if (equipped) { // fully bright, filled
+				border = t;
+				inner = withAlpha(t, 0x99);
+				textCol = 0xFFFFFFFF;
+			} else if (learned) { // learned but not equipped: bright rim, dark inner
+				border = t;
+				inner = CELL_EMPTY_INNER;
+				textCol = t;
+			} else if (met) { // available to learn: dark with a faint colour rim
+				border = dim(t);
+				inner = 0xFF141417;
+				textCol = dim(t);
+			} else { // locked (prereqs unmet): fully dark/flat
+				border = 0xFF2A2A30;
+				inner = 0xFF121215;
+				textCol = 0xFF44444E;
+			}
+			drawCell(g, n.x, n.y, PerkTree.NODE_SIZE, border, inner);
+			g.text(this.font, trim(PerkRegistry.name(n.perkId), 3), n.x + 3, n.y + PerkTree.NODE_SIZE / 2 - 4, textCol, false);
+		}
+	}
+
+	private boolean prereqsMet(PerkTree.Node n) {
+		for (int pre : n.prereqs)
+			if (!PerkLearnedVars.isLearned(entity, pre))
+				return false;
+		return true;
 	}
 
 	private void drawConnectors(GuiGraphicsExtractor g) {
@@ -229,10 +309,24 @@ public class PerkEquipGuiScreen extends AbstractContainerScreen<PerkEquipGuiMenu
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
 		int lx = (int) event.x() - leftPos;
 		int ly = (int) event.y() - topPos;
+		int nodePerk = hitNode(lx, ly);
+		if (event.button() == 1) { // right-click a node = learn (server enforces prereqs + points)
+			if (nodePerk > 0) {
+				if (!PerkLearnedVars.isLearned(entity, nodePerk))
+					sendAction(5000000 + nodePerk);
+				return true;
+			}
+			return super.mouseClicked(event, doubleClick);
+		}
 		if (event.button() == 0) { // left: our custom regions take priority
-			int pi = hitPalette(lx, ly);
-			if (pi >= 0) {
-				heldPerk = PerkRegistry.IDS[pi];
+			int tab = hitTab(lx, ly);
+			if (tab > 0) {
+				activeBranch = tab;
+				return true;
+			}
+			if (nodePerk > 0) {
+				if (PerkLearnedVars.isLearned(entity, nodePerk))
+					heldPerk = nodePerk; // hold a learned perk for equipping
 				return true;
 			}
 			int si = hitSlot(lx, ly);
@@ -296,12 +390,11 @@ public class PerkEquipGuiScreen extends AbstractContainerScreen<PerkEquipGuiMenu
 
 	// ---- hit tests (gui-local) ----------------------------------------------
 
-	private int hitPalette(int lx, int ly) {
-		for (int i = 0; i < PerkRegistry.IDS.length; i++) {
-			int rx = PerkEquipLayout.paletteColX(i);
-			int ry = PerkEquipLayout.paletteRowY(i);
-			if (lx >= rx && lx < rx + PerkEquipLayout.PALETTE_ROW_W && ly >= ry && ly < ry + PerkEquipLayout.PALETTE_ROW_H)
-				return i;
+	/** perk id of the tree node under (lx,ly) in the active branch, or -1. */
+	private int hitNode(int lx, int ly) {
+		for (PerkTree.Node n : PerkTree.forColor(activeBranch)) {
+			if (lx >= n.x && lx < n.x + PerkTree.NODE_SIZE && ly >= n.y && ly < n.y + PerkTree.NODE_SIZE)
+				return n.perkId;
 		}
 		return -1;
 	}

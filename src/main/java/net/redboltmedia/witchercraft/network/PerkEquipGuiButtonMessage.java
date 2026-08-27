@@ -2,7 +2,8 @@ package net.redboltmedia.witchercraft.network;
 
 import net.redboltmedia.witchercraft.WitchercraftMod;
 import net.redboltmedia.witchercraft.client.gui.PerkEquipLayout;
-import net.redboltmedia.witchercraft.procedures.MutagenMedallionClickProcedure;
+import net.redboltmedia.witchercraft.client.gui.PerkTree;
+import net.redboltmedia.witchercraft.procedures.*;
 
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -30,6 +31,7 @@ import net.minecraft.core.SectionPos;
  *   2000000 + slotIdx                 clear perk slot slotIdx
  *   3000000 + group                   cycle mutagen colour of group (0-3)
  *   4000000                           medallion click (placeholder button)
+ *   5000000 + perkId                  learn a tree node (prereqs + points enforced)
  * The server re-validates every action; it never trusts the client's view.
  */
 @EventBusSubscriber
@@ -61,7 +63,9 @@ public record PerkEquipGuiButtonMessage(int buttonID, int x, int y, int z) imple
 		// security measure to prevent arbitrary chunk generation
 		if (!world.getChunkSource().hasChunk(SectionPos.blockToSectionCoord(x), SectionPos.blockToSectionCoord(z)))
 			return;
-		if (buttonID >= 4000000) { // medallion click (placeholder button)
+		if (buttonID >= 5000000) { // learn a tree node (perkId), prereqs + points enforced
+			tryLearn(entity, buttonID - 5000000);
+		} else if (buttonID >= 4000000) { // medallion click (placeholder button)
 			if (PerkEquipLayout.MEDALLION_ENABLED)
 				MutagenMedallionClickProcedure.execute(entity);
 		} else if (buttonID >= 3000000) { // cycle mutagen colour: empty -> red -> green -> blue -> empty
@@ -94,6 +98,69 @@ public record PerkEquipGuiButtonMessage(int buttonID, int x, int y, int z) imple
 			PerkEquipVars.setPerkSocket(entity, slot, perkId);
 		}
 		// buttonID 0: reserved no-op. Recompute runs from PerkEquipGuiMenu.removed().
+	}
+
+	// Learn a tree node: only if not already learned and all prerequisites are
+	// learned. The actual point-check / learned-flag / point-spend is delegated
+	// to the perk's existing <Perk>Effect buy procedure, so learning stays in one
+	// place. (Dispatch covers the slice-2a Combat test nodes; extends to 45.)
+	private static void tryLearn(Player entity, int perkId) {
+		if (PerkLearnedVars.isLearned(entity, perkId))
+			return;
+		PerkTree.Node n = PerkTree.byId(perkId);
+		if (n == null)
+			return;
+		for (int pre : n.prereqs)
+			if (!PerkLearnedVars.isLearned(entity, pre))
+				return;
+		switch (perkId) {
+			case 101 : AnatomicalKnowledgeEffectProcedure.execute(entity); break;
+			case 102 : ColdBloodEffectProcedure.execute(entity); break;
+			case 103 : CripplingShotEffectProcedure.execute(entity); break;
+			case 104 : CripplingStrikesEffectProcedure.execute(entity); break;
+			case 105 : CrushingBlowsEffectProcedure.execute(entity); break;
+			case 106 : DeadlyPrecisionEffectProcedure.execute(entity); break;
+			case 107 : DefenceEffectProcedure.execute(entity); break;
+			case 108 : FleetFootedEffectProcedure.execute(entity); break;
+			case 109 : FloodOfAngerEffectProcedure.execute(entity); break;
+			case 110 : MuscleMemoryEffectProcedure.execute(entity); break;
+			case 111 : PreciseBlowsEffectProcedure.execute(entity); break;
+			case 112 : RazorFocusEffectProcedure.execute(entity); break;
+			case 113 : StrengthTrainingEffectProcedure.execute(entity); break;
+			case 114 : SunderArmorEffectProcedure.execute(entity); break;
+			case 115 : UndyingEffectProcedure.execute(entity); break;
+			case 201 : ClusterBombsEffectProcedure.execute(entity); break;
+			case 202 : DelayedRecoveryEffectProcedure.execute(entity); break;
+			case 203 : EfficiencyEffectProcedure.execute(entity); break;
+			case 204 : HunterInstinctEffectProcedure.execute(entity); break;
+			case 205 : PoisonedBladesEffectProcedure.execute(entity); break;
+			case 206 : ProtectiveCoatingEffectProcedure.execute(entity); break;
+			case 207 : PyrotechnicsEffectProcedure.execute(entity); break;
+			case 208 : RefreshmentEffectProcedure.execute(entity); break;
+			case 209 : SideEffectsEffectProcedure.execute(entity); break;
+			case 301 : AardIntensityEffectProcedure.execute(entity); break;
+			case 302 : AxiiIntensityEffectProcedure.execute(entity); break;
+			case 303 : DelusionEffectProcedure.execute(entity); break;
+			case 304 : DominationEffectProcedure.execute(entity); break;
+			case 305 : ExplodingShieldEffectProcedure.execute(entity); break;
+			case 306 : FarReachingAardEffectProcedure.execute(entity); break;
+			case 307 : FirestreamEffectProcedure.execute(entity); break;
+			case 308 : IgniIntensityEffectProcedure.execute(entity); break;
+			case 309 : MagicTrapEffectProcedure.execute(entity); break;
+			case 310 : PyromaniacEffectProcedure.execute(entity); break;
+			case 311 : QuenDischargeEffectProcedure.execute(entity); break;
+			case 312 : QuenIntensityEffectProcedure.execute(entity); break;
+			case 313 : ShockWaveEffectProcedure.execute(entity); break;
+			case 314 : SustainedGlyphsEffectProcedure.execute(entity); break;
+			case 315 : YrdenIntensityEffectProcedure.execute(entity); break;
+			case 401 : BearSchoolEffectProcedure.execute(entity); break;
+			case 402 : CatSchoolEffectProcedure.execute(entity); break;
+			case 403 : GourmetEffectProcedure.execute(entity); break;
+			case 404 : GriffinSchoolEffectProcedure.execute(entity); break;
+			case 405 : SunAndStarsEffectProcedure.execute(entity); break;
+			case 406 : SurvivalInstinctEffectProcedure.execute(entity); break;
+			default : break;
+		}
 	}
 
 	@SubscribeEvent
