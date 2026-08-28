@@ -595,43 +595,42 @@ Two consequences to know:
 All hand-written, none owned by an MCreator element (the same "orphaned helper class" pattern as
 `PerkEquipLayout` / `PerkTree` / `PerkRegistry`), so MCreator never regenerates them:
 
-- **`GuiPage`** - the page interface. `render(g, originX, originY, mouseX, mouseY, partial)` plus
-  `mouseClicked` / `keyPressed` / `onShown` / `onClose`. Every coordinate a page receives is
-  **absolute**: the shell hands it the content region's top-left and the page adds its own gui-local
-  offsets, exactly as the old container screen added `leftPos` / `topPos`.
+- **`GuiPage`** - the page interface. `render(g, x, y, w, h, mouseX, mouseY, partial)` +
+  `mouseClicked(x, y, w, h, ...)` / `keyPressed` / `pollTooltip` / `onShown` / `onClose`. The shell
+  hands every page the **content region** - the whole area below the navbar - as a design-coords rect;
+  the page fills it however it likes. All coords are design-canvas pixels (see 3.3a).
 - **`WitcherGuiScreen`** - the shell. Renders against a **fixed virtual design canvas**
   (`DESIGN_W`x`DESIGN_H`, 16:9) scaled uniformly to fit the real screen (see 3.3a). `extractBackground`
   paints opaque black over the whole (gui-scaled) screen, then - inside the `pose().pushMatrix()` /
-  `translate` / `scale` transform - blits the background to fill the design canvas + a scrim behind the
-  content area; the black shows through as **letterbox bars** on non-16:9 screens. `extractRenderState`
-  draws the navbar (a **centred group of fixed-width tabs**, icon + label) and the active page inside
-  the same transform, then pops it and renders the page's tooltip (`pollTooltip`) in screen space at
-  the real cursor. Input is transformed screen->design before hit-testing. A `WitcherGuiScreen(String
-  pageId)` constructor opens straight onto a tab.
-- **`WitcherGuiLayout`** - the tool-generated data holder. The **design canvas** (`DESIGN_W/H`), a
-  `BG` texture, navbar sizing (`NAV_Y/H`, `NAV_TAB_W`, `NAV_GAP`, `NAV_ICON`), the centred content
-  safe-area size (`CONTENT_W/H`), a `NAV[]` of tabs (each `pageId` + label key + **icon texture**;
-  positions are computed, so no rect), and a `SECTIONS[]` of content boxes (coords LOCAL to the safe
-  area) each tagged with its `pageId`. All coords are **design-canvas pixels**. Dumb data plus small
-  centring/lookup helpers, so the tool can overwrite it wholesale.
-- **`WitcherGuiPages`** - the route table: `forId(pageId)` returns the handling page. A `pageId` with
-  no custom class falls back to a cached `LayoutPage`, so **a placeholder tab is a one-line edit in
-  the tool - no new class**. Custom pages register in the `CUSTOM` map.
-- **`LayoutPage`** - the generic page. Renders the `WitcherGuiLayout` boxes for its `pageId` as
-  placeholder fills + labels (or a `blit` when a box carries a texture). This is what makes the
-  "lower section" interchangeable: a whole page is defined by tool-edited data, no code per tab.
-- **`PerkPage`** - the ported perk tree + equip grid (see 3.5).
+  `translate` / `scale` transform - blits the background to fill the design canvas; the black shows
+  through as **letterbox bars** on non-16:9 screens. `extractRenderState` draws the active page in the
+  content region, then the navbar (a **centred group of fixed-width tabs**, icon + label) **on top** so
+  page content never covers the tabs, then pops the transform and renders the page's tooltip
+  (`pollTooltip`) in screen space at the real cursor. Input is transformed screen->design before
+  hit-testing. A `WitcherGuiScreen(String pageId)` constructor opens straight onto a tab.
+- **`WitcherGuiLayout`** - the tool-generated data holder for shell **chrome only** (no page content).
+  The **design canvas** (`DESIGN_W/H`), a `BG` texture, navbar sizing (`NAV_Y/H`, `NAV_TAB_W`,
+  `NAV_GAP`, `NAV_ICON`), a `CONTENT_MARGIN`, and a `NAV[]` of tabs (each `pageId` + label key + **icon
+  texture**; positions computed, no rect). Helpers give the navbar tab rects and the **content region**
+  (`contentX/Y/W/H()` = the whole area below the navbar). All coords are design-canvas pixels.
+- **`WitcherGuiPages`** - the route table: `forId(pageId)` returns the handling page; an id with no
+  bespoke class falls back to a cached `PlaceholderPage`. Bespoke pages register in the `CUSTOM` map.
+- **`PlaceholderPage`** - a not-yet-built tab: centres a "&lt;Name&gt; - coming soon" in the content
+  region. Every navbar page with no bespoke `GuiPage` uses it, until that page gets its own class +
+  its own placer tool (the Skills pattern).
+- **`PerkPage`** - the perk tree + equip grid, fit-scaled into the content region (see 3.5).
 - **`WitcherGuiKeybind`** - a hand-written `@EventBusSubscriber(Dist.CLIENT)` that registers the **P**
-  mapping plus one **per-page** mapping built from `NAV[]` (`key.witchercraft.open_shell.<pageId>`,
-  **unbound by default** so nothing clashes - assign in Controls), and opens the shell on a client
-  tick (`ClientTickEvent.Post`, game bus) onto the matching tab. No server message, no MCreator
-  keybind element; auto-detected by FML like the HUD overlay classes. Adding a nav tab in the tool
+  mapping plus one **per-page** mapping built from `NAV[]` (`key.witchercraft.open_shell.<pageId>`; the
+  six known pages get conflict-free defaults - I / K / J / N / M / G - via a `DEFAULT_KEYS` map, any
+  other tab stays unbound; all rebindable in Controls), and opens the shell on a client tick
+  (`ClientTickEvent.Post`, game bus) onto the matching tab. No server message, no MCreator keybind
+  element; auto-detected by FML like the HUD overlay classes. Adding a nav tab in the tool
   automatically gets it a keybind.
 
 The navbar is driven by `NAV[]` (order + visuals, tool-edited) while behaviour comes from the page
-registry (code). They are paired by `pageId`: a `NAV` entry with no page renders as an inert tab; a
-page with no `NAV` entry simply never shows. That separation is deliberate - "how the navbar looks"
-is data, "what a page does" is code.
+registry (code). They are paired by `pageId`: a `NAV` entry whose id has no bespoke page shows a
+`PlaceholderPage`; a page with no `NAV` entry simply never shows. That separation is deliberate -
+"how the navbar looks" is data, "what a page does" is code.
 
 ### 3.3a Scaling: gui-scale independence + letterbox
 
@@ -659,16 +658,15 @@ must not call `setTooltipForNextFrame` itself (it would be scaled and mispositio
 stashes the tooltip and the shell reads it via `GuiPage.pollTooltip()` after popping the transform and
 renders it at the real cursor.
 
-### 3.4 The creator tool
+### 3.4 The tools: one per GUI, plus a navbar-only chrome editor
 
-`tools/gui-layout-creator.html` is the third standalone placer, alongside `equip-grid-placer.html`
-and `tree-node-placer.html`, and follows the same contract: drag/resize boxes against an optional
-background image, and **regenerate `WitcherGuiLayout.java` live -> copy -> paste over the file**. It
-is page-aware: a page-tab row (mirroring the in-game navbar) picks which page's content boxes you are
-editing, while the navbar tabs are shared and always shown in the top band. Per-box fields edit the
-`pageId` / label / icon (nav) or type / id / text / texture (section), and Add/Delete make the navbar
-and lower section fully interchangeable. It is seeded with the current layout, so `Reset` reproduces
-the checked-in file.
+Each GUI is authored by its **own** placer tool - the Skills page has `equip-grid-placer.html`
+(-> `PerkEquipLayout.java`) and `tree-node-placer.html` (-> `PerkTree.java`); a future Inventory page
+would get its own. `tools/gui-layout-creator.html` is deliberately **not** one of those - it edits the
+shell **chrome only**: the design canvas, the background, and the navbar (tab order / `pageId` / label
+/ icon, add / delete / reorder). It shows the content region as a greyed "reserved" box (a reminder
+that pages are laid out by their own tools) and **regenerates `WitcherGuiLayout.java` live -> copy ->
+paste over the file**. Seeded with the current layout, so `Reset` reproduces the checked-in file.
 
 ### 3.5 How the perk screen became a page
 
@@ -676,10 +674,13 @@ The old `PerkEquipGuiScreen` was an `AbstractContainerScreen` drawing through MC
 `extractLabels`. `PerkPage` is the same rendering + input, with two structural changes and nothing
 else:
 
-- **Origin offset instead of `leftPos`/`topPos`.** Every draw goes through `fill(...)` / `text(...)`
-  helpers that add the content origin the shell passes in, so the ported body reads almost identically
-  to the original and still uses the tool-generated `PerkEquipLayout` + `PerkTree` coordinates
-  verbatim. **Both perk tools keep working unchanged.**
+- **Fit-scaled into the content region.** The shell hands `PerkPage` the below-navbar content rect; it
+  maps its fixed 360x230 `PerkEquipLayout` space onto that rect with a uniform, centred `pose()` scale
+  (a nested transform inside the shell's design->screen one), so Skills fills the area below the
+  navbar. Draw calls stay in perk-local coords (the ported body is nearly identical to the original)
+  and still use the tool-generated `PerkEquipLayout` + `PerkTree` verbatim. **Both perk tools keep
+  working unchanged** - their 360x230 canvas now simply *is* the content region, scaled up. Input and
+  the hovered-node tooltip map the mouse back through the same fit scale.
 - **The recompute moved.** The perk-effect recompute used to fire from `PerkEquipGuiMenu.removed()`
   when the container closed. With no container, it now runs server-side after every state-changing
   action inside `PerkEquipGuiButtonMessage.handleButtonAction` (`buttonID != 0` ->
@@ -705,21 +706,20 @@ just will not appear as an element in the MCreator browser.
 
 ### 3.7 How to change things
 
-- **Add/rearrange a tab or a placeholder panel** - open `tools/gui-layout-creator.html`, edit, copy
-  `WitcherGuiLayout.java` over the file. No Java changes for placeholder pages.
-- **Add a real (custom-rendered) page** - implement `GuiPage`, register its singleton in
-  `WitcherGuiPages.CUSTOM` under its `pageId`, and give it a `NAV[]` entry with the same `pageId`.
-- **Change the open key** - it is a normal keybind; rebind in Controls, or change the default in
-  `WitcherGuiKeybind.OPEN_SHELL`.
-- **Swap placeholder boxes for art** - give a `Section` a non-empty `texture`; `LayoutPage` blits it
-  instead of drawing the coloured placeholder. For a custom page, replace its `fill`/`text` calls
-  with `blit` at the same coordinates.
+- **Rearrange the navbar / chrome** - open `tools/gui-layout-creator.html`, edit, copy
+  `WitcherGuiLayout.java` over the file.
+- **Add a real page** - implement `GuiPage` (its own class; fill the content region), register its
+  singleton in `WitcherGuiPages.CUSTOM` under its `pageId`, add a `NAV[]` entry with that `pageId`,
+  and give it its own placer tool if it needs authored geometry (the Skills pattern). Until then the
+  `pageId` shows a `PlaceholderPage`.
+- **Change an open key** - normal keybinds; rebind in Controls, or change the defaults in
+  `WitcherGuiKeybind` (`OPEN_SHELL` / `DEFAULT_KEYS`).
 
 ### 3.8 Known limitations
 
-- **Visual shell only.** `TYPE_SLOT` boxes are placeholder cells, not real inventory slots; the
-  Inventory/Alchemy/Bombs/Map tabs draw layout, not live data. Wiring functional slots is a later
-  pass and will require the owning page to bring a container.
+- **Placeholder pages.** Only Skills is a real page; Inventory / Alchemy / Bombs / Map / Glossary are
+  `PlaceholderPage` "coming soon" tabs until each is built (own class + own tool). None wire real
+  item slots yet - a page that needs live inventory slots must bring a container.
 - **Existing standalone screens are not yet folded in.** Alchemy, Meditation, Glossary, etc. remain
   their own container screens; only the perk screen has moved into the shell. They can be re-homed as
   pages later, or bridged (a tab that opens the old screen) in the interim.

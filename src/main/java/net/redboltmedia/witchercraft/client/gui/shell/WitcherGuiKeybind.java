@@ -36,6 +36,18 @@ public class WitcherGuiKeybind {
 	public static final KeyMapping[] PAGE_KEYS;
 	private static final String[] PAGE_IDS;
 
+	// Default keys per known page (tweakable in Controls). Chosen to avoid vanilla
+	// keys and this mod's existing bindings (B pause-menu, Tab sign-gui, R cast,
+	// P open-shell). A page not listed here (e.g. a new tab added in the tool)
+	// stays UNBOUND by default.
+	private static final java.util.Map<String, Integer> DEFAULT_KEYS = java.util.Map.of(
+			"inventory", GLFW.GLFW_KEY_I,
+			"skills", GLFW.GLFW_KEY_K,
+			"alchemy", GLFW.GLFW_KEY_J,
+			"bombs", GLFW.GLFW_KEY_N,
+			"map", GLFW.GLFW_KEY_M,
+			"glossary", GLFW.GLFW_KEY_G);
+
 	static {
 		int n = WitcherGuiLayout.NAV.length;
 		PAGE_KEYS = new KeyMapping[n];
@@ -43,7 +55,8 @@ public class WitcherGuiKeybind {
 		for (int i = 0; i < n; i++) {
 			String pid = WitcherGuiLayout.NAV[i].pageId;
 			PAGE_IDS[i] = pid;
-			PAGE_KEYS[i] = new KeyMapping("key.witchercraft.open_shell." + pid, GLFW.GLFW_KEY_UNKNOWN, WitchercraftModKeyMappings.CATEGORY_WITCHERCRAFT);
+			int def = DEFAULT_KEYS.getOrDefault(pid, GLFW.GLFW_KEY_UNKNOWN);
+			PAGE_KEYS[i] = new KeyMapping("key.witchercraft.open_shell." + pid, def, WitchercraftModKeyMappings.CATEGORY_WITCHERCRAFT);
 		}
 	}
 

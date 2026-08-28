@@ -30,7 +30,6 @@ public class WitcherGuiScreen extends Screen {
 
 	private static final int LETTERBOX = 0xFF000000; // opaque black behind everything
 	private static final int PANEL_DIM = 0x33000000; // gentle darken over the bg image
-	private static final int CONTENT_SCRIM = 0x66000000; // panel behind the content safe area
 	private static final int TAB_BG = 0x66101015;
 	private static final int TAB_BG_ACTIVE = 0xB0000000;
 	private static final int TAB_BORDER = 0xFF33333D;
@@ -109,8 +108,6 @@ public class WitcherGuiScreen extends Screen {
 		// screen aspect - black fills the rest)
 		g.blit(RenderPipelines.GUI_TEXTURED, Identifier.parse(WitcherGuiLayout.BG), 0, 0, 0, 0, WitcherGuiLayout.DESIGN_W, WitcherGuiLayout.DESIGN_H, WitcherGuiLayout.DESIGN_W, WitcherGuiLayout.DESIGN_H);
 		g.fill(0, 0, WitcherGuiLayout.DESIGN_W, WitcherGuiLayout.DESIGN_H, PANEL_DIM);
-		int cx = WitcherGuiLayout.contentX(), cy = WitcherGuiLayout.contentY();
-		g.fill(cx - 6, cy - 6, cx + WitcherGuiLayout.CONTENT_W + 6, cy + WitcherGuiLayout.CONTENT_H + 6, CONTENT_SCRIM);
 		g.pose().popMatrix();
 	}
 
@@ -125,8 +122,10 @@ public class WitcherGuiScreen extends Screen {
 		g.pose().pushMatrix();
 		g.pose().translate(ox, oy);
 		g.pose().scale(s, s);
+		// page fills the region below the navbar; navbar is drawn last (on top /
+		// "reserved") so page content never covers the tabs.
+		activePage().render(g, WitcherGuiLayout.contentX(), WitcherGuiLayout.contentY(), WitcherGuiLayout.contentW(), WitcherGuiLayout.contentH(), dmx, dmy, partial);
 		drawNavbar(g);
-		activePage().render(g, WitcherGuiLayout.contentX(), WitcherGuiLayout.contentY(), dmx, dmy, partial);
 		g.pose().popMatrix();
 
 		// tooltip in SCREEN space at the real cursor (after the transform is popped)
@@ -192,7 +191,7 @@ public class WitcherGuiScreen extends Screen {
 				}
 			}
 		}
-		if (activePage().mouseClicked(WitcherGuiLayout.contentX(), WitcherGuiLayout.contentY(), dmx, dmy, event.button()))
+		if (activePage().mouseClicked(WitcherGuiLayout.contentX(), WitcherGuiLayout.contentY(), WitcherGuiLayout.contentW(), WitcherGuiLayout.contentH(), dmx, dmy, event.button()))
 			return true;
 		return super.mouseClicked(event, doubleClick);
 	}

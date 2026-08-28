@@ -83,14 +83,24 @@ public class PerkPage implements GuiPage {
 	// ---- rendering (gui-local coords, offset by ox/oy in the helpers) --------
 
 	@Override
-	public void render(GuiGraphicsExtractor g, int originX, int originY, int mouseX, int mouseY, float partial) {
-		this.ox = originX;
-		this.oy = originY;
+	public void render(GuiGraphicsExtractor g, int x, int y, int w, int h, int mouseX, int mouseY, float partial) {
 		this.font = Minecraft.getInstance().font;
 		this.pendingTooltip = null;
 		Player entity = player();
 		if (entity == null)
 			return;
+
+		// map the 360x230 perk layout onto the content region (uniform scale,
+		// centred) so the Skills page fills the area below the navbar. Drawing is
+		// in perk-local coords via a nested pose transform (ox/oy stay 0).
+		float scale = fitScale(w, h);
+		float px = x + (w - PerkEquipLayout.PANEL_W * scale) / 2f;
+		float py = y + (h - PerkEquipLayout.PANEL_H * scale) / 2f;
+		this.ox = 0;
+		this.oy = 0;
+		g.pose().pushMatrix();
+		g.pose().translate(px, py);
+		g.pose().scale(scale, scale);
 
 		fill(g, 186, 0, 188, PerkEquipLayout.PANEL_H, 0xFF2A2A30); // divider
 
@@ -148,8 +158,11 @@ public class PerkPage implements GuiPage {
 			text(g, "g" + (gi + 1) + ":" + matches, PerkEquipLayout.SOCKET_X[gi] + 2, PerkEquipLayout.SOCKET_Y[gi] + PerkEquipLayout.SOCKET_SIZE + 1, col);
 		}
 
-		// tooltips - stored, not drawn here (the shell renders them in screen space)
-		int lx = mouseX - ox, ly = mouseY - oy;
+		g.pose().popMatrix();
+
+		// tooltips - stored, not drawn here (the shell renders them in screen space).
+		// Hit-test in perk-local coords (map the mouse back through the fit scale).
+		int lx = (int) ((mouseX - px) / scale), ly = (int) ((mouseY - py) / scale);
 		int np = hitNode(lx, ly);
 		if (np > 0) {
 			PerkTree.Node n = PerkTree.byId(np);
@@ -315,12 +328,15 @@ public class PerkPage implements GuiPage {
 	// ---- input ---------------------------------------------------------------
 
 	@Override
-	public boolean mouseClicked(int originX, int originY, double mouseX, double mouseY, int button) {
+	public boolean mouseClicked(int x, int y, int w, int h, double mouseX, double mouseY, int button) {
 		Player entity = player();
 		if (entity == null)
 			return false;
-		int lx = (int) mouseX - originX;
-		int ly = (int) mouseY - originY;
+		float scale = fitScale(w, h);
+		float px = x + (w - PerkEquipLayout.PANEL_W * scale) / 2f;
+		float py = y + (h - PerkEquipLayout.PANEL_H * scale) / 2f;
+		int lx = (int) ((mouseX - px) / scale);
+		int ly = (int) ((mouseY - py) / scale);
 		int nodePerk = hitNode(lx, ly);
 		if (button == 1) { // right-click a node = learn (server enforces prereqs + points)
 			if (nodePerk > 0) {
@@ -421,6 +437,11 @@ public class PerkPage implements GuiPage {
 	}
 
 	// ---- helpers -------------------------------------------------------------
+
+	/** Uniform scale to fit the 360x230 perk layout into a w x h content region. */
+	private static float fitScale(int w, int h) {
+		return Math.min((float) w / PerkEquipLayout.PANEL_W, (float) h / PerkEquipLayout.PANEL_H);
+	}
 
 	private int groupMatchCount(int gi) {
 		Player entity = player();

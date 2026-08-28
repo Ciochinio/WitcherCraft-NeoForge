@@ -12,18 +12,18 @@ import java.util.Map;
  * {@link LayoutPage} that renders that page's {@link WitcherGuiLayout} boxes -
  * so adding a placeholder tab is a one-line edit in the tool, no new class.
  *
- * To add a real (custom-rendered) page: implement {@link GuiPage} and register
- * its singleton in {@link #CUSTOM} below.
+ * To add a real (custom-rendered) page: implement {@link GuiPage} (its own class
+ * + its own placer tool, like Skills) and register its singleton in {@link #CUSTOM}.
  */
 public final class WitcherGuiPages {
 	private WitcherGuiPages() {
 	}
 
-	/** Custom pages keyed by id. Everything else becomes a LayoutPage. */
+	/** Bespoke pages keyed by id. Everything else is a "coming soon" placeholder. */
 	private static final Map<String, GuiPage> CUSTOM = new HashMap<>();
 
-	/** Cache of auto-built placeholder pages, so each id is one stable object. */
-	private static final Map<String, GuiPage> LAYOUT_CACHE = new HashMap<>();
+	/** Cache of placeholder pages, so each id is one stable object. */
+	private static final Map<String, GuiPage> PLACEHOLDER_CACHE = new HashMap<>();
 
 	static {
 		// The ported perk equip/tree screen, now a page under the "skills" tab.
@@ -31,12 +31,12 @@ public final class WitcherGuiPages {
 		CUSTOM.put(perk.id(), perk);
 	}
 
-	/** The page handling a given id (never null - falls back to a LayoutPage). */
+	/** The page handling a given id (never null - falls back to a PlaceholderPage). */
 	public static GuiPage forId(String pageId) {
 		GuiPage custom = CUSTOM.get(pageId);
 		if (custom != null)
 			return custom;
-		return LAYOUT_CACHE.computeIfAbsent(pageId, LayoutPage::new);
+		return PLACEHOLDER_CACHE.computeIfAbsent(pageId, PlaceholderPage::new);
 	}
 
 	/** The first navbar tab's pageId, used as the default active tab. */

@@ -8,19 +8,14 @@ import net.minecraft.resources.Identifier;
  * One "page" (React-style component) rendered inside {@link WitcherGuiScreen}.
  *
  * The shell stays mounted and owns the navbar + frame; it swaps which page's
- * {@link #render} fills the content region based on its {@code activeTab} state.
- * Switching tabs is pure client state - no new screen, no server round-trip.
+ * {@link #render} fills the CONTENT REGION - the whole area below the navbar -
+ * based on its {@code activeTab} state. Switching tabs is pure client state.
  *
- * All coordinates a page receives / uses are ABSOLUTE screen pixels: the shell
- * hands each call the content region's top-left as (originX, originY); a page
- * adds its own gui-local offsets to that. This mirrors how the old container
- * screen added leftPos / topPos.
- *
- * A page is identified by {@link #id}, which must match the {@code pageId} of a
- * {@link WitcherGuiLayout.Nav} entry for the tab to appear in the navbar. Pages
- * with no matching Nav entry simply never show; Nav entries with no page render
- * as an inert tab. This keeps "what pages exist" (code) separate from "how the
- * navbar looks / is ordered" (the tool-edited layout).
+ * Every page is handed the content region as (regionX, regionY, regionW, regionH)
+ * in DESIGN-canvas coordinates (see {@link WitcherGuiLayout}). A page draws
+ * itself within that box however it wants - a bespoke page (like {@link PerkPage})
+ * maps its own fixed layout onto the region; a trivial page just centres text.
+ * All rendering happens inside the shell's design->screen scale transform.
  */
 public interface GuiPage {
 
@@ -36,22 +31,24 @@ public interface GuiPage {
 	}
 
 	/**
-	 * Draw the page into the content region.
+	 * Draw the page into the content region (design coords).
 	 *
-	 * @param g         graphics
-	 * @param originX   absolute x of the content region's top-left
-	 * @param originY   absolute y of the content region's top-left
-	 * @param mouseX    absolute mouse x
-	 * @param mouseY    absolute mouse y
-	 * @param partial   partial tick
+	 * @param g       graphics
+	 * @param x       content region left (design x)
+	 * @param y       content region top (design y)
+	 * @param w       content region width
+	 * @param h       content region height
+	 * @param mouseX  mouse x in DESIGN coords (already mapped from screen)
+	 * @param mouseY  mouse y in DESIGN coords
+	 * @param partial partial tick
 	 */
-	void render(GuiGraphicsExtractor g, int originX, int originY, int mouseX, int mouseY, float partial);
+	void render(GuiGraphicsExtractor g, int x, int y, int w, int h, int mouseX, int mouseY, float partial);
 
 	/**
-	 * Handle a click inside the shell. Coordinates are absolute; subtract
-	 * (originX, originY) for gui-local. Return true to consume.
+	 * Handle a click inside the content region. Region + mouse are DESIGN coords.
+	 * Return true to consume.
 	 */
-	default boolean mouseClicked(int originX, int originY, double mouseX, double mouseY, int button) {
+	default boolean mouseClicked(int x, int y, int w, int h, double mouseX, double mouseY, int button) {
 		return false;
 	}
 
@@ -61,12 +58,11 @@ public interface GuiPage {
 	}
 
 	/**
-	 * The tooltip to show this frame (computed during {@link #render} from the
-	 * hovered element), or null. The shell renders it in SCREEN space at the real
-	 * cursor, AFTER the scaled design transform is popped - so a page must not
-	 * call setTooltipForNextFrame itself (it would be misplaced by the scale).
+	 * The tooltip to show this frame (computed during {@link #render}), or null.
+	 * The shell renders it in SCREEN space at the real cursor, so a page must not
+	 * call setTooltipForNextFrame itself (the scale transform would misplace it).
 	 */
-	default net.minecraft.network.chat.Component pollTooltip() {
+	default Component pollTooltip() {
 		return null;
 	}
 
