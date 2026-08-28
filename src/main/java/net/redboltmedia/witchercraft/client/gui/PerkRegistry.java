@@ -53,6 +53,17 @@ public final class PerkRegistry {
 		return i < 0 ? "" : NAMES[i];
 	}
 
+	/**
+	 * Lowercase icon slug for an id, or "" if empty/unknown. Matches the cleaned
+	 * icon filenames under textures/screens/perk/ (&lt;slug&gt;.png = unlit,
+	 * &lt;slug&gt;_lit.png = lit), which were copied from the old per-perk GUI
+	 * icons into consistent names. slug == name().toLowerCase() for every perk.
+	 */
+	public static String slug(int id) {
+		int i = indexOf(id);
+		return i < 0 ? "" : NAMES[i].toLowerCase(java.util.Locale.ROOT);
+	}
+
 	/** ARGB text tint for a color bucket. */
 	public static int tint(int colorBucket) {
 		switch (colorBucket) {

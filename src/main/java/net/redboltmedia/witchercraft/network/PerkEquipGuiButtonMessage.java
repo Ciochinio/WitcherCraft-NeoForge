@@ -87,8 +87,9 @@ public record PerkEquipGuiButtonMessage(int buttonID, int x, int y, int z) imple
 				return;
 			if (perkId <= 0)
 				return;
-			if (PerkEquipVars.getPerkSocket(entity, slot) != 0)
-				return; // target must be empty
+			// swap semantics: placing into an occupied slot overwrites the
+			// occupant, which returns to the unequipped pool automatically (equipped
+			// state is derived from the sockets on recompute - no extra action).
 			// move semantics: if this perk already sits in another slot, vacate
 			// it first so re-slotting an equipped perk moves it (never duplicates).
 			for (int i = 0; i < PerkEquipVars.PERK_SLOTS; i++) {

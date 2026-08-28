@@ -12,10 +12,15 @@ import net.redboltmedia.witchercraft.procedures.CharacterAbilitiesSkillPointsAva
 
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 
 /**
@@ -102,8 +107,6 @@ public class PerkPage implements GuiPage {
 		g.pose().translate(px, py);
 		g.pose().scale(scale, scale);
 
-		fill(g, 186, 0, 188, PerkEquipLayout.PANEL_H, 0xFF2A2A30); // divider
-
 		drawTabs(g);
 		text(g, "Pts:", 8, PerkEquipLayout.PANEL_H - 14, 0xFFDDDD88);
 		text(g, CharacterAbilitiesSkillPointsAvailableProcedure.execute(entity), 30, PerkEquipLayout.PANEL_H - 14, 0xFFDDDD88);
@@ -121,11 +124,13 @@ public class PerkPage implements GuiPage {
 			int sx = PerkEquipLayout.SLOT_X[i];
 			int sy = PerkEquipLayout.SLOT_Y[i];
 			int cur = PerkEquipVars.getPerkSocket(entity, i);
-			boolean validTarget = heldPerk != 0 && cur == 0;
+			// while holding, EVERY slot is a legal target now (empty = place,
+			// occupied = swap, evicting the occupant back to the pool).
+			boolean validTarget = heldPerk != 0;
 			if (cur > 0) {
 				int c = PerkRegistry.tint(PerkRegistry.color(cur));
-				drawCell(g, sx, sy, PerkEquipLayout.SLOT_SIZE, c, withAlpha(c, 0x55));
-				text(g, trim(PerkRegistry.name(cur), 3), sx + 3, sy + PerkEquipLayout.SLOT_SIZE / 2 - 4, 0xFFFFFFFF);
+				drawCell(g, sx, sy, PerkEquipLayout.SLOT_SIZE, validTarget ? CELL_VALID_BORDER : c, withAlpha(c, 0x55));
+				drawPerkIcon(g, cur, sx, sy, PerkEquipLayout.SLOT_SIZE, ICON_EQUIPPED); // socketed = equipped
 			} else {
 				drawCell(g, sx, sy, PerkEquipLayout.SLOT_SIZE, validTarget ? CELL_VALID_BORDER : CELL_EMPTY_BORDER, CELL_EMPTY_INNER);
 			}
@@ -194,6 +199,43 @@ public class PerkPage implements GuiPage {
 		g.text(font, Component.literal(s), ox + x, oy + y, col, false);
 	}
 
+	// ---- perk icons (32x32 source, scaled to the target cell) ----------------
+
+	// Each perk has its own folder textures/screens/perk/<slug>/ with three state
+	// glyphs. The coloured frame / selection highlight is drawn by the GUI, not
+	// baked into the glyph, so these are bare icons.
+	private static final int ICON_NOTLEARNED = 0, ICON_NOTEQUIPPED = 1, ICON_EQUIPPED = 2;
+	private static final String[] ICON_STATE = {"notlearned", "notequipped", "equipped"};
+
+	// Source glyphs are 32x32; cells are 24-27px, so each icon draws inside a
+	// nested pose scaled to the cell.
+	private static final int ICON_SRC = 32;
+	private static final Map<String, Identifier> ICON_CACHE = new HashMap<>();
+
+	private static Identifier perkIcon(int perkId, int state) {
+		String slug = PerkRegistry.slug(perkId);
+		if (slug.isEmpty())
+			return null;
+		String key = slug + "/" + ICON_STATE[state];
+		return ICON_CACHE.computeIfAbsent(key, k -> Identifier.parse("witchercraft:textures/screens/perk/" + k + ".png"));
+	}
+
+	/** Draw a perk's glyph filling a size x size cell at (x, y). Falls back to
+	 *  the 3-letter label if the texture id can't be built (unknown perk). */
+	private void drawPerkIcon(GuiGraphicsExtractor g, int perkId, int x, int y, int size, int state) {
+		Identifier id = perkIcon(perkId, state);
+		if (id == null) {
+			text(g, trim(PerkRegistry.name(perkId), 3), x + 3, y + size / 2 - 4, state == ICON_NOTLEARNED ? TEXT_DIM : TEXT_HELD);
+			return;
+		}
+		float s = size / (float) ICON_SRC;
+		g.pose().pushMatrix();
+		g.pose().translate((float) (ox + x), (float) (oy + y));
+		g.pose().scale(s, s);
+		g.blit(RenderPipelines.GUI_TEXTURED, id, 0, 0, 0, 0, ICON_SRC, ICON_SRC, ICON_SRC, ICON_SRC);
+		g.pose().popMatrix();
+	}
+
 	// ---- left panel: perk tree ----------------------------------------------
 
 	private void drawTabs(GuiGraphicsExtractor g) {
@@ -233,28 +275,27 @@ public class PerkPage implements GuiPage {
 			boolean equipped = learned && PerkEquipVars.isPerkSocketed(entity, n.perkId);
 			boolean met = prereqsMet(n, entity);
 			int t = PerkRegistry.tint(PerkRegistry.color(n.perkId));
-			if (heldPerk == n.perkId)
-				drawRect(g, n.x - 2, n.y - 2, PerkTree.NODE_SIZE + 4, PerkTree.NODE_SIZE + 4, CELL_VALID_BORDER, CELL_VALID_BORDER);
-			int border, inner, textCol;
+			if (heldPerk == n.perkId) // 1px selection ring (matches the slot frames)
+				drawRect(g, n.x - 1, n.y - 1, PerkTree.NODE_SIZE + 2, PerkTree.NODE_SIZE + 2, CELL_VALID_BORDER, CELL_VALID_BORDER);
+			int border, inner;
 			if (equipped) {
 				border = t;
 				inner = withAlpha(t, 0x99);
-				textCol = 0xFFFFFFFF;
 			} else if (learned) {
 				border = t;
 				inner = CELL_EMPTY_INNER;
-				textCol = t;
 			} else if (met) {
 				border = dim(t);
 				inner = 0xFF141417;
-				textCol = dim(t);
 			} else {
 				border = 0xFF2A2A30;
 				inner = 0xFF121215;
-				textCol = 0xFF44444E;
 			}
 			drawCell(g, n.x, n.y, PerkTree.NODE_SIZE, border, inner);
-			text(g, trim(PerkRegistry.name(n.perkId), 3), n.x + 3, n.y + PerkTree.NODE_SIZE / 2 - 4, textCol);
+			// three-state glyph: locked/available -> notlearned, learned but not
+			// slotted -> notequipped, slotted -> equipped.
+			int state = equipped ? ICON_EQUIPPED : (learned ? ICON_NOTEQUIPPED : ICON_NOTLEARNED);
+			drawPerkIcon(g, n.perkId, n.x, n.y, PerkTree.NODE_SIZE, state);
 		}
 	}
 
@@ -360,10 +401,11 @@ public class PerkPage implements GuiPage {
 			int si = hitSlot(lx, ly);
 			if (si >= 0) {
 				int cur = PerkEquipVars.getPerkSocket(entity, si);
-				if (heldPerk != 0 && cur == 0) {
-					sendAction(1000000 + si * 1000 + heldPerk, entity); // place
+				if (heldPerk != 0) {
+					// place, or swap: an occupied slot's perk returns to the pool
+					sendAction(1000000 + si * 1000 + heldPerk, entity);
 					heldPerk = 0;
-				} else if (heldPerk == 0 && cur != 0) {
+				} else if (cur != 0) {
 					sendAction(2000000 + si, entity); // remove
 				}
 				return true;

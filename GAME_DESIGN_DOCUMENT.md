@@ -558,13 +558,20 @@ present their character panels. Each tab also has its own bindable key (unbound 
 in Controls) so you can jump straight to, say, Skills. **Skills** is
 the progression surface: the four-tab perk tree on the left (right-click a node to learn it,
 left-click a learned one to hold it for equipping), a twelve-slot equip grid on the right, and four
-mutagen sockets whose colour synergises with the perks grouped above them. The remaining tabs are
-placeholders for now, filled in as those systems get their own screens.
+mutagen sockets whose colour synergises with the perks grouped above them. Holding a perk, every slot
+lights as a valid target: drop onto an empty slot to equip, or onto an occupied one to swap - the
+displaced perk simply returns to the unequipped pool, so re-arranging a full grid never needs a
+manual unequip first. The remaining tabs are placeholders for now, filled in as those systems get
+their own screens.
 
 The whole hub is a **reskinnable shell**: the navbar and every page's layout live in one data file,
-so tabs and panels can be rearranged, relabelled, or repointed without touching game logic. It ships
-with placeholder navbar icons, a placeholder background, and placeholder boxes rather than final art,
-so the layout can be dialled in before the real art exists.
+so tabs and panels can be rearranged, relabelled, or repointed without touching game logic. Each perk now
+renders its own icon, with three states - locked/available, learned-but-not-equipped, and equipped -
+so a glyph reads at a glance where it sits in the flow. The icons reuse the per-perk art from the
+original skill screens (the equipped-state glyph is a placeholder for now); the coloured slot frame
+and the selection highlight are drawn by the GUI around the glyph, not baked into it. The navbar
+icons, the background, and the slot/socket frames are still placeholders, so the layout can be
+dialled in before the rest of the art exists.
 
 ---
 
