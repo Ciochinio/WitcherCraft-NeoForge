@@ -565,10 +565,11 @@ MCreator container GUIs, each opened by its own keybind or procedure. That does 
 witcher-game "one panel, many tabs" layout, and it makes every screen carry the full container +
 menu + registration + button-message stack even when it only needs to draw.
 
-The shell replaces that with one persistent, client-only `Screen` that owns a top navbar and swaps
-which **page** fills its content region - the React mental model: the shell stays mounted, clicking a
-tab is `setState(activeTabId)`, and no new screen opens and no server round-trip happens for
-navigation. It is opened with **P** and lives in `client/gui/shell/`.
+The shell replaces that with one persistent, client-only **fullscreen** `Screen` that fills the
+screen with a background image and draws a top navbar + the active **page** over it - the React
+mental model: the shell stays mounted, clicking a tab is `setState(activeTabId)`, and no new screen
+opens and no server round-trip happens for navigation. It is opened with **P** (default tab) or with
+a per-page keybind (straight onto a tab), and lives in `client/gui/shell/`.
 
 ### 3.2 Why a plain Screen, not a container
 
@@ -598,14 +599,18 @@ All hand-written, none owned by an MCreator element (the same "orphaned helper c
   `mouseClicked` / `keyPressed` / `onShown` / `onClose`. Every coordinate a page receives is
   **absolute**: the shell hands it the content region's top-left and the page adds its own gui-local
   offsets, exactly as the old container screen added `leftPos` / `topPos`.
-- **`WitcherGuiScreen`** - the shell. Centres the panel, draws the frame + navbar band in
-  `extractBackground`, draws the navbar labels + delegates to the active page in `extractRenderState`,
-  and routes `mouseClicked` (nav hit-test first, then the page) and `keyPressed` (page first, then
-  Esc-close).
-- **`WitcherGuiLayout`** - the tool-generated data holder. Shell chrome constants (`PANEL_W/H`,
-  `NAV_Y/H`, `CONTENT_*`), a `NAV[]` of navbar tabs (each `pageId` + label key + icon + rect), and a
-  `SECTIONS[]` of content boxes each tagged with its `pageId`. Dumb data with three trivial lookups,
-  so the tool can overwrite it wholesale.
+- **`WitcherGuiScreen`** - the shell. Fullscreen: `extractBackground` stretch-blits the background
+  image over the whole screen (the `u=0,v=0,texW/H=screenW/H` sampler trick) + a scrim behind the
+  content area; `extractRenderState` draws the navbar (a **centred group of fixed-width tabs**, icon +
+  label, positions computed from screen width so it is resolution-independent) and delegates to the
+  active page. Routes `mouseClicked` (nav hit-test first, then the page) and `keyPressed` (page first,
+  then Esc-close). A `WitcherGuiScreen(String pageId)` constructor opens straight onto a tab.
+- **`WitcherGuiLayout`** - the tool-generated data holder. A `BG` texture, navbar sizing
+  (`NAV_Y/H`, `NAV_TAB_W`, `NAV_GAP`, `NAV_ICON`), the centred content safe-area size
+  (`CONTENT_W/H`), a `NAV[]` of tabs (each `pageId` + label key + **icon texture**; positions are
+  computed, so no rect), and a `SECTIONS[]` of content boxes (coords LOCAL to the safe area) each
+  tagged with its `pageId`. Dumb data plus small centring/lookup helpers, so the tool can overwrite it
+  wholesale.
 - **`WitcherGuiPages`** - the route table: `forId(pageId)` returns the handling page. A `pageId` with
   no custom class falls back to a cached `LayoutPage`, so **a placeholder tab is a one-line edit in
   the tool - no new class**. Custom pages register in the `CUSTOM` map.
@@ -614,9 +619,11 @@ All hand-written, none owned by an MCreator element (the same "orphaned helper c
   "lower section" interchangeable: a whole page is defined by tool-edited data, no code per tab.
 - **`PerkPage`** - the ported perk tree + equip grid (see 3.5).
 - **`WitcherGuiKeybind`** - a hand-written `@EventBusSubscriber(Dist.CLIENT)` that registers the **P**
-  mapping (`RegisterKeyMappingsEvent`, mod bus) and opens the shell on a client tick
-  (`ClientTickEvent.Post`, game bus). No server message, no MCreator keybind element; auto-detected
-  by FML like the HUD overlay classes.
+  mapping plus one **per-page** mapping built from `NAV[]` (`key.witchercraft.open_shell.<pageId>`,
+  **unbound by default** so nothing clashes - assign in Controls), and opens the shell on a client
+  tick (`ClientTickEvent.Post`, game bus) onto the matching tab. No server message, no MCreator
+  keybind element; auto-detected by FML like the HUD overlay classes. Adding a nav tab in the tool
+  automatically gets it a keybind.
 
 The navbar is driven by `NAV[]` (order + visuals, tool-edited) while behaviour comes from the page
 registry (code). They are paired by `pageId`: a `NAV` entry with no page renders as an inert tab; a
@@ -687,5 +694,7 @@ just will not appear as an element in the MCreator browser.
 - **Existing standalone screens are not yet folded in.** Alchemy, Meditation, Glossary, etc. remain
   their own container screens; only the perk screen has moved into the shell. They can be re-homed as
   pages later, or bridged (a tab that opens the old screen) in the interim.
-- **No icon art yet.** `NAV` icons are empty, so the navbar renders text labels; the icon path is
-  plumbed through to the tool and the layout but unused until textures exist.
+- **Placeholder art.** The navbar icons (`textures/gui/nav/<page>.png`) and the fullscreen
+  background (`textures/gui/shell/background.png`) are generated placeholders meant to be replaced;
+  the background is stretched to fill (no aspect-fit yet), which is fine for atmosphere art but will
+  distort a detailed image on off-16:9 screens.

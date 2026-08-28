@@ -551,9 +551,11 @@ perks into the live stats above - rather than through a separate pool of attribu
 
 ### Where you manage it - the WitcherCraft menu
 
-Progression is driven from one in-game screen, opened with **P**: the WitcherCraft menu. It is a hub
-with a top navbar - Inventory, Skills, Alchemy, Bombs, Map, Glossary - that swaps pages in place
-without leaving the screen, the way the witcher games present their character panels. **Skills** is
+Progression is driven from one in-game screen, opened with **P**: the WitcherCraft menu. It is a
+fullscreen hub - a background image with a top navbar over it - Inventory, Skills, Alchemy, Bombs,
+Map, Glossary - that swaps pages in place without leaving the screen, the way the witcher games
+present their character panels. Each tab also has its own bindable key (unbound by default; set them
+in Controls) so you can jump straight to, say, Skills. **Skills** is
 the progression surface: the four-tab perk tree on the left (right-click a node to learn it,
 left-click a learned one to hold it for equipping), a twelve-slot equip grid on the right, and four
 mutagen sockets whose colour synergises with the perks grouped above them. The remaining tabs are
@@ -561,8 +563,8 @@ placeholders for now, filled in as those systems get their own screens.
 
 The whole hub is a **reskinnable shell**: the navbar and every page's layout live in one data file,
 so tabs and panels can be rearranged, relabelled, or repointed without touching game logic. It ships
-with placeholder boxes rather than final art, so the layout can be dialled in before any pixels are
-drawn.
+with placeholder navbar icons, a placeholder background, and placeholder boxes rather than final art,
+so the layout can be dialled in before the real art exists.
 
 ---
 

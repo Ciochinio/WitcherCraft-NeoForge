@@ -14,34 +14,58 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 
 /**
- * Client-only keybind that opens the {@link WitcherGuiScreen} shell.
+ * Client-only keybinds that open the {@link WitcherGuiScreen} shell.
  *
  * Hand-written (no MCreator element): auto-registered via {@code @EventBusSubscriber}.
  * Unlike the MCreator GUI keybinds (which send a server message to open a
- * container menu), the shell is a plain client Screen, so this just calls
- * {@code Minecraft.setScreen} directly - no networking. Default key P; reuses
- * the existing "witchercraft" keybind category. The user can rebind in Controls.
+ * container menu), the shell is a plain client Screen, so these just call
+ * {@code Minecraft.setScreen} directly - no networking.
+ *
+ * - {@link #OPEN_SHELL} (default key P) opens the shell on its default tab.
+ * - One keybind per navbar page ({@link #PAGE_KEYS}, built from
+ *   {@link WitcherGuiLayout#NAV}) opens the shell straight onto that tab. These
+ *   are UNBOUND by default (GLFW_KEY_UNKNOWN) so nothing clashes with vanilla or
+ *   other mods - assign them in the Controls menu. Adding a nav tab in the tool
+ *   automatically gets it a keybind here.
  */
 @EventBusSubscriber(Dist.CLIENT)
 public class WitcherGuiKeybind {
 
 	public static final KeyMapping OPEN_SHELL = new KeyMapping("key.witchercraft.open_shell", GLFW.GLFW_KEY_P, WitchercraftModKeyMappings.CATEGORY_WITCHERCRAFT);
 
+	public static final KeyMapping[] PAGE_KEYS;
+	private static final String[] PAGE_IDS;
+
+	static {
+		int n = WitcherGuiLayout.NAV.length;
+		PAGE_KEYS = new KeyMapping[n];
+		PAGE_IDS = new String[n];
+		for (int i = 0; i < n; i++) {
+			String pid = WitcherGuiLayout.NAV[i].pageId;
+			PAGE_IDS[i] = pid;
+			PAGE_KEYS[i] = new KeyMapping("key.witchercraft.open_shell." + pid, GLFW.GLFW_KEY_UNKNOWN, WitchercraftModKeyMappings.CATEGORY_WITCHERCRAFT);
+		}
+	}
+
 	@SubscribeEvent
 	public static void registerKeyMappings(RegisterKeyMappingsEvent event) {
 		event.register(OPEN_SHELL);
+		for (KeyMapping km : PAGE_KEYS)
+			event.register(km);
 	}
 
 	@EventBusSubscriber(Dist.CLIENT)
 	public static class KeyEventListener {
 		@SubscribeEvent
 		public static void onClientTick(ClientTickEvent.Post event) {
-			// Only fire when no screen is open, and consume all queued clicks.
-			boolean open = false;
+			String target = null;
 			while (OPEN_SHELL.consumeClick())
-				open = true;
-			if (open && Minecraft.getInstance().screen == null && Minecraft.getInstance().player != null)
-				Minecraft.getInstance().setScreen(new WitcherGuiScreen());
+				target = WitcherGuiPages.defaultPageId();
+			for (int i = 0; i < PAGE_KEYS.length; i++)
+				while (PAGE_KEYS[i].consumeClick())
+					target = PAGE_IDS[i];
+			if (target != null && Minecraft.getInstance().screen == null && Minecraft.getInstance().player != null)
+				Minecraft.getInstance().setScreen(new WitcherGuiScreen(target));
 		}
 	}
 }

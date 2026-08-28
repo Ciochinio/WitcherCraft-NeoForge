@@ -322,5 +322,11 @@
   "gui.witchercraft.shell.section.alchemy_todo": "Alchemy - coming soon",
   "gui.witchercraft.shell.section.bombs_todo": "Bombs - coming soon",
   "gui.witchercraft.shell.section.glossary_todo": "Glossary - coming soon",
-  "gui.witchercraft.shell.empty_page": "Nothing here yet"
+  "gui.witchercraft.shell.empty_page": "Nothing here yet",
+  "key.witchercraft.open_shell.inventory": "WitcherCraft: Inventory",
+  "key.witchercraft.open_shell.skills": "WitcherCraft: Skills",
+  "key.witchercraft.open_shell.alchemy": "WitcherCraft: Alchemy",
+  "key.witchercraft.open_shell.bombs": "WitcherCraft: Bombs",
+  "key.witchercraft.open_shell.map": "WitcherCraft: Map",
+  "key.witchercraft.open_shell.glossary": "WitcherCraft: Glossary"
 }
