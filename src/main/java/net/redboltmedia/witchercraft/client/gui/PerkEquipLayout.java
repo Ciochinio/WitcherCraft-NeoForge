@@ -21,26 +21,26 @@ public final class PerkEquipLayout {
 	public static final int PANEL_W = 360;
 	public static final int PANEL_H = 230;
 
-	public static final int SLOT_SIZE = 24;
-	public static final int SOCKET_SIZE = 24;
+	public static final int SLOT_SIZE = 27;
+	public static final int SOCKET_SIZE = 27;
 
 	// --- Equip grid (right half): 12 perk slots, grouped 0-2 / 3-5 / 6-8 /
 	// 9-11 into the 4 mutagen groups. Two columns left of the central
 	// medallion, two columns right (W3 geometry).
-	public static final int[] SLOT_X = {196, 196, 196, 224, 224, 224, 300, 300, 300, 328, 328, 328};
-	public static final int[] SLOT_Y = {30, 62, 94, 30, 62, 94, 30, 62, 94, 30, 62, 94};
+	public static final int[] SLOT_X = {244, 244, 244, 242, 242, 242, 274, 274, 274, 274, 274, 274};
+	public static final int[] SLOT_Y = {8, 38, 68, 126, 156, 186, 8, 38, 68, 126, 156, 186};
 
 	// 4 mutagen sockets, one under each column.
-	public static final int[] SOCKET_X = {158, 258, 272, 328};
-	public static final int[] SOCKET_Y = {62, 108, 140, 130};
+	public static final int[] SOCKET_X = {206, 204, 312, 312};
+	public static final int[] SOCKET_Y = {38, 156, 38, 156};
 
 	// Central medallion: a resizable rectangular region (W3 decorative anchor by
 	// default; can be repurposed as a button later). Not drawn when disabled.
 	public static final boolean MEDALLION_ENABLED = true;
-	public static final int MEDALLION_X = 256;
-	public static final int MEDALLION_Y = 46;
+	public static final int MEDALLION_X = 252;
+	public static final int MEDALLION_Y = 100;
 	public static final int MEDALLION_W = 40;
-	public static final int MEDALLION_H = 40;
+	public static final int MEDALLION_H = 20;
 
 	// --- Debug palette (left half): every perk as a clickable text row, two
 	// sub-columns, in PerkRegistry order. Row i -> column i / ROWS_PER_COL.
