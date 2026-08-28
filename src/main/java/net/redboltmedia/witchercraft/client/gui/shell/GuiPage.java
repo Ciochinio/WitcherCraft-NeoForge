@@ -60,6 +60,16 @@ public interface GuiPage {
 		return false;
 	}
 
+	/**
+	 * The tooltip to show this frame (computed during {@link #render} from the
+	 * hovered element), or null. The shell renders it in SCREEN space at the real
+	 * cursor, AFTER the scaled design transform is popped - so a page must not
+	 * call setTooltipForNextFrame itself (it would be misplaced by the scale).
+	 */
+	default net.minecraft.network.chat.Component pollTooltip() {
+		return null;
+	}
+
 	/** Called when this page becomes the active tab. */
 	default void onShown() {
 	}

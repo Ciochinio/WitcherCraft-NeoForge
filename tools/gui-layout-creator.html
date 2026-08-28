@@ -17,9 +17,8 @@
   .wrap { display:flex; gap:16px; padding:16px; align-items:flex-start; flex-wrap:wrap; }
   .stage-col { flex:0 0 auto; }
   .side { flex:1 1 340px; min-width:320px; max-width:600px; }
-  #stage { position:relative; background:#0b0b0f; border:1px solid var(--line); overflow:hidden;
-           box-shadow:0 6px 30px #0008; }
-  #bg { position:absolute; inset:0; width:100%; height:100%; object-fit:fill; pointer-events:none; z-index:0; opacity:1; }
+  #stage { position:relative; background:#000; border:1px solid var(--line); overflow:hidden; box-shadow:0 6px 30px #0008; }
+  #bg { position:absolute; inset:0; width:100%; height:100%; object-fit:fill; pointer-events:none; z-index:0; }
   #scrim { position:absolute; inset:0; background:#00000066; z-index:1; pointer-events:none; }
   #contentregion { position:absolute; border:1px dashed #ffffff33; z-index:2; pointer-events:none; }
   .navtab { position:absolute; z-index:3; border:1px solid var(--line); background:#101015aa; cursor:pointer;
@@ -59,7 +58,7 @@
 <body>
 <header>
   <h1>GUI Layout Creator</h1>
-  <span class="hint">Lay out the fullscreen <code>WitcherGuiScreen</code>. The <b>navbar</b> is a centred group of fixed-width tabs drawn over the fullscreen background; pick a page tab to edit its <b>content boxes</b> inside the centred safe-area. Nav tabs auto-position (edit order/label/icon, not x). Drag content boxes to move, corner to resize, arrows to nudge (Shift = x5). Output regenerates <code>WitcherGuiLayout.java</code> &rarr; Copy &rarr; paste over the file. "skills" is drawn by PerkPage in-game (no boxes here).</span>
+  <span class="hint">Lay out the fullscreen <code>WitcherGuiScreen</code>. The stage IS the fixed 16:9 <b>design canvas</b> (<code>DESIGN_W</code> x <code>DESIGN_H</code>) that the shell scales uniformly to fit any screen - so this is WYSIWYG and gui-scale independent. The <b>navbar</b> is a centred group of fixed-width tabs; pick a page tab to edit its <b>content boxes</b> inside the centred safe-area. Nav tabs auto-position (edit order/label/icon). Drag content boxes to move, corner to resize, arrows to nudge (Shift = x5). Output regenerates <code>WitcherGuiLayout.java</code> &rarr; Copy &rarr; paste over the file. "skills" is drawn by PerkPage in-game (no boxes here).</span>
 </header>
 
 <div class="wrap">
@@ -86,7 +85,10 @@
     </fieldset>
 
     <fieldset>
-      <legend>Navbar &amp; content sizes</legend>
+      <legend>Design canvas &amp; sizes</legend>
+      <label>Design W <input type="number" id="DESIGN_W"></label>
+      <label>Design H <input type="number" id="DESIGN_H"></label>
+      <label>Zoom <input type="number" id="zoom" step="0.1" min="0.4" max="3"></label><br>
       <label>Nav Y <input type="number" id="NAV_Y"></label>
       <label>Nav H <input type="number" id="NAV_H"></label>
       <label>Tab W <input type="number" id="NAV_TAB_W"></label>
@@ -94,14 +96,12 @@
       <label>Icon <input type="number" id="NAV_ICON"></label><br>
       <label>Content W <input type="number" id="CONTENT_W"></label>
       <label>Content H <input type="number" id="CONTENT_H"></label>
+      <div class="muted">Design canvas is 16:9 (e.g. 640x360). Keep <code>Design W / Design H</code> at 16:9 so the background is not letterboxed on 16:9 screens.</div>
     </fieldset>
 
     <fieldset>
-      <legend>Background &amp; preview</legend>
-      <label>BG path <input type="text" id="BG"></label><br>
-      <label>Preview W <input type="number" id="prevW"></label>
-      <label>Preview H <input type="number" id="prevH"></label>
-      <label>Zoom <input type="number" id="zoom" step="0.1" min="0.4" max="3"></label>
+      <legend>Background &amp; snapping</legend>
+      <label>BG path <input type="text" id="BG"></label>
       <div class="row" style="margin-top:6px">
         <button class="sm" id="loadBg">Load bg image…</button>
         <button class="sm" id="clearBg">Clear</button>
@@ -109,7 +109,7 @@
         <label>Grid <input type="number" id="gridStep" value="2" min="1"></label>
         <input type="file" id="bgFile" accept="image/*" style="display:none">
       </div>
-      <div class="muted">Preview W/H just sim a screen size (not exported) - the shell is resolution-independent. Legend:
+      <div class="muted">Legend:
         <span class="swatch" style="border-color:var(--img)"></span>Image
         <span class="swatch" style="border-color:var(--text);border-style:dashed"></span>Text
         <span class="swatch" style="border-color:var(--slot)"></span>Slot
@@ -127,6 +127,7 @@
 <script>
 // ---- seed = current WitcherGuiLayout.java ---------------------------------
 const SEED = {
+  DESIGN_W:640, DESIGN_H:360,
   BG:"witchercraft:textures/gui/shell/background.png",
   NAV_Y:8, NAV_H:32, NAV_TAB_W:92, NAV_GAP:6, NAV_ICON:20,
   CONTENT_W:360, CONTENT_H:230,
@@ -160,7 +161,7 @@ const SEED = {
 };
 const TYPE_NAMES = ["TYPE_IMAGE","TYPE_TEXT","TYPE_SLOT"];
 let S = structuredClone(SEED);
-let previewW = 640, previewH = 360, zoom = 1.6;
+let zoom = 1.6;
 let currentPage = S.NAV.length ? S.NAV[0].pageId : "inventory";
 let sel = null; // {kind:'nav'|'section', idx}
 
@@ -170,30 +171,28 @@ const $ = id => document.getElementById(id);
 
 function pageIds(){ return S.NAV.map(n=>n.pageId); }
 function navTotalWidth(){ const n=S.NAV.length; return n<=0?0:n*S.NAV_TAB_W+(n-1)*S.NAV_GAP; }
-function navStartX(){ return Math.round((previewW-navTotalWidth())/2); }
+function navStartX(){ return Math.round((S.DESIGN_W-navTotalWidth())/2); }
 function navTabX(i){ return navStartX()+i*(S.NAV_TAB_W+S.NAV_GAP); }
-function contentX(){ return Math.round((previewW-S.CONTENT_W)/2); }
-function contentY(){ const below=S.NAV_Y+S.NAV_H; return Math.max(below+4, below+Math.round(((previewH-below)-S.CONTENT_H)/2)); }
+function contentX(){ return Math.round((S.DESIGN_W-S.CONTENT_W)/2); }
+function contentY(){ const below=S.NAV_Y+S.NAV_H; return Math.max(below+4, below+Math.round(((S.DESIGN_H-below)-S.CONTENT_H)/2)); }
 function shortText(t){ if(!t) return ''; const d=t.lastIndexOf('.'); return d>=0?t.slice(d+1):t; }
 
 // ---- build stage ----------------------------------------------------------
 function build(){
-  stage.style.width = previewW*zoom+'px';
-  stage.style.height = previewH*zoom+'px';
+  stage.style.width = S.DESIGN_W*zoom+'px';
+  stage.style.height = S.DESIGN_H*zoom+'px';
   const bg = document.getElementById('bg');
   stage.querySelectorAll('.navtab,.box,#contentregion,#scrim').forEach(b=>b.remove());
 
   const scrim=document.createElement('div'); scrim.id='scrim';
   if(bg) bg.after(scrim); else stage.prepend(scrim);
 
-  // content region guide
   const cr=document.createElement('div'); cr.id='contentregion';
   const cx=contentX(), cy=contentY();
   cr.style.left=cx*zoom+'px'; cr.style.top=cy*zoom+'px';
   cr.style.width=S.CONTENT_W*zoom+'px'; cr.style.height=S.CONTENT_H*zoom+'px';
   scrim.after(cr);
 
-  // navbar tabs (auto-centred, not draggable)
   S.NAV.forEach((n,i)=>{
     const tab=document.createElement('div'); tab.className='navtab'+(n.pageId===currentPage?' active':'')+(sel&&sel.kind==='nav'&&sel.idx===i?' sel':'');
     const tx=navTabX(i), ty=S.NAV_Y;
@@ -208,7 +207,6 @@ function build(){
     stage.appendChild(tab);
   });
 
-  // content boxes of the current page
   S.SECTIONS.forEach((s,i)=>{
     if(s.pageId!==currentPage) return;
     addBox(i, cx+s.x, cy+s.y, s.w, s.h, (s.id||shortText(s.text)), 't'+s.type);
@@ -281,9 +279,7 @@ function renderEditor(){
   if(sel.kind==='nav'){
     const o=S.NAV[sel.idx]; if(!o){ sel=null; box.innerHTML=''; return; }
     box.innerHTML =
-      field('pageId','text',o.pageId)+
-      field('labelKey','text',o.labelKey)+
-      field('icon','text',o.icon)+
+      field('pageId','text',o.pageId)+ field('labelKey','text',o.labelKey)+ field('icon','text',o.icon)+
       '<div class="row" style="margin-top:6px"><button class="sm" id="navLeft">&#9664; move left</button><button class="sm" id="navRight">move right &#9654;</button></div>';
     bindEditorFields(o, true);
     $('navLeft').onclick=()=>{ if(sel.idx>0){ [S.NAV[sel.idx-1],S.NAV[sel.idx]]=[S.NAV[sel.idx],S.NAV[sel.idx-1]]; sel.idx--; build(); } };
@@ -346,12 +342,11 @@ function renderOut(){
 /**
  * Data-driven geometry + content for the WitcherCraft GUI shell.
  *
- * The shell is FULLSCREEN: a background image fills the whole screen and the
- * navbar + active page are drawn on top of it. So most geometry here is
- * resolution-independent - the navbar is a centred group of fixed-width tabs,
- * and each page draws inside a centred content "safe area" (fixed size, so the
- * perk grid and other pages stay crisp and undistorted at any resolution).
- * Section coordinates are LOCAL to that content safe area (top-left origin).
+ * The shell renders against a FIXED VIRTUAL DESIGN CANVAS (DESIGN_W x DESIGN_H,
+ * 16:9) which WitcherGuiScreen scales uniformly to fit the real screen - so the
+ * UI is independent of Minecraft's GUI scale and never distorted; non-16:9
+ * screens get black letterbox bars. ALL coords here are DESIGN-CANVAS pixels;
+ * section coords are additionally LOCAL to the centred content safe area.
  *
  * Generated by tools/gui-layout-creator.html - paste this over the file
  * wholesale. Keep it a dumb data holder (no logic beyond the small lookups at
@@ -361,8 +356,11 @@ public final class WitcherGuiLayout {
 	private WitcherGuiLayout() {
 	}
 
+	// --- virtual design canvas (16:9); the shell scales this to fit the screen -
+	public static final int DESIGN_W = ${S.DESIGN_W};
+	public static final int DESIGN_H = ${S.DESIGN_H};
+
 	// --- fullscreen background ------------------------------------------------
-	// Blitted stretched to fill the screen. Swap this texture for the real art.
 	public static final String BG = ${jstr(S.BG)};
 
 	// --- navbar (centred group of fixed-width tabs, drawn over the background) -
@@ -441,30 +439,30 @@ ${S.SECTIONS.map(secLine).join('\n')}
 		return out;
 	}
 
-	/** Total pixel width the whole navbar group occupies. */
+	/** Total design-pixel width the whole navbar group occupies. */
 	public static int navTotalWidth(int count) {
 		return count <= 0 ? 0 : count * NAV_TAB_W + (count - 1) * NAV_GAP;
 	}
 
-	/** Left edge of the first tab, so the group is centred on screen width. */
-	public static int navStartX(int screenW, int count) {
-		return (screenW - navTotalWidth(count)) / 2;
+	/** Left edge of the first tab, so the group is centred on the design canvas. */
+	public static int navStartX(int count) {
+		return (DESIGN_W - navTotalWidth(count)) / 2;
 	}
 
-	/** Left edge of tab i. */
-	public static int navTabX(int screenW, int count, int i) {
-		return navStartX(screenW, count) + i * (NAV_TAB_W + NAV_GAP);
+	/** Left edge of tab i (design coords). */
+	public static int navTabX(int count, int i) {
+		return navStartX(count) + i * (NAV_TAB_W + NAV_GAP);
 	}
 
-	/** Left edge of the centred content safe area. */
-	public static int contentX(int screenW) {
-		return (screenW - CONTENT_W) / 2;
+	/** Left edge of the centred content safe area (design coords). */
+	public static int contentX() {
+		return (DESIGN_W - CONTENT_W) / 2;
 	}
 
 	/** Top edge of the content safe area: centred in the space below the navbar. */
-	public static int contentY(int screenH) {
+	public static int contentY() {
 		int below = NAV_Y + NAV_H;
-		int y = below + ((screenH - below) - CONTENT_H) / 2;
+		int y = below + ((DESIGN_H - below) - CONTENT_H) / 2;
 		return Math.max(below + 4, y);
 	}
 }
@@ -473,14 +471,12 @@ ${S.SECTIONS.map(secLine).join('\n')}
 }
 
 // ---- controls -------------------------------------------------------------
-['NAV_Y','NAV_H','NAV_TAB_W','NAV_GAP','NAV_ICON','CONTENT_W','CONTENT_H'].forEach(k=>{
+['DESIGN_W','DESIGN_H','NAV_Y','NAV_H','NAV_TAB_W','NAV_GAP','NAV_ICON','CONTENT_W','CONTENT_H'].forEach(k=>{
   const el=$(k); el.value=S[k];
   el.addEventListener('input',()=>{ const v=parseInt(el.value,10); if(!isNaN(v)){ S[k]=v; build(); } });
 });
 $('BG').value=S.BG; $('BG').addEventListener('input',()=>{ S.BG=$('BG').value; renderOut(); });
-$('prevW').value=previewW; $('prevH').value=previewH; $('zoom').value=zoom;
-$('prevW').addEventListener('input',()=>{ const v=parseInt($('prevW').value,10); if(v>100){ previewW=v; build(); } });
-$('prevH').addEventListener('input',()=>{ const v=parseInt($('prevH').value,10); if(v>100){ previewH=v; build(); } });
+$('zoom').value=zoom;
 $('zoom').addEventListener('input',()=>{ const v=parseFloat($('zoom').value); if(v>=0.4){ zoom=v; build(); } });
 $('gridStep').addEventListener('input',build);
 
@@ -488,9 +484,9 @@ $('copyBtn').addEventListener('click', async ()=>{ out.select();
   try{ await navigator.clipboard.writeText(out.value); flash($('copyBtn'),'Copied!'); }
   catch{ document.execCommand('copy'); flash($('copyBtn'),'Copied!'); } });
 function flash(b,m){ const t=b.textContent; b.textContent=m; setTimeout(()=>b.textContent=t,1200); }
-$('resetBtn').addEventListener('click',()=>{ S=structuredClone(SEED); previewW=640; previewH=360; zoom=1.6;
-  ['NAV_Y','NAV_H','NAV_TAB_W','NAV_GAP','NAV_ICON','CONTENT_W','CONTENT_H'].forEach(k=>$(k).value=S[k]);
-  $('BG').value=S.BG; $('prevW').value=previewW; $('prevH').value=previewH; $('zoom').value=zoom;
+$('resetBtn').addEventListener('click',()=>{ S=structuredClone(SEED); zoom=1.6;
+  ['DESIGN_W','DESIGN_H','NAV_Y','NAV_H','NAV_TAB_W','NAV_GAP','NAV_ICON','CONTENT_W','CONTENT_H'].forEach(k=>$(k).value=S[k]);
+  $('BG').value=S.BG; $('zoom').value=zoom;
   currentPage=pageIds()[0]||'inventory'; sel=null; build(); });
 
 $('loadBg').addEventListener('click',()=>$('bgFile').click());

@@ -599,18 +599,21 @@ All hand-written, none owned by an MCreator element (the same "orphaned helper c
   `mouseClicked` / `keyPressed` / `onShown` / `onClose`. Every coordinate a page receives is
   **absolute**: the shell hands it the content region's top-left and the page adds its own gui-local
   offsets, exactly as the old container screen added `leftPos` / `topPos`.
-- **`WitcherGuiScreen`** - the shell. Fullscreen: `extractBackground` stretch-blits the background
-  image over the whole screen (the `u=0,v=0,texW/H=screenW/H` sampler trick) + a scrim behind the
-  content area; `extractRenderState` draws the navbar (a **centred group of fixed-width tabs**, icon +
-  label, positions computed from screen width so it is resolution-independent) and delegates to the
-  active page. Routes `mouseClicked` (nav hit-test first, then the page) and `keyPressed` (page first,
-  then Esc-close). A `WitcherGuiScreen(String pageId)` constructor opens straight onto a tab.
-- **`WitcherGuiLayout`** - the tool-generated data holder. A `BG` texture, navbar sizing
-  (`NAV_Y/H`, `NAV_TAB_W`, `NAV_GAP`, `NAV_ICON`), the centred content safe-area size
-  (`CONTENT_W/H`), a `NAV[]` of tabs (each `pageId` + label key + **icon texture**; positions are
-  computed, so no rect), and a `SECTIONS[]` of content boxes (coords LOCAL to the safe area) each
-  tagged with its `pageId`. Dumb data plus small centring/lookup helpers, so the tool can overwrite it
-  wholesale.
+- **`WitcherGuiScreen`** - the shell. Renders against a **fixed virtual design canvas**
+  (`DESIGN_W`x`DESIGN_H`, 16:9) scaled uniformly to fit the real screen (see 3.3a). `extractBackground`
+  paints opaque black over the whole (gui-scaled) screen, then - inside the `pose().pushMatrix()` /
+  `translate` / `scale` transform - blits the background to fill the design canvas + a scrim behind the
+  content area; the black shows through as **letterbox bars** on non-16:9 screens. `extractRenderState`
+  draws the navbar (a **centred group of fixed-width tabs**, icon + label) and the active page inside
+  the same transform, then pops it and renders the page's tooltip (`pollTooltip`) in screen space at
+  the real cursor. Input is transformed screen->design before hit-testing. A `WitcherGuiScreen(String
+  pageId)` constructor opens straight onto a tab.
+- **`WitcherGuiLayout`** - the tool-generated data holder. The **design canvas** (`DESIGN_W/H`), a
+  `BG` texture, navbar sizing (`NAV_Y/H`, `NAV_TAB_W`, `NAV_GAP`, `NAV_ICON`), the centred content
+  safe-area size (`CONTENT_W/H`), a `NAV[]` of tabs (each `pageId` + label key + **icon texture**;
+  positions are computed, so no rect), and a `SECTIONS[]` of content boxes (coords LOCAL to the safe
+  area) each tagged with its `pageId`. All coords are **design-canvas pixels**. Dumb data plus small
+  centring/lookup helpers, so the tool can overwrite it wholesale.
 - **`WitcherGuiPages`** - the route table: `forId(pageId)` returns the handling page. A `pageId` with
   no custom class falls back to a cached `LayoutPage`, so **a placeholder tab is a one-line edit in
   the tool - no new class**. Custom pages register in the `CUSTOM` map.
@@ -629,6 +632,32 @@ The navbar is driven by `NAV[]` (order + visuals, tool-edited) while behaviour c
 registry (code). They are paired by `pageId`: a `NAV` entry with no page renders as an inert tab; a
 page with no `NAV` entry simply never shows. That separation is deliberate - "how the navbar looks"
 is data, "what a page does" is code.
+
+### 3.3a Scaling: gui-scale independence + letterbox
+
+The first cut laid the shell out directly in gui-scaled pixels, so its apparent size rode on the
+player's GUI-scale setting - tiny at scale 1, overflowing the screen at scale 4. The fix is a **fixed
+virtual design canvas**: everything is authored in `DESIGN_W`x`DESIGN_H` (16:9) coordinates, and the
+shell computes `scale = min(width/DESIGN_W, height/DESIGN_H)` and centres the scaled canvas, applying
+it with `pose().pushMatrix()` / `translate(offX, offY)` / `scale(s, s)`.
+
+Two properties fall out:
+
+- **GUI-scale independence.** `this.width` is already `physicalWidth / guiScale`, so
+  `scale * guiScale = (this.width/DESIGN_W) * guiScale = physicalWidth/DESIGN_W` - constant. The UI
+  fills the same fraction of the *physical* screen at every gui-scale setting.
+- **No distortion + black letterbox.** The scale is uniform (single factor), and because the canvas
+  is 16:9, fitting it to a non-16:9 screen leaves margins. `extractBackground` fills the whole screen
+  opaque black *before* the transform, so those margins render as black bars; the background image is
+  blitted to fill the 16:9 canvas and is therefore never stretched to the screen's aspect. (This is
+  what the "add a black background instead of stretching" request asked for - no separate texture
+  needed, just the black fill.)
+
+Costs: input and tooltips need care. `mouseClicked` maps the screen cursor back to design space
+(`(mouse - offset) / scale`) before hit-testing. Tooltips must render in **screen** space - a page
+must not call `setTooltipForNextFrame` itself (it would be scaled and mispositioned); instead it
+stashes the tooltip and the shell reads it via `GuiPage.pollTooltip()` after popping the transform and
+renders it at the real cursor.
 
 ### 3.4 The creator tool
 
@@ -694,7 +723,8 @@ just will not appear as an element in the MCreator browser.
 - **Existing standalone screens are not yet folded in.** Alchemy, Meditation, Glossary, etc. remain
   their own container screens; only the perk screen has moved into the shell. They can be re-homed as
   pages later, or bridged (a tab that opens the old screen) in the interim.
-- **Placeholder art.** The navbar icons (`textures/gui/nav/<page>.png`) and the fullscreen
-  background (`textures/gui/shell/background.png`) are generated placeholders meant to be replaced;
-  the background is stretched to fill (no aspect-fit yet), which is fine for atmosphere art but will
-  distort a detailed image on off-16:9 screens.
+- **Placeholder art.** The navbar icons (`textures/gui/nav/<page>.png`) and the background
+  (`textures/gui/shell/background.png`) are generated placeholders meant to be replaced. The
+  background is fit to the 16:9 design canvas (black letterbox on other screen aspects, no
+  screen-aspect distortion), but a replacement image that is not itself 16:9 will be stretched to the
+  canvas - author the background at `DESIGN_W:DESIGN_H`.

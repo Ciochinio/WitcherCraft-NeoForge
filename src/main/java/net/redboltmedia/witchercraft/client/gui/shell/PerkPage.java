@@ -59,6 +59,8 @@ public class PerkPage implements GuiPage {
 	// Per-frame context (set at the top of render); helpers offset by (ox, oy).
 	private int ox, oy;
 	private Font font;
+	// Tooltip computed during render, rendered by the shell in screen space.
+	private Component pendingTooltip;
 
 	public PerkPage(String pageId) {
 		this.pageId = pageId;
@@ -85,6 +87,7 @@ public class PerkPage implements GuiPage {
 		this.ox = originX;
 		this.oy = originY;
 		this.font = Minecraft.getInstance().font;
+		this.pendingTooltip = null;
 		Player entity = player();
 		if (entity == null)
 			return;
@@ -145,21 +148,27 @@ public class PerkPage implements GuiPage {
 			text(g, "g" + (gi + 1) + ":" + matches, PerkEquipLayout.SOCKET_X[gi] + 2, PerkEquipLayout.SOCKET_Y[gi] + PerkEquipLayout.SOCKET_SIZE + 1, col);
 		}
 
-		// tooltips
+		// tooltips - stored, not drawn here (the shell renders them in screen space)
 		int lx = mouseX - ox, ly = mouseY - oy;
 		int np = hitNode(lx, ly);
 		if (np > 0) {
 			PerkTree.Node n = PerkTree.byId(np);
 			String state = PerkLearnedVars.isLearned(entity, np) ? "Learned"
 					: (n != null && prereqsMet(n, entity) ? "Available - right-click to learn" : "Locked");
-			g.setTooltipForNextFrame(font, Component.literal(PerkRegistry.name(np) + " - " + state), mouseX, mouseY);
+			pendingTooltip = Component.literal(PerkRegistry.name(np) + " - " + state);
+		} else {
+			int si = hitSlot(lx, ly);
+			if (si >= 0) {
+				int cur = PerkEquipVars.getPerkSocket(entity, si);
+				if (cur > 0)
+					pendingTooltip = Component.literal(PerkRegistry.name(cur));
+			}
 		}
-		int si = hitSlot(lx, ly);
-		if (si >= 0) {
-			int cur = PerkEquipVars.getPerkSocket(entity, si);
-			if (cur > 0)
-				g.setTooltipForNextFrame(font, Component.literal(PerkRegistry.name(cur)), mouseX, mouseY);
-		}
+	}
+
+	@Override
+	public Component pollTooltip() {
+		return pendingTooltip;
 	}
 
 	// ---- offset-aware primitives --------------------------------------------

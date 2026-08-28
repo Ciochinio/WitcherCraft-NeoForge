@@ -12,21 +12,24 @@ import net.minecraft.resources.Identifier;
 import com.mojang.blaze3d.platform.InputConstants;
 
 /**
- * The GUI shell - a persistent, client-only, FULLSCREEN Screen that fills the
- * screen with a background image and draws a navbar + the active {@link GuiPage}
- * on top of it. Think {@code <App>}: the shell stays mounted; clicking a tab is
- * {@code setState(activeTabId)} and re-renders. No container, no server menu -
- * opened directly with {@code Minecraft.setScreen}, optionally onto a chosen tab
- * (used by the per-page keybinds).
+ * The GUI shell - a persistent, client-only, FULLSCREEN Screen.
  *
- * HAND-MAINTAINED: this class has no MCreator element and is never regenerated.
- * Navbar contents/order come from {@link WitcherGuiLayout#NAV} (tool-edited);
- * page behaviour comes from {@link WitcherGuiPages}; tab positions are computed
- * here (centred group) so the layout is resolution-independent.
+ * It renders against a fixed virtual design canvas ({@link WitcherGuiLayout#DESIGN_W}
+ * x {@code DESIGN_H}) which is scaled UNIFORMLY to fit the real screen, then drawn
+ * centred with black letterbox bars filling any leftover (non-16:9) space. This
+ * makes the UI independent of Minecraft's GUI-scale setting (it always fills the
+ * same fraction of the physical screen) and never distorted. A background image
+ * fills the design canvas; the navbar + active {@link GuiPage} draw on top.
+ *
+ * React model: the shell stays mounted; clicking a tab is {@code setState(activeTabId)}.
+ * Opened with {@code Minecraft.setScreen}, optionally onto a chosen tab.
+ *
+ * HAND-MAINTAINED: no MCreator element, never regenerated.
  */
 public class WitcherGuiScreen extends Screen {
 
-	private static final int SCREEN_DIM = 0x88000000; // slight darken over the bg for contrast
+	private static final int LETTERBOX = 0xFF000000; // opaque black behind everything
+	private static final int PANEL_DIM = 0x33000000; // gentle darken over the bg image
 	private static final int CONTENT_SCRIM = 0x66000000; // panel behind the content safe area
 	private static final int TAB_BG = 0x66101015;
 	private static final int TAB_BG_ACTIVE = 0xB0000000;
@@ -66,12 +69,27 @@ public class WitcherGuiScreen extends Screen {
 		return WitcherGuiPages.forId(activeTabId);
 	}
 
-	private int contentOriginX() {
-		return WitcherGuiLayout.contentX(this.width);
+	// ---- design-canvas <-> screen transform ----------------------------------
+
+	/** Uniform scale to fit the 16:9 design canvas inside the (gui-scaled) screen. */
+	private float layoutScale() {
+		return Math.min((float) this.width / WitcherGuiLayout.DESIGN_W, (float) this.height / WitcherGuiLayout.DESIGN_H);
 	}
 
-	private int contentOriginY() {
-		return WitcherGuiLayout.contentY(this.height);
+	private float offsetX(float s) {
+		return (this.width - WitcherGuiLayout.DESIGN_W * s) / 2f;
+	}
+
+	private float offsetY(float s) {
+		return (this.height - WitcherGuiLayout.DESIGN_H * s) / 2f;
+	}
+
+	private int toDesignX(double sx, float ox, float s) {
+		return (int) ((sx - ox) / s);
+	}
+
+	private int toDesignY(double sy, float oy, float s) {
+		return (int) ((sy - oy) / s);
 	}
 
 	// ---- rendering -----------------------------------------------------------
@@ -80,22 +98,41 @@ public class WitcherGuiScreen extends Screen {
 
 	@Override
 	public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partial) {
-		// fullscreen background image, stretched to fill (u=0,v=0, texW/H = screen
-		// size makes the sampler span the whole texture across the screen).
-		g.blit(RenderPipelines.GUI_TEXTURED, Identifier.parse(WitcherGuiLayout.BG), 0, 0, 0, 0, this.width, this.height, this.width, this.height);
-		g.fill(0, 0, this.width, this.height, SCREEN_DIM);
+		// opaque black base -> becomes the letterbox bars on non-16:9 screens
+		g.fill(0, 0, this.width, this.height, LETTERBOX);
 
-		// scrim behind the content safe area for readability over busy art
-		int cx = contentOriginX(), cy = contentOriginY();
+		float s = layoutScale();
+		g.pose().pushMatrix();
+		g.pose().translate(offsetX(s), offsetY(s));
+		g.pose().scale(s, s);
+		// background image fills the 16:9 design canvas (never stretched to the
+		// screen aspect - black fills the rest)
+		g.blit(RenderPipelines.GUI_TEXTURED, Identifier.parse(WitcherGuiLayout.BG), 0, 0, 0, 0, WitcherGuiLayout.DESIGN_W, WitcherGuiLayout.DESIGN_H, WitcherGuiLayout.DESIGN_W, WitcherGuiLayout.DESIGN_H);
+		g.fill(0, 0, WitcherGuiLayout.DESIGN_W, WitcherGuiLayout.DESIGN_H, PANEL_DIM);
+		int cx = WitcherGuiLayout.contentX(), cy = WitcherGuiLayout.contentY();
 		g.fill(cx - 6, cy - 6, cx + WitcherGuiLayout.CONTENT_W + 6, cy + WitcherGuiLayout.CONTENT_H + 6, CONTENT_SCRIM);
+		g.pose().popMatrix();
 	}
 
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partial) {
 		super.extractRenderState(g, mouseX, mouseY, partial); // widgets, if any
+
+		float s = layoutScale();
+		float ox = offsetX(s), oy = offsetY(s);
+		int dmx = toDesignX(mouseX, ox, s), dmy = toDesignY(mouseY, oy, s);
+
+		g.pose().pushMatrix();
+		g.pose().translate(ox, oy);
+		g.pose().scale(s, s);
 		drawNavbar(g);
-		// active page fills the content region (also queues its tooltips)
-		activePage().render(g, contentOriginX(), contentOriginY(), mouseX, mouseY, partial);
+		activePage().render(g, WitcherGuiLayout.contentX(), WitcherGuiLayout.contentY(), dmx, dmy, partial);
+		g.pose().popMatrix();
+
+		// tooltip in SCREEN space at the real cursor (after the transform is popped)
+		Component tip = activePage().pollTooltip();
+		if (tip != null)
+			g.setTooltipForNextFrame(this.font, tip, mouseX, mouseY);
 	}
 
 	private void drawNavbar(GuiGraphicsExtractor g) {
@@ -104,27 +141,23 @@ public class WitcherGuiScreen extends Screen {
 		for (int i = 0; i < count; i++) {
 			WitcherGuiLayout.Nav nav = WitcherGuiLayout.NAV[i];
 			boolean active = nav.pageId.equals(activeTabId);
-			int tx = WitcherGuiLayout.navTabX(this.width, count, i);
+			int tx = WitcherGuiLayout.navTabX(count, i);
 			int ty = WitcherGuiLayout.NAV_Y;
 			int tw = WitcherGuiLayout.NAV_TAB_W, th = WitcherGuiLayout.NAV_H;
 
-			// tab background + border
 			g.fill(tx, ty, tx + tw, ty + th, active ? TAB_BG_ACTIVE : TAB_BG);
 			g.fill(tx, ty, tx + tw, ty + 1, TAB_BORDER);
 			g.fill(tx, ty + th - 1, tx + tw, ty + th, TAB_BORDER);
 
-			// icon (centred near the top of the tab)
 			if (nav.icon != null && !nav.icon.isEmpty()) {
 				int ix = tx + (tw - WitcherGuiLayout.NAV_ICON) / 2;
 				g.blit(RenderPipelines.GUI_TEXTURED, Identifier.parse(nav.icon), ix, ty + 2, 0, 0, WitcherGuiLayout.NAV_ICON, WitcherGuiLayout.NAV_ICON, WitcherGuiLayout.NAV_ICON, WitcherGuiLayout.NAV_ICON);
 			}
 
-			// label under the icon
 			Component label = navLabel(nav);
 			int lw = font.width(label);
 			g.text(font, label, tx + (tw - lw) / 2, ty + th - 10, active ? TAB_TEXT_ACTIVE : TAB_TEXT, false);
 
-			// active underline
 			if (active)
 				g.fill(tx + 3, ty + th, tx + tw - 3, ty + th + 1, TAB_ACCENT);
 		}
@@ -140,13 +173,16 @@ public class WitcherGuiScreen extends Screen {
 
 	@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		float s = layoutScale();
+		float ox = offsetX(s), oy = offsetY(s);
+		int dmx = toDesignX(event.x(), ox, s), dmy = toDesignY(event.y(), oy, s);
+
 		if (event.button() == 0) {
-			int mx = (int) event.x(), my = (int) event.y();
 			int count = WitcherGuiLayout.NAV.length;
 			for (int i = 0; i < count; i++) {
-				int tx = WitcherGuiLayout.navTabX(this.width, count, i);
+				int tx = WitcherGuiLayout.navTabX(count, i);
 				int ty = WitcherGuiLayout.NAV_Y;
-				if (mx >= tx && mx < tx + WitcherGuiLayout.NAV_TAB_W && my >= ty && my < ty + WitcherGuiLayout.NAV_H) {
+				if (dmx >= tx && dmx < tx + WitcherGuiLayout.NAV_TAB_W && dmy >= ty && dmy < ty + WitcherGuiLayout.NAV_H) {
 					String pid = WitcherGuiLayout.NAV[i].pageId;
 					if (!pid.equals(activeTabId)) {
 						activeTabId = pid;
@@ -156,7 +192,7 @@ public class WitcherGuiScreen extends Screen {
 				}
 			}
 		}
-		if (activePage().mouseClicked(contentOriginX(), contentOriginY(), event.x(), event.y(), event.button()))
+		if (activePage().mouseClicked(WitcherGuiLayout.contentX(), WitcherGuiLayout.contentY(), dmx, dmy, event.button()))
 			return true;
 		return super.mouseClicked(event, doubleClick);
 	}
