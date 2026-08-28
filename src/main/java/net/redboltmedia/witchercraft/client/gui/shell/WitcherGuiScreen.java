@@ -106,7 +106,8 @@ public class WitcherGuiScreen extends Screen {
 		g.pose().scale(s, s);
 		// background image fills the 16:9 design canvas (never stretched to the
 		// screen aspect - black fills the rest)
-		g.blit(RenderPipelines.GUI_TEXTURED, Identifier.parse(WitcherGuiLayout.BG), 0, 0, 0, 0, WitcherGuiLayout.DESIGN_W, WitcherGuiLayout.DESIGN_H, WitcherGuiLayout.DESIGN_W, WitcherGuiLayout.DESIGN_H);
+		String bg = WitcherGuiLayout.backgroundFor(activeTabId);
+		g.blit(RenderPipelines.GUI_TEXTURED, Identifier.parse(bg), 0, 0, 0, 0, WitcherGuiLayout.DESIGN_W, WitcherGuiLayout.DESIGN_H, WitcherGuiLayout.DESIGN_W, WitcherGuiLayout.DESIGN_H);
 		g.fill(0, 0, WitcherGuiLayout.DESIGN_W, WitcherGuiLayout.DESIGN_H, PANEL_DIM);
 		g.pose().popMatrix();
 	}

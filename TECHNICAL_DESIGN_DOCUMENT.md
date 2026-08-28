@@ -602,17 +602,20 @@ All hand-written, none owned by an MCreator element (the same "orphaned helper c
 - **`WitcherGuiScreen`** - the shell. Renders against a **fixed virtual design canvas**
   (`DESIGN_W`x`DESIGN_H`, 16:9) scaled uniformly to fit the real screen (see 3.3a). `extractBackground`
   paints opaque black over the whole (gui-scaled) screen, then - inside the `pose().pushMatrix()` /
-  `translate` / `scale` transform - blits the background to fill the design canvas; the black shows
-  through as **letterbox bars** on non-16:9 screens. `extractRenderState` draws the active page in the
+  `translate` / `scale` transform - blits the **active tab's own background** (`backgroundFor(activeTabId)`)
+  to fill the design canvas; the black shows through as **letterbox bars** on non-16:9 screens.
+  `extractRenderState` draws the active page in the
   content region, then the navbar (a **centred group of fixed-width tabs**, icon + label) **on top** so
   page content never covers the tabs, then pops the transform and renders the page's tooltip
   (`pollTooltip`) in screen space at the real cursor. Input is transformed screen->design before
   hit-testing. A `WitcherGuiScreen(String pageId)` constructor opens straight onto a tab.
 - **`WitcherGuiLayout`** - the tool-generated data holder for shell **chrome only** (no page content).
-  The **design canvas** (`DESIGN_W/H`), a `BG` texture, navbar sizing (`NAV_Y/H`, `NAV_TAB_W`,
-  `NAV_GAP`, `NAV_ICON`), a `CONTENT_MARGIN`, and a `NAV[]` of tabs (each `pageId` + label key + **icon
-  texture**; positions computed, no rect). Helpers give the navbar tab rects and the **content region**
-  (`contentX/Y/W/H()` = the whole area below the navbar). All coords are design-canvas pixels.
+  The **design canvas** (`DESIGN_W/H`), a `BG` fallback texture, navbar sizing (`NAV_Y/H`,
+  `NAV_TAB_W`, `NAV_GAP`, `NAV_ICON`), a `CONTENT_MARGIN`, a `NAV[]` of tabs (each `pageId` + label key
+  + **icon texture**; positions computed, no rect), and a `BACKGROUNDS[]` of `(pageId, texture)` pairs
+  - `backgroundFor(pageId)` returns a page's own background, or `BG` if it has none. Helpers give the
+  navbar tab rects and the **content region** (`contentX/Y/W/H()` = the whole area below the navbar).
+  All coords are design-canvas pixels.
 - **`WitcherGuiPages`** - the route table: `forId(pageId)` returns the handling page; an id with no
   bespoke class falls back to a cached `PlaceholderPage`. Bespoke pages register in the `CUSTOM` map.
 - **`PlaceholderPage`** - a not-yet-built tab: centres a "&lt;Name&gt; - coming soon" in the content
@@ -663,10 +666,15 @@ renders it at the real cursor.
 Each GUI is authored by its **own** placer tool - the Skills page has `equip-grid-placer.html`
 (-> `PerkEquipLayout.java`) and `tree-node-placer.html` (-> `PerkTree.java`); a future Inventory page
 would get its own. `tools/gui-layout-creator.html` is deliberately **not** one of those - it edits the
-shell **chrome only**: the design canvas, the background, and the navbar (tab order / `pageId` / label
-/ icon, add / delete / reorder). It shows the content region as a greyed "reserved" box (a reminder
+shell **chrome only**: the design canvas, the navbar (tab order / `pageId` / label / icon, add /
+delete / reorder), and each tab's **own background texture** (a `background` field per tab; blank
+falls back to the shared `BG`). It shows the content region as a greyed "reserved" box (a reminder
 that pages are laid out by their own tools) and **regenerates `WitcherGuiLayout.java` live -> copy ->
-paste over the file**. Seeded with the current layout, so `Reset` reproduces the checked-in file.
+paste over the file**. Seeded with the current layout, so `Reset` reproduces the checked-in file. It
+also carries a collapsible **"How to add and connect a new GUI"** section - the step-by-step checklist
+(add the tab, art, page class, register in `WitcherGuiPages`, optional dedicated placer tool, optional
+keybind default, lang keys) for turning a placeholder tab into a real page, including the client-only
+constraint from 3.9.
 
 ### 3.5 How the perk screen became a page
 
@@ -723,8 +731,45 @@ just will not appear as an element in the MCreator browser.
 - **Existing standalone screens are not yet folded in.** Alchemy, Meditation, Glossary, etc. remain
   their own container screens; only the perk screen has moved into the shell. They can be re-homed as
   pages later, or bridged (a tab that opens the old screen) in the interim.
-- **Placeholder art.** The navbar icons (`textures/gui/nav/<page>.png`) and the background
-  (`textures/gui/shell/background.png`) are generated placeholders meant to be replaced. The
-  background is fit to the 16:9 design canvas (black letterbox on other screen aspects, no
-  screen-aspect distortion), but a replacement image that is not itself 16:9 will be stretched to the
-  canvas - author the background at `DESIGN_W:DESIGN_H`.
+- **Placeholder art.** The navbar icons (`textures/gui/nav/<page>.png`) and every page's background
+  (`textures/gui/shell/backgrounds/<page>.png`, falling back to `textures/gui/shell/background.png`)
+  are generated placeholders meant to be replaced. Backgrounds are fit to the 16:9 design canvas
+  (black letterbox on other screen aspects, no screen-aspect distortion), but a replacement image that
+  is not itself 16:9 will be stretched to the canvas - author each at `DESIGN_W:DESIGN_H`.
+
+### 3.9 Client-side only: what a page can and cannot do directly
+
+The shell (and therefore every page in it) is **entirely client-side** - opened with
+`Minecraft.setScreen`, no `AbstractContainerMenu`, no server round-trip for navigation. That has one
+consequence that matters when writing a page: **a page must not call a state-mutating MCreator
+procedure directly.**
+
+Most generated procedures assume they are running with a `ServerLevel` / `ServerPlayer` in hand (they
+check `!world.isClientSide()`, write to server-authoritative NBT/attachment data, or trigger further
+server-side effects). Calling one straight from a page's `render`/`mouseClicked` on the client will, at
+best, silently no-op behind that `isClientSide()` guard, and at worst read/write client-only state that
+immediately desyncs from the server's copy - the exact bug class the old container-screen pattern
+existed to avoid by keeping all mutation server-side.
+
+Two categories, and where the line actually is:
+
+- **Safe to call directly, client-side.** Pure **read-only** procedures that just report already-synced
+  player state - e.g. `PerkPage` calls `CharacterAbilitiesSkillPointsAvailableProcedure.execute(entity)`
+  every frame to print the points-remaining counter. These read attachment/NBT data the server already
+  keeps synced to the client, take no branch on `isClientSide()`, and produce no server-side effect.
+  Safe because they're idempotent lookups, not the same reasoning as "it happens not to crash."
+- **Must go through a network message.** Anything that **changes** server-authoritative state - learning
+  a perk, equipping/unequipping, moving an item, spending points, opening a follow-on menu - has to be
+  sent to the server and applied there, the same as any other multiplayer-safe mutation. The pattern is
+  `PerkEquipGuiButtonMessage`: a page encodes an action id (+ minimal args) into a `CustomPacketPayload`,
+  `ClientPacketDistributor.sendToServer(...)` it, and a server-side `handleButtonAction` re-validates and
+  applies it (never trust the client's view of "is this legal"). The client-side page does not wait for
+  a reply - it either updates client-visible state optimistically (like `heldPerk`, which is genuinely
+  client-only selection state) or simply re-reads the synced value next frame once the server's change
+  propagates back.
+
+Practically: when building a new page, first ask "does this button change anything the server tracks?"
+If yes, it needs its own `CustomPacketPayload` + `@EventBusSubscriber` handler (copy
+`PerkEquipGuiButtonMessage`'s shape) - do not reach for `SomeProcedure.execute(entity)` for it, even
+though that "compiles and looks like it should work." If no (it's just displaying something), calling
+the procedure directly is fine and is exactly what `PerkPage` already does.

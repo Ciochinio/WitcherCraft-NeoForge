@@ -15,7 +15,7 @@
   header .hint { color:var(--dim); font-size:12px; max-width:940px; }
   .wrap { display:flex; gap:16px; padding:16px; align-items:flex-start; flex-wrap:wrap; }
   .stage-col { flex:0 0 auto; }
-  .side { flex:1 1 340px; min-width:320px; max-width:600px; }
+  .side { flex:1 1 340px; min-width:320px; max-width:620px; }
   #stage { position:relative; background:#000; border:1px solid var(--line); overflow:hidden; box-shadow:0 6px 30px #0008; }
   #bg { position:absolute; inset:0; width:100%; height:100%; object-fit:fill; pointer-events:none; z-index:0; }
   #dim { position:absolute; inset:0; background:#00000033; z-index:1; pointer-events:none; }
@@ -28,11 +28,12 @@
   .navtab .ic { border:1px solid #ffffff44; background:#ffffff12; display:flex; align-items:center; justify-content:center; font-size:9px; color:#ffffffaa; }
   .navtab .lb { font-size:9px; text-shadow:0 1px 2px #000; }
   fieldset { border:1px solid var(--line); border-radius:6px; margin:0 0 12px; padding:10px 12px; }
-  legend { color:var(--dim); padding:0 6px; font-size:11px; text-transform:uppercase; letter-spacing:.06em; }
+  legend { color:var(--dim); padding:0 6px; font-size:11px; text-transform:uppercase; letter-spacing:.06em; cursor:pointer; user-select:none; }
+  legend:hover { color:var(--ink); }
   label { display:inline-flex; align-items:center; gap:6px; margin:3px 10px 3px 0; color:var(--dim); }
   input[type=number]{ width:58px; }
   input, select { background:#0e0e13; border:1px solid var(--line); color:var(--ink); padding:3px 5px; border-radius:4px; font:inherit; }
-  input[type=text]{ width:210px; }
+  input[type=text]{ width:230px; }
   button { background:#2a2a34; color:var(--ink); border:1px solid var(--line); border-radius:5px; padding:6px 12px; cursor:pointer; font:inherit; }
   button:hover { background:#34343f; }
   button.primary { background:var(--accent); color:#161009; border-color:var(--accent); font-weight:600; }
@@ -41,12 +42,19 @@
   textarea { width:100%; height:320px; background:#0e0e13; color:#cfe8cf; border:1px solid var(--line); border-radius:6px; padding:10px; font:12px/1.45 ui-monospace,Consolas,monospace; resize:vertical; }
   .selinfo { color:var(--dim); } .selinfo b { color:var(--ink); }
   .muted { color:var(--dim); font-size:12px; }
+  .howto { display:none; }
+  .howto.open { display:block; }
+  .howto ol { margin:6px 0 0; padding-left:20px; }
+  .howto li { margin-bottom:8px; }
+  .howto code { color:#cfe8cf; }
+  .howto .step-title { color:var(--ink); font-weight:600; }
+  pre.code { background:#0e0e13; border:1px solid var(--line); border-radius:6px; padding:8px 10px; overflow-x:auto; color:#cfe8cf; font-size:11px; margin:6px 0; }
 </style>
 </head>
 <body>
 <header>
   <h1>Navbar Layout Creator</h1>
-  <span class="hint">Edits ONLY the shell chrome for <code>WitcherGuiScreen</code> - the fullscreen <b>navbar</b> and the 16:9 design canvas. The greyed box is the <b>content region</b> reserved for the active page; each page (Skills, etc.) is laid out by its OWN tool, not here. Click a tab to edit its pageId/label/icon or reorder it. Output regenerates <code>WitcherGuiLayout.java</code> &rarr; Copy &rarr; paste over the file.</span>
+  <span class="hint">Edits ONLY the shell chrome for <code>WitcherGuiScreen</code> - the fullscreen <b>navbar</b>, the per-page <b>background</b>, and the 16:9 design canvas. The greyed box is the <b>content region</b> reserved for the active page; each page (Skills, etc.) is laid out by its OWN tool, not here. Click a tab to edit it or reorder it. Output regenerates <code>WitcherGuiLayout.java</code> &rarr; Copy &rarr; paste over the file. See "How to add and connect a new GUI" below for the full checklist.</span>
 </header>
 
 <div class="wrap">
@@ -63,7 +71,7 @@
         <button class="sm" id="addNav">+ Nav tab</button>
         <button class="sm" id="delBtn">Delete selected</button>
       </div>
-      <div class="muted">A tab's <code>pageId</code> must match a <code>GuiPage.id()</code> in code. Unknown ids show a "coming soon" placeholder in-game.</div>
+      <div class="muted">A tab's <code>pageId</code> must match a <code>GuiPage.id()</code> in code. An id with no matching page shows a "coming soon" placeholder in-game (still fully navigable).</div>
     </fieldset>
 
     <fieldset>
@@ -77,17 +85,18 @@
       <label>Gap <input type="number" id="NAV_GAP"></label>
       <label>Icon <input type="number" id="NAV_ICON"></label><br>
       <label>Margin <input type="number" id="CONTENT_MARGIN"></label>
-      <div class="muted">Keep Design W:H at 16:9 (e.g. 640x360). <code>Margin</code> is the gap between the content region and the canvas edges.</div>
+      <div class="muted">Keep Design W:H at 16:9 (e.g. 640x360) - every page's background should be authored at that same ratio, or it stretches within the canvas. <code>Margin</code> is the gap between the content region and the canvas edges.</div>
     </fieldset>
 
     <fieldset>
-      <legend>Background</legend>
+      <legend>Fallback background</legend>
       <label>BG path <input type="text" id="BG"></label>
       <div class="row" style="margin-top:6px">
-        <button class="sm" id="loadBg">Load bg image…</button>
-        <button class="sm" id="clearBg">Clear</button>
+        <button class="sm" id="loadBg">Preview an image…</button>
+        <button class="sm" id="clearBg">Clear preview</button>
         <input type="file" id="bgFile" accept="image/*" style="display:none">
       </div>
+      <div class="muted">Used for any tab with no per-page background set below. Each nav tab ALSO has its own <code>background</code> field (in "Selected tab") - if set, that page uses its own art instead of this fallback.</div>
     </fieldset>
 
     <div class="row">
@@ -95,22 +104,57 @@
       <button id="resetBtn">Reset to seeded layout</button>
     </div>
     <textarea id="out" spellcheck="false" readonly></textarea>
+
+    <fieldset style="margin-top:16px">
+      <legend id="howtoToggle">&#9654; How to add and connect a new GUI</legend>
+      <div class="howto" id="howtoBody">
+        <p class="muted">Every navbar tab needs three things to become a real, working page: a <b>NAV entry</b> (this tool), a <b>GuiPage class</b> (code), and being <b>registered</b> so the shell can find it. Follow these steps for a new page, e.g. <code>"crafting"</code>:</p>
+        <ol>
+          <li><span class="step-title">1. Add the nav tab.</span> Click <b>+ Nav tab</b> above, set its <code>pageId</code> (e.g. <code>crafting</code>), a <code>labelKey</code> (a lang key you'll add to <code>en_us.json</code>), and optionally an <code>icon</code> texture path. Reorder with the arrows. It will show as "Coming soon" in-game until step 3.</li>
+          <li><span class="step-title">2. Give it a background (optional but recommended).</span> Set the tab's <code>background</code> field to a texture path, e.g. <code>witchercraft:textures/gui/shell/backgrounds/crafting.png</code> - author that PNG at the design canvas's aspect ratio (16:9 by default) and drop it in <code>src/main/resources/assets/witchercraft/textures/gui/shell/backgrounds/</code>. Leave it blank to use the shared fallback BG.</li>
+          <li><span class="step-title">3. Write the page class.</span> In <code>client/gui/shell/</code>, create e.g. <code>CraftingPage.java</code> implementing <code>GuiPage</code>:
+            <pre class="code">public class CraftingPage implements GuiPage {
+    public String id() { return "crafting"; }
+    public Component navLabel() { return Component.translatable("gui.witchercraft.shell.nav.crafting"); }
+
+    public void render(GuiGraphicsExtractor g, int x, int y, int w, int h,
+                        int mouseX, int mouseY, float partial) {
+        // x,y,w,h = the content region (design coords, below the navbar).
+        // Draw with g.fill(...) / g.text(...) / g.blit(...), same idioms as
+        // any MCreator-generated screen. Look at PerkPage.java for a full
+        // example, including how it fit-scales an authored layout into
+        // this region and how it reports hover tooltips via pollTooltip().
+    }
+}</pre>
+          </li>
+          <li><span class="step-title">4. Register it.</span> In <code>WitcherGuiPages.java</code>'s static block, add:
+            <pre class="code">CraftingPage crafting = new CraftingPage();
+CUSTOM.put(crafting.id(), crafting);</pre>
+            This is the ONLY code wiring step - the shell already routes clicks, tooltips, Esc, and the tab highlight for any id present in both <code>NAV</code> and this map.
+          </li>
+          <li><span class="step-title">5. (Optional) build it its own placer tool.</span> If the page has authored geometry (slots, buttons, art placement) rather than just static content, copy <code>equip-grid-placer.html</code> or <code>tree-node-placer.html</code> as a starting point, point its "regenerate" output at a new <code>CraftingLayout.java</code> data class, and have <code>CraftingPage</code> read from it - exactly how Skills is built from <code>PerkEquipLayout</code> + <code>PerkTree</code>.</li>
+          <li><span class="step-title">6. (Optional) give it a keybind default.</span> In <code>WitcherGuiKeybind.java</code>, add an entry to the <code>DEFAULT_KEYS</code> map (<code>"crafting", GLFW.GLFW_KEY_...</code>) - or leave it out and it stays unbound by default (set in Controls). Per-page keybinds are auto-generated from <code>NAV[]</code>, so nothing else is needed here.</li>
+          <li><span class="step-title">7. Add lang keys.</span> Add <code>labelKey</code> (and any strings your page uses) to both <code>src/main/resources/assets/witchercraft/lang/en_us.json</code> AND the matching <code>language_map.en_us</code> block in <code>witchercraft.mcreator</code> (MCreator's own copy) - keep them in sync.</li>
+        </ol>
+        <p class="muted">Reminder on client-only limits: this shell (and every page in it) is CLIENT-SIDE, opened with <code>setScreen</code>, no server menu. A page may freely call read-only procedures that just report player state (like <code>PerkPage</code> calling <code>CharacterAbilitiesSkillPointsAvailableProcedure.execute(entity)</code>). Anything that CHANGES server-authoritative state (learning a perk, moving an item, spending points) must go through a network message handled server-side - see <code>PerkEquipGuiButtonMessage</code> for the pattern (a <code>buttonID</code>-encoded message, validated and applied server-side, mirrored optimistically or just re-read next frame client-side). Do not call a mutating MCreator procedure directly from a page - on the client it will often no-op, desync, or throw, since most such procedures assume a server-side <code>ServerLevel</code>/<code>ServerPlayer</code> context.</p>
+      </div>
+    </fieldset>
   </div>
 </div>
 
 <script>
 // ---- seed = current WitcherGuiLayout.java ---------------------------------
 const SEED = {
-  DESIGN_W:640, DESIGN_H:360, CONTENT_MARGIN:6,
+  DESIGN_W:640, DESIGN_H:360, CONTENT_MARGIN:3,
   BG:"witchercraft:textures/gui/shell/background.png",
-  NAV_Y:8, NAV_H:32, NAV_TAB_W:92, NAV_GAP:6, NAV_ICON:20,
+  NAV_Y:8, NAV_H:30, NAV_TAB_W:78, NAV_GAP:4, NAV_ICON:20,
   NAV: [
-    {pageId:"inventory", labelKey:"gui.witchercraft.shell.nav.inventory", icon:"witchercraft:textures/gui/nav/inventory.png"},
-    {pageId:"skills",    labelKey:"gui.witchercraft.shell.nav.skills",    icon:"witchercraft:textures/gui/nav/skills.png"},
-    {pageId:"alchemy",   labelKey:"gui.witchercraft.shell.nav.alchemy",   icon:"witchercraft:textures/gui/nav/alchemy.png"},
-    {pageId:"bombs",     labelKey:"gui.witchercraft.shell.nav.bombs",     icon:"witchercraft:textures/gui/nav/bombs.png"},
-    {pageId:"map",       labelKey:"gui.witchercraft.shell.nav.map",       icon:"witchercraft:textures/gui/nav/map.png"},
-    {pageId:"glossary",  labelKey:"gui.witchercraft.shell.nav.glossary",  icon:"witchercraft:textures/gui/nav/glossary.png"},
+    {pageId:"glossary",  labelKey:"gui.witchercraft.shell.nav.glossary",  icon:"witchercraft:textures/gui/nav/glossary.png",  background:"witchercraft:textures/gui/shell/backgrounds/glossary.png"},
+    {pageId:"alchemy",   labelKey:"gui.witchercraft.shell.nav.alchemy",   icon:"witchercraft:textures/gui/nav/alchemy.png",   background:"witchercraft:textures/gui/shell/backgrounds/alchemy.png"},
+    {pageId:"inventory", labelKey:"gui.witchercraft.shell.nav.inventory", icon:"witchercraft:textures/gui/nav/inventory.png", background:"witchercraft:textures/gui/shell/backgrounds/inventory.png"},
+    {pageId:"map",       labelKey:"gui.witchercraft.shell.nav.map",       icon:"witchercraft:textures/gui/nav/map.png",       background:"witchercraft:textures/gui/shell/backgrounds/map.png"},
+    {pageId:"skills",    labelKey:"gui.witchercraft.shell.nav.skills",    icon:"witchercraft:textures/gui/nav/skills.png",    background:"witchercraft:textures/gui/shell/backgrounds/skills.png"},
+    {pageId:"bombs",     labelKey:"gui.witchercraft.shell.nav.bombs",     icon:"witchercraft:textures/gui/nav/bombs.png",     background:"witchercraft:textures/gui/shell/backgrounds/bombs.png"},
   ],
 };
 let S = structuredClone(SEED);
@@ -167,8 +211,10 @@ function renderEditor(){
   const box=$('editor');
   if(sel===null || !S.NAV[sel]){ box.innerHTML='<span class="muted">Click a navbar tab to edit it.</span>'; return; }
   const o=S.NAV[sel];
+  if(o.background===undefined) o.background='';
   box.innerHTML =
     field('pageId','text',o.pageId)+ field('labelKey','text',o.labelKey)+ field('icon','text',o.icon)+
+    '<br>'+field('background','text',o.background)+
     '<div class="row" style="margin-top:6px"><button class="sm" id="navLeft">&#9664; move left</button><button class="sm" id="navRight">move right &#9654;</button></div>';
   box.querySelectorAll('[id^=f_]').forEach(inp=>{
     inp.addEventListener('input',()=>{ o[inp.id.slice(2)]=inp.value; build(); });
@@ -179,7 +225,7 @@ function renderEditor(){
 function field(k,t,v){ return '<label>'+k+' <input id="f_'+k+'" type="'+t+'" value="'+escAttr(v)+'"></label> '; }
 function escAttr(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }
 
-$('addNav').onclick=()=>{ S.NAV.push({pageId:"newtab", labelKey:"", icon:""}); sel=S.NAV.length-1; build(); };
+$('addNav').onclick=()=>{ S.NAV.push({pageId:"newtab", labelKey:"", icon:"", background:""}); sel=S.NAV.length-1; build(); };
 $('delBtn').onclick=()=>{ if(sel===null) return; S.NAV.splice(sel,1); sel=null; build(); };
 
 function updateSelInfo(){
@@ -191,14 +237,16 @@ function updateSelInfo(){
 // ---- Java output ----------------------------------------------------------
 function jstr(s){ return '"'+String(s==null?'':s).replace(/\\/g,'\\\\').replace(/"/g,'\\"')+'"'; }
 function navLine(n){ return '\t\t\tnew Nav('+jstr(n.pageId)+', '+jstr(n.labelKey)+', '+jstr(n.icon)+'),'; }
+function bgLine(n){ return '\t\t\tnew Background('+jstr(n.pageId)+', '+jstr(n.background)+'),'; }
 
 function renderOut(){
+  const withBg = S.NAV.filter(n=>n.background && n.background.trim()!=='');
   const j =
 `package net.redboltmedia.witchercraft.client.gui.shell;
 
 /**
  * Data-driven geometry for the WitcherCraft GUI shell CHROME: the virtual design
- * canvas, the fullscreen background, and the navbar. It does NOT describe page
+ * canvas, per-page backgrounds, and the navbar. It does NOT describe page
  * content - each page owns its own layout (and its own placer tool), the way the
  * Skills page owns PerkEquipLayout / PerkTree. The shell just hands every page a
  * content REGION (the whole area below the navbar) to fill however it likes.
@@ -220,7 +268,8 @@ public final class WitcherGuiLayout {
 	public static final int DESIGN_W = ${S.DESIGN_W};
 	public static final int DESIGN_H = ${S.DESIGN_H};
 
-	// --- fullscreen background ------------------------------------------------
+	// --- fullscreen background --------------------------------------------------
+	// Fallback used when a page has no entry in BACKGROUNDS below.
 	public static final String BG = ${jstr(S.BG)};
 
 	// --- navbar (centred group of fixed-width tabs, drawn over the background) -
@@ -254,7 +303,32 @@ public final class WitcherGuiLayout {
 ${S.NAV.map(navLine).join('\n')}
 	};
 
+	// ==========================================================================
+	//  Per-page background. A pageId with no entry here falls back to BG.
+	// ==========================================================================
+	public static final class Background {
+		public final String pageId;
+		public final String texture;
+
+		public Background(String pageId, String texture) {
+			this.pageId = pageId;
+			this.texture = texture;
+		}
+	}
+
+	public static final Background[] BACKGROUNDS = {
+${withBg.map(bgLine).join('\n')}
+	};
+
 	// --- lookups (kept trivial so the tool can regenerate the class) ----------
+
+	/** Background texture for a page: its own entry in BACKGROUNDS, or BG. */
+	public static String backgroundFor(String pageId) {
+		for (Background b : BACKGROUNDS)
+			if (b.pageId.equals(pageId))
+				return b.texture;
+		return BG;
+	}
 
 	/** Total design-pixel width the whole navbar group occupies. */
 	public static int navTotalWidth(int count) {
@@ -313,6 +387,11 @@ $('loadBg').addEventListener('click',()=>$('bgFile').click());
 $('bgFile').addEventListener('change',e=>{ const f=e.target.files[0]; if(!f) return; const url=URL.createObjectURL(f);
   let img=document.getElementById('bg'); if(!img){ img=document.createElement('img'); img.id='bg'; stage.prepend(img); } img.src=url; });
 $('clearBg').addEventListener('click',()=>{ const img=document.getElementById('bg'); if(img) img.remove(); });
+
+$('howtoToggle').addEventListener('click', ()=>{
+  const body=$('howtoBody'); const open=body.classList.toggle('open');
+  $('howtoToggle').innerHTML = (open?'&#9660;':'&#9654;')+' How to add and connect a new GUI';
+});
 
 build();
 </script>

@@ -24,7 +24,8 @@ public final class WitcherGuiLayout {
 	public static final int DESIGN_W = 640;
 	public static final int DESIGN_H = 360;
 
-	// --- fullscreen background ------------------------------------------------
+	// --- fullscreen background --------------------------------------------------
+	// Fallback used when a page has no entry in BACKGROUNDS below.
 	public static final String BG = "witchercraft:textures/gui/shell/background.png";
 
 	// --- navbar (centred group of fixed-width tabs, drawn over the background) -
@@ -63,7 +64,37 @@ public final class WitcherGuiLayout {
 			new Nav("bombs", "gui.witchercraft.shell.nav.bombs", "witchercraft:textures/gui/nav/bombs.png"),
 	};
 
+	// ==========================================================================
+	//  Per-page background. A pageId with no entry here falls back to BG.
+	// ==========================================================================
+	public static final class Background {
+		public final String pageId;
+		public final String texture;
+
+		public Background(String pageId, String texture) {
+			this.pageId = pageId;
+			this.texture = texture;
+		}
+	}
+
+	public static final Background[] BACKGROUNDS = {
+			new Background("inventory", "witchercraft:textures/gui/shell/backgrounds/inventory.png"),
+			new Background("skills", "witchercraft:textures/gui/shell/backgrounds/skills.png"),
+			new Background("alchemy", "witchercraft:textures/gui/shell/backgrounds/alchemy.png"),
+			new Background("bombs", "witchercraft:textures/gui/shell/backgrounds/bombs.png"),
+			new Background("map", "witchercraft:textures/gui/shell/backgrounds/map.png"),
+			new Background("glossary", "witchercraft:textures/gui/shell/backgrounds/glossary.png"),
+	};
+
 	// --- lookups (kept trivial so the tool can regenerate the class) ----------
+
+	/** Background texture for a page: its own entry in BACKGROUNDS, or BG. */
+	public static String backgroundFor(String pageId) {
+		for (Background b : BACKGROUNDS)
+			if (b.pageId.equals(pageId))
+				return b.texture;
+		return BG;
+	}
 
 	/** Total design-pixel width the whole navbar group occupies. */
 	public static int navTotalWidth(int count) {
