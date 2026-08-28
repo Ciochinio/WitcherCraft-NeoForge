@@ -310,7 +310,17 @@
   "effect.witchercraft.damage_blocked": "Damage Blocked Double DMG Fix",
   "gui.witchercraft.player_stats_overlay.label_signholdcost": "SignHoldCost",
   "effect.witchercraft.quen_active_shield": "Quen Active Shield",
-  "key.witchercraft.debug_recompute_perks_keybind": "Debug Recompute Perks",
-  "key.witchercraft.changeto_111keybing": "Changeto 1 1 1keybing",
-  "key.witchercraft.changeto_0keybind": "Changeto 0keybing"
+  "key.witchercraft.open_shell": "Open WitcherCraft Menu",
+  "gui.witchercraft.shell.title": "WitcherCraft",
+  "gui.witchercraft.shell.nav.inventory": "Inventory",
+  "gui.witchercraft.shell.nav.skills": "Skills",
+  "gui.witchercraft.shell.nav.alchemy": "Alchemy",
+  "gui.witchercraft.shell.nav.bombs": "Bombs",
+  "gui.witchercraft.shell.nav.map": "Map",
+  "gui.witchercraft.shell.nav.glossary": "Glossary",
+  "gui.witchercraft.shell.section.stats": "Stats",
+  "gui.witchercraft.shell.section.alchemy_todo": "Alchemy - coming soon",
+  "gui.witchercraft.shell.section.bombs_todo": "Bombs - coming soon",
+  "gui.witchercraft.shell.section.glossary_todo": "Glossary - coming soon",
+  "gui.witchercraft.shell.empty_page": "Nothing here yet"
 }

@@ -44,7 +44,6 @@ public class WitchercraftModMenus {
 	public static final DeferredHolder<MenuType<?>, MenuType<BruxaGuiMenu>> BRUXA_GUI = REGISTRY.register("bruxa_gui", () -> IMenuTypeExtension.create(BruxaGuiMenu::new));
 	public static final DeferredHolder<MenuType<?>, MenuType<GraveirGuiMenu>> GRAVEIR_GUI = REGISTRY.register("graveir_gui", () -> IMenuTypeExtension.create(GraveirGuiMenu::new));
 	public static final DeferredHolder<MenuType<?>, MenuType<HigherVampireGuiMenu>> HIGHER_VAMPIRE_GUI = REGISTRY.register("higher_vampire_gui", () -> IMenuTypeExtension.create(HigherVampireGuiMenu::new));
-	public static final DeferredHolder<MenuType<?>, MenuType<PerkEquipGuiMenu>> PERK_EQUIP_GUI = REGISTRY.register("perk_equip_gui", () -> IMenuTypeExtension.create(PerkEquipGuiMenu::new));
 
 	public interface MenuAccessor {
 		Map<String, Object> getMenuState();

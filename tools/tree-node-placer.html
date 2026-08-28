@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WitcherCraft - Tree Node Placer</title>
+<style>
+  :root {
+    --bg: #14141a; --ink: #e8e8ef; --dim: #9a9aa6; --line: #33333d; --accent: #ffdd55;
+    --red: #ff5555; --green: #55ff55; --blue: #5599ff; --neutral: #cccccc;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  header { padding: 10px 16px; border-bottom: 1px solid var(--line); display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;}
+  header h1 { font-size: 15px; margin: 0; font-weight: 600; }
+  header .hint { color: var(--dim); font-size: 12px; }
+  .wrap { display: flex; gap: 16px; padding: 16px; align-items: flex-start; flex-wrap: wrap; }
+  .side { flex: 1 1 320px; min-width: 300px; max-width: 560px; }
+  .tabs { display:flex; gap:6px; margin-bottom:10px; }
+  .tab { padding:5px 12px; border:1px solid var(--line); border-radius:6px; cursor:pointer; background:#1c1c24; color:var(--dim); }
+  .tab.active { color:#fff; }
+  .tab.b1.active { border-color:var(--red); } .tab.b2.active { border-color:var(--green); }
+  .tab.b3.active { border-color:var(--blue); } .tab.b4.active { border-color:var(--neutral); }
+  #stage { position: relative; background: #0b0b0f; border: 1px solid var(--line); overflow:hidden;
+           background-image: linear-gradient(#ffffff08 1px, transparent 1px), linear-gradient(90deg, #ffffff08 1px, transparent 1px);
+           box-shadow: 0 6px 30px #0008; }
+  #bg { position:absolute; inset:0; width:100%; height:100%; object-fit:fill; pointer-events:none; z-index:0; }
+  #edges { position:absolute; inset:0; pointer-events:none; z-index:1; }
+  .ref { position:absolute; border:1px dashed #ffffff22; background:#ffffff05; z-index:0; pointer-events:none;
+         display:flex; align-items:center; justify-content:center; font-size:9px; color:#ffffff33; }
+  .node { position:absolute; border:2px solid var(--dim); background:#ffffff10; z-index:2; cursor:grab;
+          display:flex; flex-direction:column; align-items:center; justify-content:center; user-select:none;
+          font-size:10px; line-height:1.1; color:var(--ink); text-align:center; text-shadow:0 1px 2px #000; overflow:hidden; }
+  .node.b1 { border-color:var(--red); } .node.b2 { border-color:var(--green); }
+  .node.b3 { border-color:var(--blue); } .node.b4 { border-color:var(--neutral); }
+  .node.src { outline:2px solid var(--accent); outline-offset:1px; z-index:6; }
+  .node .id { font-size:8px; color:var(--dim); }
+  .del { pointer-events:all; cursor:pointer; }
+  fieldset { border: 1px solid var(--line); border-radius: 6px; margin: 0 0 12px; padding: 10px 12px; }
+  legend { color: var(--dim); padding: 0 6px; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+  label { display:inline-flex; align-items:center; gap:6px; margin: 3px 10px 3px 0; color: var(--dim); }
+  input[type=number]{ width:64px; background:#0e0e13; border:1px solid var(--line); color:var(--ink); padding:3px 5px; border-radius:4px; font:inherit; }
+  input[type=checkbox]{ accent-color: var(--accent); }
+  button { background:#2a2a34; color:var(--ink); border:1px solid var(--line); border-radius:5px; padding:6px 12px; cursor:pointer; font:inherit; }
+  button:hover { background:#34343f; }
+  button.primary { background:var(--accent); color:#161009; border-color:var(--accent); font-weight:600; }
+  .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:8px; }
+  textarea { width:100%; height:320px; background:#0e0e13; color:#cfe8cf; border:1px solid var(--line); border-radius:6px; padding:10px; font:12px/1.45 ui-monospace,Consolas,monospace; resize:vertical; }
+  .selinfo { color: var(--dim); } .selinfo b { color: var(--ink); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Tree Node Placer</h1>
+  <span class="hint">Drag nodes to lay out each branch. Turn on <b>Link mode</b> to draw prerequisites (click a parent, then a child). Output regenerates <code>PerkTree.java</code> &rarr; copy &rarr; paste over the file.</span>
+</header>
+
+<div class="wrap">
+  <div>
+    <div class="tabs" id="tabs"></div>
+    <div id="stage"></div>
+    <div style="margin-top:8px" class="selinfo" id="selinfo"></div>
+  </div>
+
+  <div class="side">
+    <fieldset>
+      <legend>Editing</legend>
+      <label><input type="checkbox" id="linkMode"> Link mode (click parent &rarr; child = child requires parent)</label><br>
+      <div class="hint" style="color:var(--dim)">In link mode, click a node then another to add a prerequisite; click the small &times; on a link to remove it. Cycles and duplicates are rejected. Move mode: drag to reposition, arrow keys nudge.</div>
+    </fieldset>
+    <fieldset>
+      <legend>Canvas</legend>
+      <label>Node size <input type="number" id="nodeSize"></label>
+      <label>Zoom <input type="number" id="zoom" step="0.5" min="1" max="6"></label>
+      <label><input type="checkbox" id="snapOn" checked> Snap</label>
+      <label>Grid <input type="number" id="gridStep" value="2" min="1"></label>
+    </fieldset>
+    <fieldset>
+      <legend>Background</legend>
+      <div class="row">
+        <button id="loadBg">Load tree image…</button>
+        <button id="clearBg">Clear</button>
+        <label>Opacity <input type="number" id="bgOpacity" value="100" min="0" max="100" step="5"></label>
+        <input type="file" id="bgFile" accept="image/*" style="display:none">
+      </div>
+      <div class="hint" style="color:var(--dim)">Guide only - never exported. The full frame is shown; faint dashed boxes on the right are the equip grid (read-only reference) so you can align both sides.</div>
+    </fieldset>
+    <div class="row">
+      <button class="primary" id="copyBtn">Copy PerkTree.java</button>
+      <button id="resetBtn">Reset to default grid</button>
+    </div>
+    <textarea id="out" spellcheck="false" readonly></textarea>
+  </div>
+</div>
+
+<script>
+// perk id -> name (PerkRegistry order); colour = floor(id/100)
+const PERKS = [
+  [101,"AnatomicalKnowledge"],[102,"ColdBlood"],[103,"CripplingShot"],[104,"CripplingStrikes"],[105,"CrushingBlows"],
+  [106,"DeadlyPrecision"],[107,"Defence"],[108,"FleetFooted"],[109,"FloodOfAnger"],[110,"MuscleMemory"],
+  [111,"PreciseBlows"],[112,"RazorFocus"],[113,"StrengthTraining"],[114,"SunderArmor"],[115,"Undying"],
+  [201,"ClusterBombs"],[202,"DelayedRecovery"],[203,"Efficiency"],[204,"HunterInstinct"],[205,"PoisonedBlades"],
+  [206,"ProtectiveCoating"],[207,"Pyrotechnics"],[208,"Refreshment"],[209,"SideEffects"],
+  [301,"AardIntensity"],[302,"AxiiIntensity"],[303,"Delusion"],[304,"Domination"],[305,"ExplodingShield"],
+  [306,"FarReachingAard"],[307,"Firestream"],[308,"IgniIntensity"],[309,"MagicTrap"],[310,"Pyromaniac"],
+  [311,"QuenDischarge"],[312,"QuenIntensity"],[313,"ShockWave"],[314,"SustainedGlyphs"],[315,"YrdenIntensity"],
+  [401,"BearSchool"],[402,"CatSchool"],[403,"Gourmet"],[404,"GriffinSchool"],[405,"SunAndStars"],[406,"SurvivalInstinct"],
+];
+const NAME = {}; PERKS.forEach(([id,n])=>NAME[id]=n);
+const IDS = PERKS.map(p=>p[0]);
+const FRAME_W = 360, PANEL_H = 230;   // FULL frame (matches PerkEquipLayout PANEL_W/H) so you see both sides
+const STROKE = {1:'#ff5555',2:'#55ff55',3:'#5599ff',4:'#cccccc'};
+// equip grid, shown as faint read-only reference (current PerkEquipLayout defaults)
+const EQUIP = {
+  SLOT_X:[196,196,196,224,224,224,300,300,300,328,328,328], SLOT_Y:[30,62,94,30,62,94,30,62,94,30,62,94], SLOT:24,
+  SOCKET_X:[196,224,300,328], SOCKET_Y:[130,130,130,130], SOCKET:24,
+  MED_ON:true, MED_X:256, MED_Y:46, MED_W:40, MED_H:40
+};
+const branchOf = id => Math.floor(id/100);
+
+const $ = id => document.getElementById(id);
+const SVGNS='http://www.w3.org/2000/svg';
+const stage = $('stage'), out = $('out');
+
+let nodes = {};           // id -> {x,y,prereqs:[]}
+let nodeSize = 24, zoom = 3, activeBranch = 1, linkMode = false, linkSource = null, selected = null;
+
+function defaultGrid(){
+  const n = {};
+  for (let color=1; color<=4; color++){
+    let i=0;
+    for (const id of IDS){
+      if (branchOf(id)!==color) continue;
+      n[id] = { x: 8 + (i%3)*58, y: 24 + Math.floor(i/3)*32, prereqs: [] };
+      i++;
+    }
+  }
+  return n;
+}
+
+function build(){
+  stage.style.width = FRAME_W*zoom+'px';
+  stage.style.height = PANEL_H*zoom+'px';
+  stage.style.backgroundSize = (+$('gridStep').value||2)*zoom+'px '+(+$('gridStep').value||2)*zoom+'px';
+  const bg = $('bg');
+  stage.querySelectorAll('.node,.ref').forEach(e=>e.remove());
+  let svg = $('edges'); if(!svg){ svg=document.createElementNS(SVGNS,'svg'); svg.id='edges'; if(bg) bg.after(svg); else stage.prepend(svg); }
+  drawRefs();
+  // nodes for the active branch
+  for (const id of IDS){
+    if (branchOf(id)!==activeBranch) continue;
+    const nd = nodes[id];
+    const el = document.createElement('div');
+    el.className = 'node b'+activeBranch + (linkSource===id?' src':'');
+    el.style.left=nd.x*zoom+'px'; el.style.top=nd.y*zoom+'px';
+    el.style.width=nodeSize*zoom+'px'; el.style.height=nodeSize*zoom+'px';
+    el.innerHTML = '<span>'+NAME[id].slice(0,6)+'</span><span class="id">'+id+'</span>';
+    el.dataset.id=id;
+    stage.appendChild(el);
+    attachNode(el);
+  }
+  redrawEdges(); renderOut(); updateInfo(); syncTabs();
+}
+function drawRefs(){
+  const add=(x,y,w,h,label)=>{ const d=document.createElement('div'); d.className='ref';
+    d.style.left=x*zoom+'px'; d.style.top=y*zoom+'px'; d.style.width=w*zoom+'px'; d.style.height=h*zoom+'px';
+    if(label) d.textContent=label; stage.appendChild(d); };
+  for(let i=0;i<12;i++) add(EQUIP.SLOT_X[i], EQUIP.SLOT_Y[i], EQUIP.SLOT, EQUIP.SLOT);
+  for(let i=0;i<4;i++) add(EQUIP.SOCKET_X[i], EQUIP.SOCKET_Y[i], EQUIP.SOCKET, EQUIP.SOCKET);
+  if(EQUIP.MED_ON) add(EQUIP.MED_X, EQUIP.MED_Y, EQUIP.MED_W, EQUIP.MED_H, 'MED');
+}
+
+function center(id){ const n=nodes[id]; return [n.x+nodeSize/2, n.y+nodeSize/2]; }
+function redrawEdges(){
+  const svg=$('edges'); if(!svg) return;
+  svg.setAttribute('width', FRAME_W*zoom); svg.setAttribute('height', PANEL_H*zoom);
+  svg.innerHTML='';
+  for (const id of IDS){
+    if (branchOf(id)!==activeBranch) continue;
+    for (const pre of nodes[id].prereqs){
+      const [px,py]=center(pre), [cx,cy]=center(id);
+      arrow(svg, px, py, cx, cy, STROKE[activeBranch], pre, id);
+    }
+  }
+}
+function arrow(svg, x1,y1,x2,y2, color, pre, child){
+  // stop the arrowhead at the child node's edge
+  const ang=Math.atan2(y2-y1,x2-x1), edge=nodeSize/2+2;
+  const ex=x2-edge*Math.cos(ang), ey=y2-edge*Math.sin(ang);
+  addLine(svg, x1,y1, ex,ey, color, 2, 0.8);
+  const len=7, sp=0.5;
+  poly(svg,[ex,ey, ex-len*Math.cos(ang-sp),ey-len*Math.sin(ang-sp), ex-len*Math.cos(ang+sp),ey-len*Math.sin(ang+sp)], color);
+  if(linkMode){ // deletable midpoint marker
+    const mx=(x1+ex)/2, my=(y1+ey)/2;
+    const c=document.createElementNS(SVGNS,'circle');
+    c.setAttribute('cx',mx*zoom); c.setAttribute('cy',my*zoom); c.setAttribute('r',6);
+    c.setAttribute('fill','#000'); c.setAttribute('stroke',color); c.setAttribute('class','del');
+    c.style.pointerEvents='all'; c.style.cursor='pointer';
+    c.addEventListener('click', e=>{ e.stopPropagation(); nodes[child].prereqs = nodes[child].prereqs.filter(p=>p!==pre); build(); });
+    svg.appendChild(c);
+    const t=document.createElementNS(SVGNS,'text'); t.setAttribute('x',mx*zoom); t.setAttribute('y',my*zoom+3);
+    t.setAttribute('text-anchor','middle'); t.setAttribute('font-size','9'); t.setAttribute('fill',color); t.style.pointerEvents='none'; t.textContent='×';
+    svg.appendChild(t);
+  }
+}
+function addLine(svg,x1,y1,x2,y2,color,w,op){ const l=document.createElementNS(SVGNS,'line');
+  l.setAttribute('x1',x1*zoom); l.setAttribute('y1',y1*zoom); l.setAttribute('x2',x2*zoom); l.setAttribute('y2',y2*zoom);
+  l.setAttribute('stroke',color); l.setAttribute('stroke-width',w); l.setAttribute('stroke-opacity',op); svg.appendChild(l); }
+function poly(svg,pts,color){ const p=document.createElementNS(SVGNS,'polygon');
+  p.setAttribute('points', pts.map((v,i)=> (v*zoom)).reduce((a,v,i)=> i%2? a+','+v+' ' : a+v, '')); p.setAttribute('fill',color); svg.appendChild(p); }
+
+function attachNode(el){
+  el.addEventListener('pointerdown', e=>{
+    const id=+el.dataset.id; selected=id;
+    if(linkMode){
+      e.preventDefault();
+      if(linkSource===null){ linkSource=id; build(); }
+      else if(linkSource===id){ linkSource=null; build(); }
+      else { addPrereq(linkSource, id); linkSource=null; build(); }
+      return;
+    }
+    e.preventDefault();
+    const rect=stage.getBoundingClientRect(), nd=nodes[id];
+    const gx=(e.clientX-rect.left)/zoom - nd.x, gy=(e.clientY-rect.top)/zoom - nd.y;
+    el.setPointerCapture(e.pointerId);
+    const move=ev=>{
+      const step=$('snapOn').checked?(+$('gridStep').value||1):1;
+      let x=Math.round(((ev.clientX-rect.left)/zoom-gx)/step)*step;
+      let y=Math.round(((ev.clientY-rect.top)/zoom-gy)/step)*step;
+      x=Math.max(0,Math.min(FRAME_W-nodeSize,x)); y=Math.max(0,Math.min(PANEL_H-nodeSize,y));
+      nd.x=x; nd.y=y; el.style.left=x*zoom+'px'; el.style.top=y*zoom+'px';
+      redrawEdges(); renderOut(); updateInfo();
+    };
+    const up=()=>{ el.releasePointerCapture(e.pointerId); el.removeEventListener('pointermove',move); el.removeEventListener('pointerup',up); };
+    el.addEventListener('pointermove',move); el.addEventListener('pointerup',up);
+  });
+}
+
+// child requires parent; reject self, duplicate, and cycles
+function addPrereq(parent, child){
+  if(parent===child) return;
+  if(nodes[child].prereqs.includes(parent)) return;
+  if(reaches(parent, child)){ flashInfo('Rejected: that link would create a cycle.'); return; }
+  nodes[child].prereqs.push(parent);
+}
+function reaches(from, target){ // does 'from' already (transitively) require 'target'?
+  const seen=new Set(); const stack=[from];
+  while(stack.length){ const cur=stack.pop(); if(cur===target) return true;
+    for(const p of nodes[cur].prereqs) if(!seen.has(p)){ seen.add(p); stack.push(p); } }
+  return false;
+}
+
+function updateInfo(){
+  const si=$('selinfo');
+  if(linkMode && linkSource!==null){ si.innerHTML='Link mode: parent = <b>'+NAME[linkSource]+'</b>. Click a child to require it.'; return; }
+  if(selected && branchOf(selected)===activeBranch){
+    const nd=nodes[selected];
+    const pre = nd.prereqs.length? nd.prereqs.map(p=>NAME[p]).join(', ') : 'none';
+    si.innerHTML='<b>'+NAME[selected]+'</b> ('+selected+') &nbsp; x='+nd.x+' y='+nd.y+' &nbsp; requires: '+pre;
+  } else si.innerHTML='Click a node to select. Toggle Link mode to draw prerequisites.';
+}
+let flashT; function flashInfo(msg){ const si=$('selinfo'); si.innerHTML='<b style="color:#ff9">'+msg+'</b>'; clearTimeout(flashT); flashT=setTimeout(updateInfo,1600); }
+
+document.addEventListener('keydown', e=>{
+  if(selected===null || branchOf(selected)!==activeBranch || linkMode) return;
+  const d={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key]; if(!d) return;
+  e.preventDefault(); const m=e.shiftKey?5:1, nd=nodes[selected];
+  nd.x=Math.max(0,Math.min(FRAME_W-nodeSize,nd.x+d[0]*m)); nd.y=Math.max(0,Math.min(PANEL_H-nodeSize,nd.y+d[1]*m)); build();
+});
+
+// ---- export ----
+function renderOut(){
+  let body='';
+  for(const id of IDS){
+    const nd=nodes[id];
+    const args=[id, nd.x, nd.y, ...nd.prereqs].join(', ');
+    body += '\t\t\tnew Node('+args+'),'+(nd.prereqs.length?' // requires '+nd.prereqs.map(p=>NAME[p]).join(', '):'')+'\n';
+  }
+  out.value =
+`package net.redboltmedia.witchercraft.client.gui;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Perk-tree topology: node positions (GUI-local, left half of the equip screen)
+ * and per-node prerequisites. A node's branch is its colour = perkId / 100.
+ *
+ * Generated by tools/tree-node-placer.html - paste this over the file wholesale.
+ */
+public final class PerkTree {
+	private PerkTree() {
+	}
+
+	public static final int NODE_SIZE = ${nodeSize};
+
+	public static final class Node {
+		public final int perkId;
+		public final int x, y;
+		public final int[] prereqs;
+
+		Node(int perkId, int x, int y, int... prereqs) {
+			this.perkId = perkId;
+			this.x = x;
+			this.y = y;
+			this.prereqs = prereqs;
+		}
+
+		public int cx() {
+			return x + NODE_SIZE / 2;
+		}
+
+		public int cy() {
+			return y + NODE_SIZE / 2;
+		}
+	}
+
+	public static final Node[] NODES = {
+${body}	};
+
+	public static Node byId(int perkId) {
+		for (Node n : NODES)
+			if (n.perkId == perkId)
+				return n;
+		return null;
+	}
+
+	/** nodes belonging to a branch colour (1 red / 2 green / 3 blue / 4 neutral). */
+	public static List<Node> forColor(int color) {
+		List<Node> out = new ArrayList<>();
+		for (Node n : NODES)
+			if (n.perkId / 100 == color)
+				out.add(n);
+		return out;
+	}
+}
+`;
+}
+
+// ---- controls ----
+function syncTabs(){ document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', +t.dataset.b===activeBranch)); }
+(function buildTabs(){
+  const names={1:'Combat',2:'Alchemy',3:'Signs',4:'General'}; const tabs=$('tabs');
+  for(let b=1;b<=4;b++){ const t=document.createElement('div'); t.className='tab b'+b; t.dataset.b=b; t.textContent=names[b];
+    t.onclick=()=>{ activeBranch=b; linkSource=null; selected=null; build(); }; tabs.appendChild(t); }
+})();
+$('nodeSize').value=nodeSize; $('nodeSize').addEventListener('input',()=>{ const v=parseInt($('nodeSize').value,10); if(v>=8){ nodeSize=v; build(); } });
+$('zoom').value=zoom; $('zoom').addEventListener('input',()=>{ const v=parseFloat($('zoom').value); if(v>=1){ zoom=v; build(); } });
+$('gridStep').addEventListener('input',build);
+$('linkMode').addEventListener('change',()=>{ linkMode=$('linkMode').checked; linkSource=null; build(); });
+$('copyBtn').addEventListener('click',async()=>{ out.select(); try{ await navigator.clipboard.writeText(out.value);}catch{document.execCommand('copy');}
+  const b=$('copyBtn'), t=b.textContent; b.textContent='Copied!'; setTimeout(()=>b.textContent=t,1200); });
+$('resetBtn').addEventListener('click',()=>{ if(confirm('Reset ALL branches to the default grid and clear prerequisites?')){ nodes=defaultGrid(); linkSource=null; selected=null; build(); } });
+$('loadBg').addEventListener('click',()=>$('bgFile').click());
+$('bgFile').addEventListener('change',e=>{ const f=e.target.files[0]; if(!f)return; const url=URL.createObjectURL(f);
+  let img=$('bg'); if(!img){ img=document.createElement('img'); img.id='bg'; stage.prepend(img);} img.src=url; img.style.opacity=(+$('bgOpacity').value/100); });
+$('clearBg').addEventListener('click',()=>{ const img=$('bg'); if(img) img.remove(); });
+$('bgOpacity').addEventListener('input',()=>{ const img=$('bg'); if(img) img.style.opacity=(+$('bgOpacity').value/100); });
+
+nodes = defaultGrid();
+build();
+</script>
+</body>
+</html>

@@ -31,7 +31,6 @@ public class WitchercraftModScreens {
 		event.register(WitchercraftModMenus.BRUXA_GUI.get(), BruxaGuiScreen::new);
 		event.register(WitchercraftModMenus.GRAVEIR_GUI.get(), GraveirGuiScreen::new);
 		event.register(WitchercraftModMenus.HIGHER_VAMPIRE_GUI.get(), HigherVampireGuiScreen::new);
-		event.register(WitchercraftModMenus.PERK_EQUIP_GUI.get(), PerkEquipGuiScreen::new);
 	}
 
 	public interface ScreenAccessor {

@@ -15,6 +15,7 @@ Anything marked **tunable** is a value you are expected to change. Anything desc
 
 1. [GUI and HUD](#1-gui-and-hud)
 2. [Character Stats and Attributes](#2-character-stats-and-attributes)
+3. [The GUI shell](#3-the-gui-shell)
 
 ---
 
@@ -552,3 +553,139 @@ character sheet - the attributes are syncable, so the client already has the val
   match them. MCreator reads them fine; only tooling is affected.
 - **Armour is no longer tracked.** The old `witchercraftArmor` variable was written and never read,
   and went with the base-stats procedure.
+
+---
+
+## 3. The GUI shell
+
+### 3.1 What the system is for
+
+WitcherCraft's own screens (perk tree/equip, alchemy, bestiary, and the rest) started as separate
+MCreator container GUIs, each opened by its own keybind or procedure. That does not scale into the
+witcher-game "one panel, many tabs" layout, and it makes every screen carry the full container +
+menu + registration + button-message stack even when it only needs to draw.
+
+The shell replaces that with one persistent, client-only `Screen` that owns a top navbar and swaps
+which **page** fills its content region - the React mental model: the shell stays mounted, clicking a
+tab is `setState(activeTabId)`, and no new screen opens and no server round-trip happens for
+navigation. It is opened with **P** and lives in `client/gui/shell/`.
+
+### 3.2 Why a plain Screen, not a container
+
+Navigation is pure client state, so nothing about switching tabs needs the server. Making the shell a
+plain `net.minecraft.client.gui.screens.Screen` (opened with `Minecraft.setScreen`, not `openMenu`)
+drops the entire `Menu` + `WitchercraftModMenus` registration + open-procedure + button-message
+stack that every MCreator GUI otherwise requires. A page that later needs **real item slots** brings
+its own container at that point; the shell itself never needs one.
+
+Two consequences to know:
+
+1. **This generator has no `render(GuiGraphics)` to override.** The `GuiGraphics` class is renamed
+   `GuiGraphicsExtractor` here, and `Screen`'s render pipeline
+   (`extractRenderStateWithTooltipAndSubtitles`) calls `extractBackground(...)` then
+   `extractRenderState(...)`, both taking a `GuiGraphicsExtractor`. The shell overrides those two,
+   not `render`. Tooltips queued with `setTooltipForNextFrame` during `extractRenderState` are
+   flushed by the pipeline's `extractDeferredElements`, so pages can set tooltips inline.
+2. **`Screen.onClose()` is patched to `popGuiLayer()`** in this fork. Because the shell is opened with
+   `setScreen`, its `onClose` calls `minecraft.setScreen(null)` directly instead of `super.onClose()`.
+
+### 3.3 The pieces
+
+All hand-written, none owned by an MCreator element (the same "orphaned helper class" pattern as
+`PerkEquipLayout` / `PerkTree` / `PerkRegistry`), so MCreator never regenerates them:
+
+- **`GuiPage`** - the page interface. `render(g, originX, originY, mouseX, mouseY, partial)` plus
+  `mouseClicked` / `keyPressed` / `onShown` / `onClose`. Every coordinate a page receives is
+  **absolute**: the shell hands it the content region's top-left and the page adds its own gui-local
+  offsets, exactly as the old container screen added `leftPos` / `topPos`.
+- **`WitcherGuiScreen`** - the shell. Centres the panel, draws the frame + navbar band in
+  `extractBackground`, draws the navbar labels + delegates to the active page in `extractRenderState`,
+  and routes `mouseClicked` (nav hit-test first, then the page) and `keyPressed` (page first, then
+  Esc-close).
+- **`WitcherGuiLayout`** - the tool-generated data holder. Shell chrome constants (`PANEL_W/H`,
+  `NAV_Y/H`, `CONTENT_*`), a `NAV[]` of navbar tabs (each `pageId` + label key + icon + rect), and a
+  `SECTIONS[]` of content boxes each tagged with its `pageId`. Dumb data with three trivial lookups,
+  so the tool can overwrite it wholesale.
+- **`WitcherGuiPages`** - the route table: `forId(pageId)` returns the handling page. A `pageId` with
+  no custom class falls back to a cached `LayoutPage`, so **a placeholder tab is a one-line edit in
+  the tool - no new class**. Custom pages register in the `CUSTOM` map.
+- **`LayoutPage`** - the generic page. Renders the `WitcherGuiLayout` boxes for its `pageId` as
+  placeholder fills + labels (or a `blit` when a box carries a texture). This is what makes the
+  "lower section" interchangeable: a whole page is defined by tool-edited data, no code per tab.
+- **`PerkPage`** - the ported perk tree + equip grid (see 3.5).
+- **`WitcherGuiKeybind`** - a hand-written `@EventBusSubscriber(Dist.CLIENT)` that registers the **P**
+  mapping (`RegisterKeyMappingsEvent`, mod bus) and opens the shell on a client tick
+  (`ClientTickEvent.Post`, game bus). No server message, no MCreator keybind element; auto-detected
+  by FML like the HUD overlay classes.
+
+The navbar is driven by `NAV[]` (order + visuals, tool-edited) while behaviour comes from the page
+registry (code). They are paired by `pageId`: a `NAV` entry with no page renders as an inert tab; a
+page with no `NAV` entry simply never shows. That separation is deliberate - "how the navbar looks"
+is data, "what a page does" is code.
+
+### 3.4 The creator tool
+
+`tools/gui-layout-creator.html` is the third standalone placer, alongside `equip-grid-placer.html`
+and `tree-node-placer.html`, and follows the same contract: drag/resize boxes against an optional
+background image, and **regenerate `WitcherGuiLayout.java` live -> copy -> paste over the file**. It
+is page-aware: a page-tab row (mirroring the in-game navbar) picks which page's content boxes you are
+editing, while the navbar tabs are shared and always shown in the top band. Per-box fields edit the
+`pageId` / label / icon (nav) or type / id / text / texture (section), and Add/Delete make the navbar
+and lower section fully interchangeable. It is seeded with the current layout, so `Reset` reproduces
+the checked-in file.
+
+### 3.5 How the perk screen became a page
+
+The old `PerkEquipGuiScreen` was an `AbstractContainerScreen` drawing through MCreator's
+`extractLabels`. `PerkPage` is the same rendering + input, with two structural changes and nothing
+else:
+
+- **Origin offset instead of `leftPos`/`topPos`.** Every draw goes through `fill(...)` / `text(...)`
+  helpers that add the content origin the shell passes in, so the ported body reads almost identically
+  to the original and still uses the tool-generated `PerkEquipLayout` + `PerkTree` coordinates
+  verbatim. **Both perk tools keep working unchanged.**
+- **The recompute moved.** The perk-effect recompute used to fire from `PerkEquipGuiMenu.removed()`
+  when the container closed. With no container, it now runs server-side after every state-changing
+  action inside `PerkEquipGuiButtonMessage.handleButtonAction` (`buttonID != 0` ->
+  `RecomputeEquippedPerksProcedure.execute`). This is strictly more robust: the recompute follows the
+  authoritative change, not the screen lifecycle.
+
+`PerkEquipGuiButtonMessage` is self-registering (`@EventBusSubscriber` + `registerMessage`), so it
+survived the retirement intact even though its old owning element is gone - the page keeps sending
+the exact same packets for learn / place / remove / mutagen-cycle.
+
+### 3.6 Retiring the old perk screen
+
+Removed: `PerkEquipGuiScreen`, `PerkEquipGuiMenu`, `PerkEquipGuiOpenProcedure`,
+`DebugRecomputePerksKeybindMessage`, their three `elements/*.mod.json`, their `mod_elements` entries
+in `witchercraft.mcreator`, the `PERK_EQUIP_GUI` menu holder + screen registration, and the
+`DEBUG_RECOMPUTE_PERKS_KEYBIND` (the old **P** "Open Perk Equip Screen" mapping, whose key the shell
+now reuses). Kept and still registered: `PerkEquipGuiButtonMessage`, `PerkEquipLayout`, `PerkTree`,
+`PerkRegistry`, `PerkEquipVars`, `PerkLearnedVars`, `RecomputeEquippedPerksProcedure`.
+
+`PerkEquipGuiButtonMessage` is now an **orphaned** file - a real, compiled, self-registering class
+that no MCreator element owns. That is intentional and matches the existing perk helper classes; it
+just will not appear as an element in the MCreator browser.
+
+### 3.7 How to change things
+
+- **Add/rearrange a tab or a placeholder panel** - open `tools/gui-layout-creator.html`, edit, copy
+  `WitcherGuiLayout.java` over the file. No Java changes for placeholder pages.
+- **Add a real (custom-rendered) page** - implement `GuiPage`, register its singleton in
+  `WitcherGuiPages.CUSTOM` under its `pageId`, and give it a `NAV[]` entry with the same `pageId`.
+- **Change the open key** - it is a normal keybind; rebind in Controls, or change the default in
+  `WitcherGuiKeybind.OPEN_SHELL`.
+- **Swap placeholder boxes for art** - give a `Section` a non-empty `texture`; `LayoutPage` blits it
+  instead of drawing the coloured placeholder. For a custom page, replace its `fill`/`text` calls
+  with `blit` at the same coordinates.
+
+### 3.8 Known limitations
+
+- **Visual shell only.** `TYPE_SLOT` boxes are placeholder cells, not real inventory slots; the
+  Inventory/Alchemy/Bombs/Map tabs draw layout, not live data. Wiring functional slots is a later
+  pass and will require the owning page to bring a container.
+- **Existing standalone screens are not yet folded in.** Alchemy, Meditation, Glossary, etc. remain
+  their own container screens; only the perk screen has moved into the shell. They can be re-homed as
+  pages later, or bridged (a tab that opens the old screen) in the interim.
+- **No icon art yet.** `NAV` icons are empty, so the navbar renders text labels; the icon path is
+  plumbed through to the tool and the layout but unused until textures exist.

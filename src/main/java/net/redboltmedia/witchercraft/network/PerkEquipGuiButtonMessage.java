@@ -97,7 +97,12 @@ public record PerkEquipGuiButtonMessage(int buttonID, int x, int y, int z) imple
 			}
 			PerkEquipVars.setPerkSocket(entity, slot, perkId);
 		}
-		// buttonID 0: reserved no-op. Recompute runs from PerkEquipGuiMenu.removed().
+		// buttonID 0: reserved no-op. Any state-changing action recomputes the
+		// active perk effects here (server-authoritative). This replaces the old
+		// PerkEquipGuiMenu.removed() hook, retired with the container screen when
+		// the perk UI became a page in WitcherGuiScreen.
+		if (buttonID != 0)
+			RecomputeEquippedPerksProcedure.execute(entity);
 	}
 
 	// Learn a tree node: only if not already learned and all prerequisites are

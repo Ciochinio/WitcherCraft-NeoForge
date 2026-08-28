@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WitcherCraft - GUI Layout Creator</title>
+<style>
+  :root {
+    --bg:#14141a; --panel:#1e1e26; --ink:#e8e8ef; --dim:#9a9aa6; --line:#33333d; --accent:#ffdd55;
+    --nav:#15151b; --img:#3a5a7a; --slot:#8a6d3b; --text:#5b8c5b; --med:#d8b366;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  header { padding:10px 16px; border-bottom:1px solid var(--line); display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+  header h1 { font-size:15px; margin:0; font-weight:600; }
+  header .hint { color:var(--dim); font-size:12px; max-width:900px; }
+  .wrap { display:flex; gap:16px; padding:16px; align-items:flex-start; flex-wrap:wrap; }
+  .stage-col { flex:0 0 auto; }
+  .side { flex:1 1 340px; min-width:320px; max-width:600px; }
+  #stage { position:relative; background:#0b0b0f; border:1px solid var(--line); overflow:hidden;
+           background-image:linear-gradient(#ffffff08 1px,transparent 1px),linear-gradient(90deg,#ffffff08 1px,transparent 1px);
+           box-shadow:0 6px 30px #0008; }
+  #bg { position:absolute; inset:0; width:100%; height:100%; object-fit:fill; pointer-events:none; z-index:0; }
+  #navband { position:absolute; left:0; right:0; background:var(--nav); border-bottom:1px solid var(--line); z-index:1; pointer-events:none; }
+  #contentregion { position:absolute; border:1px dashed #ffffff22; z-index:1; pointer-events:none; }
+  .box { position:absolute; border:2px solid var(--dim); background:#ffffff10; display:flex; align-items:center; justify-content:center;
+         cursor:grab; font-size:10px; color:var(--ink); user-select:none; text-shadow:0 1px 2px #000; z-index:3; text-align:center; overflow:hidden; padding:1px; }
+  .box.sel { outline:2px solid var(--accent); outline-offset:1px; z-index:6; }
+  .box.nav { border-color:var(--accent); background:#ffdd5518; }
+  .box.t0 { border-color:var(--img); }   /* IMAGE */
+  .box.t1 { border-color:var(--text); border-style:dashed; }  /* TEXT */
+  .box.t2 { border-color:var(--slot); }  /* SLOT */
+  .rz { position:absolute; right:-4px; bottom:-4px; width:12px; height:12px; background:var(--accent); border:1px solid #000; border-radius:2px; cursor:nwse-resize; z-index:7; }
+  fieldset { border:1px solid var(--line); border-radius:6px; margin:0 0 12px; padding:10px 12px; }
+  legend { color:var(--dim); padding:0 6px; font-size:11px; text-transform:uppercase; letter-spacing:.06em; }
+  label { display:inline-flex; align-items:center; gap:6px; margin:3px 10px 3px 0; color:var(--dim); }
+  input[type=number]{ width:60px; }
+  input, select { background:#0e0e13; border:1px solid var(--line); color:var(--ink); padding:3px 5px; border-radius:4px; font:inherit; }
+  input[type=text]{ width:190px; }
+  button { background:#2a2a34; color:var(--ink); border:1px solid var(--line); border-radius:5px; padding:6px 12px; cursor:pointer; font:inherit; }
+  button:hover { background:#34343f; }
+  button.primary { background:var(--med); color:#161009; border-color:var(--med); font-weight:600; }
+  button.sm { padding:3px 8px; font-size:12px; }
+  .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:8px; }
+  .pagetabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px; }
+  .ptab { padding:4px 10px; border:1px solid var(--line); border-radius:6px; cursor:pointer; background:#1c1c24; color:var(--dim); font-size:12px; }
+  .ptab.active { color:#fff; border-color:var(--accent); }
+  textarea { width:100%; height:300px; background:#0e0e13; color:#cfe8cf; border:1px solid var(--line); border-radius:6px; padding:10px; font:12px/1.45 ui-monospace,Consolas,monospace; resize:vertical; }
+  .selinfo { color:var(--dim); } .selinfo b { color:var(--ink); }
+  .swatch { display:inline-block; width:10px; height:10px; border:2px solid; margin-right:4px; vertical-align:middle; }
+  .muted { color:var(--dim); font-size:12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>GUI Layout Creator</h1>
+  <span class="hint">Lay out the shell for <code>WitcherGuiScreen</code>. Pick a page tab to edit its content boxes; the <b>navbar tabs</b> (yellow, in the top band) are shared across all pages. Drag to move, drag the corner to resize, arrow keys nudge (Shift = x5). Output regenerates <code>WitcherGuiLayout.java</code> live &rarr; Copy &rarr; paste over the file. The "skills" page is drawn by PerkPage in-game, so it has no boxes here (edit it with equip-grid-placer / tree-node-placer).</span>
+</header>
+
+<div class="wrap">
+  <div class="stage-col">
+    <div id="stage"></div>
+    <div style="margin-top:8px" class="selinfo" id="selinfo">Nothing selected.</div>
+  </div>
+
+  <div class="side">
+    <fieldset>
+      <legend>Page being edited</legend>
+      <div class="pagetabs" id="pagetabs"></div>
+      <div class="muted">Nav tabs come from the NAV list below; each links to a pageId. A page with no boxes shows the "Nothing here yet" placeholder in-game (except custom pages like skills).</div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Selected element</legend>
+      <div id="editor"><span class="muted">Click a box on the stage to edit it.</span></div>
+      <div class="row" style="margin-top:8px">
+        <button class="sm" id="addNav">+ Nav tab</button>
+        <button class="sm" id="addSection">+ Section (this page)</button>
+        <button class="sm" id="delBtn">Delete selected</button>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Panel &amp; regions</legend>
+      <label>Panel W <input type="number" id="PANEL_W"></label>
+      <label>Panel H <input type="number" id="PANEL_H"></label>
+      <label>Zoom <input type="number" id="zoom" step="0.5" min="1" max="6"></label><br>
+      <label>Nav Y <input type="number" id="NAV_Y"></label>
+      <label>Nav H <input type="number" id="NAV_H"></label><br>
+      <label>Content X <input type="number" id="CONTENT_X"></label>
+      <label>Content Y <input type="number" id="CONTENT_Y"></label>
+      <label>Content W <input type="number" id="CONTENT_W"></label>
+      <label>Content H <input type="number" id="CONTENT_H"></label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Snapping &amp; background</legend>
+      <label><input type="checkbox" id="snapOn" checked> Snap</label>
+      <label>Grid <input type="number" id="gridStep" value="2" min="1"></label>
+      <button class="sm" id="loadBg">Load bg image…</button>
+      <button class="sm" id="clearBg">Clear</button>
+      <label>Opacity <input type="number" id="bgOpacity" value="100" min="0" max="100" step="5"></label>
+      <input type="file" id="bgFile" accept="image/*" style="display:none">
+      <div class="muted">Legend:
+        <span class="swatch" style="border-color:var(--accent)"></span>Nav
+        <span class="swatch" style="border-color:var(--img)"></span>Image
+        <span class="swatch" style="border-color:var(--text);border-style:dashed"></span>Text
+        <span class="swatch" style="border-color:var(--slot)"></span>Slot
+      </div>
+    </fieldset>
+
+    <div class="row">
+      <button class="primary" id="copyBtn">Copy WitcherGuiLayout.java</button>
+      <button id="resetBtn">Reset to seeded layout</button>
+    </div>
+    <textarea id="out" spellcheck="false" readonly></textarea>
+  </div>
+</div>
+
+<script>
+// ---- seed = current WitcherGuiLayout.java ---------------------------------
+const SEED = {
+  PANEL_W:360, PANEL_H:252, NAV_Y:4, NAV_H:14, CONTENT_X:0, CONTENT_Y:22, CONTENT_W:360, CONTENT_H:230,
+  NAV: [
+    {pageId:"inventory", labelKey:"gui.witchercraft.shell.nav.inventory", icon:"", x:8,  y:4, w:54, h:14},
+    {pageId:"skills",    labelKey:"gui.witchercraft.shell.nav.skills",    icon:"", x:66, y:4, w:54, h:14},
+    {pageId:"alchemy",   labelKey:"gui.witchercraft.shell.nav.alchemy",   icon:"", x:124,y:4, w:54, h:14},
+    {pageId:"bombs",     labelKey:"gui.witchercraft.shell.nav.bombs",     icon:"", x:182,y:4, w:54, h:14},
+    {pageId:"map",       labelKey:"gui.witchercraft.shell.nav.map",       icon:"", x:240,y:4, w:54, h:14},
+    {pageId:"glossary",  labelKey:"gui.witchercraft.shell.nav.glossary",  icon:"", x:298,y:4, w:54, h:14},
+  ],
+  SECTIONS: [
+    {pageId:"inventory", type:0, text:"PORTRAIT", texture:"", id:"portrait", x:150,y:34,w:90,h:150},
+    {pageId:"inventory", type:2, text:"WEAPON",   texture:"", id:"weapon",   x:40, y:40,w:24,h:24},
+    {pageId:"inventory", type:2, text:"ARMOR",    texture:"", id:"armor",    x:40, y:72,w:24,h:24},
+    {pageId:"inventory", type:2, text:"GLOVES",   texture:"", id:"gloves",   x:40, y:104,w:24,h:24},
+    {pageId:"inventory", type:2, text:"TROUSERS", texture:"", id:"trousers", x:296,y:40,w:24,h:24},
+    {pageId:"inventory", type:2, text:"BOOTS",    texture:"", id:"boots",    x:296,y:72,w:24,h:24},
+    {pageId:"inventory", type:0, text:"BAG",      texture:"", id:"bag",      x:296,y:120,w:40,h:40},
+    {pageId:"inventory", type:1, text:"gui.witchercraft.shell.section.stats", texture:"", id:"stats", x:12,y:196,w:200,h:28},
+    {pageId:"alchemy",   type:1, text:"gui.witchercraft.shell.section.alchemy_todo", texture:"", id:"todo", x:12,y:30,w:300,h:20},
+    {pageId:"alchemy",   type:2, text:"POTION", texture:"", id:"potion1", x:40, y:60,w:24,h:24},
+    {pageId:"alchemy",   type:2, text:"POTION", texture:"", id:"potion2", x:72, y:60,w:24,h:24},
+    {pageId:"alchemy",   type:2, text:"OIL",    texture:"", id:"oil1",    x:104,y:60,w:24,h:24},
+    {pageId:"bombs",     type:1, text:"gui.witchercraft.shell.section.bombs_todo", texture:"", id:"todo", x:12,y:30,w:300,h:20},
+    {pageId:"bombs",     type:2, text:"BOMB", texture:"", id:"bomb1", x:40,y:60,w:24,h:24},
+    {pageId:"bombs",     type:2, text:"BOMB", texture:"", id:"bomb2", x:72,y:60,w:24,h:24},
+    {pageId:"map",       type:0, text:"MAP", texture:"", id:"map", x:20,y:30,w:320,h:180},
+    {pageId:"glossary",  type:1, text:"gui.witchercraft.shell.section.glossary_todo", texture:"", id:"todo", x:12,y:30,w:300,h:20},
+  ],
+};
+const TYPE_NAMES = ["TYPE_IMAGE","TYPE_TEXT","TYPE_SLOT"];
+let S = structuredClone(SEED);
+let zoom = 2.5;
+let currentPage = S.NAV.length ? S.NAV[0].pageId : "inventory";
+let sel = null; // {kind:'nav'|'section', idx}
+
+const stage = document.getElementById('stage');
+const out = document.getElementById('out');
+const $ = id => document.getElementById(id);
+
+function pageIds(){ return S.NAV.map(n=>n.pageId); }
+
+// ---- build stage ----------------------------------------------------------
+function build(){
+  stage.style.width = S.PANEL_W*zoom+'px';
+  stage.style.height = S.PANEL_H*zoom+'px';
+  const gs = (+$('gridStep').value||2)*zoom;
+  stage.style.backgroundSize = gs+'px '+gs+'px';
+  const bg = document.getElementById('bg');
+  stage.querySelectorAll('.box,#navband,#contentregion').forEach(b=>{ if(b.id!=='bg') b.remove(); });
+
+  // nav band + content region guides
+  const nb = document.createElement('div'); nb.id='navband';
+  nb.style.top = S.NAV_Y*zoom+'px'; nb.style.height=(S.NAV_H+2)*zoom+'px';
+  if(bg) bg.after(nb); else stage.prepend(nb);
+  const cr = document.createElement('div'); cr.id='contentregion';
+  cr.style.left=S.CONTENT_X*zoom+'px'; cr.style.top=S.CONTENT_Y*zoom+'px';
+  cr.style.width=S.CONTENT_W*zoom+'px'; cr.style.height=S.CONTENT_H*zoom+'px';
+  nb.after(cr);
+
+  // nav boxes (panel coords)
+  S.NAV.forEach((n,i)=> addBox('nav', i, n.x, n.y, n.w, n.h, n.pageId, 'nav'));
+  // sections of the current page (content-local coords -> offset by content origin)
+  S.SECTIONS.forEach((s,i)=>{
+    if(s.pageId!==currentPage) return;
+    addBox('section', i, S.CONTENT_X+s.x, S.CONTENT_Y+s.y, s.w, s.h, (s.id||shortText(s.text)), 't'+s.type);
+  });
+  renderPageTabs(); renderOut(); renderEditor(); updateSelInfo();
+}
+
+function shortText(t){ if(!t) return ''; const d=t.lastIndexOf('.'); return d>=0?t.slice(d+1):t; }
+
+function addBox(kind, idx, px, py, w, h, label, cls){
+  const el = document.createElement('div');
+  el.className = 'box '+cls;
+  el.textContent = label;
+  el.style.left=px*zoom+'px'; el.style.top=py*zoom+'px';
+  el.style.width=w*zoom+'px'; el.style.height=h*zoom+'px';
+  el.dataset.kind=kind; el.dataset.idx=idx;
+  if(sel && sel.kind===kind && sel.idx===idx) el.classList.add('sel');
+  const hz=document.createElement('div'); hz.className='rz'; el.appendChild(hz);
+  stage.appendChild(el);
+  attachDrag(el); attachResize(el,hz);
+}
+
+// object + its stored x/y (nav uses panel coords; section uses content-local)
+function objOf(kind,idx){ return kind==='nav'?S.NAV[idx]:S.SECTIONS[idx]; }
+function dispPos(kind,o){ return kind==='nav'?[o.x,o.y]:[S.CONTENT_X+o.x, S.CONTENT_Y+o.y]; }
+function setDispPos(kind,o,px,py){ if(kind==='nav'){o.x=px;o.y=py;} else {o.x=px-S.CONTENT_X; o.y=py-S.CONTENT_Y;} }
+
+function snap(v){ const step=$('snapOn').checked?(+$('gridStep').value||1):1; return Math.round(v/step)*step; }
+
+function attachDrag(el){
+  el.addEventListener('pointerdown', e=>{
+    if(e.target.classList.contains('rz')) return;
+    e.preventDefault();
+    const kind=el.dataset.kind, idx=+el.dataset.idx;
+    sel={kind,idx};
+    stage.querySelectorAll('.box').forEach(b=>b.classList.remove('sel')); el.classList.add('sel');
+    renderEditor(); updateSelInfo();
+    const o=objOf(kind,idx); const rect=stage.getBoundingClientRect();
+    const [ox,oy]=dispPos(kind,o);
+    const gx=(e.clientX-rect.left)/zoom-ox, gy=(e.clientY-rect.top)/zoom-oy;
+    el.setPointerCapture(e.pointerId);
+    const move=ev=>{
+      let nx=snap((ev.clientX-rect.left)/zoom-gx), ny=snap((ev.clientY-rect.top)/zoom-gy);
+      nx=Math.max(0,Math.min(S.PANEL_W-o.w,nx)); ny=Math.max(0,Math.min(S.PANEL_H-o.h,ny));
+      setDispPos(kind,o,nx,ny);
+      el.style.left=nx*zoom+'px'; el.style.top=ny*zoom+'px';
+      renderOut(); renderEditor(); updateSelInfo();
+    };
+    const up=()=>{ el.releasePointerCapture(e.pointerId); el.removeEventListener('pointermove',move); el.removeEventListener('pointerup',up); };
+    el.addEventListener('pointermove',move); el.addEventListener('pointerup',up);
+  });
+}
+function attachResize(el,handle){
+  handle.addEventListener('pointerdown', e=>{
+    e.preventDefault(); e.stopPropagation();
+    const kind=el.dataset.kind, idx=+el.dataset.idx;
+    sel={kind,idx};
+    stage.querySelectorAll('.box').forEach(b=>b.classList.remove('sel')); el.classList.add('sel');
+    const o=objOf(kind,idx); const rect=stage.getBoundingClientRect(); const [dx,dy]=dispPos(kind,o);
+    handle.setPointerCapture(e.pointerId);
+    const move=ev=>{
+      let w=snap((ev.clientX-rect.left)/zoom-dx), h=snap((ev.clientY-rect.top)/zoom-dy);
+      w=Math.max(6,Math.min(S.PANEL_W-dx,w)); h=Math.max(6,Math.min(S.PANEL_H-dy,h));
+      o.w=w; o.h=h; el.style.width=w*zoom+'px'; el.style.height=h*zoom+'px';
+      renderOut(); renderEditor(); updateSelInfo();
+    };
+    const up=()=>{ handle.releasePointerCapture(e.pointerId); handle.removeEventListener('pointermove',move); handle.removeEventListener('pointerup',up); };
+    handle.addEventListener('pointermove',move); handle.addEventListener('pointerup',up);
+  });
+}
+
+// ---- page tabs ------------------------------------------------------------
+function renderPageTabs(){
+  const box=$('pagetabs'); box.innerHTML='';
+  pageIds().forEach(pid=>{
+    const t=document.createElement('div'); t.className='ptab'+(pid===currentPage?' active':'');
+    t.textContent=pid; t.onclick=()=>{ currentPage=pid; sel=null; build(); };
+    box.appendChild(t);
+  });
+}
+
+// ---- property editor ------------------------------------------------------
+function renderEditor(){
+  const box=$('editor');
+  if(!sel){ box.innerHTML='<span class="muted">Click a box on the stage to edit it.</span>'; return; }
+  const o=objOf(sel.kind,sel.idx); if(!o){ sel=null; box.innerHTML=''; return; }
+  if(sel.kind==='nav'){
+    box.innerHTML =
+      field('pageId','text',o.pageId)+
+      field('labelKey','text',o.labelKey)+
+      field('icon','text',o.icon)+
+      '<br>'+num('x',o.x)+num('y',o.y)+num('w',o.w)+num('h',o.h);
+  } else {
+    box.innerHTML =
+      '<label>type <select id="f_type">'+
+        TYPE_NAMES.map((n,i)=>'<option value="'+i+'"'+(i===o.type?' selected':'')+'>'+n.replace('TYPE_','')+'</option>').join('')+
+      '</select></label>'+
+      field('id','text',o.id)+
+      field('text','text',o.text)+
+      field('texture','text',o.texture)+
+      '<br>'+num('x',o.x)+num('y',o.y)+num('w',o.w)+num('h',o.h);
+  }
+  box.querySelectorAll('[id^=f_]').forEach(inp=>{
+    inp.addEventListener('input',()=>{
+      const key=inp.id.slice(2);
+      let v=inp.value; if(inp.type==='number'||key==='type') v=parseInt(v,10)||0;
+      o[key]=v;
+      if(key==='pageId'){ renderPageTabs(); } // nav pageId affects tabs
+      build();
+    });
+  });
+}
+function field(k,t,v){ return '<label>'+k+' <input id="f_'+k+'" type="'+t+'" value="'+escAttr(v)+'"></label> '; }
+function num(k,v){ return '<label>'+k+' <input id="f_'+k+'" type="number" value="'+v+'"></label> '; }
+function escAttr(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }
+
+// ---- add / delete ---------------------------------------------------------
+$('addNav').onclick=()=>{
+  const n={pageId:"newtab", labelKey:"", icon:"", x:8, y:S.NAV_Y, w:54, h:S.NAV_H};
+  S.NAV.push(n); sel={kind:'nav', idx:S.NAV.length-1}; build();
+};
+$('addSection').onclick=()=>{
+  const s={pageId:currentPage, type:2, text:"NEW", texture:"", id:"new", x:20, y:20, w:24, h:24};
+  S.SECTIONS.push(s); sel={kind:'section', idx:S.SECTIONS.length-1}; build();
+};
+$('delBtn').onclick=()=>{
+  if(!sel) return;
+  if(sel.kind==='nav') S.NAV.splice(sel.idx,1); else S.SECTIONS.splice(sel.idx,1);
+  sel=null;
+  if(!pageIds().includes(currentPage)) currentPage = pageIds()[0]||'inventory';
+  build();
+};
+
+// ---- keyboard nudge -------------------------------------------------------
+document.addEventListener('keydown', e=>{
+  if(!sel) return;
+  if(document.activeElement && /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  const d={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];
+  if(!d) return; e.preventDefault();
+  const m=e.shiftKey?5:1; const o=objOf(sel.kind,sel.idx); const [px,py]=dispPos(sel.kind,o);
+  let nx=Math.max(0,Math.min(S.PANEL_W-o.w,px+d[0]*m)), ny=Math.max(0,Math.min(S.PANEL_H-o.h,py+d[1]*m));
+  setDispPos(sel.kind,o,nx,ny); build();
+});
+
+function updateSelInfo(){
+  const si=$('selinfo');
+  if(!sel){ si.innerHTML='Nothing selected.'; return; }
+  const o=objOf(sel.kind,sel.idx); if(!o){ si.textContent=''; return; }
+  if(sel.kind==='nav') si.innerHTML='Selected nav <b>'+o.pageId+'</b> &nbsp; x=<b>'+o.x+'</b> y=<b>'+o.y+'</b> w=<b>'+o.w+'</b> h=<b>'+o.h+'</b>';
+  else si.innerHTML='Selected section <b>'+(o.id||'')+'</b> ('+TYPE_NAMES[o.type].replace('TYPE_','')+') on <b>'+o.pageId+'</b> &nbsp; x=<b>'+o.x+'</b> y=<b>'+o.y+'</b> w=<b>'+o.w+'</b> h=<b>'+o.h+'</b>';
+}
+
+// ---- Java output ----------------------------------------------------------
+function jstr(s){ return '"'+String(s==null?'':s).replace(/\\/g,'\\\\').replace(/"/g,'\\"')+'"'; }
+function navLine(n){ return '\t\t\tnew Nav('+jstr(n.pageId)+', '+jstr(n.labelKey)+', '+jstr(n.icon)+', '+n.x+', '+n.y+', '+n.w+', '+n.h+'),'; }
+function secLine(s){ return '\t\t\tnew Section('+jstr(s.pageId)+', '+TYPE_NAMES[s.type]+', '+jstr(s.text)+', '+jstr(s.texture)+', '+jstr(s.id)+', '+s.x+', '+s.y+', '+s.w+', '+s.h+'),'; }
+
+function renderOut(){
+  const j =
+`package net.redboltmedia.witchercraft.client.gui.shell;
+
+/**
+ * Data-driven geometry + content for the WitcherCraft GUI shell.
+ *
+ * All coordinates are GUI-LOCAL to the shell panel (top-left origin), in
+ * Minecraft GUI pixels. The shell centres the panel via leftPos / topPos and
+ * adds those itself, so values here are pure layout.
+ *
+ * Generated by tools/gui-layout-creator.html - paste this over the file
+ * wholesale. Keep it a dumb data holder (no logic beyond the tiny lookups at
+ * the bottom) so the tool can overwrite it freely.
+ *
+ * Two arrays drive everything:
+ *   NAV[]      - the top navbar tabs (order = navbar order). Each links to a
+ *                page by pageId; the matching {@link GuiPage} renders when the
+ *                tab is active.
+ *   SECTIONS[] - the "lower" content boxes, each tagged with the pageId it
+ *                belongs to. {@link LayoutPage} renders the boxes for its page;
+ *                custom pages (e.g. PerkPage) ignore these and draw themselves.
+ */
+public final class WitcherGuiLayout {
+	private WitcherGuiLayout() {
+	}
+
+	// --- shell panel ----------------------------------------------------------
+	public static final int PANEL_W = ${S.PANEL_W};
+	public static final int PANEL_H = ${S.PANEL_H};
+
+	// --- navbar band ----------------------------------------------------------
+	public static final int NAV_Y = ${S.NAV_Y};
+	public static final int NAV_H = ${S.NAV_H};
+
+	// --- content region (below the navbar; where the active page draws) -------
+	public static final int CONTENT_X = ${S.CONTENT_X};
+	public static final int CONTENT_Y = ${S.CONTENT_Y};
+	public static final int CONTENT_W = ${S.CONTENT_W};
+	public static final int CONTENT_H = ${S.CONTENT_H};
+
+	// ==========================================================================
+	//  A navbar tab. pageId must match a GuiPage.id() to be interactive.
+	// ==========================================================================
+	public static final class Nav {
+		public final String pageId;
+		public final String labelKey; // lang key; may be "" to use the page's own label
+		public final String icon; // texture path, or "" for none (label only)
+		public final int x, y, w, h;
+
+		public Nav(String pageId, String labelKey, String icon, int x, int y, int w, int h) {
+			this.pageId = pageId;
+			this.labelKey = labelKey;
+			this.icon = icon;
+			this.x = x;
+			this.y = y;
+			this.w = w;
+			this.h = h;
+		}
+	}
+
+	// ==========================================================================
+	//  A content box on a page. type picks how it renders (placeholder art).
+	// ==========================================================================
+	public static final int TYPE_IMAGE = 0;
+	public static final int TYPE_TEXT = 1;
+	public static final int TYPE_SLOT = 2;
+
+	public static final class Section {
+		public final String pageId; // which page this box belongs to
+		public final int type; // TYPE_IMAGE / TYPE_TEXT / TYPE_SLOT
+		public final String text; // lang key or literal (TEXT), or caption
+		public final String texture; // texture path (IMAGE), or "" placeholder
+		public final String id; // stable id for later wiring
+		public final int x, y, w, h;
+
+		public Section(String pageId, int type, String text, String texture, String id, int x, int y, int w, int h) {
+			this.pageId = pageId;
+			this.type = type;
+			this.text = text;
+			this.texture = texture;
+			this.id = id;
+			this.x = x;
+			this.y = y;
+			this.w = w;
+			this.h = h;
+		}
+	}
+
+	// --- navbar ---------------------------------------------------------------
+	public static final Nav[] NAV = {
+${S.NAV.map(navLine).join('\n')}
+	};
+
+	// --- content boxes (placeholder panels per page) --------------------------
+	public static final Section[] SECTIONS = {
+${S.SECTIONS.map(secLine).join('\n')}
+	};
+
+	// --- tiny lookups (kept trivial so the tool can regenerate the class) -----
+
+	/** Sections belonging to a page, in declaration order. */
+	public static java.util.List<Section> sectionsFor(String pageId) {
+		java.util.List<Section> out = new java.util.ArrayList<>();
+		for (Section s : SECTIONS)
+			if (s.pageId.equals(pageId))
+				out.add(s);
+		return out;
+	}
+
+	/** Absolute-centred left edge for a panel of PANEL_W in a screen of width w. */
+	public static int leftPos(int screenW) {
+		return (screenW - PANEL_W) / 2;
+	}
+
+	public static int topPos(int screenH) {
+		return (screenH - PANEL_H) / 2;
+	}
+}
+`;
+  out.value = j;
+}
+
+// ---- controls -------------------------------------------------------------
+['PANEL_W','PANEL_H','NAV_Y','NAV_H','CONTENT_X','CONTENT_Y','CONTENT_W','CONTENT_H'].forEach(k=>{
+  const el=$(k); el.value=S[k];
+  el.addEventListener('input',()=>{ const v=parseInt(el.value,10); if(!isNaN(v)){ S[k]=v; build(); } });
+});
+$('zoom').value=zoom;
+$('zoom').addEventListener('input',()=>{ const v=parseFloat($('zoom').value); if(v>=1){ zoom=v; build(); } });
+$('gridStep').addEventListener('input',build);
+
+$('copyBtn').addEventListener('click', async ()=>{
+  out.select();
+  try{ await navigator.clipboard.writeText(out.value); flash($('copyBtn'),'Copied!'); }
+  catch{ document.execCommand('copy'); flash($('copyBtn'),'Copied!'); }
+});
+function flash(b,m){ const t=b.textContent; b.textContent=m; setTimeout(()=>b.textContent=t,1200); }
+$('resetBtn').addEventListener('click',()=>{ S=structuredClone(SEED); zoom=2.5; $('zoom').value=zoom;
+  ['PANEL_W','PANEL_H','NAV_Y','NAV_H','CONTENT_X','CONTENT_Y','CONTENT_W','CONTENT_H'].forEach(k=>$(k).value=S[k]);
+  currentPage=pageIds()[0]||'inventory'; sel=null; build(); });
+
+$('loadBg').addEventListener('click',()=>$('bgFile').click());
+$('bgFile').addEventListener('change',e=>{
+  const f=e.target.files[0]; if(!f) return; const url=URL.createObjectURL(f);
+  let img=document.getElementById('bg'); if(!img){ img=document.createElement('img'); img.id='bg'; stage.prepend(img); }
+  img.src=url; img.style.opacity=(+$('bgOpacity').value/100);
+});
+$('clearBg').addEventListener('click',()=>{ const img=document.getElementById('bg'); if(img) img.remove(); });
+$('bgOpacity').addEventListener('input',()=>{ const img=document.getElementById('bg'); if(img) img.style.opacity=(+$('bgOpacity').value/100); });
+
+build();
+</script>
+</body>
+</html>
