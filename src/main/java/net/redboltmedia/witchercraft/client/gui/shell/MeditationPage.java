@@ -17,8 +17,8 @@ import net.minecraft.world.entity.player.Player;
  * A smooth 24-hour dial: click anywhere on the ring and the nearest hour becomes
  * the target (no per-hour buttons, no slider). A dim hand shows the CURRENT world
  * time (live), a bright hand shows the picked TARGET, and a "Meditate" button
- * commits. Midnight (00:00) sits at the top, 06:00 right, 12:00 bottom, 18:00
- * left - a full 24h dial.
+ * commits. The dial reads day-up: NOON (12:00) sits at the top, 18:00 right,
+ * midnight (00:00) bottom, 06:00 left - a full 24h dial.
  *
  * All geometry + colours live in {@link MeditationLayout} (edited visually with
  * tools/meditation-dial-creator.html), which this page fit-scales into the shell
@@ -32,6 +32,15 @@ import net.minecraft.world.entity.player.Player;
 public class MeditationPage implements GuiPage {
 
 	private static final double TAU = Math.PI * 2.0;
+	// Half-turn so the dial reads day-up / night-down: NOON sits at the top, 00:00 at
+	// the bottom (without this, hour 0 = midnight lands at the top). Every hour->angle
+	// conversion goes through hourAngle(); mouseClicked() inverts it.
+	private static final double DIAL_OFFSET = Math.PI;
+
+	/** Screen rotation (radians, 0 = up, clockwise) for a dial hour, with the day-up offset. */
+	private static double hourAngle(double hour) {
+		return hour / 24.0 * TAU + DIAL_OFFSET;
+	}
 
 	private final String pageId;
 
@@ -66,6 +75,24 @@ public class MeditationPage implements GuiPage {
 			prevHideGui = mc.options.hideGui;
 		hudHidden = true;
 		mc.options.hideGui = true;
+	}
+
+	/**
+	 * Called on the client (via MeditationRejectMessage) when the server refuses a
+	 * Meditate: show the reason on the action bar and close the meditation GUI, so a
+	 * blocked click gives feedback instead of silently doing nothing. {@code reason}
+	 * is a {@link net.redboltmedia.witchercraft.procedures.MeditationCanStartProcedure}
+	 * BLOCKED_* code (compile-time constant, so no server class loads on the client).
+	 */
+	public static void rejectAndClose(int reason) {
+		Minecraft mc = Minecraft.getInstance();
+		String key = reason == net.redboltmedia.witchercraft.procedures.MeditationCanStartProcedure.BLOCKED_MONSTER
+				? "gui.witchercraft.shell.meditation.blocked_monster"
+				: "gui.witchercraft.shell.meditation.blocked_space";
+		if (mc.player != null)
+			mc.gui.setOverlayMessage(Component.translatable(key), false); // action bar
+		if (mc.screen instanceof WitcherGuiScreen)
+			mc.setScreen(null);
 	}
 
 	private static long spinElapsed() {
@@ -244,7 +271,7 @@ public class MeditationPage implements GuiPage {
 			int col = major ? MeditationLayout.COL_TICK_MAJOR : MeditationLayout.COL_TICK_MINOR;
 			drawRadial(g, hHour, MeditationLayout.RADIUS, MeditationLayout.RADIUS - len, half, col);
 			if (major) {
-				double a = hHour / 24.0 * TAU;
+				double a = hourAngle(hHour);
 				int lx = MeditationLayout.CX + (int) (Math.sin(a) * MeditationLayout.LABEL_RADIUS);
 				int ly = MeditationLayout.CY - (int) (Math.cos(a) * MeditationLayout.LABEL_RADIUS);
 				String s = String.valueOf(hHour);
@@ -257,7 +284,7 @@ public class MeditationPage implements GuiPage {
 	private void drawHand(GuiGraphicsExtractor g, double hour, int len, int half, int col) {
 		g.pose().pushMatrix();
 		g.pose().translate(MeditationLayout.CX, MeditationLayout.CY);
-		g.pose().rotate((float) (hour / 24.0 * TAU));
+		g.pose().rotate((float) hourAngle(hour));
 		fillA(g, -half, -len, half, MeditationLayout.HUB_HALF, col); // up = towards the hour before rotation
 		g.pose().popMatrix();
 	}
@@ -266,14 +293,14 @@ public class MeditationPage implements GuiPage {
 	private void drawRadial(GuiGraphicsExtractor g, double hour, int rOuter, int rInner, int half, int col) {
 		g.pose().pushMatrix();
 		g.pose().translate(MeditationLayout.CX, MeditationLayout.CY);
-		g.pose().rotate((float) (hour / 24.0 * TAU));
+		g.pose().rotate((float) hourAngle(hour));
 		fillA(g, -half, -rOuter, half, -rInner, col);
 		g.pose().popMatrix();
 	}
 
 	/** Sun (day) or moon (night) marker sitting on the ring at the target hour. */
 	private void drawTargetGlyph(GuiGraphicsExtractor g) {
-		double a = targetHour / 24.0 * TAU;
+		double a = hourAngle(targetHour);
 		int gx = MeditationLayout.CX + (int) (Math.sin(a) * MeditationLayout.RADIUS);
 		int gy = MeditationLayout.CY - (int) (Math.cos(a) * MeditationLayout.RADIUS);
 		boolean day = targetHour >= 6 && targetHour < 18;
@@ -342,9 +369,8 @@ public class MeditationPage implements GuiPage {
 		double dx = lx - MeditationLayout.CX, dy = ly - MeditationLayout.CY;
 		double dist = Math.sqrt(dx * dx + dy * dy);
 		if (dist <= MeditationLayout.RADIUS * 1.25) {
-			double a = Math.atan2(dx, -dy); // up = 0, clockwise positive
-			if (a < 0)
-				a += TAU;
+			double a = Math.atan2(dx, -dy) - DIAL_OFFSET; // up = 0, clockwise; undo the day-up offset
+			a = ((a % TAU) + TAU) % TAU;
 			targetHour = ((int) Math.round(a / TAU * 24.0)) % 24;
 			return true;
 		}

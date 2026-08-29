@@ -2,6 +2,7 @@ package net.redboltmedia.witchercraft.procedures;
 
 import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
 import net.redboltmedia.witchercraft.network.MeditationSpinMessage;
+import net.redboltmedia.witchercraft.network.MeditationRejectMessage;
 
 import net.neoforged.neoforge.network.PacketDistributor;
 
@@ -40,9 +41,14 @@ public class MeditationStartProcedure {
 		// one session at a time (slice 3 turns this into join-the-pending-session)
 		if (WitchercraftModVariables.meditationState != 0)
 			return;
-		// safety gate (mobs / air) - Blockly procedure, re-validated server-side
-		if (!MeditationCanStartProcedure.execute(world, x, y, z, entity))
+		// safety gate (space / mobs), re-validated server-side. On failure, tell the
+		// player why on the action bar and close their GUI (MeditationRejectMessage).
+		int gate = MeditationCanStartProcedure.reason(world, x, y, z, entity);
+		if (gate != MeditationCanStartProcedure.OK) {
+			if (entity instanceof ServerPlayer sp)
+				PacketDistributor.sendToPlayer(sp, new MeditationRejectMessage(gate));
 			return;
+		}
 
 		int hour = ((int) Math.round(targetHour) % 24 + 24) % 24;
 		long anchor = (long) level.getDefaultClockTime();
