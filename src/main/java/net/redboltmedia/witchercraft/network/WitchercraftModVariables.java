@@ -35,6 +35,14 @@ public class WitchercraftModVariables {
 	public static final Supplier<AttachmentType<PlayerVariables>> PLAYER_VARIABLES = ATTACHMENT_TYPES.register("player_variables", () -> AttachmentType.serializable(PlayerVariables::new).build());
 	public static double witchercraftSeconds = 0;
 	public static double witchercraftMinutes = 0;
+	// Meditation session (global, server-side runtime state). 0 = idle, 2 = spinning.
+	// The accelerated clock advance in MeditationTickProcedure is idempotent per
+	// tick: it recomputes the desired clock from these anchors, so being driven
+	// once per online player from the heartbeat never over-advances.
+	public static double meditationState = 0;
+	public static double meditationAnchorTicks = 0; // default-clock total ticks at commit
+	public static double meditationDeltaTicks = 0; // forward ticks to advance (1..24000)
+	public static double meditationAnchorGametime = 0; // Level.getGameTime() at commit
 
 	@SubscribeEvent
 	public static void init(FMLCommonSetupEvent event) {

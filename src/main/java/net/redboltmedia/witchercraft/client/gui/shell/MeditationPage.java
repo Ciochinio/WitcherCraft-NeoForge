@@ -1,6 +1,9 @@
 package net.redboltmedia.witchercraft.client.gui.shell;
 
 import net.redboltmedia.witchercraft.client.gui.MeditationLayout;
+import net.redboltmedia.witchercraft.network.MeditationGuiButtonMessage;
+
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -35,6 +38,25 @@ public class MeditationPage implements GuiPage {
 	// Client-only selection: the target hour (0-23). Defaults to the next hour.
 	private int targetHour = -1;
 
+	// Client spin state, set by MeditationSpinMessage when a session commits. The
+	// client self-times the translucent overlay (no per-tick stop packet): the
+	// world shows through while the server sweeps the real clock. See
+	// beginClientSpin / isClientSpinning / wantsWorldVisible.
+	private static volatile long clientSpinStartMs = 0L;
+	private static volatile int clientSpinDurationMs = 0;
+	private static volatile int clientSpinTargetHour = 0;
+
+	/** Called on the client (via MeditationSpinMessage) when a spin begins. */
+	public static void beginClientSpin(int targetHour, int durationTicks) {
+		clientSpinTargetHour = targetHour;
+		clientSpinDurationMs = Math.max(0, durationTicks) * 50;
+		clientSpinStartMs = System.currentTimeMillis();
+	}
+
+	private static boolean isClientSpinning() {
+		return System.currentTimeMillis() - clientSpinStartMs < clientSpinDurationMs;
+	}
+
 	// Per-frame panel->screen mapping (set at the top of render), reused by input.
 	private float scale;
 	private float px, py;
@@ -52,6 +74,12 @@ public class MeditationPage implements GuiPage {
 	@Override
 	public Component navLabel() {
 		return Component.translatable("gui.witchercraft.shell.nav.meditation");
+	}
+
+	@Override
+	public boolean wantsWorldVisible() {
+		// during the spin, drop the shell background so the real sky shows through
+		return isClientSpinning();
 	}
 
 	private static Player player() {
@@ -187,6 +215,8 @@ public class MeditationPage implements GuiPage {
 	public boolean mouseClicked(int x, int y, int w, int h, double mouseX, double mouseY, int button) {
 		if (button != 0)
 			return false;
+		if (isClientSpinning())
+			return true; // dial is locked while the world spins
 		// map the click back into panel coords through this frame's fit-scale.
 		double lx = (mouseX - px) / scale, ly = (mouseY - py) / scale;
 
@@ -209,10 +239,12 @@ public class MeditationPage implements GuiPage {
 		return false;
 	}
 
-	// SLICE 1: no server action yet - the pick is recorded and shown on the dial.
-	// Slice 2 replaces this with a MeditationGuiButtonMessage confirm (buttonID =
-	// 1000 + targetHour) that the server re-validates (safety) before starting.
+	// Send the confirm to the server, which re-validates and starts the session.
+	// buttonID = 1000 + targetHour (see MeditationGuiButtonMessage).
 	private void onMeditate() {
-		// intentionally a no-op for now.
+		Player p = player();
+		if (p == null || isClientSpinning())
+			return;
+		ClientPacketDistributor.sendToServer(new MeditationGuiButtonMessage(1000 + (((targetHour % 24) + 24) % 24), (int) p.getX(), (int) p.getY(), (int) p.getZ()));
 	}
 }

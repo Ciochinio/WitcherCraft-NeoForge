@@ -79,6 +79,68 @@
       "path": "~/Meditation"
     },
     {
+      "name": "MeditationStart",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "meditation_start",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "world",
+            "type": "world"
+          },
+          {
+            "name": "x",
+            "type": "number"
+          },
+          {
+            "name": "y",
+            "type": "number"
+          },
+          {
+            "name": "z",
+            "type": "number"
+          },
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "targetHour",
+            "type": "number"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/MeditationStartProcedure.java"
+        ]
+      },
+      "path": "~/Meditation2"
+    },
+    {
+      "name": "MeditationTick",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "meditation_tick",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "world",
+            "type": "world"
+          },
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/MeditationTickProcedure.java"
+        ]
+      },
+      "path": "~/Meditation2"
+    },
+    {
       "name": "PauseMenuGuiOpen",
       "type": "procedure",
       "compiles": true,
@@ -10031,6 +10093,30 @@
     },
     {
       "name": "witchercraftMinutes",
+      "type": "number",
+      "scope": "global",
+      "value": "0"
+    },
+    {
+      "name": "meditationState",
+      "type": "number",
+      "scope": "global",
+      "value": "0"
+    },
+    {
+      "name": "meditationAnchorTicks",
+      "type": "number",
+      "scope": "global",
+      "value": "0"
+    },
+    {
+      "name": "meditationDeltaTicks",
+      "type": "number",
+      "scope": "global",
+      "value": "0"
+    },
+    {
+      "name": "meditationAnchorGametime",
       "type": "number",
       "scope": "global",
       "value": "0"

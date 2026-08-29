@@ -32,6 +32,7 @@ public class TimeTickProcedure {
 			if (entity.tickCount % 60 == 0) {
 				ToxicityTickStartProcedure.execute(world, entity);
 			}
+			MeditationTickProcedure.execute(world, entity);
 		}
 	}
 }
