@@ -114,8 +114,7 @@
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/procedures/MeditationStartProcedure.java"
         ]
-      },
-      "path": "~/Meditation2"
+      }
     },
     {
       "name": "MeditationTick",
@@ -137,8 +136,61 @@
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/procedures/MeditationTickProcedure.java"
         ]
-      },
-      "path": "~/Meditation2"
+      }
+    },
+    {
+      "name": "MeditationStop",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "meditation_stop",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/MeditationStopProcedure.java"
+        ]
+      }
+    },
+    {
+      "name": "MeditationPage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "meditation_page",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/client/gui/shell/MeditationPage.java"
+        ]
+      }
+    },
+    {
+      "name": "MeditationLayout",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "meditation_layout",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/client/gui/MeditationLayout.java"
+        ]
+      }
+    },
+    {
+      "name": "MeditationSpinMessage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "meditation_spin_message",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/network/MeditationSpinMessage.java"
+        ]
+      }
     },
     {
       "name": "PauseMenuGuiOpen",
@@ -4599,7 +4651,8 @@
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/procedures/RecomputeEquippedPerksProcedure.java"
         ]
-      }
+      },
+      "path": "~/Character Abilities"
     },
     {
       "name": "RecomputeEquippedPerksOnLogin",
@@ -4617,7 +4670,8 @@
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/procedures/RecomputeEquippedPerksOnLoginProcedure.java"
         ]
-      }
+      },
+      "path": "~/Character Abilities"
     },
     {
       "name": "ApplyMutagenBonus",
@@ -4635,7 +4689,8 @@
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/procedures/ApplyMutagenBonusProcedure.java"
         ]
-      }
+      },
+      "path": "~/Character Abilities"
     },
     {
       "name": "MutagenMedallionClick",
@@ -4653,7 +4708,8 @@
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/procedures/MutagenMedallionClickProcedure.java"
         ]
-      }
+      },
+      "path": "~/Character Abilities"
     },
     {
       "name": "RecomputeEquippedPerksCombat",
@@ -4671,7 +4727,8 @@
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/procedures/RecomputeEquippedPerksCombatProcedure.java"
         ]
-      }
+      },
+      "path": "~/Character Abilities"
     },
     {
       "name": "RecomputeEquippedPerksAlchemy",
@@ -4689,7 +4746,8 @@
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/procedures/RecomputeEquippedPerksAlchemyProcedure.java"
         ]
-      }
+      },
+      "path": "~/Character Abilities"
     },
     {
       "name": "RecomputeEquippedPerksSigns",
@@ -4707,7 +4765,8 @@
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/procedures/RecomputeEquippedPerksSignsProcedure.java"
         ]
-      }
+      },
+      "path": "~/Character Abilities"
     },
     {
       "name": "RecomputeEquippedPerksGeneral",
@@ -4725,7 +4784,8 @@
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/procedures/RecomputeEquippedPerksGeneralProcedure.java"
         ]
-      }
+      },
+      "path": "~/Character Abilities"
     },
     {
       "name": "DodgeChance",
@@ -10568,6 +10628,7 @@
       "gui.witchercraft.shell.meditation.now": "Now: %s",
       "gui.witchercraft.shell.meditation.target": "Meditate to %s",
       "gui.witchercraft.shell.meditation.button": "Meditate",
+      "gui.witchercraft.shell.meditation.cancel": "Cancel",
       "key.witchercraft.open_shell.inventory": "WitcherCraft: Inventory",
       "key.witchercraft.open_shell.skills": "WitcherCraft: Skills",
       "key.witchercraft.open_shell.alchemy": "WitcherCraft: Alchemy",

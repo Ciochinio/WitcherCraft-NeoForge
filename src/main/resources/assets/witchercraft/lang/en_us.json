@@ -353,6 +353,7 @@
   "gui.witchercraft.shell.meditation.now": "Now: %s",
   "gui.witchercraft.shell.meditation.target": "Meditate to %s",
   "gui.witchercraft.shell.meditation.button": "Meditate",
+  "gui.witchercraft.shell.meditation.cancel": "Cancel",
   "key.witchercraft.open_shell.inventory": "WitcherCraft: Inventory",
   "key.witchercraft.open_shell.skills": "WitcherCraft: Skills",
   "key.witchercraft.open_shell.alchemy": "WitcherCraft: Alchemy",

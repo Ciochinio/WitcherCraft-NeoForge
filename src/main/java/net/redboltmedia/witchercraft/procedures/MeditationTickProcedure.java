@@ -23,8 +23,18 @@ import java.util.Optional;
  * and clears the session. Insomnia (timeSinceRest) accrual lands in slice 2b.
  */
 public class MeditationTickProcedure {
-	/** Real ticks the spin takes, whatever the size of the time jump (~4s). */
-	public static final int DURATION_TICKS = 80;
+	/**
+	 * Real ticks a FULL 24h (24000-tick) jump takes; a shorter jump scales down
+	 * proportionally, so the spin duration tracks how much time is being skipped.
+	 * Tunable - 180 ticks ~ 9 seconds for a whole day.
+	 */
+	public static final int FULL_DAY_SPIN_TICKS = 180;
+
+	/** Real ticks the spin should take for a forward jump of {@code delta} clock ticks. */
+	public static int spinDurationTicks(long delta) {
+		long d = Math.max(0L, Math.min(24000L, delta));
+		return Math.max(2, (int) Math.round(d / 24000.0 * FULL_DAY_SPIN_TICKS));
+	}
 
 	public static void execute(LevelAccessor world, Entity entity) {
 		if (!(world instanceof ServerLevel level))
@@ -39,7 +49,7 @@ public class MeditationTickProcedure {
 		long elapsed = level.getGameTime() - anchorGt;
 		if (elapsed < 0)
 			elapsed = 0;
-		double frac = Math.min(1.0, elapsed / (double) DURATION_TICKS);
+		double frac = Math.min(1.0, elapsed / (double) spinDurationTicks(delta));
 		setClock(level, anchor + (long) (delta * frac));
 
 		if (frac >= 1.0) {

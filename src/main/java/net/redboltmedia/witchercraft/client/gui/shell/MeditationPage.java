@@ -45,16 +45,39 @@ public class MeditationPage implements GuiPage {
 	private static volatile long clientSpinStartMs = 0L;
 	private static volatile int clientSpinDurationMs = 0;
 	private static volatile int clientSpinTargetHour = 0;
+	// While spinning we force the vanilla HUD off for the F1-clean look; remember
+	// the prior state so restoring never clobbers a user-set F1.
+	private static boolean hudHidden = false;
+	private static boolean prevHideGui = false;
 
 	/** Called on the client (via MeditationSpinMessage) when a spin begins. */
 	public static void beginClientSpin(int targetHour, int durationTicks) {
 		clientSpinTargetHour = targetHour;
 		clientSpinDurationMs = Math.max(0, durationTicks) * 50;
 		clientSpinStartMs = System.currentTimeMillis();
+		Minecraft mc = Minecraft.getInstance();
+		if (!hudHidden)
+			prevHideGui = mc.options.hideGui;
+		hudHidden = true;
+		mc.options.hideGui = true;
 	}
 
 	private static boolean isClientSpinning() {
 		return System.currentTimeMillis() - clientSpinStartMs < clientSpinDurationMs;
+	}
+
+	/** End the client spin immediately (cancel) and restore the HUD. */
+	private static void stopClientSpin() {
+		clientSpinStartMs = 0L;
+		clientSpinDurationMs = 0;
+		restoreHud();
+	}
+
+	private static void restoreHud() {
+		if (hudHidden) {
+			Minecraft.getInstance().options.hideGui = prevHideGui;
+			hudHidden = false;
+		}
 	}
 
 	// Per-frame panel->screen mapping (set at the top of render), reused by input.
@@ -105,6 +128,10 @@ public class MeditationPage implements GuiPage {
 		if (player() == null)
 			return;
 
+		// the spin ends on the client by its own timer -> restore the HUD when it does
+		if (hudHidden && !isClientSpinning())
+			restoreHud();
+
 		double nowHour = currentHourFloat();
 		if (targetHour < 0)
 			targetHour = ((int) Math.ceil(nowHour)) % 24; // first open -> next hour
@@ -142,7 +169,9 @@ public class MeditationPage implements GuiPage {
 		g.fill(bx, by, bx + bw, by + bh, hover ? MeditationLayout.COL_BTN_BG_HOVER : MeditationLayout.COL_BTN_BG);
 		g.fill(bx, by, bx + bw, by + 1, MeditationLayout.COL_BTN_BORDER);
 		g.fill(bx, by + bh - 1, bx + bw, by + bh, MeditationLayout.COL_BTN_BORDER);
-		centeredText(g, Component.translatable("gui.witchercraft.shell.meditation.button"), bx + bw / 2, by + bh / 2 - 4, MeditationLayout.COL_BTN_TEXT);
+		// while spinning the same button becomes Cancel (stop the meditation)
+		Component btnLabel = Component.translatable(isClientSpinning() ? "gui.witchercraft.shell.meditation.cancel" : "gui.witchercraft.shell.meditation.button");
+		centeredText(g, btnLabel, bx + bw / 2, by + bh / 2 - 4, MeditationLayout.COL_BTN_TEXT);
 
 		g.pose().popMatrix();
 	}
@@ -215,17 +244,20 @@ public class MeditationPage implements GuiPage {
 	public boolean mouseClicked(int x, int y, int w, int h, double mouseX, double mouseY, int button) {
 		if (button != 0)
 			return false;
-		if (isClientSpinning())
-			return true; // dial is locked while the world spins
 		// map the click back into panel coords through this frame's fit-scale.
 		double lx = (mouseX - px) / scale, ly = (mouseY - py) / scale;
 
-		// Meditate button
+		// the button works in both states: Meditate when idle, Cancel while spinning
 		if (lx >= MeditationLayout.BTN_X && lx < MeditationLayout.BTN_X + MeditationLayout.BTN_W
 				&& ly >= MeditationLayout.BTN_Y && ly < MeditationLayout.BTN_Y + MeditationLayout.BTN_H) {
-			onMeditate();
+			if (isClientSpinning())
+				sendCancel();
+			else
+				onMeditate();
 			return true;
 		}
+		if (isClientSpinning())
+			return true; // dial is locked while the world spins
 		// dial: any click inside the ring picks the nearest hour
 		double dx = lx - MeditationLayout.CX, dy = ly - MeditationLayout.CY;
 		double dist = Math.sqrt(dx * dx + dy * dy);
@@ -246,5 +278,23 @@ public class MeditationPage implements GuiPage {
 		if (p == null || isClientSpinning())
 			return;
 		ClientPacketDistributor.sendToServer(new MeditationGuiButtonMessage(1000 + (((targetHour % 24) + 24) % 24), (int) p.getX(), (int) p.getY(), (int) p.getZ()));
+	}
+
+	// Cancel an in-progress meditation: tell the server to stop advancing and end
+	// the client overlay now (buttonID 2000). Used by the Cancel button and by
+	// closing the GUI mid-spin.
+	private void sendCancel() {
+		Player p = player();
+		if (p != null)
+			ClientPacketDistributor.sendToServer(new MeditationGuiButtonMessage(2000, (int) p.getX(), (int) p.getY(), (int) p.getZ()));
+		stopClientSpin();
+	}
+
+	@Override
+	public void onClose() {
+		// closing the GUI during meditation cancels it (time stops where it reached)
+		if (isClientSpinning())
+			sendCancel();
+		restoreHud();
 	}
 }

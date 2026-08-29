@@ -100,10 +100,8 @@ public class WitcherGuiScreen extends Screen {
 	@Override
 	public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partial) {
 		// When the active page wants the world visible (meditation time-lapse),
-		// skip the opaque base + bg image entirely so the live world renders
-		// behind the Screen; a gentle dim keeps the dial readable.
+		// draw nothing at all - pure live world behind the Screen (F1-clean look).
 		if (activePage().wantsWorldVisible()) {
-			g.fill(0, 0, this.width, this.height, PANEL_DIM);
 			return;
 		}
 
@@ -134,9 +132,12 @@ public class WitcherGuiScreen extends Screen {
 		g.pose().translate(ox, oy);
 		g.pose().scale(s, s);
 		// page fills the region below the navbar; navbar is drawn last (on top /
-		// "reserved") so page content never covers the tabs.
+		// "reserved") so page content never covers the tabs. A page that wants the
+		// world visible (meditation spin) also suppresses the navbar for the
+		// F1-clean look.
 		activePage().render(g, WitcherGuiLayout.contentX(), WitcherGuiLayout.contentY(), WitcherGuiLayout.contentW(), WitcherGuiLayout.contentH(), dmx, dmy, partial);
-		drawNavbar(g);
+		if (!activePage().wantsWorldVisible())
+			drawNavbar(g);
 		g.pose().popMatrix();
 
 		// tooltip in SCREEN space at the real cursor (after the transform is popped)
@@ -187,7 +188,7 @@ public class WitcherGuiScreen extends Screen {
 		float ox = offsetX(s), oy = offsetY(s);
 		int dmx = toDesignX(event.x(), ox, s), dmy = toDesignY(event.y(), oy, s);
 
-		if (event.button() == 0) {
+		if (event.button() == 0 && !activePage().wantsWorldVisible()) {
 			int count = WitcherGuiLayout.NAV.length;
 			for (int i = 0; i < count; i++) {
 				int tx = WitcherGuiLayout.navTabX(count, i);

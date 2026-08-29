@@ -3,6 +3,7 @@ package net.redboltmedia.witchercraft.network;
 import net.redboltmedia.witchercraft.procedures.PauseMenuGuiBackButtonProcedure;
 import net.redboltmedia.witchercraft.procedures.MeditationGuiChangeTimeProcedure;
 import net.redboltmedia.witchercraft.procedures.MeditationStartProcedure;
+import net.redboltmedia.witchercraft.procedures.MeditationStopProcedure;
 import net.redboltmedia.witchercraft.WitchercraftMod;
 
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -61,6 +62,10 @@ public record MeditationGuiButtonMessage(int buttonID, int x, int y, int z) impl
 		// to that hour. Server-authoritative; re-validated in the procedure.
 		if (buttonID >= 1000 && buttonID < 1024) {
 			MeditationStartProcedure.execute(world, x, y, z, entity, buttonID - 1000);
+		}
+		// Cancel an in-progress meditation (Cancel button / GUI closed mid spin).
+		if (buttonID == 2000) {
+			MeditationStopProcedure.execute(world);
 		}
 	}
 

@@ -46,6 +46,6 @@ public class MeditationStartProcedure {
 		WitchercraftModVariables.meditationState = 2;
 
 		if (entity instanceof ServerPlayer sp)
-			PacketDistributor.sendToPlayer(sp, new MeditationSpinMessage(hour, MeditationTickProcedure.DURATION_TICKS));
+			PacketDistributor.sendToPlayer(sp, new MeditationSpinMessage(hour, MeditationTickProcedure.spinDurationTicks(delta)));
 	}
 }
