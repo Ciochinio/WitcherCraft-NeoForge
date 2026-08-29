@@ -1,8 +1,8 @@
 package net.redboltmedia.witchercraft.procedures;
 
 import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
-import net.redboltmedia.witchercraft.network.MeditationSpinMessage;
-import net.redboltmedia.witchercraft.network.MeditationRejectMessage;
+import net.redboltmedia.witchercraft.MeditationSpinMessage;
+import net.redboltmedia.witchercraft.MeditationRejectMessage;
 
 import net.neoforged.neoforge.network.PacketDistributor;
 

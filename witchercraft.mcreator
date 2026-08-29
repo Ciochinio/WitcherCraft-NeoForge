@@ -1,6 +1,188 @@
 {
   "mod_elements": [
     {
+      "name": "WitcherGuiScreen",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "witcher_gui_screen",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WitcherGuiScreen.java"
+        ]
+      },
+      "path": "~/NAVBAR"
+    },
+    {
+      "name": "GuiPage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "gui_page",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/GuiPage.java"
+        ]
+      },
+      "path": "~/NAVBAR"
+    },
+    {
+      "name": "PerkPage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "perk_page",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/PerkPage.java"
+        ]
+      },
+      "path": "~/NAVBAR"
+    },
+    {
+      "name": "PlaceholderPage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "placeholder_page",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/PlaceholderPage.java"
+        ]
+      },
+      "path": "~/NAVBAR"
+    },
+    {
+      "name": "WitcherGuiPages",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "witcher_gui_pages",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WitcherGuiPages.java"
+        ]
+      },
+      "path": "~/NAVBAR"
+    },
+    {
+      "name": "WitcherGuiLayout",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "witcher_gui_layout",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WitcherGuiLayout.java"
+        ]
+      },
+      "path": "~/NAVBAR"
+    },
+    {
+      "name": "WitcherGuiKeybind",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "witcher_gui_keybind",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WitcherGuiKeybind.java"
+        ]
+      },
+      "path": "~/NAVBAR"
+    },
+    {
+      "name": "PerkEquipLayout",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "perk_equip_layout",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/PerkEquipLayout.java"
+        ]
+      },
+      "path": "~/Character Abilities/Perk Gui"
+    },
+    {
+      "name": "PerkRegistry",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "perk_registry",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/PerkRegistry.java"
+        ]
+      },
+      "path": "~/Character Abilities/Perk Gui"
+    },
+    {
+      "name": "PerkTree",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "perk_tree",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/PerkTree.java"
+        ]
+      },
+      "path": "~/Character Abilities/Perk Gui"
+    },
+    {
+      "name": "PerkEquipGuiButtonMessage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "perk_equip_gui_button_message",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/PerkEquipGuiButtonMessage.java"
+        ]
+      },
+      "path": "~/Character Abilities/Perk Gui"
+    },
+    {
+      "name": "PerkEquipVars",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "perk_equip_vars",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/PerkEquipVars.java"
+        ]
+      },
+      "path": "~/Character Abilities/Perk Gui"
+    },
+    {
+      "name": "PerkLearnedVars",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "perk_learned_vars",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/PerkLearnedVars.java"
+        ]
+      },
+      "path": "~/Character Abilities/Perk Gui"
+    },
+    {
+      "name": "MeditationGuiButtonMessage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "meditation_gui_button_message",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/MeditationGuiButtonMessage.java"
+        ]
+      },
+      "path": "~/Meditation"
+    },
+    {
       "name": "PauseMenuKeybindPress",
       "type": "keybind",
       "compiles": true,
@@ -188,7 +370,7 @@
       "registry_name": "meditation_page",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/client/gui/shell/MeditationPage.java"
+          "src/main/java/net/redboltmedia/witchercraft/MeditationPage.java"
         ]
       },
       "path": "~/Meditation"
@@ -201,7 +383,7 @@
       "registry_name": "meditation_layout",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/client/gui/MeditationLayout.java"
+          "src/main/java/net/redboltmedia/witchercraft/MeditationLayout.java"
         ]
       },
       "path": "~/Meditation"
@@ -214,7 +396,7 @@
       "registry_name": "meditation_spin_message",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/network/MeditationSpinMessage.java"
+          "src/main/java/net/redboltmedia/witchercraft/MeditationSpinMessage.java"
         ]
       },
       "path": "~/Meditation"
@@ -227,7 +409,7 @@
       "registry_name": "meditation_reject_message",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/network/MeditationRejectMessage.java"
+          "src/main/java/net/redboltmedia/witchercraft/MeditationRejectMessage.java"
         ]
       },
       "path": "~/Meditation"
@@ -3853,7 +4035,7 @@
           "src/main/java/net/redboltmedia/witchercraft/WitcherHud.java"
         ]
       },
-      "path": "~/Gui"
+      "path": "~/HUD"
     },
     {
       "name": "MedallionShow",
@@ -3873,7 +4055,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/MedallionShowProcedure.java"
         ]
       },
-      "path": "~/Gui"
+      "path": "~/HUD"
     },
     {
       "name": "MedallionSenseRange",
@@ -3888,7 +4070,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/MedallionSenseRangeProcedure.java"
         ]
       },
-      "path": "~/Gui"
+      "path": "~/HUD"
     },
     {
       "name": "MedallionStepNear",
@@ -3903,7 +4085,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/MedallionStepNearProcedure.java"
         ]
       },
-      "path": "~/Gui"
+      "path": "~/HUD"
     },
     {
       "name": "MedallionStepMid",
@@ -3918,7 +4100,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/MedallionStepMidProcedure.java"
         ]
       },
-      "path": "~/Gui"
+      "path": "~/HUD"
     },
     {
       "name": "MedallionSenseAllHostiles",
@@ -3933,7 +4115,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/MedallionSenseAllHostilesProcedure.java"
         ]
       },
-      "path": "~/Gui"
+      "path": "~/HUD"
     },
     {
       "name": "MedallionVariant",
@@ -3953,7 +4135,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/MedallionVariantProcedure.java"
         ]
       },
-      "path": "~/Gui"
+      "path": "~/HUD"
     },
     {
       "name": "MedallionCycle",
@@ -3972,7 +4154,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/MedallionCycleProcedure.java"
         ]
       },
-      "path": "~/Gui"
+      "path": "~/HUD"
     },
     {
       "name": "MedallionCommand",
@@ -4692,7 +4874,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/RecomputeEquippedPerksProcedure.java"
         ]
       },
-      "path": "~/Character Abilities"
+      "path": "~/Character Abilities/Perk Calc"
     },
     {
       "name": "RecomputeEquippedPerksOnLogin",
@@ -4711,7 +4893,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/RecomputeEquippedPerksOnLoginProcedure.java"
         ]
       },
-      "path": "~/Character Abilities"
+      "path": "~/Character Abilities/Perk Calc"
     },
     {
       "name": "ApplyMutagenBonus",
@@ -4730,7 +4912,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/ApplyMutagenBonusProcedure.java"
         ]
       },
-      "path": "~/Character Abilities"
+      "path": "~/Character Abilities/Perk Calc"
     },
     {
       "name": "MutagenMedallionClick",
@@ -4749,7 +4931,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/MutagenMedallionClickProcedure.java"
         ]
       },
-      "path": "~/Character Abilities"
+      "path": "~/Character Abilities/Perk Calc"
     },
     {
       "name": "RecomputeEquippedPerksCombat",
@@ -4768,7 +4950,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/RecomputeEquippedPerksCombatProcedure.java"
         ]
       },
-      "path": "~/Character Abilities"
+      "path": "~/Character Abilities/Perk Calc"
     },
     {
       "name": "RecomputeEquippedPerksAlchemy",
@@ -4787,7 +4969,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/RecomputeEquippedPerksAlchemyProcedure.java"
         ]
       },
-      "path": "~/Character Abilities"
+      "path": "~/Character Abilities/Perk Calc"
     },
     {
       "name": "RecomputeEquippedPerksSigns",
@@ -4806,7 +4988,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/RecomputeEquippedPerksSignsProcedure.java"
         ]
       },
-      "path": "~/Character Abilities"
+      "path": "~/Character Abilities/Perk Calc"
     },
     {
       "name": "RecomputeEquippedPerksGeneral",
@@ -4825,7 +5007,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/RecomputeEquippedPerksGeneralProcedure.java"
         ]
       },
-      "path": "~/Character Abilities"
+      "path": "~/Character Abilities/Perk Calc"
     },
     {
       "name": "DodgeChance",
@@ -10225,6 +10407,14 @@
                 "children": []
               }
             ]
+          },
+          {
+            "name": "Perk Calc",
+            "children": []
+          },
+          {
+            "name": "Perk Gui",
+            "children": []
           }
         ]
       },
@@ -10334,7 +10524,11 @@
         "children": []
       },
       {
-        "name": "Gui",
+        "name": "HUD",
+        "children": []
+      },
+      {
+        "name": "NAVBAR",
         "children": []
       }
     ]

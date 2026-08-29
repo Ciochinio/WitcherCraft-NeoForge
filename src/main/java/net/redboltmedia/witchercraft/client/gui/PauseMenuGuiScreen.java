@@ -3,7 +3,7 @@ package net.redboltmedia.witchercraft.client.gui;
 import net.redboltmedia.witchercraft.world.inventory.PauseMenuGuiMenu;
 import net.redboltmedia.witchercraft.network.PauseMenuGuiButtonMessage;
 import net.redboltmedia.witchercraft.init.WitchercraftModScreens;
-import net.redboltmedia.witchercraft.client.gui.shell.WitcherGuiScreen;
+import net.redboltmedia.witchercraft.WitcherGuiScreen;
 
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
@@ -131,4 +131,4 @@ public class PauseMenuGuiScreen extends AbstractContainerScreen<PauseMenuGuiMenu
 		}).bounds(this.leftPos + 133, this.topPos + 97, 77, 20).build();
 		this.addRenderableWidget(button_skill_tree);
 	}
-}
+}
