@@ -123,6 +123,15 @@
     </div>
     <textarea id="out" spellcheck="false" readonly></textarea>
 
+    <fieldset style="margin-top:12px">
+      <legend id="impToggle">&#9654; Import from Java (paste current WitcherGuiLayout.java)</legend>
+      <div class="howto" id="impBody">
+        <div class="muted" style="margin-bottom:6px">Paste the current <code>WitcherGuiLayout.java</code> to load its values into the editor - so you start from the checked-in file instead of the seed. Reads the design canvas, navbar sizing, level/XP block, <code>NAV[]</code> and <code>BACKGROUNDS[]</code>.</div>
+        <textarea id="imp" spellcheck="false" placeholder="paste WitcherGuiLayout.java here"></textarea>
+        <div class="row" style="margin-top:6px"><button class="sm" id="impBtn">Import</button><span class="muted" id="impMsg"></span></div>
+      </div>
+    </fieldset>
+
     <fieldset style="margin-top:16px">
       <legend id="howtoToggle">&#9654; How to add and connect a new GUI</legend>
       <div class="howto" id="howtoBody">
@@ -130,7 +139,7 @@
         <ol>
           <li><span class="step-title">1. Add the nav tab.</span> Click <b>+ Nav tab</b> above, set its <code>pageId</code> (e.g. <code>crafting</code>), a <code>labelKey</code> (a lang key you'll add to <code>en_us.json</code>), and optionally an <code>icon</code> texture path. Reorder with the arrows. It will show as "Coming soon" in-game until step 3.</li>
           <li><span class="step-title">2. Give it a background (optional but recommended).</span> Set the tab's <code>background</code> field to a texture path, e.g. <code>witchercraft:textures/gui/shell/backgrounds/crafting.png</code> - author that PNG at the design canvas's aspect ratio (16:9 by default) and drop it in <code>src/main/resources/assets/witchercraft/textures/gui/shell/backgrounds/</code>. Leave it blank to use the shared fallback BG.</li>
-          <li><span class="step-title">3. Write the page class.</span> In <code>client/gui/shell/</code>, create e.g. <code>CraftingPage.java</code> implementing <code>GuiPage</code>:
+          <li><span class="step-title">3. Write the page class.</span> In the base package <code>net.redboltmedia.witchercraft</code> (so it opens as a <code>code</code> element in MCreator), create e.g. <code>CraftingPage.java</code> implementing <code>GuiPage</code>:
             <pre class="code">public class CraftingPage implements GuiPage {
     public String id() { return "crafting"; }
     public Component navLabel() { return Component.translatable("gui.witchercraft.shell.nav.crafting"); }
@@ -450,6 +459,7 @@ COLOR_KEYS.forEach(k=>{
   el.addEventListener('input',()=>{ S[k]=el.value; build(); });
 });
 $('BG').value=S.BG; $('BG').addEventListener('input',()=>{ S.BG=$('BG').value; renderOut(); });
+function syncInputs(){ NUM_KEYS.forEach(k=>$(k).value=S[k]); COLOR_KEYS.forEach(k=>$(k).value=S[k]); $('BG').value=S.BG; }
 $('zoom').value=zoom;
 $('zoom').addEventListener('input',()=>{ const v=parseFloat($('zoom').value); if(v>=0.4){ zoom=v; build(); } });
 
@@ -458,13 +468,42 @@ $('copyBtn').addEventListener('click', async ()=>{ out.select();
   catch{ document.execCommand('copy'); flash($('copyBtn'),'Copied!'); } });
 function flash(b,m){ const t=b.textContent; b.textContent=m; setTimeout(()=>b.textContent=t,1200); }
 $('resetBtn').addEventListener('click',()=>{ S=structuredClone(SEED); zoom=1.6;
-  NUM_KEYS.forEach(k=>$(k).value=S[k]); COLOR_KEYS.forEach(k=>$(k).value=S[k]);
-  $('BG').value=S.BG; $('zoom').value=zoom; sel=null; build(); });
+  syncInputs(); $('zoom').value=zoom; sel=null; build(); });
 
 $('loadBg').addEventListener('click',()=>$('bgFile').click());
 $('bgFile').addEventListener('change',e=>{ const f=e.target.files[0]; if(!f) return; const url=URL.createObjectURL(f);
   let img=document.getElementById('bg'); if(!img){ img=document.createElement('img'); img.id='bg'; stage.prepend(img); } img.src=url; });
 $('clearBg').addEventListener('click',()=>{ const img=document.getElementById('bg'); if(img) img.remove(); });
+
+// ---- import from Java ------------------------------------------------------
+function parseLayoutJava(txt){
+  const S2 = structuredClone(SEED);
+  const intOf=(n)=>{ const m=txt.match(new RegExp('\\bint\\s+'+n+'\\s*=\\s*(-?\\d+)\\s*;')); return m?parseInt(m[1],10):undefined; };
+  const hexOf=(n)=>{ const m=txt.match(new RegExp('\\bint\\s+'+n+'\\s*=\\s*(0x[0-9A-Fa-f]+)\\s*;')); return m?m[1]:undefined; };
+  const strOf=(n)=>{ const m=txt.match(new RegExp('\\bString\\s+'+n+'\\s*=\\s*"([^"]*)"\\s*;')); return m?m[1]:undefined; };
+  NUM_KEYS.forEach(k=>{ const v=intOf(k); if(v!==undefined) S2[k]=v; });
+  COLOR_KEYS.forEach(k=>{ const v=hexOf(k); if(v!==undefined) S2[k]=v; });
+  const bg=strOf('BG'); if(bg!==undefined) S2.BG=bg;
+  const navs=[...txt.matchAll(/new\s+Nav\(\s*"([^"]*)"\s*,\s*"([^"]*)"\s*,\s*"([^"]*)"\s*\)/g)]
+    .map(m=>({pageId:m[1],labelKey:m[2],icon:m[3],background:""}));
+  if(navs.length){
+    [...txt.matchAll(/new\s+Background\(\s*"([^"]*)"\s*,\s*"([^"]*)"\s*\)/g)]
+      .forEach(m=>{ const e=navs.find(n=>n.pageId===m[1]); if(e) e.background=m[2]; });
+    S2.NAV=navs;
+  }
+  return S2;
+}
+$('impToggle').addEventListener('click', ()=>{
+  const body=$('impBody'); const open=body.classList.toggle('open');
+  $('impToggle').innerHTML = (open?'&#9660;':'&#9654;')+' Import from Java (paste current WitcherGuiLayout.java)';
+});
+$('impBtn').addEventListener('click', ()=>{
+  const txt=$('imp').value;
+  if(!txt.trim()){ $('impMsg').textContent='Paste some Java first.'; return; }
+  try{ S=parseLayoutJava(txt); syncInputs(); sel=null; build();
+    $('impMsg').textContent='Imported '+S.NAV.length+' tabs.'; }
+  catch(e){ $('impMsg').textContent='Parse error: '+e.message; }
+});
 
 $('howtoToggle').addEventListener('click', ()=>{
   const body=$('howtoBody'); const open=body.classList.toggle('open');

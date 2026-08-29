@@ -120,6 +120,13 @@
       <button id="resetBtn">Reset to seeded layout</button>
     </div>
     <textarea id="out" spellcheck="false" readonly></textarea>
+
+    <fieldset style="margin-top:12px">
+      <legend>Import from Java</legend>
+      <div class="hint" style="color:var(--dim);margin-bottom:6px">Paste the current <code>PerkEquipLayout.java</code> to load its values into the editor - so you start from the checked-in file instead of the seed. Reads panel/slot/socket/medallion values (the debug palette block is carried through unchanged).</div>
+      <textarea id="impArea" spellcheck="false" style="height:120px" placeholder="paste PerkEquipLayout.java here"></textarea>
+      <div class="row" style="margin-top:6px"><button id="impDo">Import</button><span class="hint" style="color:var(--dim)" id="impInfo"></span></div>
+    </fieldset>
   </div>
 </div>
 
@@ -299,7 +306,7 @@ document.addEventListener('keydown', e=>{
 function arr(a){ return '{'+a.join(', ')+'}'; }
 function renderOut(){
   const j =
-`package net.redboltmedia.witchercraft.client.gui;
+`package net.redboltmedia.witchercraft;
 
 /**
  * Data-driven geometry for the perk equip panel.
@@ -385,9 +392,30 @@ $('copyBtn').addEventListener('click', async ()=>{
 });
 function flash(btn,msg){ const t=btn.textContent; btn.textContent=msg; setTimeout(()=>btn.textContent=t,1200); }
 
-$('resetBtn').addEventListener('click', ()=>{ S=structuredClone(SEED); zoom=3; $('zoom').value=3;
+function syncEquipInputs(){
   ['panelW:PANEL_W','panelH:PANEL_H','slotSize:SLOT_SIZE','socketSize:SOCKET_SIZE','medW:MEDALLION_W','medH:MEDALLION_H'].forEach(p=>{const[a,b]=p.split(':');$(a).value=S[b];});
-  $('medOn').checked=S.MEDALLION_ENABLED; selected=null; build(); });
+  $('medOn').checked=S.MEDALLION_ENABLED;
+}
+$('resetBtn').addEventListener('click', ()=>{ S=structuredClone(SEED); zoom=3; $('zoom').value=3;
+  syncEquipInputs(); selected=null; build(); });
+
+// ---- import from Java ----
+function parseEquipJava(txt){
+  const S2=structuredClone(SEED);
+  const intOf=n=>{const m=txt.match(new RegExp('\\bint\\s+'+n+'\\s*=\\s*(-?\\d+)\\s*;'));return m?parseInt(m[1],10):undefined;};
+  const boolOf=n=>{const m=txt.match(new RegExp('\\bboolean\\s+'+n+'\\s*=\\s*(true|false)\\s*;'));return m?m[1]==='true':undefined;};
+  const arrOf=n=>{const m=txt.match(new RegExp('\\bint\\[\\]\\s+'+n+'\\s*=\\s*\\{([^}]*)\\}'));return m?m[1].split(',').map(s=>parseInt(s.trim(),10)).filter(v=>!isNaN(v)):undefined;};
+  ['PANEL_W','PANEL_H','SLOT_SIZE','SOCKET_SIZE','MEDALLION_X','MEDALLION_Y','MEDALLION_W','MEDALLION_H'].forEach(k=>{const v=intOf(k);if(v!==undefined)S2[k]=v;});
+  const me=boolOf('MEDALLION_ENABLED'); if(me!==undefined)S2.MEDALLION_ENABLED=me;
+  ['SLOT_X','SLOT_Y','SOCKET_X','SOCKET_Y'].forEach(k=>{const v=arrOf(k);if(v&&v.length)S2[k]=v;});
+  return S2;
+}
+$('impDo').addEventListener('click', ()=>{
+  const t=$('impArea').value;
+  if(!t.trim()){ $('impInfo').textContent='Paste some Java first.'; return; }
+  try{ S=parseEquipJava(t); syncEquipInputs(); selected=null; build(); $('impInfo').textContent='Imported.'; }
+  catch(e){ $('impInfo').textContent='Parse error: '+e.message; }
+});
 
 // background image
 $('loadBg').addEventListener('click', ()=>$('bgFile').click());

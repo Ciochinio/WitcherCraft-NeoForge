@@ -67,6 +67,13 @@
       <button id="reset">Reset defaults</button>
     </div>
     <textarea id="out" spellcheck="false"></textarea>
+
+    <fieldset style="margin-top:12px">
+      <legend>Import from Java</legend>
+      <div style="color:var(--dim);margin-bottom:6px">Paste the current <code>MeditationLayout.java</code> to load its numbers, orb textures and colours into the editor - so you start from the checked-in file instead of the defaults.</div>
+      <textarea id="impArea" spellcheck="false" style="height:120px" placeholder="paste MeditationLayout.java here"></textarea>
+      <div class="row" style="margin-top:6px"><button id="impDo">Import</button><span style="color:var(--dim)" id="impInfo"></span></div>
+    </fieldset>
   </div>
 </div>
 
@@ -283,13 +290,13 @@ svg.addEventListener("pointerup",()=>{ drag=null; });
 function regen(){
   const n=k=>S[k];
   const out=
-`package net.redboltmedia.witchercraft.client.gui;
+`package net.redboltmedia.witchercraft;
 
 /**
  * Data-driven geometry + colours for the meditation clock dial.
  *
  * All coordinates are PANEL-LOCAL (relative to a fixed PANEL_W x PANEL_H design
- * box). {@link net.redboltmedia.witchercraft.client.gui.shell.MeditationPage}
+ * box). {@link net.redboltmedia.witchercraft.MeditationPage}
  * fit-scales this panel uniformly (centred) into the shell content region, the
  * same way the perk page maps {@link PerkEquipLayout}. The dial reads day-up:
  * hour h sits at angle h/24 * 2PI + PI, so NOON is at the top and 00:00 at the
@@ -392,6 +399,25 @@ document.getElementById("copy").addEventListener("click",()=>{
 });
 document.getElementById("reset").addEventListener("click",()=>{
   S=Object.assign({},DEFAULTS); T=Object.assign({},STRINGS); C=Object.assign({},COLORS); P=Object.assign({},PREVIEW); redraw();
+});
+
+// ---- import from Java ----
+function parseDialJava(txt){
+  const S2=Object.assign({},DEFAULTS), T2=Object.assign({},STRINGS), C2=Object.assign({},COLORS);
+  const intOf=n=>{const m=txt.match(new RegExp('\\bint\\s+'+n+'\\s*=\\s*(-?\\d+)\\s*;'));return m?parseInt(m[1],10):undefined;};
+  const hexOf=n=>{const m=txt.match(new RegExp('\\bint\\s+'+n+'\\s*=\\s*(0x[0-9A-Fa-f]+)\\s*;'));return m?m[1]:undefined;};
+  const strOf=n=>{const m=txt.match(new RegExp('\\bString\\s+'+n+'\\s*=\\s*"([^"]*)"\\s*;'));return m?m[1]:undefined;};
+  Object.keys(DEFAULTS).forEach(k=>{const v=intOf(k);if(v!==undefined)S2[k]=v;});
+  Object.keys(STRINGS).forEach(k=>{const v=strOf(k);if(v!==undefined)T2[k]=v;});
+  Object.keys(COLORS).forEach(k=>{const v=hexOf(k);if(v!==undefined)C2[k]=v;});
+  return {S:S2,T:T2,C:C2};
+}
+document.getElementById("impDo").addEventListener("click",()=>{
+  const t=document.getElementById("impArea").value;
+  const info=document.getElementById("impInfo");
+  if(!t.trim()){ info.textContent='Paste some Java first.'; return; }
+  try{ const r=parseDialJava(t); S=r.S; T=r.T; C=r.C; redraw(); info.textContent='Imported.'; }
+  catch(e){ info.textContent='Parse error: '+e.message; }
 });
 
 redraw();

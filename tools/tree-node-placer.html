@@ -91,6 +91,13 @@
       <button id="resetBtn">Reset to default grid</button>
     </div>
     <textarea id="out" spellcheck="false" readonly></textarea>
+
+    <fieldset style="margin-top:12px">
+      <legend>Import from Java</legend>
+      <div style="color:var(--dim);margin-bottom:6px">Paste the current <code>PerkTree.java</code> to load its node positions + prerequisites into the editor. Unknown perk ids are ignored; any perk missing from the paste keeps its default-grid position.</div>
+      <textarea id="impArea" spellcheck="false" style="height:120px" placeholder="paste PerkTree.java here"></textarea>
+      <div class="row" style="margin-top:6px"><button id="impDo">Import</button><span style="color:var(--dim)" id="impInfo"></span></div>
+    </fieldset>
   </div>
 </div>
 
@@ -278,7 +285,7 @@ function renderOut(){
     body += '\t\t\tnew Node('+args+'),'+(nd.prereqs.length?' // requires '+nd.prereqs.map(p=>NAME[p]).join(', '):'')+'\n';
   }
   out.value =
-`package net.redboltmedia.witchercraft.client.gui;
+`package net.redboltmedia.witchercraft;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -352,6 +359,29 @@ $('linkMode').addEventListener('change',()=>{ linkMode=$('linkMode').checked; li
 $('copyBtn').addEventListener('click',async()=>{ out.select(); try{ await navigator.clipboard.writeText(out.value);}catch{document.execCommand('copy');}
   const b=$('copyBtn'), t=b.textContent; b.textContent='Copied!'; setTimeout(()=>b.textContent=t,1200); });
 $('resetBtn').addEventListener('click',()=>{ if(confirm('Reset ALL branches to the default grid and clear prerequisites?')){ nodes=defaultGrid(); linkSource=null; selected=null; build(); } });
+
+// ---- import from Java ----
+function parseTreeJava(txt){
+  const n=defaultGrid();
+  const ns=txt.match(/\bint\s+NODE_SIZE\s*=\s*(\d+)\s*;/);
+  const size=ns?parseInt(ns[1],10):nodeSize;
+  let count=0;
+  for(const m of [...txt.matchAll(/new\s+Node\(([^)]*)\)/g)]){
+    const nums=m[1].split(',').map(s=>parseInt(s.trim(),10)).filter(v=>!isNaN(v));
+    if(nums.length<3) continue;
+    const id=nums[0]; if(!(id in NAME)) continue;
+    n[id]={x:nums[1], y:nums[2], prereqs:nums.slice(3)};
+    count++;
+  }
+  return {nodes:n, size, count};
+}
+$('impDo').addEventListener('click',()=>{
+  const t=$('impArea').value;
+  if(!t.trim()){ $('impInfo').textContent='Paste some Java first.'; return; }
+  try{ const r=parseTreeJava(t); nodes=r.nodes; nodeSize=r.size; $('nodeSize').value=nodeSize;
+    linkSource=null; selected=null; build(); $('impInfo').textContent='Imported '+r.count+' nodes.'; }
+  catch(e){ $('impInfo').textContent='Parse error: '+e.message; }
+});
 $('loadBg').addEventListener('click',()=>$('bgFile').click());
 $('bgFile').addEventListener('change',e=>{ const f=e.target.files[0]; if(!f)return; const url=URL.createObjectURL(f);
   let img=$('bg'); if(!img){ img=document.createElement('img'); img.id='bg'; stage.prepend(img);} img.src=url; img.style.opacity=(+$('bgOpacity').value/100); });
