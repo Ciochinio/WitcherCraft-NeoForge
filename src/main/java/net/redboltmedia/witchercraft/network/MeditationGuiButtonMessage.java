@@ -1,7 +1,5 @@
 package net.redboltmedia.witchercraft.network;
 
-import net.redboltmedia.witchercraft.procedures.PauseMenuGuiBackButtonProcedure;
-import net.redboltmedia.witchercraft.procedures.MeditationGuiChangeTimeProcedure;
 import net.redboltmedia.witchercraft.procedures.MeditationStartProcedure;
 import net.redboltmedia.witchercraft.procedures.MeditationStopProcedure;
 import net.redboltmedia.witchercraft.WitchercraftMod;
@@ -50,14 +48,7 @@ public record MeditationGuiButtonMessage(int buttonID, int x, int y, int z) impl
 		// security measure to prevent arbitrary chunk generation
 		if (!world.getChunkSource().hasChunk(SectionPos.blockToSectionCoord(x), SectionPos.blockToSectionCoord(z)))
 			return;
-		if (buttonID == 0) {
-
-			PauseMenuGuiBackButtonProcedure.execute(world, x, y, z, entity);
-		}
-		if (buttonID == 1) {
-
-			MeditationGuiChangeTimeProcedure.execute(world, entity);
-		}
+		// buttonID 0/1 (old container's back + slider-commit) retired in slice 4.
 		// New dial: buttonID = 1000 + targetHour -> start an accelerated meditation
 		// to that hour. Server-authoritative; re-validated in the procedure.
 		if (buttonID >= 1000 && buttonID < 1024) {

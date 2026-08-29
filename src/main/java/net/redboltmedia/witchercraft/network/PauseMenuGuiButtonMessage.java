@@ -47,10 +47,9 @@ public record PauseMenuGuiButtonMessage(int buttonID, int x, int y, int z) imple
 		// security measure to prevent arbitrary chunk generation
 		if (!world.getChunkSource().hasChunk(SectionPos.blockToSectionCoord(x), SectionPos.blockToSectionCoord(z)))
 			return;
-		if (buttonID == 0) {
-
-			MeditationGuiOpenProcedure.execute(world, x, y, z, entity);
-		}
+		// buttonID 0 ("Meditation") retired in slice 4: the old container GUI + opener
+		// are gone; PauseMenuGuiScreen now opens the shell's meditation tab directly
+		// (client-only, no server action), same as the Skill Tree button.
 		if (buttonID == 1) {
 
 			CharacterGuiOpenProcedure.execute(world, x, y, z, entity);

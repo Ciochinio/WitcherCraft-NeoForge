@@ -78,13 +78,12 @@ public class PauseMenuGuiScreen extends AbstractContainerScreen<PauseMenuGuiMenu
 	@Override
 	public void init() {
 		super.init();
+		// Meditation now lives in the WitcherCraft shell (key U) - open it directly,
+		// client-side, same as the Skills button below. No server round-trip: opening
+		// a screen is not server-authoritative state (the old container GUI + opener
+		// were retired in slice 4).
 		button_meditation = Button.builder(Component.translatable("gui.witchercraft.pause_menu_gui.button_meditation"), e -> {
-			int x = PauseMenuGuiScreen.this.x;
-			int y = PauseMenuGuiScreen.this.y;
-			if (true) {
-				ClientPacketDistributor.sendToServer(new PauseMenuGuiButtonMessage(0, x, y, z));
-				PauseMenuGuiButtonMessage.handleButtonAction(entity, 0, x, y, z);
-			}
+			Minecraft.getInstance().setScreen(new WitcherGuiScreen("meditation"));
 		}).bounds(this.leftPos + 216, this.topPos + 97, 77, 20).build();
 		this.addRenderableWidget(button_meditation);
 		button_character = Button.builder(Component.translatable("gui.witchercraft.pause_menu_gui.button_character"), e -> {

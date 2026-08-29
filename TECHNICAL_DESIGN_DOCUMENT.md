@@ -764,9 +764,11 @@ divergence risk the way the `en_us.json` gotcha (3.11) is.
 - **Placeholder pages.** Only Skills is a real page; Inventory / Alchemy / Bombs / Map / Glossary are
   `PlaceholderPage` "coming soon" tabs until each is built (own class + own tool). None wire real
   item slots yet - a page that needs live inventory slots must bring a container.
-- **Existing standalone screens are not yet folded in.** Alchemy, Meditation, Glossary, etc. remain
-  their own container screens; only the perk screen has moved into the shell. They can be re-homed as
-  pages later, or bridged (a tab that opens the old screen) in the interim.
+- **Existing standalone screens are only partly folded in.** The perk screen (Skills) and Meditation
+  are now real shell pages; Meditation's old container GUI + in-world opener were deleted outright in
+  the meditation-redesign slice 4, and the ESC pause-menu "Meditation" button now opens the shell tab
+  client-side (like the Skills button). Alchemy, Glossary, etc. still remain their own container
+  screens - they can be re-homed as pages later, or bridged (a tab that opens the old screen).
 - **Placeholder art.** The navbar icons (`textures/gui/nav/<page>.png`) and every page's background
   (`textures/gui/shell/backgrounds/<page>.png`, falling back to `textures/gui/shell/background.png`)
   are generated placeholders meant to be replaced. Backgrounds are fit to the 16:9 design canvas

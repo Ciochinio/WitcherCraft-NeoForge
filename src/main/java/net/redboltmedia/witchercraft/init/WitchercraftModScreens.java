@@ -15,7 +15,6 @@ public class WitchercraftModScreens {
 	@SubscribeEvent
 	public static void clientLoad(RegisterMenuScreensEvent event) {
 		event.register(WitchercraftModMenus.PAUSE_MENU_GUI.get(), PauseMenuGuiScreen::new);
-		event.register(WitchercraftModMenus.MEDITATION_GUI.get(), MeditationGuiScreen::new);
 		event.register(WitchercraftModMenus.ALCHEMY_GUI.get(), AlchemyGuiScreen::new);
 		event.register(WitchercraftModMenus.GLOSSARY_MENU_GUI.get(), GlossaryMenuGuiScreen::new);
 		event.register(WitchercraftModMenus.BESTIARY_MENU_GUI.get(), BestiaryMenuGuiScreen::new);

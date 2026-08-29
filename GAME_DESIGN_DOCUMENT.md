@@ -710,10 +710,13 @@ is shown while it's running.
 
 ### Meditation
 
-Meditation is a clock. Open it and pick an hour on a 24-hour dial, and the world jumps to that
-time. It replaces sleeping as the way to move time, and it exists for the hunt: waiting for night
-to bring out the monsters that only appear then, skipping to daylight, or simply passing the time
-while Toxicity drains back to safe.
+Meditation is a clock. Open it - from the menu tab, its keybind, or the pause-menu button - pick an
+hour on a 24-hour dial, and the world time-lapses to that hour: the real sky accelerates forward
+while the GUI fades out, rather than a jarring instant jump. It replaces sleeping as the way to move
+time, and it exists for the hunt: waiting for night to bring out the monsters that only appear then,
+skipping to daylight, or simply passing the time while Toxicity drains back to safe. You cannot
+meditate boxed into a tight space or with monsters nearby, and a campfire is placed for you; because
+meditation is not rest, it does not hold off the phantoms that a lack of sleep brings.
 
 ### Glossary
 
