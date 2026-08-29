@@ -96,24 +96,41 @@ public class MeditationPage implements GuiPage {
 		}
 	}
 
-	/** Fullscreen black overlay alpha (0..1): fade in at the start, fade out at the end. */
+	/** Fullscreen black overlay alpha (0..1): fades IN from black at the very start only. */
 	private static float spinFadeAlphaValue() {
 		if (!spinActive)
 			return 0f;
 		long e = spinElapsed();
 		if (e < FADE_MS)
 			return 1f - e / (float) FADE_MS; // fade in from black
+		return 0f; // the finish is handled by fading the dial itself, not a black flash
+	}
+
+	/**
+	 * The dial's own opacity (0..1). Full while spinning; in the last FADE_MS it
+	 * fades the clock (ticks, hands, text, button - everything this page draws)
+	 * down to fully transparent, so what remains at the end is just the plain
+	 * world (the HUD is already hidden) - not a black flash. The shell then closes
+	 * once this reaches 0, which is visually seamless.
+	 */
+	private static float contentAlphaValue() {
+		if (!spinActive)
+			return 1f;
+		long e = spinElapsed();
 		if (e < spinMs)
-			return 0f; // world fully visible
+			return 1f;
 		if (e < spinMs + FADE_MS)
-			return (e - spinMs) / (float) FADE_MS; // fade out to black
-		return 1f; // finished; hold black until the shell closes this frame
+			return 1f - (e - spinMs) / (float) FADE_MS;
+		return 0f;
 	}
 
 	// Per-frame panel->screen mapping (set at the top of render), reused by input.
 	private float scale;
 	private float px, py;
 	private Font font;
+	// This frame's dial opacity (see contentAlphaValue) - all draw calls go through
+	// fillA/textA below, which apply it to every colour's alpha channel.
+	private float contentAlpha = 1f;
 
 	public MeditationPage(String pageId) {
 		this.pageId = pageId;
@@ -172,6 +189,8 @@ public class MeditationPage implements GuiPage {
 		if (spinActive && spinElapsed() >= spinMs + FADE_MS)
 			pendingClose = true;
 
+		this.contentAlpha = contentAlphaValue();
+
 		double nowHour = currentHourFloat();
 		if (targetHour < 0)
 			targetHour = ((int) Math.ceil(nowHour)) % 24; // first open -> next hour
@@ -195,7 +214,7 @@ public class MeditationPage implements GuiPage {
 		drawTargetGlyph(g);
 		// centre hub
 		int hub = MeditationLayout.HUB_HALF;
-		g.fill(MeditationLayout.CX - hub, MeditationLayout.CY - hub, MeditationLayout.CX + hub + 1, MeditationLayout.CY + hub + 1, MeditationLayout.COL_HUB);
+		fillA(g, MeditationLayout.CX - hub, MeditationLayout.CY - hub, MeditationLayout.CX + hub + 1, MeditationLayout.CY + hub + 1, MeditationLayout.COL_HUB);
 
 		// readouts (centred on CX)
 		Component now = Component.translatable("gui.witchercraft.shell.meditation.now", clock(nowHour));
@@ -206,9 +225,9 @@ public class MeditationPage implements GuiPage {
 		// Meditate button
 		int bx = MeditationLayout.BTN_X, by = MeditationLayout.BTN_Y, bw = MeditationLayout.BTN_W, bh = MeditationLayout.BTN_H;
 		boolean hover = lmx >= bx && lmx < bx + bw && lmy >= by && lmy < by + bh;
-		g.fill(bx, by, bx + bw, by + bh, hover ? MeditationLayout.COL_BTN_BG_HOVER : MeditationLayout.COL_BTN_BG);
-		g.fill(bx, by, bx + bw, by + 1, MeditationLayout.COL_BTN_BORDER);
-		g.fill(bx, by + bh - 1, bx + bw, by + bh, MeditationLayout.COL_BTN_BORDER);
+		fillA(g, bx, by, bx + bw, by + bh, hover ? MeditationLayout.COL_BTN_BG_HOVER : MeditationLayout.COL_BTN_BG);
+		fillA(g, bx, by, bx + bw, by + 1, MeditationLayout.COL_BTN_BORDER);
+		fillA(g, bx, by + bh - 1, bx + bw, by + bh, MeditationLayout.COL_BTN_BORDER);
 		// while spinning the same button becomes Cancel (stop the meditation)
 		Component btnLabel = Component.translatable(cancellable() ? "gui.witchercraft.shell.meditation.cancel" : "gui.witchercraft.shell.meditation.button");
 		centeredText(g, btnLabel, bx + bw / 2, by + bh / 2 - 4, MeditationLayout.COL_BTN_TEXT);
@@ -229,7 +248,7 @@ public class MeditationPage implements GuiPage {
 				int lx = MeditationLayout.CX + (int) (Math.sin(a) * MeditationLayout.LABEL_RADIUS);
 				int ly = MeditationLayout.CY - (int) (Math.cos(a) * MeditationLayout.LABEL_RADIUS);
 				String s = String.valueOf(hHour);
-				g.text(font, Component.literal(s), lx - font.width(s) / 2, ly - 4, MeditationLayout.COL_TICK_MAJOR, false);
+				textA(g, Component.literal(s), lx - font.width(s) / 2, ly - 4, MeditationLayout.COL_TICK_MAJOR);
 			}
 		}
 	}
@@ -239,7 +258,7 @@ public class MeditationPage implements GuiPage {
 		g.pose().pushMatrix();
 		g.pose().translate(MeditationLayout.CX, MeditationLayout.CY);
 		g.pose().rotate((float) (hour / 24.0 * TAU));
-		g.fill(-half, -len, half, MeditationLayout.HUB_HALF, col); // up = towards the hour before rotation
+		fillA(g, -half, -len, half, MeditationLayout.HUB_HALF, col); // up = towards the hour before rotation
 		g.pose().popMatrix();
 	}
 
@@ -248,7 +267,7 @@ public class MeditationPage implements GuiPage {
 		g.pose().pushMatrix();
 		g.pose().translate(MeditationLayout.CX, MeditationLayout.CY);
 		g.pose().rotate((float) (hour / 24.0 * TAU));
-		g.fill(-half, -rOuter, half, -rInner, col);
+		fillA(g, -half, -rOuter, half, -rInner, col);
 		g.pose().popMatrix();
 	}
 
@@ -259,11 +278,30 @@ public class MeditationPage implements GuiPage {
 		int gy = MeditationLayout.CY - (int) (Math.cos(a) * MeditationLayout.RADIUS);
 		boolean day = targetHour >= 6 && targetHour < 18;
 		int hs = MeditationLayout.GLYPH_HALF;
-		g.fill(gx - hs, gy - hs, gx + hs + 1, gy + hs + 1, day ? MeditationLayout.COL_SUN : MeditationLayout.COL_MOON);
+		fillA(g, gx - hs, gy - hs, gx + hs + 1, gy + hs + 1, day ? MeditationLayout.COL_SUN : MeditationLayout.COL_MOON);
 	}
 
 	private void centeredText(GuiGraphicsExtractor g, Component c, int centerX, int topY, int col) {
-		g.text(font, c, centerX - font.width(c) / 2, topY, col, false);
+		textA(g, c, centerX - font.width(c) / 2, topY, col);
+	}
+
+	// ---- alpha-aware drawing primitives ---------------------------------------
+	// Every draw in this page goes through these two, so contentAlpha (the
+	// finishing fade-to-transparent) applies uniformly without touching each
+	// call site's colour math.
+
+	private void fillA(GuiGraphicsExtractor g, int x1, int y1, int x2, int y2, int argb) {
+		g.fill(x1, y1, x2, y2, withAlpha(argb, contentAlpha));
+	}
+
+	private void textA(GuiGraphicsExtractor g, Component c, int x, int y, int argb) {
+		g.text(font, c, x, y, withAlpha(argb, contentAlpha), false);
+	}
+
+	private static int withAlpha(int argb, float mul) {
+		int a = (argb >>> 24) & 0xFF;
+		int newA = Math.round(a * Math.max(0f, Math.min(1f, mul)));
+		return (newA << 24) | (argb & 0x00FFFFFF);
 	}
 
 	// ---- time formatting -----------------------------------------------------
