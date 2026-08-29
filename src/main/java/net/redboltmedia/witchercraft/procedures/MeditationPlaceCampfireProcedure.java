@@ -40,13 +40,15 @@ public class MeditationPlaceCampfireProcedure {
 				return;
 		}
 
-		// candidates, all >= MIN_DIST blocks away, ordered by facing:
-		// straight ahead (2 then 3), the two front diagonals, the sides, then behind.
+		// candidate COLUMNS, all >= MIN_DIST blocks away horizontally, ordered by
+		// facing: straight ahead (2 then 3), the two front diagonals, the sides, then
+		// behind. Only the height is searched per column (see findFloorSpot), so the
+		// campfire is never placed closer than MIN_DIST to the player - never under them.
 		Direction front = entity.getDirection();
 		Direction right = front.getClockWise();
 		Direction left = front.getCounterClockWise();
 		BlockPos ahead = base.relative(front, MIN_DIST);
-		BlockPos[] candidates = {
+		BlockPos[] columns = {
 				ahead,
 				base.relative(front, MIN_DIST + 1),
 				ahead.relative(right),
@@ -56,11 +58,27 @@ public class MeditationPlaceCampfireProcedure {
 				base.relative(front.getOpposite(), MIN_DIST),
 		};
 
-		for (BlockPos spot : candidates) {
-			if (level.isEmptyBlock(spot) && !level.isEmptyBlock(spot.below())) {
+		for (BlockPos col : columns) {
+			BlockPos spot = findFloorSpot(level, col);
+			if (spot != null) {
 				level.setBlock(spot, Blocks.CAMPFIRE.defaultBlockState(), 3);
 				return;
 			}
 		}
+	}
+
+	/**
+	 * In a column at the player's feet level, search a small vertical window (a few
+	 * blocks up and down, to cope with slopes/steps) for an open cell with a solid
+	 * floor beneath. Only Y changes here - the horizontal offset is fixed by the
+	 * caller (>= MIN_DIST), so this can never bring the campfire under the player.
+	 */
+	private static BlockPos findFloorSpot(ServerLevel level, BlockPos col) {
+		for (int dy = 2; dy >= -3; dy--) {
+			BlockPos p = col.offset(0, dy, 0);
+			if (level.isEmptyBlock(p) && !level.isEmptyBlock(p.below()))
+				return p;
+		}
+		return null;
 	}
 }

@@ -8,7 +8,9 @@ import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 
 /**
@@ -41,6 +43,12 @@ public class MeditationPage implements GuiPage {
 	private static double hourAngle(double hour) {
 		return hour / 24.0 * TAU + DIAL_OFFSET;
 	}
+
+	// Time-of-day orb textures (parsed once); positions/sizes come from MeditationLayout.
+	private static final Identifier ORB_DAWN = Identifier.parse(MeditationLayout.ORB_DAWN_TEX);
+	private static final Identifier ORB_NOON = Identifier.parse(MeditationLayout.ORB_NOON_TEX);
+	private static final Identifier ORB_DUSK = Identifier.parse(MeditationLayout.ORB_DUSK_TEX);
+	private static final Identifier ORB_NIGHT = Identifier.parse(MeditationLayout.ORB_NIGHT_TEX);
 
 	private final String pageId;
 
@@ -236,9 +244,10 @@ public class MeditationPage implements GuiPage {
 		g.pose().scale(scale, scale);
 
 		drawTicks(g);
-		drawHand(g, nowHour, MeditationLayout.HAND_CURRENT_LEN, MeditationLayout.HAND_CURRENT_HALF, MeditationLayout.COL_HAND_CURRENT);
-		drawHand(g, targetHour, MeditationLayout.HAND_TARGET_LEN, MeditationLayout.HAND_TARGET_HALF, MeditationLayout.COL_HAND_TARGET);
-		drawTargetGlyph(g);
+		drawOrbs(g);
+		drawArc(g, nowHour, targetHour);
+		drawArrow(g, nowHour, MeditationLayout.HAND_CURRENT_LEN, MeditationLayout.HAND_CURRENT_HALF, MeditationLayout.COL_HAND_CURRENT);
+		drawArrow(g, targetHour, MeditationLayout.HAND_TARGET_LEN, MeditationLayout.HAND_TARGET_HALF, MeditationLayout.COL_HAND_TARGET);
 		// centre hub
 		int hub = MeditationLayout.HUB_HALF;
 		fillA(g, MeditationLayout.CX - hub, MeditationLayout.CY - hub, MeditationLayout.CX + hub + 1, MeditationLayout.CY + hub + 1, MeditationLayout.COL_HUB);
@@ -270,7 +279,7 @@ public class MeditationPage implements GuiPage {
 			int half = major ? MeditationLayout.TICK_MAJOR_HALF : MeditationLayout.TICK_MINOR_HALF;
 			int col = major ? MeditationLayout.COL_TICK_MAJOR : MeditationLayout.COL_TICK_MINOR;
 			drawRadial(g, hHour, MeditationLayout.RADIUS, MeditationLayout.RADIUS - len, half, col);
-			if (major) {
+			if (major && MeditationLayout.SHOW_NUMBERS != 0) {
 				double a = hourAngle(hHour);
 				int lx = MeditationLayout.CX + (int) (Math.sin(a) * MeditationLayout.LABEL_RADIUS);
 				int ly = MeditationLayout.CY - (int) (Math.cos(a) * MeditationLayout.LABEL_RADIUS);
@@ -280,12 +289,27 @@ public class MeditationPage implements GuiPage {
 		}
 	}
 
-	/** A hand from the hub outward to {@code len}, {@code half}px each side, at hour. */
-	private void drawHand(GuiGraphicsExtractor g, double hour, int len, int half, int col) {
+	/**
+	 * A clock hand drawn as an ARROW at {@code hour}: a shaft from the hub out to the
+	 * arrowhead base, then a triangular head tapering to the tip at {@code len}. Drawn
+	 * in the rotated frame (up = towards the hour), the head is a stack of 1px rows so
+	 * it works with axis-aligned fills.
+	 */
+	private void drawArrow(GuiGraphicsExtractor g, double hour, int len, int half, int col) {
+		int headLen = Math.min(MeditationLayout.HAND_HEAD_LEN, len - MeditationLayout.HUB_HALF);
+		int headHalf = Math.max(half, MeditationLayout.HAND_HEAD_HALF);
+		int baseY = -(len - headLen); // where shaft meets the arrowhead (up = negative)
 		g.pose().pushMatrix();
 		g.pose().translate(MeditationLayout.CX, MeditationLayout.CY);
 		g.pose().rotate((float) hourAngle(hour));
-		fillA(g, -half, -len, half, MeditationLayout.HUB_HALF, col); // up = towards the hour before rotation
+		// shaft: hub -> arrowhead base
+		fillA(g, -half, baseY, half, MeditationLayout.HUB_HALF, col);
+		// arrowhead: rows from the base (full width) up to the tip (zero width)
+		for (int i = 0; i < headLen; i++) {
+			int hw = Math.round(headHalf * (1f - i / (float) headLen));
+			int y = baseY - i;
+			fillA(g, -hw, y - 1, hw + 1, y, col);
+		}
 		g.pose().popMatrix();
 	}
 
@@ -298,14 +322,72 @@ public class MeditationPage implements GuiPage {
 		g.pose().popMatrix();
 	}
 
-	/** Sun (day) or moon (night) marker sitting on the ring at the target hour. */
-	private void drawTargetGlyph(GuiGraphicsExtractor g) {
-		double a = hourAngle(targetHour);
-		int gx = MeditationLayout.CX + (int) (Math.sin(a) * MeditationLayout.RADIUS);
-		int gy = MeditationLayout.CY - (int) (Math.cos(a) * MeditationLayout.RADIUS);
-		boolean day = targetHour >= 6 && targetHour < 18;
-		int hs = MeditationLayout.GLYPH_HALF;
-		fillA(g, gx - hs, gy - hs, gx + hs + 1, gy + hs + 1, day ? MeditationLayout.COL_SUN : MeditationLayout.COL_MOON);
+	/** The four time-of-day orbs at their fixed hours (dawn/noon/dusk/night). */
+	private void drawOrbs(GuiGraphicsExtractor g) {
+		drawOrb(g, MeditationLayout.ORB_DAWN_HOUR, ORB_DAWN);
+		drawOrb(g, MeditationLayout.ORB_NOON_HOUR, ORB_NOON);
+		drawOrb(g, MeditationLayout.ORB_DUSK_HOUR, ORB_DUSK);
+		drawOrb(g, MeditationLayout.ORB_NIGHT_HOUR, ORB_NIGHT);
+	}
+
+	/** Blit one ORB_SIZE orb centred on the ring at {@code hour}, faded with the dial. */
+	private void drawOrb(GuiGraphicsExtractor g, int hour, Identifier tex) {
+		double a = hourAngle(hour);
+		float cx = MeditationLayout.CX + (float) (Math.sin(a) * MeditationLayout.ORB_RADIUS);
+		float cy = MeditationLayout.CY - (float) (Math.cos(a) * MeditationLayout.ORB_RADIUS);
+		float s = MeditationLayout.ORB_SIZE / (float) MeditationLayout.ORB_SRC;
+		int tint = withAlpha(0xFFFFFFFF, contentAlpha); // white tint, alpha = dial fade
+		g.pose().pushMatrix();
+		g.pose().translate(cx - MeditationLayout.ORB_SIZE / 2f, cy - MeditationLayout.ORB_SIZE / 2f);
+		g.pose().scale(s, s);
+		g.blit(RenderPipelines.GUI_TEXTURED, tex, 0, 0, 0, 0, MeditationLayout.ORB_SRC, MeditationLayout.ORB_SRC, MeditationLayout.ORB_SRC, MeditationLayout.ORB_SRC, tint);
+		g.pose().popMatrix();
+	}
+
+	/**
+	 * A thin progress arc sweeping FORWARD from the current hour to the target hour
+	 * (the span of world time the meditation will skip), plotted as small dots along
+	 * ARC_RADIUS. A full-day pick (delta 0) shows the whole ring.
+	 */
+	private void drawArc(GuiGraphicsExtractor g, double nowHour, int target) {
+		double delta = (((target - nowHour) % 24.0) + 24.0) % 24.0;
+		if (spinning()) {
+			// During the spin the live clock advances to the target and STOPS there, so
+			// delta shrinks smoothly to ~0 - draw nothing once it arrives (also guards the
+			// float boundary where now nudges just past target and delta wraps to ~24, the
+			// old full-ring "pop"). Otherwise the arc stays live and shrinks as time passes.
+			if (delta < 0.02 || delta > 23.98)
+				return;
+		} else if (delta < 1e-3) {
+			delta = 24.0; // picking the current hour = advance a full day
+		}
+		// The arc is the 24-gon's edges from the current hour to the target: a partial
+		// leading segment (now -> next whole hour) then one straight segment per hour.
+		// As the current hand advances the leading segment shrinks then whole edges drop,
+		// so the arc "eats" itself edge by edge instead of flickering pixels.
+		double end = nowHour + delta;
+		double h = nowHour;
+		while (h < end - 1e-9) {
+			double next = Math.min(Math.floor(h) + 1.0, end);
+			drawArcSegment(g, h, next);
+			h = next;
+		}
+	}
+
+	/** One straight arc edge between two (fractional) hours, drawn as a rotated bar. */
+	private void drawArcSegment(GuiGraphicsExtractor g, double h1, double h2) {
+		double a1 = hourAngle(h1), a2 = hourAngle(h2);
+		float x1 = MeditationLayout.CX + (float) (Math.sin(a1) * MeditationLayout.ARC_RADIUS);
+		float y1 = MeditationLayout.CY - (float) (Math.cos(a1) * MeditationLayout.ARC_RADIUS);
+		float x2 = MeditationLayout.CX + (float) (Math.sin(a2) * MeditationLayout.ARC_RADIUS);
+		float y2 = MeditationLayout.CY - (float) (Math.cos(a2) * MeditationLayout.ARC_RADIUS);
+		float len = (float) Math.hypot(x2 - x1, y2 - y1);
+		int half = MeditationLayout.ARC_HALF;
+		g.pose().pushMatrix();
+		g.pose().translate(x1, y1);
+		g.pose().rotate((float) Math.atan2(y2 - y1, x2 - x1));
+		fillA(g, 0, -half, Math.round(len), half + 1, MeditationLayout.COL_ARC);
+		g.pose().popMatrix();
 	}
 
 	private void centeredText(GuiGraphicsExtractor g, Component c, int centerX, int topY, int col) {

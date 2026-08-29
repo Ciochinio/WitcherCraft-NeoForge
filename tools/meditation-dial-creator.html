@@ -27,6 +27,9 @@
   label { display:inline-flex; align-items:center; gap:6px; margin: 3px 10px 3px 0; color: var(--dim); }
   input[type=number]{ width:60px; background:#0e0e13; border:1px solid var(--line); color:var(--ink); padding:3px 5px; border-radius:4px; font:inherit; }
   input[type=text]{ width:104px; background:#0e0e13; border:1px solid var(--line); color:var(--ink); padding:3px 5px; border-radius:4px; font:inherit; }
+  .txtrow { display:flex; align-items:center; gap:6px; margin:3px 0; }
+  .txtrow span.k { color:var(--dim); width:110px; display:inline-block; }
+  .txtrow input[type=text]{ width:100%; }
   .sw { width:16px; height:16px; border:1px solid var(--line); border-radius:3px; display:inline-block; vertical-align:middle; }
   .colrow { display:flex; align-items:center; gap:6px; margin:3px 0; }
   .colrow span.k { color:var(--dim); width:130px; display:inline-block; }
@@ -40,20 +43,22 @@
 <body>
 <header>
   <h1>Meditation Dial Creator</h1>
-  <span class="hint">Drag the <b>centre</b>, the <b>radius</b> handle (on the ring), or the <b>button</b>; tune the rest with the inputs. Output regenerates
-  <code>src/main/java/net/redboltmedia/witchercraft/client/gui/MeditationLayout.java</code> &rarr; Copy &rarr; paste over the file. The two preview-hour inputs only move the sample hands; they are not saved.</span>
+  <span class="hint">Drag the <b>centre</b>, the <b>radius</b> handle (on the ring), or the <b>button</b>; tune the rest with the inputs. The dial reads day-up (noon top, 00:00 bottom). Output regenerates
+  <code>src/main/java/net/redboltmedia/witchercraft/client/gui/MeditationLayout.java</code> &rarr; Copy &rarr; paste over the file. The two preview-hour inputs only move the sample hands + arc; they are not saved.</span>
 </header>
 
 <div class="wrap">
   <div>
     <div id="stageWrap"><svg id="svg"></svg></div>
-    <div style="margin-top:8px;color:var(--dim)" id="selinfo">Panel is the fixed design box the page fit-scales into the shell content region.</div>
+    <div style="margin-top:8px;color:var(--dim)" id="selinfo">Panel is the fixed design box the page fit-scales into the shell content region. Orb art previews load from ../src/main/resources if present.</div>
   </div>
 
   <div class="side">
     <fieldset><legend>Panel &amp; dial</legend><div id="grpDial"></div></fieldset>
-    <fieldset><legend>Ticks &amp; labels</legend><div id="grpTicks"></div></fieldset>
-    <fieldset><legend>Hands &amp; hub</legend><div id="grpHands"></div></fieldset>
+    <fieldset><legend>Ticks &amp; numbers</legend><div id="grpTicks"></div></fieldset>
+    <fieldset><legend>Time-of-day orbs</legend><div id="grpOrbs"></div><div id="grpOrbTex"></div></fieldset>
+    <fieldset><legend>Hands &amp; hub (arrows)</legend><div id="grpHands"></div></fieldset>
+    <fieldset><legend>Progress arc</legend><div id="grpArc"></div></fieldset>
     <fieldset><legend>Readout &amp; button</legend><div id="grpBtn"></div></fieldset>
     <fieldset><legend>Preview only (not saved)</legend><div id="grpPrev"></div></fieldset>
     <fieldset><legend>Colours (0xAARRGGBB)</legend><div id="grpColors"></div></fieldset>
@@ -68,32 +73,46 @@
 <script>
 const SVG_NS = "http://www.w3.org/2000/svg";
 const VIEW_SCALE = 2.2; // on-screen zoom of the panel
+const ORB_SRC = 32;     // orb source texture size (fixed, matches the sprites)
+const DIAL_OFFSET = Math.PI; // day-up: noon at top (matches MeditationPage.hourAngle)
 
 // --- defaults must match MeditationLayout.java ------------------------------
 const DEFAULTS = {
-  PANEL_W:210, PANEL_H:286, CX:105, CY:110, RADIUS:90,
+  PANEL_W:224, PANEL_H:300, CX:112, CY:112, RADIUS:82,
   MAJOR_EVERY:6, TICK_MINOR_LEN:5, TICK_MAJOR_LEN:10, TICK_MINOR_HALF:1, TICK_MAJOR_HALF:2,
-  LABEL_RADIUS:102, GLYPH_HALF:3,
-  HAND_CURRENT_LEN:64, HAND_CURRENT_HALF:1, HAND_TARGET_LEN:80, HAND_TARGET_HALF:2, HUB_HALF:2,
-  NOW_Y:222, TARGET_Y:234, BTN_X:45, BTN_Y:250, BTN_W:120, BTN_H:20
+  SHOW_NUMBERS:0, LABEL_RADIUS:98,
+  ORB_RADIUS:88, ORB_SIZE:30, ORB_DAWN_HOUR:6, ORB_NOON_HOUR:12, ORB_DUSK_HOUR:18, ORB_NIGHT_HOUR:0,
+  HAND_CURRENT_LEN:58, HAND_CURRENT_HALF:1, HAND_TARGET_LEN:72, HAND_TARGET_HALF:2,
+  HAND_HEAD_LEN:12, HAND_HEAD_HALF:4, HUB_HALF:3,
+  ARC_RADIUS:68, ARC_HALF:1,
+  NOW_Y:232, TARGET_Y:244, BTN_X:52, BTN_Y:262, BTN_W:120, BTN_H:20
+};
+const STRINGS = {
+  ORB_DAWN_TEX:"witchercraft:textures/screens/meditationguitimedawn.png",
+  ORB_NOON_TEX:"witchercraft:textures/screens/meditationguitimenoon.png",
+  ORB_DUSK_TEX:"witchercraft:textures/screens/meditationguitimedusk.png",
+  ORB_NIGHT_TEX:"witchercraft:textures/screens/meditationguitimenight.png"
 };
 const COLORS = {
   COL_TICK_MINOR:"0xFF55555F", COL_TICK_MAJOR:"0xFFCFC7B0", COL_HAND_CURRENT:"0xFF8899AA",
-  COL_HAND_TARGET:"0xFFFFDD55", COL_HUB:"0xFFCFC7B0", COL_SUN:"0xFFFFCC33", COL_MOON:"0xFFAAB6CC",
+  COL_HAND_TARGET:"0xFFFFDD55", COL_HUB:"0xFFCFC7B0", COL_ARC:"0xAAFFCF66",
   COL_TEXT_TITLE:"0xFFCFC7B0", COL_TEXT_SUB:"0xFF9A9AA2", COL_BTN_BG:"0x66101015",
   COL_BTN_BG_HOVER:"0xB0000000", COL_BTN_BORDER:"0xFF33333D", COL_BTN_TEXT:"0xFFFFDD55"
 };
 const PREVIEW = { previewNow:8.5, previewTarget:18 };
 
 let S = Object.assign({}, DEFAULTS);
+let T = Object.assign({}, STRINGS);
 let C = Object.assign({}, COLORS);
 let P = Object.assign({}, PREVIEW);
 
 // which numeric fields go in which fieldset
 const GROUPS = {
   grpDial:  ["PANEL_W","PANEL_H","CX","CY","RADIUS"],
-  grpTicks: ["MAJOR_EVERY","TICK_MINOR_LEN","TICK_MAJOR_LEN","TICK_MINOR_HALF","TICK_MAJOR_HALF","LABEL_RADIUS","GLYPH_HALF"],
-  grpHands: ["HAND_CURRENT_LEN","HAND_CURRENT_HALF","HAND_TARGET_LEN","HAND_TARGET_HALF","HUB_HALF"],
+  grpTicks: ["MAJOR_EVERY","TICK_MINOR_LEN","TICK_MAJOR_LEN","TICK_MINOR_HALF","TICK_MAJOR_HALF","SHOW_NUMBERS","LABEL_RADIUS"],
+  grpOrbs:  ["ORB_RADIUS","ORB_SIZE","ORB_DAWN_HOUR","ORB_NOON_HOUR","ORB_DUSK_HOUR","ORB_NIGHT_HOUR"],
+  grpHands: ["HAND_CURRENT_LEN","HAND_CURRENT_HALF","HAND_TARGET_LEN","HAND_TARGET_HALF","HAND_HEAD_LEN","HAND_HEAD_HALF","HUB_HALF"],
+  grpArc:   ["ARC_RADIUS","ARC_HALF"],
   grpBtn:   ["NOW_Y","TARGET_Y","BTN_X","BTN_Y","BTN_W","BTN_H"]
 };
 
@@ -103,6 +122,11 @@ function argbToCss(v){ // "0xAARRGGBB" -> rgba()
   if (isNaN(n)) return "rgba(0,0,0,0)";
   const a=((n>>>24)&255)/255, r=(n>>16)&255, g=(n>>8)&255, b=n&255;
   return `rgba(${r},${g},${b},${a.toFixed(3)})`;
+}
+// "witchercraft:textures/screens/x.png" -> repo-relative file path for the preview
+function orbHref(id){
+  const i=id.indexOf(":"); if(i<0) return "";
+  return "../src/main/resources/assets/"+id.slice(0,i)+"/"+id.slice(i+1);
 }
 
 // --- build inputs -----------------------------------------------------------
@@ -116,6 +140,14 @@ function numInput(key){
 for (const [gid,keys] of Object.entries(GROUPS)){
   const box=document.getElementById(gid);
   keys.forEach(k=>box.appendChild(numInput(k)));
+}
+// orb texture (string) inputs
+for (const key of Object.keys(T)){
+  const row=document.createElement("div"); row.className="txtrow";
+  const k=document.createElement("span"); k.className="k"; k.textContent=key.replace(/_TEX$/,"").replace(/^ORB_/,"").toLowerCase();
+  const t=document.createElement("input"); t.type="text"; t.value=T[key]; t.dataset.tk=key;
+  t.addEventListener("input",()=>{ T[key]=t.value.trim(); redraw(); });
+  row.append(k,t); document.getElementById("grpOrbTex").appendChild(row);
 }
 // preview inputs
 {
@@ -141,12 +173,24 @@ for (const key of Object.keys(C)){
 // --- SVG rendering ----------------------------------------------------------
 const svg=document.getElementById("svg");
 function el(name,attrs){ const e=document.createElementNS(SVG_NS,name); for(const k in attrs) e.setAttribute(k,attrs[k]); return e; }
-function pt(hour,r){ const a=hour/24*Math.PI*2; return [S.CX+Math.sin(a)*r, S.CY-Math.cos(a)*r]; }
+function ang(hour){ return hour/24*Math.PI*2 + DIAL_OFFSET; }
+function pt(hour,r){ const a=ang(hour); return [S.CX+Math.sin(a)*r, S.CY-Math.cos(a)*r]; }
+
+// an arrow (shaft line + head triangle) from the hub to `len` at `hour`
+function drawArrowSvg(hour,len,half,headLen,headHalf,col){
+  const a=ang(hour), d=[Math.sin(a),-Math.cos(a)], perp=[Math.cos(a),Math.sin(a)];
+  const bx=S.CX+d[0]*(len-headLen), by=S.CY+d[1]*(len-headLen);
+  const tx=S.CX+d[0]*len, ty=S.CY+d[1]*len;
+  svg.appendChild(el("line",{x1:S.CX,y1:S.CY,x2:bx,y2:by,stroke:col,"stroke-width":half*2,"stroke-linecap":"round"}));
+  const l=[bx+perp[0]*headHalf, by+perp[1]*headHalf], r=[bx-perp[0]*headHalf, by-perp[1]*headHalf];
+  svg.appendChild(el("polygon",{points:`${tx},${ty} ${l[0]},${l[1]} ${r[0]},${r[1]}`,fill:col}));
+}
 
 function redraw(){
   // sync input values (in case changed programmatically e.g. by drag)
   document.querySelectorAll("input[type=number][data-k]").forEach(i=>{ if(document.activeElement!==i) i.value=S[i.dataset.k]; });
   document.querySelectorAll("input[type=text][data-k]").forEach(i=>{ if(document.activeElement!==i) i.value=C[i.dataset.k]; });
+  document.querySelectorAll("input[type=text][data-tk]").forEach(i=>{ if(document.activeElement!==i) i.value=T[i.dataset.tk]; });
   for (const key in swatches) swatches[key].style.background=argbToCss(C[key]);
 
   svg.setAttribute("width", S.PANEL_W*VIEW_SCALE);
@@ -157,7 +201,7 @@ function redraw(){
   // panel border
   svg.appendChild(el("rect",{x:0,y:0,width:S.PANEL_W,height:S.PANEL_H,fill:"none",stroke:"#ffffff18","stroke-width":0.5}));
 
-  // ticks + labels
+  // ticks + optional numbers
   const every=Math.max(1,S.MAJOR_EVERY|0);
   for (let hHour=0;hHour<24;hHour++){
     const major=(hHour%every)===0;
@@ -166,21 +210,34 @@ function redraw(){
     const col=argbToCss(major?C.COL_TICK_MAJOR:C.COL_TICK_MINOR);
     const [ox,oy]=pt(hHour,S.RADIUS), [ix,iy]=pt(hHour,S.RADIUS-len);
     svg.appendChild(el("line",{x1:ox,y1:oy,x2:ix,y2:iy,stroke:col,"stroke-width":half*2}));
-    if (major){
+    if (major && S.SHOW_NUMBERS){
       const [lx,ly]=pt(hHour,S.LABEL_RADIUS);
       const t=el("text",{x:lx,y:ly+3,fill:argbToCss(C.COL_TICK_MAJOR),"text-anchor":"middle"}); t.textContent=hHour;
       svg.appendChild(t);
     }
   }
-  // hands
-  const [cnx,cny]=pt(P.previewNow,S.HAND_CURRENT_LEN);
-  svg.appendChild(el("line",{x1:S.CX,y1:S.CY,x2:cnx,y2:cny,stroke:argbToCss(C.COL_HAND_CURRENT),"stroke-width":S.HAND_CURRENT_HALF*2}));
-  const [ctx,cty]=pt(P.previewTarget,S.HAND_TARGET_LEN);
-  svg.appendChild(el("line",{x1:S.CX,y1:S.CY,x2:ctx,y2:cty,stroke:argbToCss(C.COL_HAND_TARGET),"stroke-width":S.HAND_TARGET_HALF*2}));
-  // target glyph
-  const [gx,gy]=pt(P.previewTarget,S.RADIUS);
-  const day=(((P.previewTarget%24)+24)%24)>=6 && (((P.previewTarget%24)+24)%24)<18;
-  svg.appendChild(el("rect",{x:gx-S.GLYPH_HALF,y:gy-S.GLYPH_HALF,width:S.GLYPH_HALF*2+1,height:S.GLYPH_HALF*2+1,fill:argbToCss(day?C.COL_SUN:C.COL_MOON)}));
+
+  // time-of-day orbs (faint circle fallback + real art if the file loads)
+  const orbs=[[S.ORB_DAWN_HOUR,T.ORB_DAWN_TEX],[S.ORB_NOON_HOUR,T.ORB_NOON_TEX],[S.ORB_DUSK_HOUR,T.ORB_DUSK_TEX],[S.ORB_NIGHT_HOUR,T.ORB_NIGHT_TEX]];
+  for (const [hr,tex] of orbs){
+    const [ocx,ocy]=pt(hr,S.ORB_RADIUS);
+    svg.appendChild(el("circle",{cx:ocx,cy:ocy,r:S.ORB_SIZE/2,fill:"#ffffff10",stroke:"#ffffff22","stroke-width":0.5}));
+    const href=orbHref(tex);
+    if(href){ const im=el("image",{x:ocx-S.ORB_SIZE/2,y:ocy-S.ORB_SIZE/2,width:S.ORB_SIZE,height:S.ORB_SIZE}); im.setAttributeNS("http://www.w3.org/1999/xlink","href",href); im.setAttribute("href",href); svg.appendChild(im); }
+  }
+
+  // progress arc: current hour -> target, drawn as the 24-gon's straight edges
+  // (partial leading edge, then one segment per whole hour) - matches MeditationPage.
+  let delta=(((P.previewTarget-P.previewNow)%24)+24)%24; if(delta<1e-3) delta=24;
+  const arcEnd=P.previewNow+delta, apts=[]; let ah=P.previewNow;
+  apts.push(pt(ah,S.ARC_RADIUS));
+  while(ah<arcEnd-1e-9){ ah=Math.min(Math.floor(ah)+1,arcEnd); apts.push(pt(ah,S.ARC_RADIUS)); }
+  svg.appendChild(el("polyline",{points:apts.map(p=>p[0]+","+p[1]).join(" "),fill:"none",stroke:argbToCss(C.COL_ARC),"stroke-width":S.ARC_HALF*2+1,"stroke-linejoin":"round"}));
+
+  // hands (arrows)
+  drawArrowSvg(P.previewNow,S.HAND_CURRENT_LEN,S.HAND_CURRENT_HALF,Math.min(S.HAND_HEAD_LEN,S.HAND_CURRENT_LEN-S.HUB_HALF),Math.max(S.HAND_CURRENT_HALF,S.HAND_HEAD_HALF),argbToCss(C.COL_HAND_CURRENT));
+  drawArrowSvg(P.previewTarget,S.HAND_TARGET_LEN,S.HAND_TARGET_HALF,Math.min(S.HAND_HEAD_LEN,S.HAND_TARGET_LEN-S.HUB_HALF),Math.max(S.HAND_TARGET_HALF,S.HAND_HEAD_HALF),argbToCss(C.COL_HAND_TARGET));
+
   // hub
   svg.appendChild(el("rect",{x:S.CX-S.HUB_HALF,y:S.CY-S.HUB_HALF,width:S.HUB_HALF*2+1,height:S.HUB_HALF*2+1,fill:argbToCss(C.COL_HUB)}));
   // readouts
@@ -234,8 +291,9 @@ function regen(){
  * All coordinates are PANEL-LOCAL (relative to a fixed PANEL_W x PANEL_H design
  * box). {@link net.redboltmedia.witchercraft.client.gui.shell.MeditationPage}
  * fit-scales this panel uniformly (centred) into the shell content region, the
- * same way the perk page maps {@link PerkEquipLayout}. Hours run clockwise with
- * 00:00 at the top (CX, CY - RADIUS): hour h sits at angle h/24 * 2PI.
+ * same way the perk page maps {@link PerkEquipLayout}. The dial reads day-up:
+ * hour h sits at angle h/24 * 2PI + PI, so NOON is at the top and 00:00 at the
+ * bottom (see MeditationPage.hourAngle).
  *
  * Generated by tools/meditation-dial-creator.html - paste this over the file
  * wholesale. Keep it a dumb data holder (no logic) so the tool can overwrite it.
@@ -253,26 +311,48 @@ public final class MeditationLayout {
 \tpublic static final int CY = ${n("CY")};
 \tpublic static final int RADIUS = ${n("RADIUS")};
 
-\t// Tick marks: every MAJOR_EVERY-th hour is a longer/thicker "major" tick and
-\t// gets a number label. len = inward length from the ring; half = half-width.
+\t// Tick marks: every MAJOR_EVERY-th hour is a longer/thicker "major" tick. len =
+\t// inward length from the ring; half = half-width. Numbers are optional (the orbs
+\t// double as the time legend) - SHOW_NUMBERS != 0 labels the major hours.
 \tpublic static final int MAJOR_EVERY = ${n("MAJOR_EVERY")};
 \tpublic static final int TICK_MINOR_LEN = ${n("TICK_MINOR_LEN")};
 \tpublic static final int TICK_MAJOR_LEN = ${n("TICK_MAJOR_LEN")};
 \tpublic static final int TICK_MINOR_HALF = ${n("TICK_MINOR_HALF")};
 \tpublic static final int TICK_MAJOR_HALF = ${n("TICK_MAJOR_HALF")};
-
+\tpublic static final int SHOW_NUMBERS = ${n("SHOW_NUMBERS")};
 \t// Distance from centre at which the major-hour number labels are centred.
 \tpublic static final int LABEL_RADIUS = ${n("LABEL_RADIUS")};
 
-\t// Sun/moon target marker half-size (a small square on the ring at the target).
-\tpublic static final int GLYPH_HALF = ${n("GLYPH_HALF")};
+\t// Time-of-day orbs (32x32 sprites) placed at four fixed hours around the ring.
+\t// ORB_RADIUS = distance of each orb centre from the dial centre; ORB_SIZE = the
+\t// drawn size in panel px (the source is ORB_SRC square).
+\tpublic static final int ORB_SRC = ${ORB_SRC};
+\tpublic static final int ORB_RADIUS = ${n("ORB_RADIUS")};
+\tpublic static final int ORB_SIZE = ${n("ORB_SIZE")};
+\tpublic static final int ORB_DAWN_HOUR = ${n("ORB_DAWN_HOUR")};
+\tpublic static final int ORB_NOON_HOUR = ${n("ORB_NOON_HOUR")};
+\tpublic static final int ORB_DUSK_HOUR = ${n("ORB_DUSK_HOUR")};
+\tpublic static final int ORB_NIGHT_HOUR = ${n("ORB_NIGHT_HOUR")};
+\tpublic static final String ORB_DAWN_TEX = "${T.ORB_DAWN_TEX}";
+\tpublic static final String ORB_NOON_TEX = "${T.ORB_NOON_TEX}";
+\tpublic static final String ORB_DUSK_TEX = "${T.ORB_DUSK_TEX}";
+\tpublic static final String ORB_NIGHT_TEX = "${T.ORB_NIGHT_TEX}";
 
-\t// Hands (from the hub outward). Current-time hand is dim/thin, target bright.
+\t// Hands, drawn as arrows from the hub outward. LEN = tip distance from centre,
+\t// HALF = shaft half-width; the shared arrowhead is HAND_HEAD_LEN long and
+\t// HAND_HEAD_HALF wide at its base. Current-time hand is dim/thin, target bright.
 \tpublic static final int HAND_CURRENT_LEN = ${n("HAND_CURRENT_LEN")};
 \tpublic static final int HAND_CURRENT_HALF = ${n("HAND_CURRENT_HALF")};
 \tpublic static final int HAND_TARGET_LEN = ${n("HAND_TARGET_LEN")};
 \tpublic static final int HAND_TARGET_HALF = ${n("HAND_TARGET_HALF")};
+\tpublic static final int HAND_HEAD_LEN = ${n("HAND_HEAD_LEN")};
+\tpublic static final int HAND_HEAD_HALF = ${n("HAND_HEAD_HALF")};
 \tpublic static final int HUB_HALF = ${n("HUB_HALF")};
+
+\t// Progress arc: a thin sweep from the current hour forward to the target hour
+\t// (the time that will pass), at ARC_RADIUS, ARC_HALF px thick.
+\tpublic static final int ARC_RADIUS = ${n("ARC_RADIUS")};
+\tpublic static final int ARC_HALF = ${n("ARC_HALF")};
 
 \t// Readout text baselines (centred on CX): current time then target time.
 \tpublic static final int NOW_Y = ${n("NOW_Y")};
@@ -290,8 +370,7 @@ public final class MeditationLayout {
 \tpublic static final int COL_HAND_CURRENT = ${C.COL_HAND_CURRENT};
 \tpublic static final int COL_HAND_TARGET = ${C.COL_HAND_TARGET};
 \tpublic static final int COL_HUB = ${C.COL_HUB};
-\tpublic static final int COL_SUN = ${C.COL_SUN};
-\tpublic static final int COL_MOON = ${C.COL_MOON};
+\tpublic static final int COL_ARC = ${C.COL_ARC};
 \tpublic static final int COL_TEXT_TITLE = ${C.COL_TEXT_TITLE};
 \tpublic static final int COL_TEXT_SUB = ${C.COL_TEXT_SUB};
 \tpublic static final int COL_BTN_BG = ${C.COL_BTN_BG};
@@ -312,7 +391,7 @@ document.getElementById("copy").addEventListener("click",()=>{
   const t=document.getElementById("out"); t.select(); document.execCommand("copy");
 });
 document.getElementById("reset").addEventListener("click",()=>{
-  S=Object.assign({},DEFAULTS); C=Object.assign({},COLORS); P=Object.assign({},PREVIEW); redraw();
+  S=Object.assign({},DEFAULTS); T=Object.assign({},STRINGS); C=Object.assign({},COLORS); P=Object.assign({},PREVIEW); redraw();
 });
 
 redraw();
