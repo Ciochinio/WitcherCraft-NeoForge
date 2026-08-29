@@ -2,6 +2,9 @@ package net.redboltmedia.witchercraft;
 
 import java.util.List;
 
+import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
+
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
@@ -152,8 +155,46 @@ public class WitcherGuiScreen extends Screen {
 			g.setComponentTooltipForNextFrame(this.font, tip, mouseX, mouseY);
 	}
 
+	/**
+	 * Level + XP readout, drawn in DESIGN-canvas coords (call inside the shell's
+	 * design->screen transform). Reads the live, already-synced player vars, so it
+	 * is pure client state and needs no packet. Static + self-contained so the
+	 * reworked pause menu can draw the identical readout for visual coherence.
+	 */
+	public static void drawLevelReadout(GuiGraphicsExtractor g, Font font) {
+		Minecraft mc = Minecraft.getInstance();
+		if (mc.player == null)
+			return;
+		WitchercraftModVariables.PlayerVariables v = mc.player.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+		int level = (int) Math.floor(v.witchercraftPlayerLevel);
+		double xp = v.witchercraftPlayerExperience;
+		double req = v.witchercraftPlayerExperienceRequirement;
+		double frac = req > 0 ? Math.max(0, Math.min(1, xp / req)) : 0;
+
+		// level number (scaled)
+		g.pose().pushMatrix();
+		g.pose().translate(WitcherGuiLayout.LEVEL_X, WitcherGuiLayout.LEVEL_Y);
+		g.pose().scale(WitcherGuiLayout.LEVEL_SCALE, WitcherGuiLayout.LEVEL_SCALE);
+		g.text(font, Component.literal(Integer.toString(level)), 0, 0, WitcherGuiLayout.LEVEL_TEXT_COLOR, true);
+		g.pose().popMatrix();
+
+		// xp progress bar (empty track + left-anchored fill)
+		int bx = WitcherGuiLayout.XP_BAR_X, by = WitcherGuiLayout.XP_BAR_Y;
+		int bw = WitcherGuiLayout.XP_BAR_W, bh = WitcherGuiLayout.XP_BAR_H;
+		g.fill(bx, by, bx + bw, by + bh, WitcherGuiLayout.XP_BAR_BG_COLOR);
+		int filled = (int) Math.round(frac * bw);
+		if (filled > 0)
+			g.fill(bx, by, bx + filled, by + bh, WitcherGuiLayout.XP_BAR_FILL_COLOR);
+
+		// exp/req caption
+		java.text.DecimalFormat fmt = new java.text.DecimalFormat("0.##");
+		Component caption = Component.literal(fmt.format(xp) + "/" + fmt.format(req));
+		g.text(font, caption, WitcherGuiLayout.XP_TEXT_X, WitcherGuiLayout.XP_TEXT_Y, WitcherGuiLayout.XP_TEXT_COLOR, false);
+	}
+
 	private void drawNavbar(GuiGraphicsExtractor g) {
 		Font font = this.font;
+		drawLevelReadout(g, font);
 		int count = WitcherGuiLayout.NAV.length;
 		for (int i = 0; i < count; i++) {
 			WitcherGuiLayout.Nav nav = WitcherGuiLayout.NAV[i];

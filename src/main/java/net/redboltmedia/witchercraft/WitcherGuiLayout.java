@@ -38,6 +38,24 @@ public final class WitcherGuiLayout {
 	// --- content region (everything below the navbar; handed to the page) -----
 	public static final int CONTENT_MARGIN = 3;
 
+	// --- level + XP readout (drawn left of the centred navbar tab group) -------
+	// All design-canvas pixels. Positions are absolute on the canvas so the tool
+	// can place them freely in the empty space left of the tabs. Editable in
+	// tools/gui-layout-creator.html; also drawn on the reworked pause menu.
+	public static final int LEVEL_X = 6; // level number anchor (top-left)
+	public static final int LEVEL_Y = 10;
+	public static final int LEVEL_SCALE = 2; // level-number text scale
+	public static final int XP_BAR_X = 34; // xp progress bar
+	public static final int XP_BAR_Y = 13;
+	public static final int XP_BAR_W = 40;
+	public static final int XP_BAR_H = 4;
+	public static final int XP_TEXT_X = 34; // "exp/req" caption
+	public static final int XP_TEXT_Y = 20;
+	public static final int LEVEL_TEXT_COLOR = 0xFFFFDD55;
+	public static final int XP_BAR_BG_COLOR = 0xFF201D14;
+	public static final int XP_BAR_FILL_COLOR = 0xFFFFDD55;
+	public static final int XP_TEXT_COLOR = 0xFFC9C9D2;
+
 	// ==========================================================================
 	//  A navbar tab. pageId must match a GuiPage.id() to be interactive. Tab
 	//  positions are computed (centred) by the shell, so there is no rect here.
@@ -61,7 +79,6 @@ public final class WitcherGuiLayout {
 			new Nav("inventory", "gui.witchercraft.shell.nav.inventory", "witchercraft:textures/gui/nav/inventory.png"),
 			new Nav("map", "gui.witchercraft.shell.nav.map", "witchercraft:textures/gui/nav/map.png"),
 			new Nav("skills", "gui.witchercraft.shell.nav.skills", "witchercraft:textures/gui/nav/skills.png"),
-			new Nav("bombs", "gui.witchercraft.shell.nav.bombs", "witchercraft:textures/gui/nav/bombs.png"),
 			new Nav("meditation", "gui.witchercraft.shell.nav.meditation", "witchercraft:textures/gui/nav/meditation.png"),
 	};
 
@@ -82,7 +99,6 @@ public final class WitcherGuiLayout {
 			new Background("inventory", "witchercraft:textures/gui/shell/backgrounds/inventory.png"),
 			new Background("skills", "witchercraft:textures/gui/shell/backgrounds/skills.png"),
 			new Background("alchemy", "witchercraft:textures/gui/shell/backgrounds/alchemy.png"),
-			new Background("bombs", "witchercraft:textures/gui/shell/backgrounds/bombs.png"),
 			new Background("map", "witchercraft:textures/gui/shell/backgrounds/map.png"),
 			new Background("glossary", "witchercraft:textures/gui/shell/backgrounds/glossary.png"),
 			new Background("meditation", "witchercraft:textures/gui/shell/backgrounds/meditation.png"),

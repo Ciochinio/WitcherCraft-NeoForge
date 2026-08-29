@@ -44,7 +44,6 @@ public class WitcherGuiKeybind {
 			"inventory", GLFW.GLFW_KEY_I,
 			"skills", GLFW.GLFW_KEY_K,
 			"alchemy", GLFW.GLFW_KEY_J,
-			"bombs", GLFW.GLFW_KEY_N,
 			"map", GLFW.GLFW_KEY_M,
 			"glossary", GLFW.GLFW_KEY_G,
 			"meditation", GLFW.GLFW_KEY_U);

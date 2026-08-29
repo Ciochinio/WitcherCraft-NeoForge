@@ -89,6 +89,24 @@
     </fieldset>
 
     <fieldset>
+      <legend>Level &amp; XP readout</legend>
+      <label>Lvl X <input type="number" id="LEVEL_X"></label>
+      <label>Lvl Y <input type="number" id="LEVEL_Y"></label>
+      <label>Lvl scale <input type="number" id="LEVEL_SCALE"></label><br>
+      <label>Bar X <input type="number" id="XP_BAR_X"></label>
+      <label>Bar Y <input type="number" id="XP_BAR_Y"></label>
+      <label>Bar W <input type="number" id="XP_BAR_W"></label>
+      <label>Bar H <input type="number" id="XP_BAR_H"></label><br>
+      <label>Text X <input type="number" id="XP_TEXT_X"></label>
+      <label>Text Y <input type="number" id="XP_TEXT_Y"></label><br>
+      <label>Lvl color <input type="text" id="LEVEL_TEXT_COLOR" style="width:100px"></label>
+      <label>Bar bg <input type="text" id="XP_BAR_BG_COLOR" style="width:100px"></label><br>
+      <label>Bar fill <input type="text" id="XP_BAR_FILL_COLOR" style="width:100px"></label>
+      <label>Text color <input type="text" id="XP_TEXT_COLOR" style="width:100px"></label>
+      <div class="muted">Drawn left of the centred tab group, read live from <code>witchercraftPlayerLevel</code> / <code>PlayerExperience</code> / <code>...Requirement</code>. Colors are Java <code>0xAARRGGBB</code> hex. Preview shows a sample level "22" at 40% XP.</div>
+    </fieldset>
+
+    <fieldset>
       <legend>Fallback background</legend>
       <label>BG path <input type="text" id="BG"></label>
       <div class="row" style="margin-top:6px">
@@ -148,13 +166,19 @@ const SEED = {
   DESIGN_W:640, DESIGN_H:360, CONTENT_MARGIN:3,
   BG:"witchercraft:textures/gui/shell/background.png",
   NAV_Y:8, NAV_H:30, NAV_TAB_W:78, NAV_GAP:4, NAV_ICON:20,
+  // level + XP readout (drawn left of the centred tab group)
+  LEVEL_X:6, LEVEL_Y:10, LEVEL_SCALE:2,
+  XP_BAR_X:34, XP_BAR_Y:13, XP_BAR_W:40, XP_BAR_H:4,
+  XP_TEXT_X:34, XP_TEXT_Y:20,
+  LEVEL_TEXT_COLOR:"0xFFFFDD55", XP_BAR_BG_COLOR:"0xFF201D14",
+  XP_BAR_FILL_COLOR:"0xFFFFDD55", XP_TEXT_COLOR:"0xFFC9C9D2",
   NAV: [
     {pageId:"glossary",  labelKey:"gui.witchercraft.shell.nav.glossary",  icon:"witchercraft:textures/gui/nav/glossary.png",  background:"witchercraft:textures/gui/shell/backgrounds/glossary.png"},
     {pageId:"alchemy",   labelKey:"gui.witchercraft.shell.nav.alchemy",   icon:"witchercraft:textures/gui/nav/alchemy.png",   background:"witchercraft:textures/gui/shell/backgrounds/alchemy.png"},
     {pageId:"inventory", labelKey:"gui.witchercraft.shell.nav.inventory", icon:"witchercraft:textures/gui/nav/inventory.png", background:"witchercraft:textures/gui/shell/backgrounds/inventory.png"},
     {pageId:"map",       labelKey:"gui.witchercraft.shell.nav.map",       icon:"witchercraft:textures/gui/nav/map.png",       background:"witchercraft:textures/gui/shell/backgrounds/map.png"},
     {pageId:"skills",    labelKey:"gui.witchercraft.shell.nav.skills",    icon:"witchercraft:textures/gui/nav/skills.png",    background:"witchercraft:textures/gui/shell/backgrounds/skills.png"},
-    {pageId:"bombs",     labelKey:"gui.witchercraft.shell.nav.bombs",     icon:"witchercraft:textures/gui/nav/bombs.png",     background:"witchercraft:textures/gui/shell/backgrounds/bombs.png"},
+    {pageId:"meditation",labelKey:"gui.witchercraft.shell.nav.meditation",icon:"witchercraft:textures/gui/nav/meditation.png",background:"witchercraft:textures/gui/shell/backgrounds/meditation.png"},
   ],
 };
 let S = structuredClone(SEED);
@@ -179,7 +203,7 @@ function build(){
   stage.style.width = S.DESIGN_W*zoom+'px';
   stage.style.height = S.DESIGN_H*zoom+'px';
   const bg = document.getElementById('bg');
-  stage.querySelectorAll('.navtab,#reserved,#dim').forEach(b=>b.remove());
+  stage.querySelectorAll('.navtab,#reserved,#dim,#lvlreadout').forEach(b=>b.remove());
 
   const dim=document.createElement('div'); dim.id='dim';
   if(bg) bg.after(dim); else stage.prepend(dim);
@@ -203,7 +227,36 @@ function build(){
     tab.onclick=()=>{ sel=i; build(); };
     stage.appendChild(tab);
   });
+
+  // level + XP readout preview (sample: level 22 at 40% XP)
+  const lr=document.createElement('div'); lr.id='lvlreadout';
+  lr.style.position='absolute'; lr.style.zIndex='4'; lr.style.pointerEvents='none';
+  lr.style.inset='0';
+  const num=document.createElement('div');
+  num.style.position='absolute'; num.style.left=S.LEVEL_X*zoom+'px'; num.style.top=S.LEVEL_Y*zoom+'px';
+  num.style.font=(7*S.LEVEL_SCALE*zoom)+'px/1 monospace'; num.style.color=hexToCss(S.LEVEL_TEXT_COLOR);
+  num.style.textShadow='1px 1px 0 #000'; num.textContent='22';
+  const bar=document.createElement('div');
+  bar.style.position='absolute'; bar.style.left=S.XP_BAR_X*zoom+'px'; bar.style.top=S.XP_BAR_Y*zoom+'px';
+  bar.style.width=S.XP_BAR_W*zoom+'px'; bar.style.height=S.XP_BAR_H*zoom+'px'; bar.style.background=hexToCss(S.XP_BAR_BG_COLOR);
+  const fill=document.createElement('div');
+  fill.style.width='40%'; fill.style.height='100%'; fill.style.background=hexToCss(S.XP_BAR_FILL_COLOR);
+  bar.appendChild(fill);
+  const txt=document.createElement('div');
+  txt.style.position='absolute'; txt.style.left=S.XP_TEXT_X*zoom+'px'; txt.style.top=S.XP_TEXT_Y*zoom+'px';
+  txt.style.font=(7*zoom)+'px/1 monospace'; txt.style.color=hexToCss(S.XP_TEXT_COLOR); txt.textContent='325/1050';
+  lr.appendChild(num); lr.appendChild(bar); lr.appendChild(txt);
+  stage.appendChild(lr);
+
   renderOut(); renderEditor(); updateSelInfo();
+}
+// "0xAARRGGBB" (or "#RRGGBB") -> css rgba
+function hexToCss(h){
+  let s=String(h||'').replace(/^0x/i,'').replace(/^#/,'');
+  if(s.length===8){ const a=parseInt(s.slice(0,2),16)/255, r=parseInt(s.slice(2,4),16), g=parseInt(s.slice(4,6),16), b=parseInt(s.slice(6,8),16);
+    return `rgba(${r},${g},${b},${a.toFixed(3)})`; }
+  if(s.length===6) return '#'+s;
+  return '#ffffff';
 }
 
 // ---- property editor ------------------------------------------------------
@@ -242,7 +295,7 @@ function bgLine(n){ return '\t\t\tnew Background('+jstr(n.pageId)+', '+jstr(n.ba
 function renderOut(){
   const withBg = S.NAV.filter(n=>n.background && n.background.trim()!=='');
   const j =
-`package net.redboltmedia.witchercraft.client.gui.shell;
+`package net.redboltmedia.witchercraft;
 
 /**
  * Data-driven geometry for the WitcherCraft GUI shell CHROME: the virtual design
@@ -281,6 +334,24 @@ public final class WitcherGuiLayout {
 
 	// --- content region (everything below the navbar; handed to the page) -----
 	public static final int CONTENT_MARGIN = ${S.CONTENT_MARGIN};
+
+	// --- level + XP readout (drawn left of the centred navbar tab group) -------
+	// All design-canvas pixels. Positions are absolute on the canvas so the tool
+	// can place them freely in the empty space left of the tabs. Editable in
+	// tools/gui-layout-creator.html; also drawn on the reworked pause menu.
+	public static final int LEVEL_X = ${S.LEVEL_X}; // level number anchor (top-left)
+	public static final int LEVEL_Y = ${S.LEVEL_Y};
+	public static final int LEVEL_SCALE = ${S.LEVEL_SCALE}; // level-number text scale
+	public static final int XP_BAR_X = ${S.XP_BAR_X}; // xp progress bar
+	public static final int XP_BAR_Y = ${S.XP_BAR_Y};
+	public static final int XP_BAR_W = ${S.XP_BAR_W};
+	public static final int XP_BAR_H = ${S.XP_BAR_H};
+	public static final int XP_TEXT_X = ${S.XP_TEXT_X}; // "exp/req" caption
+	public static final int XP_TEXT_Y = ${S.XP_TEXT_Y};
+	public static final int LEVEL_TEXT_COLOR = ${S.LEVEL_TEXT_COLOR};
+	public static final int XP_BAR_BG_COLOR = ${S.XP_BAR_BG_COLOR};
+	public static final int XP_BAR_FILL_COLOR = ${S.XP_BAR_FILL_COLOR};
+	public static final int XP_TEXT_COLOR = ${S.XP_TEXT_COLOR};
 
 	// ==========================================================================
 	//  A navbar tab. pageId must match a GuiPage.id() to be interactive. Tab
@@ -367,9 +438,16 @@ ${withBg.map(bgLine).join('\n')}
 }
 
 // ---- controls -------------------------------------------------------------
-['DESIGN_W','DESIGN_H','CONTENT_MARGIN','NAV_Y','NAV_H','NAV_TAB_W','NAV_GAP','NAV_ICON'].forEach(k=>{
+const NUM_KEYS=['DESIGN_W','DESIGN_H','CONTENT_MARGIN','NAV_Y','NAV_H','NAV_TAB_W','NAV_GAP','NAV_ICON',
+  'LEVEL_X','LEVEL_Y','LEVEL_SCALE','XP_BAR_X','XP_BAR_Y','XP_BAR_W','XP_BAR_H','XP_TEXT_X','XP_TEXT_Y'];
+const COLOR_KEYS=['LEVEL_TEXT_COLOR','XP_BAR_BG_COLOR','XP_BAR_FILL_COLOR','XP_TEXT_COLOR'];
+NUM_KEYS.forEach(k=>{
   const el=$(k); el.value=S[k];
   el.addEventListener('input',()=>{ const v=parseInt(el.value,10); if(!isNaN(v)){ S[k]=v; build(); } });
+});
+COLOR_KEYS.forEach(k=>{
+  const el=$(k); el.value=S[k];
+  el.addEventListener('input',()=>{ S[k]=el.value; build(); });
 });
 $('BG').value=S.BG; $('BG').addEventListener('input',()=>{ S.BG=$('BG').value; renderOut(); });
 $('zoom').value=zoom;
@@ -380,7 +458,7 @@ $('copyBtn').addEventListener('click', async ()=>{ out.select();
   catch{ document.execCommand('copy'); flash($('copyBtn'),'Copied!'); } });
 function flash(b,m){ const t=b.textContent; b.textContent=m; setTimeout(()=>b.textContent=t,1200); }
 $('resetBtn').addEventListener('click',()=>{ S=structuredClone(SEED); zoom=1.6;
-  ['DESIGN_W','DESIGN_H','CONTENT_MARGIN','NAV_Y','NAV_H','NAV_TAB_W','NAV_GAP','NAV_ICON'].forEach(k=>$(k).value=S[k]);
+  NUM_KEYS.forEach(k=>$(k).value=S[k]); COLOR_KEYS.forEach(k=>$(k).value=S[k]);
   $('BG').value=S.BG; $('zoom').value=zoom; sel=null; build(); });
 
 $('loadBg').addEventListener('click',()=>$('bgFile').click());

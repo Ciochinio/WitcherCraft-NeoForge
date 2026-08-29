@@ -9,6 +9,6 @@ public class CharacterExperienceProcedure {
 		if (entity == null)
 			return "";
 		return new java.text.DecimalFormat("##.##").format(entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerExperience) + ""
-				+ ("/" + entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerExperienceRequirement);
+				+ ("/  wel" + entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerExperienceRequirement);
 	}
 }
