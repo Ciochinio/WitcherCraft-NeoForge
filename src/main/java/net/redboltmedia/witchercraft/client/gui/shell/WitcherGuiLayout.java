@@ -62,6 +62,7 @@ public final class WitcherGuiLayout {
 			new Nav("map", "gui.witchercraft.shell.nav.map", "witchercraft:textures/gui/nav/map.png"),
 			new Nav("skills", "gui.witchercraft.shell.nav.skills", "witchercraft:textures/gui/nav/skills.png"),
 			new Nav("bombs", "gui.witchercraft.shell.nav.bombs", "witchercraft:textures/gui/nav/bombs.png"),
+			new Nav("meditation", "gui.witchercraft.shell.nav.meditation", "witchercraft:textures/gui/nav/meditation.png"),
 	};
 
 	// ==========================================================================
@@ -84,6 +85,7 @@ public final class WitcherGuiLayout {
 			new Background("bombs", "witchercraft:textures/gui/shell/backgrounds/bombs.png"),
 			new Background("map", "witchercraft:textures/gui/shell/backgrounds/map.png"),
 			new Background("glossary", "witchercraft:textures/gui/shell/backgrounds/glossary.png"),
+			new Background("meditation", "witchercraft:textures/gui/shell/backgrounds/meditation.png"),
 	};
 
 	// --- lookups (kept trivial so the tool can regenerate the class) ----------

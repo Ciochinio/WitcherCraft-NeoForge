@@ -29,6 +29,10 @@ public final class WitcherGuiPages {
 		// The ported perk equip/tree screen, now a page under the "skills" tab.
 		PerkPage perk = new PerkPage("skills");
 		CUSTOM.put(perk.id(), perk);
+
+		// The meditation clock dial.
+		MeditationPage meditation = new MeditationPage("meditation");
+		CUSTOM.put(meditation.id(), meditation);
 	}
 
 	/** The page handling a given id (never null - falls back to a PlaceholderPage). */

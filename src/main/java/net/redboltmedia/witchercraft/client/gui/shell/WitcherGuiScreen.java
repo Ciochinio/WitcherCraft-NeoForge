@@ -99,6 +99,14 @@ public class WitcherGuiScreen extends Screen {
 
 	@Override
 	public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partial) {
+		// When the active page wants the world visible (meditation time-lapse),
+		// skip the opaque base + bg image entirely so the live world renders
+		// behind the Screen; a gentle dim keeps the dial readable.
+		if (activePage().wantsWorldVisible()) {
+			g.fill(0, 0, this.width, this.height, PANEL_DIM);
+			return;
+		}
+
 		// opaque black base -> becomes the letterbox bars on non-16:9 screens
 		g.fill(0, 0, this.width, this.height, LETTERBOX);
 

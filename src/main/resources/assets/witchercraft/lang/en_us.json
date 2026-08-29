@@ -343,16 +343,21 @@
   "gui.witchercraft.shell.nav.bombs": "Bombs",
   "gui.witchercraft.shell.nav.map": "Map",
   "gui.witchercraft.shell.nav.glossary": "Glossary",
+  "gui.witchercraft.shell.nav.meditation": "Meditation",
   "gui.witchercraft.shell.section.stats": "Stats",
   "gui.witchercraft.shell.section.alchemy_todo": "Alchemy - coming soon",
   "gui.witchercraft.shell.section.bombs_todo": "Bombs - coming soon",
   "gui.witchercraft.shell.section.glossary_todo": "Glossary - coming soon",
   "gui.witchercraft.shell.empty_page": "Nothing here yet",
   "gui.witchercraft.shell.coming_soon": "Coming soon",
+  "gui.witchercraft.shell.meditation.now": "Now: %s",
+  "gui.witchercraft.shell.meditation.target": "Meditate to %s",
+  "gui.witchercraft.shell.meditation.button": "Meditate",
   "key.witchercraft.open_shell.inventory": "WitcherCraft: Inventory",
   "key.witchercraft.open_shell.skills": "WitcherCraft: Skills",
   "key.witchercraft.open_shell.alchemy": "WitcherCraft: Alchemy",
   "key.witchercraft.open_shell.bombs": "WitcherCraft: Bombs",
   "key.witchercraft.open_shell.map": "WitcherCraft: Map",
-  "key.witchercraft.open_shell.glossary": "WitcherCraft: Glossary"
+  "key.witchercraft.open_shell.glossary": "WitcherCraft: Glossary",
+  "key.witchercraft.open_shell.meditation": "WitcherCraft: Meditation"
 }

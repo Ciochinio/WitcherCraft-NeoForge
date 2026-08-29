@@ -69,6 +69,15 @@ public interface GuiPage {
 		return null;
 	}
 
+	/**
+	 * When true, the shell skips its opaque background image (and heavy dim) so
+	 * the live world renders through the Screen. Used by the meditation page
+	 * during the accelerated time-lapse, so the player watches the real sky spin.
+	 */
+	default boolean wantsWorldVisible() {
+		return false;
+	}
+
 	/** Called when this page becomes the active tab. */
 	default void onShown() {
 	}

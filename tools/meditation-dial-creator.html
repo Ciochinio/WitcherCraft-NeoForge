@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WitcherCraft - Meditation Dial Creator</title>
+<style>
+  :root {
+    --bg: #14141a; --ink: #e8e8ef; --dim: #9a9aa6; --line: #33333d; --accent: #ffdd55;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  header { padding: 10px 16px; border-bottom: 1px solid var(--line); display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;}
+  header h1 { font-size: 15px; margin: 0; font-weight: 600; }
+  header .hint { color: var(--dim); font-size: 12px; max-width:720px; }
+  .wrap { display: flex; gap: 16px; padding: 16px; align-items: flex-start; flex-wrap: wrap; }
+  .side { flex: 1 1 340px; min-width: 320px; max-width: 560px; }
+  #stageWrap { background:#0b0b0f; border:1px solid var(--line); box-shadow:0 6px 30px #0008;
+               background-image: linear-gradient(#ffffff08 1px, transparent 1px), linear-gradient(90deg, #ffffff08 1px, transparent 1px);
+               background-size: 10px 10px; }
+  svg { display:block; touch-action:none; }
+  svg .handle { cursor:grab; }
+  svg text { font: 8px ui-monospace, Consolas, monospace; }
+  fieldset { border: 1px solid var(--line); border-radius: 6px; margin: 0 0 12px; padding: 10px 12px; }
+  legend { color: var(--dim); padding: 0 6px; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+  label { display:inline-flex; align-items:center; gap:6px; margin: 3px 10px 3px 0; color: var(--dim); }
+  input[type=number]{ width:60px; background:#0e0e13; border:1px solid var(--line); color:var(--ink); padding:3px 5px; border-radius:4px; font:inherit; }
+  input[type=text]{ width:104px; background:#0e0e13; border:1px solid var(--line); color:var(--ink); padding:3px 5px; border-radius:4px; font:inherit; }
+  .sw { width:16px; height:16px; border:1px solid var(--line); border-radius:3px; display:inline-block; vertical-align:middle; }
+  .colrow { display:flex; align-items:center; gap:6px; margin:3px 0; }
+  .colrow span.k { color:var(--dim); width:130px; display:inline-block; }
+  button { background:#2a2a34; color:var(--ink); border:1px solid var(--line); border-radius:5px; padding:6px 12px; cursor:pointer; font:inherit; }
+  button:hover { background:#34343f; }
+  button.primary { background:var(--accent); color:#161009; border-color:var(--accent); font-weight:600; }
+  .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:8px; }
+  textarea { width:100%; height:340px; background:#0e0e13; color:#cfe8cf; border:1px solid var(--line); border-radius:6px; padding:10px; font:12px/1.45 ui-monospace,Consolas,monospace; resize:vertical; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Meditation Dial Creator</h1>
+  <span class="hint">Drag the <b>centre</b>, the <b>radius</b> handle (on the ring), or the <b>button</b>; tune the rest with the inputs. Output regenerates
+  <code>src/main/java/net/redboltmedia/witchercraft/client/gui/MeditationLayout.java</code> &rarr; Copy &rarr; paste over the file. The two preview-hour inputs only move the sample hands; they are not saved.</span>
+</header>
+
+<div class="wrap">
+  <div>
+    <div id="stageWrap"><svg id="svg"></svg></div>
+    <div style="margin-top:8px;color:var(--dim)" id="selinfo">Panel is the fixed design box the page fit-scales into the shell content region.</div>
+  </div>
+
+  <div class="side">
+    <fieldset><legend>Panel &amp; dial</legend><div id="grpDial"></div></fieldset>
+    <fieldset><legend>Ticks &amp; labels</legend><div id="grpTicks"></div></fieldset>
+    <fieldset><legend>Hands &amp; hub</legend><div id="grpHands"></div></fieldset>
+    <fieldset><legend>Readout &amp; button</legend><div id="grpBtn"></div></fieldset>
+    <fieldset><legend>Preview only (not saved)</legend><div id="grpPrev"></div></fieldset>
+    <fieldset><legend>Colours (0xAARRGGBB)</legend><div id="grpColors"></div></fieldset>
+    <div class="row">
+      <button class="primary" id="copy">Copy MeditationLayout.java</button>
+      <button id="reset">Reset defaults</button>
+    </div>
+    <textarea id="out" spellcheck="false"></textarea>
+  </div>
+</div>
+
+<script>
+const SVG_NS = "http://www.w3.org/2000/svg";
+const VIEW_SCALE = 2.2; // on-screen zoom of the panel
+
+// --- defaults must match MeditationLayout.java ------------------------------
+const DEFAULTS = {
+  PANEL_W:210, PANEL_H:286, CX:105, CY:110, RADIUS:90,
+  MAJOR_EVERY:6, TICK_MINOR_LEN:5, TICK_MAJOR_LEN:10, TICK_MINOR_HALF:1, TICK_MAJOR_HALF:2,
+  LABEL_RADIUS:102, GLYPH_HALF:3,
+  HAND_CURRENT_LEN:64, HAND_CURRENT_HALF:1, HAND_TARGET_LEN:80, HAND_TARGET_HALF:2, HUB_HALF:2,
+  NOW_Y:222, TARGET_Y:234, BTN_X:45, BTN_Y:250, BTN_W:120, BTN_H:20
+};
+const COLORS = {
+  COL_TICK_MINOR:"0xFF55555F", COL_TICK_MAJOR:"0xFFCFC7B0", COL_HAND_CURRENT:"0xFF8899AA",
+  COL_HAND_TARGET:"0xFFFFDD55", COL_HUB:"0xFFCFC7B0", COL_SUN:"0xFFFFCC33", COL_MOON:"0xFFAAB6CC",
+  COL_TEXT_TITLE:"0xFFCFC7B0", COL_TEXT_SUB:"0xFF9A9AA2", COL_BTN_BG:"0x66101015",
+  COL_BTN_BG_HOVER:"0xB0000000", COL_BTN_BORDER:"0xFF33333D", COL_BTN_TEXT:"0xFFFFDD55"
+};
+const PREVIEW = { previewNow:8.5, previewTarget:18 };
+
+let S = Object.assign({}, DEFAULTS);
+let C = Object.assign({}, COLORS);
+let P = Object.assign({}, PREVIEW);
+
+// which numeric fields go in which fieldset
+const GROUPS = {
+  grpDial:  ["PANEL_W","PANEL_H","CX","CY","RADIUS"],
+  grpTicks: ["MAJOR_EVERY","TICK_MINOR_LEN","TICK_MAJOR_LEN","TICK_MINOR_HALF","TICK_MAJOR_HALF","LABEL_RADIUS","GLYPH_HALF"],
+  grpHands: ["HAND_CURRENT_LEN","HAND_CURRENT_HALF","HAND_TARGET_LEN","HAND_TARGET_HALF","HUB_HALF"],
+  grpBtn:   ["NOW_Y","TARGET_Y","BTN_X","BTN_Y","BTN_W","BTN_H"]
+};
+
+// --- colour helpers ---------------------------------------------------------
+function argbToCss(v){ // "0xAARRGGBB" -> rgba()
+  const n = parseInt(v.replace(/^0x/i,""),16);
+  if (isNaN(n)) return "rgba(0,0,0,0)";
+  const a=((n>>>24)&255)/255, r=(n>>16)&255, g=(n>>8)&255, b=n&255;
+  return `rgba(${r},${g},${b},${a.toFixed(3)})`;
+}
+
+// --- build inputs -----------------------------------------------------------
+function numInput(key){
+  const l=document.createElement("label");
+  l.textContent=key.toLowerCase();
+  const i=document.createElement("input"); i.type="number"; i.value=S[key]; i.dataset.k=key;
+  i.addEventListener("input",()=>{ S[key]=Math.round(parseFloat(i.value)||0); redraw(); });
+  l.appendChild(i); return l;
+}
+for (const [gid,keys] of Object.entries(GROUPS)){
+  const box=document.getElementById(gid);
+  keys.forEach(k=>box.appendChild(numInput(k)));
+}
+// preview inputs
+{
+  const box=document.getElementById("grpPrev");
+  [["previewNow","current hand hour"],["previewTarget","target hand hour"]].forEach(([k,lbl])=>{
+    const l=document.createElement("label"); l.textContent=lbl;
+    const i=document.createElement("input"); i.type="number"; i.step="0.5"; i.value=P[k];
+    i.addEventListener("input",()=>{ P[k]=parseFloat(i.value)||0; redraw(); });
+    l.appendChild(i); box.appendChild(l);
+  });
+}
+// colour inputs
+const swatches={};
+for (const key of Object.keys(C)){
+  const row=document.createElement("div"); row.className="colrow";
+  const k=document.createElement("span"); k.className="k"; k.textContent=key;
+  const sw=document.createElement("span"); sw.className="sw"; swatches[key]=sw;
+  const t=document.createElement("input"); t.type="text"; t.value=C[key]; t.dataset.k=key;
+  t.addEventListener("input",()=>{ C[key]=t.value.trim(); redraw(); });
+  row.append(k,sw,t); document.getElementById("grpColors").appendChild(row);
+}
+
+// --- SVG rendering ----------------------------------------------------------
+const svg=document.getElementById("svg");
+function el(name,attrs){ const e=document.createElementNS(SVG_NS,name); for(const k in attrs) e.setAttribute(k,attrs[k]); return e; }
+function pt(hour,r){ const a=hour/24*Math.PI*2; return [S.CX+Math.sin(a)*r, S.CY-Math.cos(a)*r]; }
+
+function redraw(){
+  // sync input values (in case changed programmatically e.g. by drag)
+  document.querySelectorAll("input[type=number][data-k]").forEach(i=>{ if(document.activeElement!==i) i.value=S[i.dataset.k]; });
+  document.querySelectorAll("input[type=text][data-k]").forEach(i=>{ if(document.activeElement!==i) i.value=C[i.dataset.k]; });
+  for (const key in swatches) swatches[key].style.background=argbToCss(C[key]);
+
+  svg.setAttribute("width", S.PANEL_W*VIEW_SCALE);
+  svg.setAttribute("height", S.PANEL_H*VIEW_SCALE);
+  svg.setAttribute("viewBox", `0 0 ${S.PANEL_W} ${S.PANEL_H}`);
+  svg.innerHTML="";
+
+  // panel border
+  svg.appendChild(el("rect",{x:0,y:0,width:S.PANEL_W,height:S.PANEL_H,fill:"none",stroke:"#ffffff18","stroke-width":0.5}));
+
+  // ticks + labels
+  const every=Math.max(1,S.MAJOR_EVERY|0);
+  for (let hHour=0;hHour<24;hHour++){
+    const major=(hHour%every)===0;
+    const len=major?S.TICK_MAJOR_LEN:S.TICK_MINOR_LEN;
+    const half=major?S.TICK_MAJOR_HALF:S.TICK_MINOR_HALF;
+    const col=argbToCss(major?C.COL_TICK_MAJOR:C.COL_TICK_MINOR);
+    const [ox,oy]=pt(hHour,S.RADIUS), [ix,iy]=pt(hHour,S.RADIUS-len);
+    svg.appendChild(el("line",{x1:ox,y1:oy,x2:ix,y2:iy,stroke:col,"stroke-width":half*2}));
+    if (major){
+      const [lx,ly]=pt(hHour,S.LABEL_RADIUS);
+      const t=el("text",{x:lx,y:ly+3,fill:argbToCss(C.COL_TICK_MAJOR),"text-anchor":"middle"}); t.textContent=hHour;
+      svg.appendChild(t);
+    }
+  }
+  // hands
+  const [cnx,cny]=pt(P.previewNow,S.HAND_CURRENT_LEN);
+  svg.appendChild(el("line",{x1:S.CX,y1:S.CY,x2:cnx,y2:cny,stroke:argbToCss(C.COL_HAND_CURRENT),"stroke-width":S.HAND_CURRENT_HALF*2}));
+  const [ctx,cty]=pt(P.previewTarget,S.HAND_TARGET_LEN);
+  svg.appendChild(el("line",{x1:S.CX,y1:S.CY,x2:ctx,y2:cty,stroke:argbToCss(C.COL_HAND_TARGET),"stroke-width":S.HAND_TARGET_HALF*2}));
+  // target glyph
+  const [gx,gy]=pt(P.previewTarget,S.RADIUS);
+  const day=(((P.previewTarget%24)+24)%24)>=6 && (((P.previewTarget%24)+24)%24)<18;
+  svg.appendChild(el("rect",{x:gx-S.GLYPH_HALF,y:gy-S.GLYPH_HALF,width:S.GLYPH_HALF*2+1,height:S.GLYPH_HALF*2+1,fill:argbToCss(day?C.COL_SUN:C.COL_MOON)}));
+  // hub
+  svg.appendChild(el("rect",{x:S.CX-S.HUB_HALF,y:S.CY-S.HUB_HALF,width:S.HUB_HALF*2+1,height:S.HUB_HALF*2+1,fill:argbToCss(C.COL_HUB)}));
+  // readouts
+  const now=el("text",{x:S.CX,y:S.NOW_Y+6,fill:argbToCss(C.COL_TEXT_SUB),"text-anchor":"middle"}); now.textContent="Now: "+fmt(P.previewNow); svg.appendChild(now);
+  const tgt=el("text",{x:S.CX,y:S.TARGET_Y+6,fill:argbToCss(C.COL_TEXT_TITLE),"text-anchor":"middle"}); tgt.textContent="Meditate to "+fmtHour(P.previewTarget); svg.appendChild(tgt);
+  // button
+  svg.appendChild(el("rect",{x:S.BTN_X,y:S.BTN_Y,width:S.BTN_W,height:S.BTN_H,fill:argbToCss(C.COL_BTN_BG),stroke:argbToCss(C.COL_BTN_BORDER),"stroke-width":1}));
+  const bt=el("text",{x:S.BTN_X+S.BTN_W/2,y:S.BTN_Y+S.BTN_H/2+3,fill:argbToCss(C.COL_BTN_TEXT),"text-anchor":"middle"}); bt.textContent="Meditate"; svg.appendChild(bt);
+
+  // drag handles (drawn last, on top)
+  addHandle("center", S.CX, S.CY, "#ffdd55");
+  const [rhx,rhy]=pt(6,S.RADIUS); addHandle("radius", rhx, rhy, "#55ff99");
+  addHandle("button", S.BTN_X, S.BTN_Y, "#5599ff");
+
+  regen();
+}
+function fmt(h){ h=((h%24)+24)%24; const hh=Math.floor(h), mm=Math.floor((h-hh)*60); return String(hh).padStart(2,"0")+":"+String(mm).padStart(2,"0"); }
+function fmtHour(h){ h=((Math.round(h)%24)+24)%24; return String(h).padStart(2,"0")+":00"; }
+
+function addHandle(role,x,y,color){
+  const c=el("circle",{cx:x,cy:y,r:3.2,fill:color,stroke:"#000","stroke-width":0.6,class:"handle"});
+  c.dataset.role=role; c.addEventListener("pointerdown",startDrag); svg.appendChild(c);
+}
+
+// --- dragging ---------------------------------------------------------------
+let drag=null;
+function svgPoint(ev){
+  const r=svg.getBoundingClientRect();
+  return [ (ev.clientX-r.left)/VIEW_SCALE, (ev.clientY-r.top)/VIEW_SCALE ];
+}
+function startDrag(ev){ drag=ev.target.dataset.role; ev.target.setPointerCapture(ev.pointerId); ev.preventDefault(); }
+svg.addEventListener("pointermove",ev=>{
+  if(!drag) return;
+  const [mx,my]=svgPoint(ev);
+  if(drag==="center"){ S.CX=Math.round(mx); S.CY=Math.round(my); }
+  else if(drag==="radius"){ const dx=mx-S.CX, dy=my-S.CY; S.RADIUS=Math.max(10,Math.round(Math.hypot(dx,dy))); }
+  else if(drag==="button"){ S.BTN_X=Math.round(mx); S.BTN_Y=Math.round(my); }
+  redraw();
+});
+svg.addEventListener("pointerup",()=>{ drag=null; });
+
+// --- Java output ------------------------------------------------------------
+function regen(){
+  const n=k=>S[k];
+  const out=
+`package net.redboltmedia.witchercraft.client.gui;
+
+/**
+ * Data-driven geometry + colours for the meditation clock dial.
+ *
+ * All coordinates are PANEL-LOCAL (relative to a fixed PANEL_W x PANEL_H design
+ * box). {@link net.redboltmedia.witchercraft.client.gui.shell.MeditationPage}
+ * fit-scales this panel uniformly (centred) into the shell content region, the
+ * same way the perk page maps {@link PerkEquipLayout}. Hours run clockwise with
+ * 00:00 at the top (CX, CY - RADIUS): hour h sits at angle h/24 * 2PI.
+ *
+ * Generated by tools/meditation-dial-creator.html - paste this over the file
+ * wholesale. Keep it a dumb data holder (no logic) so the tool can overwrite it.
+ */
+public final class MeditationLayout {
+\tprivate MeditationLayout() {
+\t}
+
+\t// Panel size (drives centering + fit-scale in the page).
+\tpublic static final int PANEL_W = ${n("PANEL_W")};
+\tpublic static final int PANEL_H = ${n("PANEL_H")};
+
+\t// Dial centre + radius (panel coords).
+\tpublic static final int CX = ${n("CX")};
+\tpublic static final int CY = ${n("CY")};
+\tpublic static final int RADIUS = ${n("RADIUS")};
+
+\t// Tick marks: every MAJOR_EVERY-th hour is a longer/thicker "major" tick and
+\t// gets a number label. len = inward length from the ring; half = half-width.
+\tpublic static final int MAJOR_EVERY = ${n("MAJOR_EVERY")};
+\tpublic static final int TICK_MINOR_LEN = ${n("TICK_MINOR_LEN")};
+\tpublic static final int TICK_MAJOR_LEN = ${n("TICK_MAJOR_LEN")};
+\tpublic static final int TICK_MINOR_HALF = ${n("TICK_MINOR_HALF")};
+\tpublic static final int TICK_MAJOR_HALF = ${n("TICK_MAJOR_HALF")};
+
+\t// Distance from centre at which the major-hour number labels are centred.
+\tpublic static final int LABEL_RADIUS = ${n("LABEL_RADIUS")};
+
+\t// Sun/moon target marker half-size (a small square on the ring at the target).
+\tpublic static final int GLYPH_HALF = ${n("GLYPH_HALF")};
+
+\t// Hands (from the hub outward). Current-time hand is dim/thin, target bright.
+\tpublic static final int HAND_CURRENT_LEN = ${n("HAND_CURRENT_LEN")};
+\tpublic static final int HAND_CURRENT_HALF = ${n("HAND_CURRENT_HALF")};
+\tpublic static final int HAND_TARGET_LEN = ${n("HAND_TARGET_LEN")};
+\tpublic static final int HAND_TARGET_HALF = ${n("HAND_TARGET_HALF")};
+\tpublic static final int HUB_HALF = ${n("HUB_HALF")};
+
+\t// Readout text baselines (centred on CX): current time then target time.
+\tpublic static final int NOW_Y = ${n("NOW_Y")};
+\tpublic static final int TARGET_Y = ${n("TARGET_Y")};
+
+\t// "Meditate" button rect (panel coords).
+\tpublic static final int BTN_X = ${n("BTN_X")};
+\tpublic static final int BTN_Y = ${n("BTN_Y")};
+\tpublic static final int BTN_W = ${n("BTN_W")};
+\tpublic static final int BTN_H = ${n("BTN_H")};
+
+\t// --- colours (0xAARRGGBB) --------------------------------------------------
+\tpublic static final int COL_TICK_MINOR = ${C.COL_TICK_MINOR};
+\tpublic static final int COL_TICK_MAJOR = ${C.COL_TICK_MAJOR};
+\tpublic static final int COL_HAND_CURRENT = ${C.COL_HAND_CURRENT};
+\tpublic static final int COL_HAND_TARGET = ${C.COL_HAND_TARGET};
+\tpublic static final int COL_HUB = ${C.COL_HUB};
+\tpublic static final int COL_SUN = ${C.COL_SUN};
+\tpublic static final int COL_MOON = ${C.COL_MOON};
+\tpublic static final int COL_TEXT_TITLE = ${C.COL_TEXT_TITLE};
+\tpublic static final int COL_TEXT_SUB = ${C.COL_TEXT_SUB};
+\tpublic static final int COL_BTN_BG = ${C.COL_BTN_BG};
+\tpublic static final int COL_BTN_BG_HOVER = ${C.COL_BTN_BG_HOVER};
+\tpublic static final int COL_BTN_BORDER = ${C.COL_BTN_BORDER};
+\tpublic static final int COL_BTN_TEXT = ${C.COL_BTN_TEXT};
+
+\t/** Uniform scale to fit the panel into a w x h content region. */
+\tpublic static float fitScale(int w, int h) {
+\t\treturn Math.min((float) w / PANEL_W, (float) h / PANEL_H);
+\t}
+}
+`;
+  document.getElementById("out").value=out;
+}
+
+document.getElementById("copy").addEventListener("click",()=>{
+  const t=document.getElementById("out"); t.select(); document.execCommand("copy");
+});
+document.getElementById("reset").addEventListener("click",()=>{
+  S=Object.assign({},DEFAULTS); C=Object.assign({},COLORS); P=Object.assign({},PREVIEW); redraw();
+});
+
+redraw();
+</script>
+</body>
+</html>

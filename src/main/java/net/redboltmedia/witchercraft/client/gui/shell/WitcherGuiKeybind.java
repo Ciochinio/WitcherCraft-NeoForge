@@ -46,7 +46,8 @@ public class WitcherGuiKeybind {
 			"alchemy", GLFW.GLFW_KEY_J,
 			"bombs", GLFW.GLFW_KEY_N,
 			"map", GLFW.GLFW_KEY_M,
-			"glossary", GLFW.GLFW_KEY_G);
+			"glossary", GLFW.GLFW_KEY_G,
+			"meditation", GLFW.GLFW_KEY_U);
 
 	static {
 		int n = WitcherGuiLayout.NAV.length;
