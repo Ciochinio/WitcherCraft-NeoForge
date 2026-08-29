@@ -537,9 +537,12 @@ Perks are split across four tabs, each pointed at one side of the witcher kit:
   drinking a potion or decoction).
 - **General** - cross-cutting utility perks.
 
-Each tab has **3 tiers**. A tab's Tier 2 opens once you've spent **3** points in that tab, and
-Tier 3 after **6**. Depth in one tree therefore costs you breadth in the others - committing to
-Signs all the way to its Tier 3 is a large fraction of a whole run's points.
+What unlocks a perk is purely its position in that tab's tree: a perk with no connecting lines is
+learnable from the start, and one with connecting lines to earlier perks needs any ONE of them
+learned first (several parents are alternative routes in, not a checklist). There is no longer a
+separate "spend N points in this tab to open its later rows" threshold - the old point-threshold
+tiers were dropped once the tree's own prerequisites fully took over that job, so depth in a branch
+now costs exactly the points its own chain requires, not a flat tab-wide toll on top.
 
 ### How perks work
 
@@ -561,8 +564,12 @@ left-click a learned one to hold it for equipping), a twelve-slot equip grid on 
 mutagen sockets whose colour synergises with the perks grouped above them. Holding a perk, every slot
 lights as a valid target: drop onto an empty slot to equip, or onto an occupied one to swap - the
 displaced perk simply returns to the unequipped pool, so re-arranging a full grid never needs a
-manual unequip first. The remaining tabs are placeholders for now, filled in as those systems get
-their own screens.
+manual unequip first. When a node has more than one connecting line to earlier perks, learning any
+ONE of them is enough - multiple parents are alternative routes into that node, not a checklist you
+have to clear in full, so a tree can branch and re-converge without gating a node behind everything
+that feeds into it. Hovering a node or a slotted perk shows its name (in its branch's colour) and a
+one-line description; whether it's locked, available, or equipped is left to the art alone. The
+remaining tabs are placeholders for now, filled in as those systems get their own screens.
 
 The whole hub is a **reskinnable shell**: the navbar and every page's layout live in one data file,
 so tabs and panels can be rearranged, relabelled, or repointed without touching game logic. Each perk now

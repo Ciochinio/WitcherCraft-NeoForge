@@ -67,10 +67,9 @@ public record PauseMenuGuiButtonMessage(int buttonID, int x, int y, int z) imple
 
 			BestiaryMenuGuiOpenProcedure.execute(world, x, y, z, entity);
 		}
-		if (buttonID == 5) {
-
-			CharacterAbilitiesGeneralGuiOpenProcedure.execute(world, x, y, z, entity);
-		}
+		// buttonID 5 ("Skill Tree", used to open the now-retired old tab GUI)
+		// retired: the client no longer sends it, PauseMenuGuiScreen now opens the
+		// WitcherCraft shell's Skills tab directly (client-only, no server action).
 	}
 
 	@SubscribeEvent

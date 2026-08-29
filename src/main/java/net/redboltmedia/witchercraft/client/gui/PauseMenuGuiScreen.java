@@ -3,6 +3,7 @@ package net.redboltmedia.witchercraft.client.gui;
 import net.redboltmedia.witchercraft.world.inventory.PauseMenuGuiMenu;
 import net.redboltmedia.witchercraft.network.PauseMenuGuiButtonMessage;
 import net.redboltmedia.witchercraft.init.WitchercraftModScreens;
+import net.redboltmedia.witchercraft.client.gui.shell.WitcherGuiScreen;
 
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
@@ -10,6 +11,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.network.chat.Component;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.components.Button;
@@ -121,13 +123,12 @@ public class PauseMenuGuiScreen extends AbstractContainerScreen<PauseMenuGuiMenu
 			}
 		}).bounds(this.leftPos + -32, this.topPos + 97, 77, 20).build();
 		this.addRenderableWidget(button_bestiary);
+		// Skills now lives in the WitcherCraft shell (P) - open it directly,
+		// client-side, same as WitcherGuiKeybind. No server round-trip: opening a
+		// screen is not server-authoritative state, unlike the other pause-menu
+		// buttons above, which still open their own MCreator container screens.
 		button_skill_tree = Button.builder(Component.translatable("gui.witchercraft.pause_menu_gui.button_skill_tree"), e -> {
-			int x = PauseMenuGuiScreen.this.x;
-			int y = PauseMenuGuiScreen.this.y;
-			if (true) {
-				ClientPacketDistributor.sendToServer(new PauseMenuGuiButtonMessage(5, x, y, z));
-				PauseMenuGuiButtonMessage.handleButtonAction(entity, 5, x, y, z);
-			}
+			Minecraft.getInstance().setScreen(new WitcherGuiScreen("skills"));
 		}).bounds(this.leftPos + 133, this.topPos + 97, 77, 20).build();
 		this.addRenderableWidget(button_skill_tree);
 	}

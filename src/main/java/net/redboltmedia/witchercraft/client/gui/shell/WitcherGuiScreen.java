@@ -1,5 +1,7 @@
 package net.redboltmedia.witchercraft.client.gui.shell;
 
+import java.util.List;
+
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
@@ -130,9 +132,9 @@ public class WitcherGuiScreen extends Screen {
 		g.pose().popMatrix();
 
 		// tooltip in SCREEN space at the real cursor (after the transform is popped)
-		Component tip = activePage().pollTooltip();
-		if (tip != null)
-			g.setTooltipForNextFrame(this.font, tip, mouseX, mouseY);
+		List<Component> tip = activePage().pollTooltip();
+		if (tip != null && !tip.isEmpty())
+			g.setComponentTooltipForNextFrame(this.font, tip, mouseX, mouseY);
 	}
 
 	private void drawNavbar(GuiGraphicsExtractor g) {

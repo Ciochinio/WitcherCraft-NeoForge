@@ -1,5 +1,7 @@
 package net.redboltmedia.witchercraft.client.gui.shell;
 
+import java.util.List;
+
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -58,11 +60,12 @@ public interface GuiPage {
 	}
 
 	/**
-	 * The tooltip to show this frame (computed during {@link #render}), or null.
-	 * The shell renders it in SCREEN space at the real cursor, so a page must not
-	 * call setTooltipForNextFrame itself (the scale transform would misplace it).
+	 * The tooltip lines to show this frame (computed during {@link #render}), one
+	 * {@link Component} per line, or null/empty for none. The shell renders it in
+	 * SCREEN space at the real cursor, so a page must not call
+	 * setTooltipForNextFrame itself (the scale transform would misplace it).
 	 */
-	default Component pollTooltip() {
+	default List<Component> pollTooltip() {
 		return null;
 	}
 

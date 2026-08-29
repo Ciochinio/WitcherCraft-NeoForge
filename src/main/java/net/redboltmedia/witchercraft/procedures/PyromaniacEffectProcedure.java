@@ -9,14 +9,12 @@ public class PyromaniacEffectProcedure {
 		if (entity == null)
 			return;
 		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
-			if (CharacterAbilitiesSignsTier3Procedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 					_vars.witchercraftPerksPyromaniac = true;
 					_vars.markSyncDirty();
 				}
 				CharacterAbilitiesSignsSkillPointsUsedProcedure.execute(entity);
-			}
 		}
 	}
 }

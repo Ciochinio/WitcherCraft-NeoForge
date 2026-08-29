@@ -64,6 +64,39 @@ public final class PerkRegistry {
 		return i < 0 ? "" : NAMES[i].toLowerCase(java.util.Locale.ROOT);
 	}
 
+	/** Lang key for a perk's localized display name ("perk.witchercraft.<slug>.name"), or "" if unknown. */
+	public static String nameKey(int id) {
+		String slug = slug(id);
+		return slug.isEmpty() ? "" : "perk.witchercraft." + slug + ".name";
+	}
+
+	/** Lang key for a perk's localized description ("perk.witchercraft.<slug>.desc"), or "" if unknown. */
+	public static String descKey(int id) {
+		String slug = slug(id);
+		return slug.isEmpty() ? "" : "perk.witchercraft." + slug + ".desc";
+	}
+
+	/**
+	 * Spaced display-name fallback derived from {@link #name}, e.g. "RazorFocus"
+	 * -> "Razor Focus". Passed as the translatable fallback text so a missing/lost
+	 * lang key (MCreator overwrites en_us.json wholesale on save and does not know
+	 * about hand-added keys - see TDD 3.11) renders something readable instead of
+	 * the raw dotted key string; not itself localized.
+	 */
+	public static String fallbackName(int id) {
+		String raw = name(id);
+		if (raw.isEmpty())
+			return "";
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < raw.length(); i++) {
+			char c = raw.charAt(i);
+			if (i > 0 && Character.isUpperCase(c))
+				sb.append(' ');
+			sb.append(c);
+		}
+		return sb.toString();
+	}
+
 	/** ARGB text tint for a color bucket. */
 	public static int tint(int colorBucket) {
 		switch (colorBucket) {

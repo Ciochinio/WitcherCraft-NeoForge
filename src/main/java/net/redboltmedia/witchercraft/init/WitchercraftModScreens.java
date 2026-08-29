@@ -21,10 +21,6 @@ public class WitchercraftModScreens {
 		event.register(WitchercraftModMenus.BESTIARY_MENU_GUI.get(), BestiaryMenuGuiScreen::new);
 		event.register(WitchercraftModMenus.CHARACTER_GUI.get(), CharacterGuiScreen::new);
 		event.register(WitchercraftModMenus.SIGN_GUI.get(), SignGuiScreen::new);
-		event.register(WitchercraftModMenus.CHARACTER_ABILITIES_GENERAL_GUI.get(), CharacterAbilitiesGeneralGuiScreen::new);
-		event.register(WitchercraftModMenus.CHARACTER_ABILITIES_COMBAT_GUI.get(), CharacterAbilitiesCombatGuiScreen::new);
-		event.register(WitchercraftModMenus.CHARACTER_ABILITIES_ALCHEMY_GUI.get(), CharacterAbilitiesAlchemyGuiScreen::new);
-		event.register(WitchercraftModMenus.CHARACTER_ABILITIES_SIGNS_GUI.get(), CharacterAbilitiesSignsGuiScreen::new);
 		event.register(WitchercraftModMenus.DROWNER_GUI.get(), DrownerGuiScreen::new);
 		event.register(WitchercraftModMenus.ROTFIEND_GUI.get(), RotfiendGuiScreen::new);
 		event.register(WitchercraftModMenus.FOGLET_GUI.get(), FogletGuiScreen::new);

@@ -9,14 +9,12 @@ public class AxiiIntensityEffectProcedure {
 		if (entity == null)
 			return;
 		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
-			if (CharacterAbilitiesSignsTier2Procedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 					_vars.witchercraftPerksAxiiIntensity = true;
 					_vars.markSyncDirty();
 				}
 				CharacterAbilitiesSignsSkillPointsUsedProcedure.execute(entity);
-			}
 		}
 	}
 }

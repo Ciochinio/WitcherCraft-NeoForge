@@ -712,6 +712,42 @@ now reuses). Kept and still registered: `PerkEquipGuiButtonMessage`, `PerkEquipL
 that no MCreator element owns. That is intentional and matches the existing perk helper classes; it
 just will not appear as an element in the MCreator browser.
 
+### 3.6a Retiring the four old tab GUIs and the point-threshold tier gates (2026-08-29)
+
+The four original per-branch perk screens (`CharacterAbilities{Combat,Alchemy,Signs,General}Gui` +
+their `Menu`/`ButtonMessage`/`GuiOpenProcedure`/`GuiSkillPointsUsedProcedure`) were left alone during
+the Phase 1/2 work (TDD 3.5-3.6 predate this) because the Pause Menu's "Skill Tree" button still
+opened `CharacterAbilitiesGeneralGuiOpenProcedure` directly - a live, reachable path into the old
+screen even after `PerkPage` fully replaced its function. That's fixed now: `PauseMenuGuiScreen`'s
+Skill Tree button opens `WitcherGuiScreen("skills")` directly (client-only `Minecraft.setScreen`, no
+network message - opening a screen isn't server-authoritative state, see 3.9), and
+`PauseMenuGuiButtonMessage` no longer has a buttonID 5 branch. `PauseMenuGui` was marked
+`locked_code: true` in `witchercraft.mcreator` so this hand-edit survives MCreator resaving the
+project (its `Screen`/`ButtonMessage`/`Menu` java are all now MCreator-immune, same protection
+`PerkEquipGui` had while it existed).
+
+With that link cut, the old-GUI cluster (4 screens + their menus/button-messages/open-procedures/
+skill-points-used-display-procedures, 15 elements) had zero remaining references anywhere in the mod
+and was moved - not deleted - to **`trash/`** at the repo root (mirrors the original `src/`/`elements/`
+paths, `git mv`'d so history is preserved). Same treatment for the **branch-specific tier-gate
+procedures** (`CharacterAbilities{Combat,Alchemy,Signs}Tier{2,3}Procedure`, 6 elements) plus the two
+already-dead top-level ones (`CharacterAbilitiesTier2/3Procedure`): these turned out to still be
+load-bearing right up until this pass - every Tier2/3 perk's buy procedure (23 of the 45 perks) called
+its branch's tier-check (`witchercraftPerks<Branch>SkillPointsUsed >= 3`) as a second gate ALONGSIDE
+the new tree's prerequisites, contradicting the "tier gates replaced by prereqs" Phase 2 intent
+(Section 8 of the rework plan). Removed by unwrapping the tier-check `controls_if` out of each of the
+26 affected `elements/<Perk>Effect.mod.json` Blockly XML (not just the generated Java - see the
+CLAUDE.md warning about MCreator regenerating from XML) and the matching Java. **This is a real balance
+change**, made on explicit request: perks that used to require both a prerequisite AND a branch point
+threshold now require only the prerequisite.
+
+19 `mod_elements` entries removed from `witchercraft.mcreator`, 46 files moved to `trash/` total (27
+Java + 19 `elements/*.mod.json`). The two files this touches that MCreator regenerates wholesale on
+every build (`WitchercraftModScreens`, `WitchercraftModMenus`) had their now-dead registration lines
+removed by hand to keep `compileJava` green today; since the registry no longer lists these elements,
+MCreator's own next regeneration will produce the same (registration-free) result, so this isn't a
+divergence risk the way the `en_us.json` gotcha (3.11) is.
+
 ### 3.7 How to change things
 
 - **Rearrange the navbar / chrome** - open `tools/gui-layout-creator.html`, edit, copy
@@ -773,3 +809,110 @@ If yes, it needs its own `CustomPacketPayload` + `@EventBusSubscriber` handler (
 `PerkEquipGuiButtonMessage`'s shape) - do not reach for `SomeProcedure.execute(entity)` for it, even
 though that "compiles and looks like it should work." If no (it's just displaying something), calling
 the procedure directly is fine and is exactly what `PerkPage` already does.
+
+### 3.10 Adding a new perk
+
+A perk touches several files that must stay in sync. In order:
+
+1. **Branch + ID** (`PerkRegistry.IDS` / `NAMES`). Pick the branch (Combat=red 100s, Alchemy=green
+   200s, Signs=blue 300s, General=neutral 400s) and a free ID in that range. Append to both arrays at
+   the same index - `IDS[i]` and `NAMES[i]` must line up. `NAMES[i]` is PascalCase (e.g.
+   `"CripplingShot"`) - it is the single source the slug, icon folder, and lang keys all derive from
+   (`slug = name.toLowerCase()`), so get it right here once rather than fixing it in four places later.
+2. **Learned + equipped vars** - `witchercraftPerks<Name>` and `witchercraftEquippedPerk<X>`
+   (player-persistent booleans), same pattern as every existing perk.
+3. **Tree node** (`PerkTree.NODES`) - `new Node(id, x, y, prereqId...)`. Position it by hand or with
+   `tools/tree-node-placer.html`. **Prereqs are an OR group**: zero = always learnable, one or more =
+   learning ANY one of them unlocks this node (several parents are alternative unlock paths, not a
+   requirement to learn every one) - enforced identically in `PerkPage.prereqsMet` (client, render
+   state) and `PerkEquipGuiButtonMessage.prereqsMet` (server, the actual learn gate). Keep both in sync
+   by hand if you ever change this rule; it is intentionally duplicated rather than shared, the same way
+   the rest of the equip screen keeps client-render and server-authority logic separate.
+4. **Icon** - a folder `assets/witchercraft/textures/screens/perk/<slug>/` with three 32x32 glyphs:
+   `notlearned.png` (locked or available), `notequipped.png` (learned but not slotted), `equipped.png`
+   (slotted). Bare glyph only - no baked-in frame or background; the coloured cell border and selection
+   ring are drawn by `PerkPage` around whatever the icon is. Missing files fall back to a 3-letter text
+   abbreviation, so a half-finished icon set degrades visibly rather than crashing.
+5. **Buy procedure wiring** - a `<Name>Effect` procedure (sets the learned flag + spends the point,
+   mirror an existing perk) and a `<Name>Show` procedure (visibility gate, only used by the 4 retired
+   tab GUIs now - kept for parity, not load-bearing for the tree). Add a `case <id>:
+   <Name>EffectProcedure.execute(entity); break;` line to the big switch in
+   `PerkEquipGuiButtonMessage.tryLearn` - this is the one place that actually dispatches a tree
+   right-click to the perk's buy logic.
+6. **Apply the buff, gated on EQUIPPED, not learned** - a static flat stat goes in `PerkModifiers`
+   (applied on menu close); a triggered/conditional effect goes in its own event procedure or
+   `PerkModifiersConditional`, gated on `witchercraftEquippedPerk<Name>` (+ its condition, if any).
+7. **Lang keys** - `perk.witchercraft.<slug>.name` and `perk.witchercraft.<slug>.desc` in
+   `en_us.json` (see 3.11 - both are required, this is not optional polish). The tooltip is built purely
+   from these two keys (`PerkRegistry.nameKey` / `descKey`) plus the branch tint colour - nothing else to
+   wire for the hover tooltip to work. Description length is not constrained: `PerkPage.wrapToWidth`
+   greedy word-wraps the resolved text to `TOOLTIP_WRAP_WIDTH` (200px) at tooltip render time, since
+   Minecraft's `List<Component>` tooltip is one line per list entry with no wrapping of its own.
+8. **GDD** - add the perk to Section 12's table and describe its effect/values in the relevant branch
+   section, per the project's "keep the GDD current" rule.
+
+### 3.11 Localization
+
+**Every GUI-facing string must go through the lang file, no exceptions for "it's just a placeholder."**
+Use `Component.translatable(key, args...)` and add the key to `en_us.json`, not `Component.literal("...")`
+with the text baked into Java. This is cheap to do at write time and expensive to retrofit later (see the
+perk tooltip rewrite in 3.10, which had to reverse-engineer descriptions out of four old screens' lang
+files because they were never centralised against the new tree). That retrofit is now done: every perk
+has real `perk.witchercraft.<slug>.name` and `.desc` keys (see below), so the tooltip no longer relies on
+the Java fallback for its text.
+
+**`en_us.json` is MCreator-managed the same way `witchercraft.mcreator` is: MCreator rewrites the WHOLE
+file from its own element data on save, and it has no idea about lang keys added by hand outside its GUI -
+they get silently dropped, not merged.** This bit TWICE in one session: every hand-added key vanished
+between turns, reverting the file byte-for-byte to its pre-session git state. Confirmed NOT the cause:
+`./gradlew compileJava` (tested directly - a marker key survived a compile untouched) and no lingering
+MCreator/watcher process (checked via full process list, not just name-matching "mcreator" - only a normal
+Gradle daemon was present, unrelated). That leaves the MCreator desktop app itself being opened directly
+as the only remaining explanation. Treat `en_us.json` with the same caution as the pending-registry
+workflow - if MCreator has been opened at all since the last check, don't trust a hand-edit to have
+survived; re-verify the keys are still there before assuming a past pass is still in effect.
+
+**Because of that risk, every `Component.translatable(key)` built from `PerkRegistry` data uses
+`Component.translatableWithFallback(key, fallback)` instead**, where `fallback` is
+`PerkRegistry.fallbackName(id)` (a spaced, non-localized display name, e.g. `"RazorFocus"` ->
+`"Razor Focus"`) or a `"<Name>: Placeholder description."` string built from it. This is defence in depth,
+not a substitute for the real lang keys: the real `perk.witchercraft.<slug>.name` / `.desc` keys now
+exist (45 perks x 2), with `.desc` text ported from the retired ability-tab tooltips - a handful with no
+honest match carry a `"Description coming soon."` placeholder, on the assumption they aren't wired to
+anything yet. Crucially, those 90 keys were written to BOTH `en_us.json` AND the `language_map.en_us`
+block inside `witchercraft.mcreator`, because that map - not `en_us.json` - is what MCreator regenerates
+the resource file from. If the keys were only in `en_us.json`, MCreator would wipe them; being in the map
+too is what makes them durable. The fallback stays as a safety net: if `en_us.json` is ever wiped and the
+map ever loses them, the tooltip degrades to readable placeholder text instead of the raw dotted key
+string, rather than failing silently or ugly.
+Vanilla's plain `Component.translatable` (no fallback) still renders the raw key on a miss, so a missing
+key is visible immediately in-game and cheap to catch in testing - the fallback variant is only worth the
+extra argument where the string is genuinely GUI-facing every session, like this one.
+
+**One tracked exception:** `PerkPage`'s points-available text (`CharacterAbilitiesSkillPointsAvailableProcedure`)
+returns a pre-formatted, hardcoded-English `String`, not a `Component` - historically shared with the four
+tab GUIs retired in 3.6a (they drew it the same raw way). Localizing it properly means either duplicating
+its `witchercraftPlayerLevel - witchercraftPerksLearned` formula next to a translatable key, or rewriting
+the procedure itself; neither was in scope for the tooltip/description pass that added this note, so it
+stays a known gap rather than a silent one. If you touch that counter again, migrate it properly instead
+of patching around it a second time.
+
+**Dead lang keys get removed, not just left to rot.** When 3.6a retired the four tab GUIs, their
+`gui.witchercraft.character_abilities_{combat,alchemy,signs,general}_gui.*` keys (65 entries - buttons,
+labels, the pre-3.10 tooltip text) were deleted from `en_us.json` in the same pass, verified unreferenced
+by grepping every `.java` file under `src/main` first. A lang key with no reader is just noise for anyone
+searching the file by hand - don't leave it "just in case" once its owning code is confirmed gone.
+
+**...but deleting them from `en_us.json` alone does NOT stick.** Those same 65 keys were found back in
+`en_us.json` a later session, because the 3.6a pass only removed them from the generated resource file and
+never touched `language_map.en_us` in `witchercraft.mcreator` - so the next MCreator save regenerated them
+verbatim. They have now been removed from BOTH places. Rule of thumb: any lang-key add or delete must be
+done in both `en_us.json` and `witchercraft.mcreator`'s `language_map`, or MCreator will silently undo it.
+
+**Retired GUI display plumbing gets trashed with its GUI.** The old per-perk tab GUIs each had a
+`<Perk>ShowProcedure` (returns whether a perk node should render as available) driving their visibility.
+The shell's `PerkPage` reads `PerkLearnedVars` / `PerkEquipVars` directly instead, so all 45 per-perk
+`*Show` procedures were dead (zero references, verified by grep) and were moved to `trash/` (Java +
+`elements/*.mod.json`) with their `mod_elements` entries removed from `witchercraft.mcreator`. The two
+non-perk `*Show` procedures - `MedallionShow` and `QuenHudShow` - are still read by `WitcherHud` and stay.
+The live `<Perk>Effect` procedures (the actual gameplay) are untouched.

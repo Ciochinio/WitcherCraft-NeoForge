@@ -9,14 +9,12 @@ public class DefenceEffectProcedure {
 		if (entity == null)
 			return;
 		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
-			if (CharacterAbilitiesCombatTier2Procedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 					_vars.witchercraftPerksDefence = true;
 					_vars.markSyncDirty();
 				}
 				CharacterAbilitiesCombatSkillPointsUsedProcedure.execute(entity);
-			}
 		}
 	}
 }

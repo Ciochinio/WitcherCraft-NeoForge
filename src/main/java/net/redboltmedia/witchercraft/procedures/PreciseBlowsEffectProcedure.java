@@ -9,14 +9,12 @@ public class PreciseBlowsEffectProcedure {
 		if (entity == null)
 			return;
 		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
-			if (CharacterAbilitiesCombatTier2Procedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 					_vars.witchercraftPerksPreciseBlows = true;
 					_vars.markSyncDirty();
 				}
 				CharacterAbilitiesCombatSkillPointsUsedProcedure.execute(entity);
-			}
 		}
 	}
 }

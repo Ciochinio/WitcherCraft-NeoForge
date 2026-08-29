@@ -106,19 +106,21 @@ public record PerkEquipGuiButtonMessage(int buttonID, int x, int y, int z) imple
 			RecomputeEquippedPerksProcedure.execute(entity);
 	}
 
-	// Learn a tree node: only if not already learned and all prerequisites are
-	// learned. The actual point-check / learned-flag / point-spend is delegated
-	// to the perk's existing <Perk>Effect buy procedure, so learning stays in one
-	// place. (Dispatch covers the slice-2a Combat test nodes; extends to 45.)
+	// Learn a tree node: only if not already learned and at least one prerequisite
+	// (if any) is learned - a node with several parents is a set of ALTERNATIVE
+	// unlock paths, not a converging AND requirement; a node with zero prereqs is
+	// always available. The actual point-check / learned-flag / point-spend is
+	// delegated to the perk's existing <Perk>Effect buy procedure, so learning
+	// stays in one place. (Dispatch covers the slice-2a Combat test nodes; extends
+	// to 45.)
 	private static void tryLearn(Player entity, int perkId) {
 		if (PerkLearnedVars.isLearned(entity, perkId))
 			return;
 		PerkTree.Node n = PerkTree.byId(perkId);
 		if (n == null)
 			return;
-		for (int pre : n.prereqs)
-			if (!PerkLearnedVars.isLearned(entity, pre))
-				return;
+		if (!prereqsMet(n, entity))
+			return;
 		switch (perkId) {
 			case 101 : AnatomicalKnowledgeEffectProcedure.execute(entity); break;
 			case 102 : ColdBloodEffectProcedure.execute(entity); break;
@@ -167,6 +169,18 @@ public record PerkEquipGuiButtonMessage(int buttonID, int x, int y, int z) imple
 			case 406 : SurvivalInstinctEffectProcedure.execute(entity); break;
 			default : break;
 		}
+	}
+
+	// A node's prereqs are an OR group: zero prereqs = always available, one or
+	// more = any single one being learned satisfies the node. Mirrors
+	// PerkPage.prereqsMet (client, for render state) - see TDD 3.10.
+	private static boolean prereqsMet(PerkTree.Node n, Player entity) {
+		if (n.prereqs.length == 0)
+			return true;
+		for (int pre : n.prereqs)
+			if (PerkLearnedVars.isLearned(entity, pre))
+				return true;
+		return false;
 	}
 
 	@SubscribeEvent

@@ -31,13 +31,6 @@ public class WitchercraftModMenus {
 	public static final DeferredHolder<MenuType<?>, MenuType<BestiaryMenuGuiMenu>> BESTIARY_MENU_GUI = REGISTRY.register("bestiary_menu_gui", () -> IMenuTypeExtension.create(BestiaryMenuGuiMenu::new));
 	public static final DeferredHolder<MenuType<?>, MenuType<CharacterGuiMenu>> CHARACTER_GUI = REGISTRY.register("character_gui", () -> IMenuTypeExtension.create(CharacterGuiMenu::new));
 	public static final DeferredHolder<MenuType<?>, MenuType<SignGuiMenu>> SIGN_GUI = REGISTRY.register("sign_gui", () -> IMenuTypeExtension.create(SignGuiMenu::new));
-	public static final DeferredHolder<MenuType<?>, MenuType<CharacterAbilitiesGeneralGuiMenu>> CHARACTER_ABILITIES_GENERAL_GUI = REGISTRY.register("character_abilities_general_gui",
-			() -> IMenuTypeExtension.create(CharacterAbilitiesGeneralGuiMenu::new));
-	public static final DeferredHolder<MenuType<?>, MenuType<CharacterAbilitiesCombatGuiMenu>> CHARACTER_ABILITIES_COMBAT_GUI = REGISTRY.register("character_abilities_combat_gui",
-			() -> IMenuTypeExtension.create(CharacterAbilitiesCombatGuiMenu::new));
-	public static final DeferredHolder<MenuType<?>, MenuType<CharacterAbilitiesAlchemyGuiMenu>> CHARACTER_ABILITIES_ALCHEMY_GUI = REGISTRY.register("character_abilities_alchemy_gui",
-			() -> IMenuTypeExtension.create(CharacterAbilitiesAlchemyGuiMenu::new));
-	public static final DeferredHolder<MenuType<?>, MenuType<CharacterAbilitiesSignsGuiMenu>> CHARACTER_ABILITIES_SIGNS_GUI = REGISTRY.register("character_abilities_signs_gui", () -> IMenuTypeExtension.create(CharacterAbilitiesSignsGuiMenu::new));
 	public static final DeferredHolder<MenuType<?>, MenuType<DrownerGuiMenu>> DROWNER_GUI = REGISTRY.register("drowner_gui", () -> IMenuTypeExtension.create(DrownerGuiMenu::new));
 	public static final DeferredHolder<MenuType<?>, MenuType<RotfiendGuiMenu>> ROTFIEND_GUI = REGISTRY.register("rotfiend_gui", () -> IMenuTypeExtension.create(RotfiendGuiMenu::new));
 	public static final DeferredHolder<MenuType<?>, MenuType<FogletGuiMenu>> FOGLET_GUI = REGISTRY.register("foglet_gui", () -> IMenuTypeExtension.create(FogletGuiMenu::new));

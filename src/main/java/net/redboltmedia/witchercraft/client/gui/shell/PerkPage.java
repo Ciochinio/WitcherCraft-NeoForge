@@ -12,6 +12,7 @@ import net.redboltmedia.witchercraft.procedures.CharacterAbilitiesSkillPointsAva
 
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,6 +21,8 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 
@@ -50,7 +53,10 @@ public class PerkPage implements GuiPage {
 	private static final int TEXT_HELD = 0xFFFFFFFF;
 
 	// Branch tabs (index i -> branch colour i+1: Combat/Alchemy/Signs/General).
-	private static final String[] TAB_LABELS = {"CMB", "ALC", "SGN", "GEN"};
+	private static final String[] TAB_KEYS = {
+			"gui.witchercraft.shell.skills.tab_combat", "gui.witchercraft.shell.skills.tab_alchemy",
+			"gui.witchercraft.shell.skills.tab_signs", "gui.witchercraft.shell.skills.tab_general"};
+	private static final String[] TAB_FALLBACKS = {"CMB", "ALC", "SGN", "GEN"};
 	private static final int[] TAB_X = {8, 52, 96, 140};
 	private static final int TAB_Y = 6, TAB_W = 40, TAB_H = 11;
 
@@ -64,8 +70,8 @@ public class PerkPage implements GuiPage {
 	// Per-frame context (set at the top of render); helpers offset by (ox, oy).
 	private int ox, oy;
 	private Font font;
-	// Tooltip computed during render, rendered by the shell in screen space.
-	private Component pendingTooltip;
+	// Tooltip lines computed during render, rendered by the shell in screen space.
+	private List<Component> pendingTooltip;
 
 	public PerkPage(String pageId) {
 		this.pageId = pageId;
@@ -108,13 +114,17 @@ public class PerkPage implements GuiPage {
 		g.pose().scale(scale, scale);
 
 		drawTabs(g);
-		text(g, "Pts:", 8, PerkEquipLayout.PANEL_H - 14, 0xFFDDDD88);
-		text(g, CharacterAbilitiesSkillPointsAvailableProcedure.execute(entity), 30, PerkEquipLayout.PANEL_H - 14, 0xFFDDDD88);
-		if (heldPerk != 0) {
-			text(g, "Holding: " + PerkRegistry.name(heldPerk), 60, PerkEquipLayout.PANEL_H - 14, TEXT_HELD);
-		} else {
-			text(g, "R-click=learn  L-click learned=hold", 60, PerkEquipLayout.PANEL_H - 14, TEXT_DIM);
-		}
+		// status row: points-available text is not yet localized (a legacy
+		// procedure shared with 3 retired GUIs - see TDD 3.11), so its width is
+		// measured rather than assumed, and the tail text is positioned after it
+		// to avoid the two overlapping regardless of locale/points-string length.
+		String pts = CharacterAbilitiesSkillPointsAvailableProcedure.execute(entity);
+		int statusY = PerkEquipLayout.PANEL_H - 14;
+		text(g, pts, 8, statusY, 0xFFDDDD88);
+		int tailX = 8 + font.width(pts) + 10;
+		// no separate "Holding: X" readout - the node's selection ring and the
+		// lit-up valid-target slots already show what's held and where it can go.
+		textC(g, tt("gui.witchercraft.shell.skills.instructions", "R-click=learn  L-click learned=hold"), tailX, statusY, TEXT_DIM);
 
 		drawTree(g, entity);
 		drawConnectors(g, entity);
@@ -144,7 +154,7 @@ public class PerkPage implements GuiPage {
 			if (m > 0) {
 				int c = PerkRegistry.tint(m);
 				drawCell(g, sx, sy, PerkEquipLayout.SOCKET_SIZE, c, withAlpha(c, 0x55));
-				text(g, mutagenAbbrev(m), sx + 4, sy + PerkEquipLayout.SOCKET_SIZE / 2 - 4, 0xFFFFFFFF);
+				textC(g, tt(mutagenAbbrevKey(m), mutagenAbbrevFallback(m)), sx + 4, sy + PerkEquipLayout.SOCKET_SIZE / 2 - 4, 0xFFFFFFFF);
 			} else {
 				drawCell(g, sx, sy, PerkEquipLayout.SOCKET_SIZE, CELL_EMPTY_BORDER, CELL_EMPTY_INNER);
 				text(g, "-", sx + PerkEquipLayout.SOCKET_SIZE / 2 - 2, sy + PerkEquipLayout.SOCKET_SIZE / 2 - 4, TEXT_DIM);
@@ -154,7 +164,7 @@ public class PerkPage implements GuiPage {
 		// medallion + per-group synergy counts
 		if (PerkEquipLayout.MEDALLION_ENABLED) {
 			drawRect(g, PerkEquipLayout.MEDALLION_X, PerkEquipLayout.MEDALLION_Y, PerkEquipLayout.MEDALLION_W, PerkEquipLayout.MEDALLION_H, 0xFF8A6D3B, 0xFF3A2E1C);
-			text(g, "MED", PerkEquipLayout.MEDALLION_X + PerkEquipLayout.MEDALLION_W / 2 - 8, PerkEquipLayout.MEDALLION_Y + PerkEquipLayout.MEDALLION_H / 2 - 4, 0xFFEEDDBB);
+			textC(g, tt("gui.witchercraft.shell.skills.medallion", "MED"), PerkEquipLayout.MEDALLION_X + PerkEquipLayout.MEDALLION_W / 2 - 8, PerkEquipLayout.MEDALLION_Y + PerkEquipLayout.MEDALLION_H / 2 - 4, 0xFFEEDDBB);
 		}
 		for (int gi = 0; gi < PerkEquipVars.MUTAGEN_GROUPS; gi++) {
 			int matches = groupMatchCount(gi);
@@ -170,23 +180,66 @@ public class PerkPage implements GuiPage {
 		int lx = (int) ((mouseX - px) / scale), ly = (int) ((mouseY - py) / scale);
 		int np = hitNode(lx, ly);
 		if (np > 0) {
-			PerkTree.Node n = PerkTree.byId(np);
-			String state = PerkLearnedVars.isLearned(entity, np) ? "Learned"
-					: (n != null && prereqsMet(n, entity) ? "Available - right-click to learn" : "Locked");
-			pendingTooltip = Component.literal(PerkRegistry.name(np) + " - " + state);
+			pendingTooltip = perkTooltip(np);
 		} else {
 			int si = hitSlot(lx, ly);
 			if (si >= 0) {
 				int cur = PerkEquipVars.getPerkSocket(entity, si);
 				if (cur > 0)
-					pendingTooltip = Component.literal(PerkRegistry.name(cur));
+					pendingTooltip = perkTooltip(cur);
 			}
 		}
 	}
 
 	@Override
-	public Component pollTooltip() {
+	public List<Component> pollTooltip() {
 		return pendingTooltip;
+	}
+
+	// Tooltip pixel width the description wraps to. The tooltip is drawn in
+	// SCREEN space (after the shell's pose scale is popped - see render()), so
+	// this is measured against the real, unscaled font, same as it will render.
+	private static final int TOOLTIP_WRAP_WIDTH = 200;
+
+	// name in its branch colour, then the description wrapped onto as many lines
+	// as it needs - the learned/available/locked state is dropped here since the
+	// icon art (3 glyph states) and the cell border colour already convey it.
+	private List<Component> perkTooltip(int perkId) {
+		int rgb = PerkRegistry.tint(PerkRegistry.color(perkId)) & 0xFFFFFF;
+		String fallback = PerkRegistry.fallbackName(perkId);
+		// translatableWithFallback: if the lang key is ever missing (see
+		// PerkRegistry.fallbackName), shows readable placeholder text instead of
+		// the raw dotted key.
+		Component name = Component.translatableWithFallback(PerkRegistry.nameKey(perkId), fallback)
+				.withStyle(Style.EMPTY.withColor(TextColor.fromRgb(rgb)));
+		Component desc = Component.translatableWithFallback(PerkRegistry.descKey(perkId), fallback + ": Placeholder description.");
+		List<Component> lines = new ArrayList<>(3);
+		lines.add(name);
+		lines.addAll(wrapToWidth(desc, TOOLTIP_WRAP_WIDTH));
+		return lines;
+	}
+
+	// Greedy word-wrap: Minecraft's List<Component> tooltip renders one line per
+	// entry with no wrapping of its own, so a description longer than a couple of
+	// words needs to be pre-split. Wraps on the resolved (localized) plain text,
+	// not the Component's formatting, since none of these descriptions carry
+	// inline styling worth preserving per-word.
+	private List<Component> wrapToWidth(Component c, int maxWidth) {
+		String text = c.getString();
+		List<Component> out = new ArrayList<>();
+		StringBuilder line = new StringBuilder();
+		for (String word : text.split(" ")) {
+			String candidate = line.length() == 0 ? word : line + " " + word;
+			if (font.width(candidate) > maxWidth && line.length() > 0) {
+				out.add(Component.literal(line.toString()));
+				line = new StringBuilder(word);
+			} else {
+				line = new StringBuilder(candidate);
+			}
+		}
+		if (line.length() > 0)
+			out.add(Component.literal(line.toString()));
+		return out;
 	}
 
 	// ---- offset-aware primitives --------------------------------------------
@@ -197,6 +250,15 @@ public class PerkPage implements GuiPage {
 
 	private void text(GuiGraphicsExtractor g, String s, int x, int y, int col) {
 		g.text(font, Component.literal(s), ox + x, oy + y, col, false);
+	}
+
+	private void textC(GuiGraphicsExtractor g, Component c, int x, int y, int col) {
+		g.text(font, c, ox + x, oy + y, col, false);
+	}
+
+	// shorthand for a translatable with a readable fallback (see PerkRegistry.fallbackName).
+	private static Component tt(String key, String fallback) {
+		return Component.translatableWithFallback(key, fallback);
 	}
 
 	// ---- perk icons (32x32 source, scaled to the target cell) ----------------
@@ -239,16 +301,16 @@ public class PerkPage implements GuiPage {
 	// ---- left panel: perk tree ----------------------------------------------
 
 	private void drawTabs(GuiGraphicsExtractor g) {
-		for (int i = 0; i < TAB_LABELS.length; i++) {
+		for (int i = 0; i < TAB_KEYS.length; i++) {
 			boolean active = activeBranch == i + 1;
-			text(g, TAB_LABELS[i], TAB_X[i], TAB_Y, active ? 0xFFFFFFFF : TEXT_DIM);
+			textC(g, tt(TAB_KEYS[i], TAB_FALLBACKS[i]), TAB_X[i], TAB_Y, active ? 0xFFFFFFFF : TEXT_DIM);
 			if (active)
 				fill(g, TAB_X[i] - 1, TAB_Y + 9, TAB_X[i] + 22, TAB_Y + 10, PerkRegistry.tint(i + 1));
 		}
 	}
 
 	private int hitTab(int lx, int ly) {
-		for (int i = 0; i < TAB_LABELS.length; i++) {
+		for (int i = 0; i < TAB_KEYS.length; i++) {
 			if (lx >= TAB_X[i] - 2 && lx < TAB_X[i] + TAB_W && ly >= TAB_Y - 2 && ly < TAB_Y + TAB_H)
 				return i + 1;
 		}
@@ -299,11 +361,17 @@ public class PerkPage implements GuiPage {
 		}
 	}
 
+	// A node's prereqs are an OR group: zero prereqs = always available, one or
+	// more = any single one being learned satisfies the node (several parents are
+	// alternative unlock paths, not a converging AND requirement). Mirrors the
+	// server-side check in PerkEquipGuiButtonMessage - see TDD 3.10.
 	private boolean prereqsMet(PerkTree.Node n, Player entity) {
+		if (n.prereqs.length == 0)
+			return true;
 		for (int pre : n.prereqs)
-			if (!PerkLearnedVars.isLearned(entity, pre))
-				return false;
-		return true;
+			if (PerkLearnedVars.isLearned(entity, pre))
+				return true;
+		return false;
 	}
 
 	private void drawConnectors(GuiGraphicsExtractor g, Player entity) {
@@ -501,7 +569,20 @@ public class PerkPage implements GuiPage {
 		return n;
 	}
 
-	private static String mutagenAbbrev(int m) {
+	private static String mutagenAbbrevKey(int m) {
+		switch (m) {
+			case 1:
+				return "gui.witchercraft.shell.skills.mutagen_red";
+			case 2:
+				return "gui.witchercraft.shell.skills.mutagen_green";
+			case 3:
+				return "gui.witchercraft.shell.skills.mutagen_blue";
+			default:
+				return "gui.witchercraft.shell.skills.mutagen_empty";
+		}
+	}
+
+	private static String mutagenAbbrevFallback(int m) {
 		switch (m) {
 			case 1:
 				return "RED";
