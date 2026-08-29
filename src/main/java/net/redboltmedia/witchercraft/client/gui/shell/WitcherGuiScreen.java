@@ -140,6 +140,12 @@ public class WitcherGuiScreen extends Screen {
 			drawNavbar(g);
 		g.pose().popMatrix();
 
+		// meditation fade overlay (screen space, on top of the world + dial): black
+		// that fades in at the start of a spin and out at the end.
+		float fade = activePage().spinFadeAlpha();
+		if (fade > 0f)
+			g.fill(0, 0, this.width, this.height, (int) (Math.min(1f, fade) * 255f) << 24);
+
 		// tooltip in SCREEN space at the real cursor (after the transform is popped)
 		List<Component> tip = activePage().pollTooltip();
 		if (tip != null && !tip.isEmpty())
@@ -214,6 +220,14 @@ public class WitcherGuiScreen extends Screen {
 		if (activePage().keyPressed(key))
 			return true;
 		return super.keyPressed(event); // Esc closes via onClose()
+	}
+
+	@Override
+	public void tick() {
+		super.tick();
+		// a page can ask to close itself (meditation auto-closes after its fade-out)
+		if (activePage().requestsClose())
+			onClose();
 	}
 
 	@Override

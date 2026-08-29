@@ -16,5 +16,7 @@ import net.minecraft.world.level.LevelAccessor;
 public class MeditationStopProcedure {
 	public static void execute(LevelAccessor world) {
 		WitchercraftModVariables.meditationState = 0;
+		// cancelled before finishing -> no insomnia is awarded (see MeditationTick)
+		MeditationStartProcedure.initiator = null;
 	}
 }

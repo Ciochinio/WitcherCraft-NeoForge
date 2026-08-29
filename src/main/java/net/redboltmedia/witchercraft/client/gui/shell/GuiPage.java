@@ -78,6 +78,19 @@ public interface GuiPage {
 		return false;
 	}
 
+	/**
+	 * Fullscreen black-overlay alpha (0..1) the shell draws on top during a
+	 * {@link #wantsWorldVisible} spin - used for the meditation fade in/out. 0 = none.
+	 */
+	default float spinFadeAlpha() {
+		return 0f;
+	}
+
+	/** When true, the shell closes itself this tick (meditation's finishing fade). */
+	default boolean requestsClose() {
+		return false;
+	}
+
 	/** Called when this page becomes the active tab. */
 	default void onShown() {
 	}

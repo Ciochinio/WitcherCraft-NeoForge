@@ -157,6 +157,75 @@
       }
     },
     {
+      "name": "MeditationCanStart",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "meditation_can_start",
+      "metadata": {
+        "return_type": "logic",
+        "dependencies": [
+          {
+            "name": "world",
+            "type": "world"
+          },
+          {
+            "name": "x",
+            "type": "number"
+          },
+          {
+            "name": "y",
+            "type": "number"
+          },
+          {
+            "name": "z",
+            "type": "number"
+          },
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/MeditationCanStartProcedure.java"
+        ]
+      }
+    },
+    {
+      "name": "MeditationPlaceCampfire",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "meditation_place_campfire",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "world",
+            "type": "world"
+          },
+          {
+            "name": "x",
+            "type": "number"
+          },
+          {
+            "name": "y",
+            "type": "number"
+          },
+          {
+            "name": "z",
+            "type": "number"
+          },
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/MeditationPlaceCampfireProcedure.java"
+        ]
+      }
+    },
+    {
       "name": "MeditationPage",
       "type": "code",
       "compiles": true,

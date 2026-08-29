@@ -38,13 +38,17 @@ public class MeditationPage implements GuiPage {
 	// Client-only selection: the target hour (0-23). Defaults to the next hour.
 	private int targetHour = -1;
 
-	// Client spin state, set by MeditationSpinMessage when a session commits. The
-	// client self-times the translucent overlay (no per-tick stop packet): the
-	// world shows through while the server sweeps the real clock. See
-	// beginClientSpin / isClientSpinning / wantsWorldVisible.
-	private static volatile long clientSpinStartMs = 0L;
-	private static volatile int clientSpinDurationMs = 0;
-	private static volatile int clientSpinTargetHour = 0;
+	// Client spin state, armed by MeditationSpinMessage when a session commits. The
+	// client self-times the whole transition (no per-tick packets): a short fade in
+	// from black, the world spinning with the world + dial visible, then a fade out
+	// to black and auto-close (like waking from a bed). Timeline helpers below:
+	// spinFadeAlpha / requestsClose / wantsWorldVisible.
+	private static final int FADE_MS = 400;
+	private static volatile long spinStartMs = 0L;
+	private static volatile int spinMs = 0; // server spin length; the fade-out follows it
+	private static volatile int spinTargetHour = 0;
+	private static volatile boolean spinActive = false; // overlay owns the screen (world visible, dial locked)
+	private static volatile boolean pendingClose = false; // natural finish -> the shell should close
 	// While spinning we force the vanilla HUD off for the F1-clean look; remember
 	// the prior state so restoring never clobbers a user-set F1.
 	private static boolean hudHidden = false;
@@ -52,9 +56,11 @@ public class MeditationPage implements GuiPage {
 
 	/** Called on the client (via MeditationSpinMessage) when a spin begins. */
 	public static void beginClientSpin(int targetHour, int durationTicks) {
-		clientSpinTargetHour = targetHour;
-		clientSpinDurationMs = Math.max(0, durationTicks) * 50;
-		clientSpinStartMs = System.currentTimeMillis();
+		spinTargetHour = targetHour;
+		spinMs = Math.max(0, durationTicks) * 50;
+		spinStartMs = System.currentTimeMillis();
+		spinActive = true;
+		pendingClose = false;
 		Minecraft mc = Minecraft.getInstance();
 		if (!hudHidden)
 			prevHideGui = mc.options.hideGui;
@@ -62,14 +68,24 @@ public class MeditationPage implements GuiPage {
 		mc.options.hideGui = true;
 	}
 
-	private static boolean isClientSpinning() {
-		return System.currentTimeMillis() - clientSpinStartMs < clientSpinDurationMs;
+	private static long spinElapsed() {
+		return System.currentTimeMillis() - spinStartMs;
 	}
 
-	/** End the client spin immediately (cancel) and restore the HUD. */
-	private static void stopClientSpin() {
-		clientSpinStartMs = 0L;
-		clientSpinDurationMs = 0;
+	/** True while the meditation overlay owns the screen (world visible, dial locked). */
+	private static boolean spinning() {
+		return spinActive;
+	}
+
+	/** True only while the spin can still be cancelled (before the finishing fade-out). */
+	private static boolean cancellable() {
+		return spinActive && !pendingClose;
+	}
+
+	/** Drop the overlay and restore the HUD (used by cancel + close + finish). */
+	private static void endSpin() {
+		spinActive = false;
+		pendingClose = false;
 		restoreHud();
 	}
 
@@ -78,6 +94,20 @@ public class MeditationPage implements GuiPage {
 			Minecraft.getInstance().options.hideGui = prevHideGui;
 			hudHidden = false;
 		}
+	}
+
+	/** Fullscreen black overlay alpha (0..1): fade in at the start, fade out at the end. */
+	private static float spinFadeAlphaValue() {
+		if (!spinActive)
+			return 0f;
+		long e = spinElapsed();
+		if (e < FADE_MS)
+			return 1f - e / (float) FADE_MS; // fade in from black
+		if (e < spinMs)
+			return 0f; // world fully visible
+		if (e < spinMs + FADE_MS)
+			return (e - spinMs) / (float) FADE_MS; // fade out to black
+		return 1f; // finished; hold black until the shell closes this frame
 	}
 
 	// Per-frame panel->screen mapping (set at the top of render), reused by input.
@@ -102,7 +132,17 @@ public class MeditationPage implements GuiPage {
 	@Override
 	public boolean wantsWorldVisible() {
 		// during the spin, drop the shell background so the real sky shows through
-		return isClientSpinning();
+		return spinning();
+	}
+
+	@Override
+	public float spinFadeAlpha() {
+		return spinFadeAlphaValue();
+	}
+
+	@Override
+	public boolean requestsClose() {
+		return pendingClose;
 	}
 
 	private static Player player() {
@@ -128,9 +168,9 @@ public class MeditationPage implements GuiPage {
 		if (player() == null)
 			return;
 
-		// the spin ends on the client by its own timer -> restore the HUD when it does
-		if (hudHidden && !isClientSpinning())
-			restoreHud();
+		// natural finish: after the spin + fade-out, ask the shell to close (bed-wake)
+		if (spinActive && spinElapsed() >= spinMs + FADE_MS)
+			pendingClose = true;
 
 		double nowHour = currentHourFloat();
 		if (targetHour < 0)
@@ -170,7 +210,7 @@ public class MeditationPage implements GuiPage {
 		g.fill(bx, by, bx + bw, by + 1, MeditationLayout.COL_BTN_BORDER);
 		g.fill(bx, by + bh - 1, bx + bw, by + bh, MeditationLayout.COL_BTN_BORDER);
 		// while spinning the same button becomes Cancel (stop the meditation)
-		Component btnLabel = Component.translatable(isClientSpinning() ? "gui.witchercraft.shell.meditation.cancel" : "gui.witchercraft.shell.meditation.button");
+		Component btnLabel = Component.translatable(cancellable() ? "gui.witchercraft.shell.meditation.cancel" : "gui.witchercraft.shell.meditation.button");
 		centeredText(g, btnLabel, bx + bw / 2, by + bh / 2 - 4, MeditationLayout.COL_BTN_TEXT);
 
 		g.pose().popMatrix();
@@ -250,13 +290,15 @@ public class MeditationPage implements GuiPage {
 		// the button works in both states: Meditate when idle, Cancel while spinning
 		if (lx >= MeditationLayout.BTN_X && lx < MeditationLayout.BTN_X + MeditationLayout.BTN_W
 				&& ly >= MeditationLayout.BTN_Y && ly < MeditationLayout.BTN_Y + MeditationLayout.BTN_H) {
-			if (isClientSpinning())
-				sendCancel();
-			else
+			if (spinning()) {
+				if (cancellable())
+					sendCancel();
+			} else {
 				onMeditate();
+			}
 			return true;
 		}
-		if (isClientSpinning())
+		if (spinning())
 			return true; // dial is locked while the world spins
 		// dial: any click inside the ring picks the nearest hour
 		double dx = lx - MeditationLayout.CX, dy = ly - MeditationLayout.CY;
@@ -275,7 +317,7 @@ public class MeditationPage implements GuiPage {
 	// buttonID = 1000 + targetHour (see MeditationGuiButtonMessage).
 	private void onMeditate() {
 		Player p = player();
-		if (p == null || isClientSpinning())
+		if (p == null || spinning())
 			return;
 		ClientPacketDistributor.sendToServer(new MeditationGuiButtonMessage(1000 + (((targetHour % 24) + 24) % 24), (int) p.getX(), (int) p.getY(), (int) p.getZ()));
 	}
@@ -287,14 +329,16 @@ public class MeditationPage implements GuiPage {
 		Player p = player();
 		if (p != null)
 			ClientPacketDistributor.sendToServer(new MeditationGuiButtonMessage(2000, (int) p.getX(), (int) p.getY(), (int) p.getZ()));
-		stopClientSpin();
+		endSpin();
 	}
 
 	@Override
 	public void onClose() {
-		// closing the GUI during meditation cancels it (time stops where it reached)
-		if (isClientSpinning())
+		// closing mid-spin cancels it (time stops where it reached); a natural
+		// finish already ran server-side, so that path just drops the overlay.
+		if (cancellable())
 			sendCancel();
-		restoreHud();
+		else
+			endSpin();
 	}
 }

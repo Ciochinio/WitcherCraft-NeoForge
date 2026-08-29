@@ -10,6 +10,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerLevel;
 
+import java.util.UUID;
+
 /**
  * HAND-MAINTAINED (locked_code procedure, ~/Meditation2). Begins a meditation
  * session: converts the picked hour to a forward tick delta, arms the session
@@ -25,11 +27,21 @@ import net.minecraft.server.level.ServerLevel;
  * 24000. Picking the current hour advances a full day.
  */
 public class MeditationStartProcedure {
+	/**
+	 * Who started the current session (server-side). MeditationTick awards this
+	 * player their insomnia on completion; MeditationStop clears it on cancel.
+	 * A plain static is fine - there is one session per server (slice 3 revisits).
+	 */
+	public static UUID initiator = null;
+
 	public static void execute(LevelAccessor world, double x, double y, double z, Entity entity, double targetHour) {
 		if (entity == null || !(world instanceof ServerLevel level))
 			return;
 		// one session at a time (slice 3 turns this into join-the-pending-session)
 		if (WitchercraftModVariables.meditationState != 0)
+			return;
+		// safety gate (mobs / air) - Blockly procedure, re-validated server-side
+		if (!MeditationCanStartProcedure.execute(world, x, y, z, entity))
 			return;
 
 		int hour = ((int) Math.round(targetHour) % 24 + 24) % 24;
@@ -45,7 +57,12 @@ public class MeditationStartProcedure {
 		WitchercraftModVariables.meditationAnchorGametime = level.getGameTime();
 		WitchercraftModVariables.meditationState = 2;
 
-		if (entity instanceof ServerPlayer sp)
+		// place the campfire near the initiator (Blockly procedure; skips if one is
+		// already nearby), then arm the client overlay.
+		MeditationPlaceCampfireProcedure.execute(world, x, y, z, entity);
+		if (entity instanceof ServerPlayer sp) {
+			initiator = sp.getUUID();
 			PacketDistributor.sendToPlayer(sp, new MeditationSpinMessage(hour, MeditationTickProcedure.spinDurationTicks(delta)));
+		}
 	}
 }
