@@ -21,3 +21,6 @@ build/
 CLAUDE.md
 .claude
 
+/.agents
+skills-lock.json
+agents.md
