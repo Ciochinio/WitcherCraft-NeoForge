@@ -647,6 +647,14 @@ decoctions are all in place. The creature roster itself - models, AI, spawning, 
 patterns - is under active development, being filled in one monster at a time. The current live
 list of implemented creatures is maintained on the project wiki rather than frozen here.
 
+The Cockatrice is the first creature in the reworked roster. Its current test implementation is a
+hostile Draconid that fights with a head bash or grounded wing slam. When undisturbed, it alternates
+between ground wandering and 15-to-45-second flights near its takeoff area. In combat it can take a
+shorter flight and uses a two-wing bash when it reaches a target in the air. Idle breathing, walking,
+and flying each have their own animation. Its combat stats are provisional and remain editable in the
+MCreator living-entity editor. Natural spawning is disabled until its movement and collision have
+been tested in varied terrain, so it is currently available through its spawn egg only.
+
 ---
 
 ## 9. World and Utility Systems

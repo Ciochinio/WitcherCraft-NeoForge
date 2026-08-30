@@ -8607,6 +8607,161 @@
         ]
       },
       "path": "~/Admin/Calc"
+    },
+    {
+      "name": "Cockatrice",
+      "type": "livingentity",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "cockatrice",
+      "metadata": {
+        "files": [
+          "src/main/resources/assets/witchercraft/items/cockatrice_spawn_egg.json",
+          "src/main/java/net/redboltmedia/witchercraft/client/renderer/CockatriceRenderer.java",
+          "src/main/java/net/redboltmedia/witchercraft/entity/CockatriceEntity.java",
+          "src/main/resources/assets/witchercraft/models/item/cockatrice_spawn_egg.json"
+        ]
+      },
+      "path": "~/Mobs/Cockatrice"
+    },
+    {
+      "name": "CockatriceFlightTick",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "cockatrice_flight_tick",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/CockatriceFlightTickProcedure.java"
+        ]
+      },
+      "path": "~/Mobs/Cockatrice"
+    },
+    {
+      "name": "CockatriceFlyAnimationCondition",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "cockatrice_fly_animation_condition",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "return_type": "logic",
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/CockatriceFlyAnimationConditionProcedure.java"
+        ]
+      },
+      "path": "~/Mobs/Cockatrice"
+    },
+    {
+      "name": "CockatriceWalkAnimationCondition",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "cockatrice_walk_animation_condition",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "return_type": "logic",
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/CockatriceWalkAnimationConditionProcedure.java"
+        ]
+      },
+      "path": "~/Mobs/Cockatrice"
+    },
+    {
+      "name": "CockatriceIdleAnimationCondition",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "cockatrice_idle_animation_condition",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "return_type": "logic",
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/CockatriceIdleAnimationConditionProcedure.java"
+        ]
+      },
+      "path": "~/Mobs/Cockatrice"
+    },
+    {
+      "name": "CockatriceHeadBashAnimationCondition",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "cockatrice_head_bash_animation_condition",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "return_type": "logic",
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/CockatriceHeadBashAnimationConditionProcedure.java"
+        ]
+      },
+      "path": "~/Mobs/Cockatrice"
+    },
+    {
+      "name": "CockatriceWingSlamAnimationCondition",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "cockatrice_wing_slam_animation_condition",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "return_type": "logic",
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/CockatriceWingSlamAnimationConditionProcedure.java"
+        ]
+      },
+      "path": "~/Mobs/Cockatrice"
+    },
+    {
+      "name": "CockatriceWingBashAnimationCondition",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "cockatrice_wing_bash_animation_condition",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "return_type": "logic",
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/CockatriceWingBashAnimationConditionProcedure.java"
+        ]
+      },
+      "path": "~/Mobs/Cockatrice"
     }
   ],
   "variable_elements": [
@@ -9855,7 +10010,9 @@
       "key.witchercraft.open_shell.alchemy": "WitcherCraft: Alchemy",
       "key.witchercraft.open_shell.map": "WitcherCraft: Map",
       "key.witchercraft.open_shell.glossary": "WitcherCraft: Glossary",
-      "key.witchercraft.open_shell.meditation": "WitcherCraft: Meditation"
+      "key.witchercraft.open_shell.meditation": "WitcherCraft: Meditation",
+      "entity.witchercraft.cockatrice": "Cockatrice",
+      "item.witchercraft.cockatrice_spawn_egg": "Cockatrice Spawn Egg"
     }
   },
   "metadata": {
@@ -9876,7 +10033,8 @@
       "src/main/resources/pack.mcmeta",
       "src/main/resources/META-INF/neoforge.mods.toml",
       "src/main/java/net/redboltmedia/witchercraft/network/WitchercraftModVariables.java",
-      "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModTabs.java"
+      "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModTabs.java",
+      "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModModels.java"
     ]
   },
   "foldersRoot": {
@@ -10468,7 +10626,12 @@
       },
       {
         "name": "Mobs",
-        "children": []
+        "children": [
+          {
+            "name": "Cockatrice",
+            "children": []
+          }
+        ]
       },
       {
         "name": "Pause Menu",

@@ -8,6 +8,10 @@ import net.redboltmedia.witchercraft.WitchercraftMod;
 
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
+import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.bus.api.SubscribeEvent;
 
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.EntityType;
@@ -16,6 +20,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.core.registries.Registries;
 
+@EventBusSubscriber
 public class WitchercraftModEntities {
 	public static final DeferredRegister<EntityType<?>> REGISTRY = DeferredRegister.create(Registries.ENTITY_TYPE, WitchercraftMod.MODID);
 	public static final DeferredHolder<EntityType<?>, EntityType<GrapeshotProjectileEntity>> GRAPESHOT_PROJECTILE = register("grapeshot_projectile",
@@ -34,10 +39,24 @@ public class WitchercraftModEntities {
 			EntityType.Builder.<IgniParticlesEntity>of(IgniParticlesEntity::new, MobCategory.MISC).setShouldReceiveVelocityUpdates(true).setTrackingRange(64).setUpdateInterval(1).sized(0.5f, 0.5f));
 	public static final DeferredHolder<EntityType<?>, EntityType<AardParticlesEntity>> AARD_PARTICLES = register("aard_particles",
 			EntityType.Builder.<AardParticlesEntity>of(AardParticlesEntity::new, MobCategory.MISC).setShouldReceiveVelocityUpdates(true).setTrackingRange(64).setUpdateInterval(1).sized(0.5f, 0.5f));
+	public static final DeferredHolder<EntityType<?>, EntityType<CockatriceEntity>> COCKATRICE = register("cockatrice",
+			EntityType.Builder.<CockatriceEntity>of(CockatriceEntity::new, MobCategory.MONSTER).setShouldReceiveVelocityUpdates(true).setTrackingRange(64).setUpdateInterval(3)
+
+					.notInPeaceful().sized(3.5f, 2.5f));
 
 	// Start of user code block custom entities
 	// End of user code block custom entities
 	private static <T extends Entity> DeferredHolder<EntityType<?>, EntityType<T>> register(String registryname, EntityType.Builder<T> entityTypeBuilder) {
 		return REGISTRY.register(registryname, () -> (EntityType<T>) entityTypeBuilder.build(ResourceKey.create(Registries.ENTITY_TYPE, Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, registryname))));
+	}
+
+	@SubscribeEvent
+	public static void init(RegisterSpawnPlacementsEvent event) {
+		CockatriceEntity.init(event);
+	}
+
+	@SubscribeEvent
+	public static void registerAttributes(EntityAttributeCreationEvent event) {
+		event.put(COCKATRICE.get(), CockatriceEntity.createAttributes().build());
 	}
 }

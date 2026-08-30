@@ -16,6 +16,7 @@ Anything marked **tunable** is a value you are expected to change. Anything desc
 1. [GUI and HUD](#1-gui-and-hud)
 2. [Character Stats and Attributes](#2-character-stats-and-attributes)
 3. [The GUI shell](#3-the-gui-shell)
+4. [Cockatrice and hybrid mob movement](#4-cockatrice-and-hybrid-mob-movement)
 
 ---
 
@@ -918,3 +919,69 @@ The shell's `PerkPage` reads `PerkLearnedVars` / `PerkEquipVars` directly instea
 `elements/*.mod.json`) with their `mod_elements` entries removed from `witchercraft.mcreator`. The two
 non-perk `*Show` procedures - `MedallionShow` and `QuenHudShow` - are still read by `WitcherHud` and stay.
 The live `<Perk>Effect` procedures (the actual gameplay) are untouched.
+
+---
+
+## 4. Cockatrice and hybrid mob movement
+
+### 4.1 Ownership
+
+`Cockatrice` is an unlocked MCreator living-entity element. MCreator owns its generated entity,
+renderer, registration, spawn egg, attributes, AI task list, synchronized entity data, model choice,
+texture choice, and animation assignments. Keep it unlocked. Health, damage, follow range, movement
+speed, hitbox, AI goals, spawn settings, and similar tuning belong in the living-entity editor.
+
+MCreator's `flyingMob` option stays disabled. That option replaces ground navigation with permanent
+flying navigation and prevents the grounded half of this creature from behaving like a normal melee
+mob.
+
+The hand-maintained exception is the locked `CockatriceFlightTick` procedure. MCreator calls it from
+the entity's tick-update trigger. It applies direct airborne steering while leaving the generated
+ground navigation intact. The procedure can be opened through its locked procedure element in
+MCreator and survives regeneration.
+
+### 4.2 Flight contract
+
+The controller uses directly steered flights rather than swapping the generated entity's protected navigation
+or movement-control objects. On the ground, MCreator's melee and wander goals have full control. On
+takeoff, the controller stops navigation, disables gravity, and steers with delta movement. Without a
+combat target, it waits 10 to 30 seconds on the ground, checks for four blocks of overhead clearance,
+then flies for a random 15 to 45 seconds. Idle waypoints stay within 16 blocks of the takeoff position,
+so repeated direction changes do not carry the creature across the world. Combat takeoffs retain a
+shorter six-second flight. A horizontal collision ends either type of flight. The controller then
+restores gravity and lets the mob descend. Fall damage is disabled in the entity editor because
+landing height varies with terrain.
+
+The controller derives air speed from the normal `MOVEMENT_SPEED` attribute. This keeps the editor's
+movement-speed field meaningful for both forms. Flight timing, lift, steering blend, and aerial attack
+cooldown are constants in `CockatriceFlightTickProcedure`; changing those values requires editing the
+locked procedure.
+
+The server owns flight and attack state. Two synchronized MCreator entity-data entries carry the
+small amount of state the renderer needs:
+
+| Entry | Meaning |
+|-------|---------|
+| `Flying` | The creature is airborne or landing and should use an air animation. |
+| `AttackAnimation` | `0` means none, `1` head bash, `2` grounded wing slam, and `3` aerial wing bash. |
+
+Do not replace these with unsynchronized persistent data. Animation conditions run on the client and
+would otherwise disagree with the server.
+
+### 4.3 Animation resources
+
+The editable Blockbench source is `models/blockbench/Cockatrice.bbmodel`. MCreator's imported Java
+model is `models/mojmap-1.21.x/ModelCockatrice.java`, and all animation definitions remain together in
+`models/animations/CockatriceAnimation.java`. A single animation class is intentional. MCreator can
+reference each public `AnimationDefinition` field separately, so splitting the file adds maintenance
+without changing behavior.
+
+The six locked animation-condition procedures read the synchronized state. Walking uses MCreator's
+walking-animation path and its normal walk progress. The attack animations last 15 ticks, matching the
+0.75-second Blockbench timelines.
+
+### 4.4 Current test boundary
+
+Natural spawning is off. Test with the Cockatrice spawn egg until ground movement, clearance during
+takeoff, landing on uneven terrain, collision around trees, and aerial attack reach have been checked
+in game. Enabling biome spawning is an editor task after those checks, not a Java change.

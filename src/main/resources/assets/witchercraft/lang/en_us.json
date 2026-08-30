@@ -347,5 +347,7 @@
   "key.witchercraft.open_shell.alchemy": "WitcherCraft: Alchemy",
   "key.witchercraft.open_shell.map": "WitcherCraft: Map",
   "key.witchercraft.open_shell.glossary": "WitcherCraft: Glossary",
-  "key.witchercraft.open_shell.meditation": "WitcherCraft: Meditation"
+  "key.witchercraft.open_shell.meditation": "WitcherCraft: Meditation",
+  "entity.witchercraft.cockatrice": "Cockatrice",
+  "item.witchercraft.cockatrice_spawn_egg": "Cockatrice Spawn Egg"
 }

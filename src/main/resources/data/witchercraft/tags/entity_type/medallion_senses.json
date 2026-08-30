@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "zombie"
+    "zombie",
+    "witchercraft:cockatrice"
   ]
 }
