@@ -79,6 +79,19 @@
       "path": "~/NAVBAR"
     },
     {
+      "name": "PauseMenuLayout",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "pause_menu_layout",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/PauseMenuLayout.java"
+        ]
+      },
+      "path": "~/Pause Menu"
+    },
+    {
       "name": "WitcherGuiKeybind",
       "type": "code",
       "compiles": true,

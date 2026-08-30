@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WitcherCraft - Pause Menu Creator</title>
+<style>
+  :root { --bg:#14141a; --panel:#1e1e26; --ink:#e8e8ef; --dim:#9a9aa6; --line:#33333d; --accent:#ffdd55; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  header { padding:10px 16px; border-bottom:1px solid var(--line); display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+  header h1 { font-size:15px; margin:0; font-weight:600; }
+  header .hint { color:var(--dim); font-size:12px; max-width:940px; }
+  .wrap { display:flex; gap:16px; padding:16px; align-items:flex-start; flex-wrap:wrap; }
+  .stage-col { flex:0 0 auto; }
+  .side { flex:1 1 340px; min-width:320px; max-width:620px; }
+  #stage { position:relative; background:#000; border:1px solid var(--line); overflow:hidden; box-shadow:0 6px 30px #0008; }
+  #bg { position:absolute; inset:0; width:100%; height:100%; object-fit:fill; pointer-events:none; z-index:0; }
+  #dim { position:absolute; inset:0; background:#00000033; z-index:1; pointer-events:none; }
+  #lvlref { position:absolute; z-index:2; pointer-events:none; color:#ffdd55; font-family:monospace; text-shadow:1px 1px 0 #000; }
+  .navtab { position:absolute; z-index:3; border:1px solid var(--line); background:#101015cc; cursor:pointer;
+            display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:2px; padding-top:4px;
+            color:var(--ink); user-select:none; overflow:hidden; }
+  .navtab.sel { outline:2px solid var(--accent); outline-offset:1px; z-index:6; }
+  .navtab .ic { border:1px solid #ffffff44; background:#ffffff12; display:flex; align-items:center; justify-content:center; font-size:9px; color:#ffffffaa; }
+  .navtab .lb { font-size:10px; text-shadow:0 1px 2px #000; }
+  fieldset { border:1px solid var(--line); border-radius:6px; margin:0 0 12px; padding:10px 12px; }
+  legend { color:var(--dim); padding:0 6px; font-size:11px; text-transform:uppercase; letter-spacing:.06em; cursor:pointer; user-select:none; }
+  legend:hover { color:var(--ink); }
+  label { display:inline-flex; align-items:center; gap:6px; margin:3px 10px 3px 0; color:var(--dim); }
+  input[type=number]{ width:58px; }
+  input, select { background:#0e0e13; border:1px solid var(--line); color:var(--ink); padding:3px 5px; border-radius:4px; font:inherit; }
+  input[type=text]{ width:230px; }
+  button { background:#2a2a34; color:var(--ink); border:1px solid var(--line); border-radius:5px; padding:6px 12px; cursor:pointer; font:inherit; }
+  button:hover { background:#34343f; }
+  button.primary { background:var(--accent); color:#161009; border-color:var(--accent); font-weight:600; }
+  button.sm { padding:3px 8px; font-size:12px; }
+  .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:8px; }
+  textarea { width:100%; height:320px; background:#0e0e13; color:#cfe8cf; border:1px solid var(--line); border-radius:6px; padding:10px; font:12px/1.45 ui-monospace,Consolas,monospace; resize:vertical; }
+  .selinfo { color:var(--dim); } .selinfo b { color:var(--ink); }
+  .muted { color:var(--dim); font-size:12px; }
+  .collapse { display:none; } .collapse.open { display:block; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Pause Menu Creator</h1>
+  <span class="hint">Edits the WitcherCraft pause menu - a centred group of tabs that works just like the shell navbar, only <b>bigger</b> and over its own <b>background</b>. Each tab opens the shell on its <code>pageId</code>. The level/XP readout is shared with the shell and edited in <code>gui-layout-creator.html</code> (shown here as a greyed reference). Output regenerates <code>PauseMenuLayout.java</code> &rarr; Copy &rarr; paste over the file.</span>
+</header>
+
+<div class="wrap">
+  <div class="stage-col">
+    <div id="stage"></div>
+    <div style="margin-top:8px" class="selinfo" id="selinfo">Nothing selected.</div>
+  </div>
+
+  <div class="side">
+    <fieldset>
+      <legend>Selected tab</legend>
+      <div id="editor"><span class="muted">Click a tab to edit it.</span></div>
+      <div class="row" style="margin-top:8px">
+        <button class="sm" id="addNav">+ Nav tab</button>
+        <button class="sm" id="delBtn">Delete selected</button>
+      </div>
+      <div class="muted">A tab's <code>pageId</code> must match a shell <code>GuiPage.id()</code> - clicking it opens that shell tab. Same ids as the navbar (glossary, inventory, map, alchemy, skills, meditation).</div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Design canvas &amp; navbar</legend>
+      <label>Design W <input type="number" id="DESIGN_W"></label>
+      <label>Design H <input type="number" id="DESIGN_H"></label>
+      <label>Zoom <input type="number" id="zoom" step="0.1" min="0.4" max="3"></label><br>
+      <label>Nav Y <input type="number" id="NAV_Y"></label>
+      <label>Nav H <input type="number" id="NAV_H"></label>
+      <label>Tab W <input type="number" id="NAV_TAB_W"></label>
+      <label>Gap <input type="number" id="NAV_GAP"></label>
+      <label>Icon <input type="number" id="NAV_ICON"></label>
+      <div class="muted">Keep Design W:H at 16:9 (e.g. 640x360) - the background should be authored at that same ratio, or it stretches within the canvas. The tabs are a centred group at <code>Nav Y</code>.</div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Background</legend>
+      <label>BG path <input type="text" id="BG"></label>
+      <div class="row" style="margin-top:6px">
+        <button class="sm" id="loadBg">Preview an image…</button>
+        <button class="sm" id="clearBg">Clear preview</button>
+        <input type="file" id="bgFile" accept="image/*" style="display:none">
+      </div>
+      <div class="muted">The single pause-menu background, filling the 16:9 canvas (black letterbox on other aspects).</div>
+    </fieldset>
+
+    <div class="row">
+      <button class="primary" id="copyBtn">Copy PauseMenuLayout.java</button>
+      <button id="resetBtn">Reset to seeded layout</button>
+    </div>
+    <textarea id="out" spellcheck="false" readonly></textarea>
+
+    <fieldset style="margin-top:12px">
+      <legend id="impToggle">&#9654; Import from Java (paste current PauseMenuLayout.java)</legend>
+      <div class="collapse" id="impBody">
+        <div class="muted" style="margin-bottom:6px">Paste the current <code>PauseMenuLayout.java</code> to load its values into the editor - so you start from the checked-in file instead of the seed.</div>
+        <textarea id="imp" spellcheck="false" style="height:120px" placeholder="paste PauseMenuLayout.java here"></textarea>
+        <div class="row" style="margin-top:6px"><button class="sm" id="impBtn">Import</button><span class="muted" id="impMsg"></span></div>
+      </div>
+    </fieldset>
+  </div>
+</div>
+
+<script>
+// ---- seed = current PauseMenuLayout.java ----------------------------------
+const SEED = {
+  DESIGN_W:640, DESIGN_H:360,
+  BG:"witchercraft:textures/gui/shell/background.png",
+  NAV_Y:150, NAV_H:44, NAV_TAB_W:92, NAV_GAP:6, NAV_ICON:28,
+  NAV: [
+    {pageId:"glossary",   labelKey:"gui.witchercraft.shell.nav.glossary",   icon:"witchercraft:textures/gui/nav/glossary.png"},
+    {pageId:"inventory",  labelKey:"gui.witchercraft.shell.nav.inventory",  icon:"witchercraft:textures/gui/nav/inventory.png"},
+    {pageId:"map",        labelKey:"gui.witchercraft.shell.nav.map",        icon:"witchercraft:textures/gui/nav/map.png"},
+    {pageId:"alchemy",    labelKey:"gui.witchercraft.shell.nav.alchemy",    icon:"witchercraft:textures/gui/nav/alchemy.png"},
+    {pageId:"skills",     labelKey:"gui.witchercraft.shell.nav.skills",     icon:"witchercraft:textures/gui/nav/skills.png"},
+    {pageId:"meditation", labelKey:"gui.witchercraft.shell.nav.meditation", icon:"witchercraft:textures/gui/nav/meditation.png"},
+  ],
+};
+const NUM_KEYS=['DESIGN_W','DESIGN_H','NAV_Y','NAV_H','NAV_TAB_W','NAV_GAP','NAV_ICON'];
+
+let S = structuredClone(SEED);
+let zoom = 1.2;
+let sel = null;
+
+const stage = document.getElementById('stage');
+const out = document.getElementById('out');
+const $ = id => document.getElementById(id);
+
+function navTotalWidth(){ const n=S.NAV.length; return n<=0?0:n*S.NAV_TAB_W+(n-1)*S.NAV_GAP; }
+function navStartX(){ return Math.round((S.DESIGN_W-navTotalWidth())/2); }
+function navTabX(i){ return navStartX()+i*(S.NAV_TAB_W+S.NAV_GAP); }
+function shortText(t){ if(!t) return ''; const d=t.lastIndexOf('.'); return d>=0?t.slice(d+1):t; }
+
+// ---- build stage ----------------------------------------------------------
+function build(){
+  stage.style.width = S.DESIGN_W*zoom+'px';
+  stage.style.height = S.DESIGN_H*zoom+'px';
+  const bg = $('bg');
+  stage.querySelectorAll('.navtab,#dim,#lvlref').forEach(b=>b.remove());
+
+  const dim=document.createElement('div'); dim.id='dim';
+  if(bg) bg.after(dim); else stage.prepend(dim);
+
+  // level/XP readout reference (edited in the navbar tool) - fixed sample
+  const lvl=document.createElement('div'); lvl.id='lvlref';
+  lvl.style.left=6*zoom+'px'; lvl.style.top=10*zoom+'px'; lvl.style.fontSize=(14*zoom)+'px';
+  lvl.textContent='22'; lvl.title='level/XP - edited in gui-layout-creator';
+  dim.after(lvl);
+
+  S.NAV.forEach((n,i)=>{
+    const tab=document.createElement('div'); tab.className='navtab'+(sel===i?' sel':'');
+    const tx=navTabX(i), ty=S.NAV_Y;
+    tab.style.left=tx*zoom+'px'; tab.style.top=ty*zoom+'px';
+    tab.style.width=S.NAV_TAB_W*zoom+'px'; tab.style.height=S.NAV_H*zoom+'px';
+    const ic=document.createElement('div'); ic.className='ic';
+    ic.style.width=S.NAV_ICON*zoom+'px'; ic.style.height=S.NAV_ICON*zoom+'px';
+    ic.textContent = n.icon? '' : 'no ic';
+    const lb=document.createElement('div'); lb.className='lb'; lb.textContent=shortText(n.labelKey)||n.pageId;
+    tab.appendChild(ic); tab.appendChild(lb);
+    tab.onclick=()=>{ sel=i; build(); };
+    stage.appendChild(tab);
+  });
+  renderOut(); renderEditor(); updateSelInfo();
+}
+
+// ---- property editor ------------------------------------------------------
+function renderEditor(){
+  const box=$('editor');
+  if(sel===null || !S.NAV[sel]){ box.innerHTML='<span class="muted">Click a tab to edit it.</span>'; return; }
+  const o=S.NAV[sel];
+  box.innerHTML =
+    field('pageId','text',o.pageId)+ field('labelKey','text',o.labelKey)+ field('icon','text',o.icon)+
+    '<div class="row" style="margin-top:6px"><button class="sm" id="navLeft">&#9664; move left</button><button class="sm" id="navRight">move right &#9654;</button></div>';
+  box.querySelectorAll('[id^=f_]').forEach(inp=>{
+    inp.addEventListener('input',()=>{ o[inp.id.slice(2)]=inp.value; build(); });
+  });
+  $('navLeft').onclick=()=>{ if(sel>0){ [S.NAV[sel-1],S.NAV[sel]]=[S.NAV[sel],S.NAV[sel-1]]; sel--; build(); } };
+  $('navRight').onclick=()=>{ if(sel<S.NAV.length-1){ [S.NAV[sel+1],S.NAV[sel]]=[S.NAV[sel],S.NAV[sel+1]]; sel++; build(); } };
+}
+function field(k,t,v){ return '<label>'+k+' <input id="f_'+k+'" type="'+t+'" value="'+escAttr(v)+'"></label> '; }
+function escAttr(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }
+
+$('addNav').onclick=()=>{ S.NAV.push({pageId:"newtab", labelKey:"", icon:""}); sel=S.NAV.length-1; build(); };
+$('delBtn').onclick=()=>{ if(sel===null) return; S.NAV.splice(sel,1); sel=null; build(); };
+
+function updateSelInfo(){
+  const si=$('selinfo');
+  if(sel===null || !S.NAV[sel]){ si.innerHTML='Nothing selected. '+S.NAV.length+' tabs.'; return; }
+  si.innerHTML='Selected tab <b>'+S.NAV[sel].pageId+'</b> (position '+(sel+1)+' of '+S.NAV.length+') - tabs auto-centre as a group';
+}
+
+// ---- Java output ----------------------------------------------------------
+function jstr(s){ return '"'+String(s==null?'':s).replace(/\\/g,'\\\\').replace(/"/g,'\\"')+'"'; }
+function navLine(n){ return '\t\t\tnew Nav('+jstr(n.pageId)+', '+jstr(n.labelKey)+', '+jstr(n.icon)+'),'; }
+
+function renderOut(){
+  const j =
+`package net.redboltmedia.witchercraft;
+
+/**
+ * Data-driven geometry for the WitcherCraft pause menu.
+ *
+ * The pause menu works just like the shell navbar - a centred group of
+ * fixed-width tabs - only BIGGER, drawn over its own background. Each tab opens
+ * the shell on the matching page ({@code new WitcherGuiScreen(pageId)}), so its
+ * tab set mirrors the navbar. It renders against the shell's virtual design
+ * canvas and also draws the same level/XP readout
+ * ({@link WitcherGuiScreen#drawLevelReadout}), which is edited in the navbar
+ * tool; this class owns only the pause chrome: canvas, background and the tabs.
+ *
+ * {@link net.redboltmedia.witchercraft.client.gui.PauseMenuGuiScreen} reads this
+ * and keeps only render + input logic (the tab palette is hardcoded there, the
+ * same way the shell navbar's is).
+ *
+ * Generated by tools/pause-menu-creator.html - paste this over the file
+ * wholesale. Keep it a dumb data holder so the tool can overwrite it freely.
+ */
+public final class PauseMenuLayout {
+	private PauseMenuLayout() {
+	}
+
+	// --- virtual design canvas (16:9); the screen scales this to fit -----------
+	public static final int DESIGN_W = ${S.DESIGN_W};
+	public static final int DESIGN_H = ${S.DESIGN_H};
+
+	// --- background (fills the 16:9 design canvas; black letterbox elsewhere) --
+	public static final String BG = ${jstr(S.BG)};
+
+	// --- navbar (centred group of fixed-width tabs; bigger than the shell's) ---
+	public static final int NAV_Y = ${S.NAV_Y};
+	public static final int NAV_H = ${S.NAV_H};
+	public static final int NAV_TAB_W = ${S.NAV_TAB_W};
+	public static final int NAV_GAP = ${S.NAV_GAP};
+	public static final int NAV_ICON = ${S.NAV_ICON};
+
+	// ==========================================================================
+	//  A pause tab. pageId is the shell page it opens (new WitcherGuiScreen(id)).
+	//  Positions are computed (centred) by the screen, so there is no rect here.
+	// ==========================================================================
+	public static final class Nav {
+		public final String pageId;
+		public final String labelKey; // lang key; may be "" to use the page's own label
+		public final String icon; // texture path, or "" for none (label only)
+
+		public Nav(String pageId, String labelKey, String icon) {
+			this.pageId = pageId;
+			this.labelKey = labelKey;
+			this.icon = icon;
+		}
+	}
+
+	// --- tabs (same set as the navbar) ----------------------------------------
+	public static final Nav[] NAV = {
+${S.NAV.map(navLine).join('\n')}
+	};
+
+	// --- lookups (kept trivial so the tool can regenerate the class) ----------
+
+	/** Total design-pixel width the whole tab group occupies. */
+	public static int navTotalWidth(int count) {
+		return count <= 0 ? 0 : count * NAV_TAB_W + (count - 1) * NAV_GAP;
+	}
+
+	/** Left edge of the first tab, so the group is centred on the design canvas. */
+	public static int navStartX(int count) {
+		return (DESIGN_W - navTotalWidth(count)) / 2;
+	}
+
+	/** Left edge of tab i (design coords). */
+	public static int navTabX(int count, int i) {
+		return navStartX(count) + i * (NAV_TAB_W + NAV_GAP);
+	}
+}
+`;
+  out.value = j;
+}
+
+// ---- controls -------------------------------------------------------------
+NUM_KEYS.forEach(k=>{ const el=$(k); el.value=S[k];
+  el.addEventListener('input',()=>{ const v=parseInt(el.value,10); if(!isNaN(v)){ S[k]=v; build(); } }); });
+$('BG').value=S.BG; $('BG').addEventListener('input',()=>{ S.BG=$('BG').value; build(); });
+$('zoom').value=zoom; $('zoom').addEventListener('input',()=>{ const v=parseFloat($('zoom').value); if(v>=0.4){ zoom=v; build(); } });
+function syncInputs(){ NUM_KEYS.forEach(k=>$(k).value=S[k]); $('BG').value=S.BG; }
+
+$('copyBtn').addEventListener('click', async ()=>{ out.select();
+  try{ await navigator.clipboard.writeText(out.value); flash($('copyBtn'),'Copied!'); }
+  catch{ document.execCommand('copy'); flash($('copyBtn'),'Copied!'); } });
+function flash(b,m){ const t=b.textContent; b.textContent=m; setTimeout(()=>b.textContent=t,1200); }
+$('resetBtn').addEventListener('click',()=>{ S=structuredClone(SEED); zoom=1.2; syncInputs(); $('zoom').value=zoom; sel=null; build(); });
+
+$('loadBg').addEventListener('click',()=>$('bgFile').click());
+$('bgFile').addEventListener('change',e=>{ const f=e.target.files[0]; if(!f) return; const url=URL.createObjectURL(f);
+  let img=$('bg'); if(!img){ img=document.createElement('img'); img.id='bg'; stage.prepend(img); } img.src=url; });
+$('clearBg').addEventListener('click',()=>{ const img=$('bg'); if(img) img.remove(); });
+
+// ---- import from Java -----------------------------------------------------
+function parsePauseJava(txt){
+  const S2=structuredClone(SEED);
+  const intOf=n=>{const m=txt.match(new RegExp('\\bint\\s+'+n+'\\s*=\\s*(-?\\d+)\\s*;'));return m?parseInt(m[1],10):undefined;};
+  const strOf=n=>{const m=txt.match(new RegExp('\\bString\\s+'+n+'\\s*=\\s*"([^"]*)"\\s*;'));return m?m[1]:undefined;};
+  NUM_KEYS.forEach(k=>{const v=intOf(k);if(v!==undefined)S2[k]=v;});
+  const bg=strOf('BG'); if(bg!==undefined)S2.BG=bg;
+  const navs=[...txt.matchAll(/new\s+Nav\(\s*"([^"]*)"\s*,\s*"([^"]*)"\s*,\s*"([^"]*)"\s*\)/g)]
+    .map(m=>({pageId:m[1],labelKey:m[2],icon:m[3]}));
+  if(navs.length) S2.NAV=navs;
+  return S2;
+}
+$('impToggle').addEventListener('click',()=>{ const open=$('impBody').classList.toggle('open');
+  $('impToggle').innerHTML=(open?'&#9660;':'&#9654;')+' Import from Java (paste current PauseMenuLayout.java)'; });
+$('impBtn').addEventListener('click',()=>{
+  const txt=$('imp').value;
+  if(!txt.trim()){ $('impMsg').textContent='Paste some Java first.'; return; }
+  try{ S=parsePauseJava(txt); syncInputs(); sel=null; build(); $('impMsg').textContent='Imported '+S.NAV.length+' tabs.'; }
+  catch(e){ $('impMsg').textContent='Parse error: '+e.message; }
+});
+
+build();
+</script>
+</body>
+</html>

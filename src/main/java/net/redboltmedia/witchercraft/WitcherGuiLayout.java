@@ -2,7 +2,7 @@ package net.redboltmedia.witchercraft;
 
 /**
  * Data-driven geometry for the WitcherCraft GUI shell CHROME: the virtual design
- * canvas, the fullscreen background, and the navbar. It does NOT describe page
+ * canvas, per-page backgrounds, and the navbar. It does NOT describe page
  * content - each page owns its own layout (and its own placer tool), the way the
  * Skills page owns PerkEquipLayout / PerkTree. The shell just hands every page a
  * content REGION (the whole area below the navbar) to fill however it likes.
@@ -31,7 +31,7 @@ public final class WitcherGuiLayout {
 	// --- navbar (centred group of fixed-width tabs, drawn over the background) -
 	public static final int NAV_Y = 8;
 	public static final int NAV_H = 30;
-	public static final int NAV_TAB_W = 78;
+	public static final int NAV_TAB_W = 60;
 	public static final int NAV_GAP = 4;
 	public static final int NAV_ICON = 20;
 
@@ -43,14 +43,14 @@ public final class WitcherGuiLayout {
 	// can place them freely in the empty space left of the tabs. Editable in
 	// tools/gui-layout-creator.html; also drawn on the reworked pause menu.
 	public static final int LEVEL_X = 6; // level number anchor (top-left)
-	public static final int LEVEL_Y = 10;
+	public static final int LEVEL_Y = 15;
 	public static final int LEVEL_SCALE = 2; // level-number text scale
-	public static final int XP_BAR_X = 34; // xp progress bar
-	public static final int XP_BAR_Y = 13;
+	public static final int XP_BAR_X = 25; // xp progress bar
+	public static final int XP_BAR_Y = 17;
 	public static final int XP_BAR_W = 40;
 	public static final int XP_BAR_H = 4;
-	public static final int XP_TEXT_X = 34; // "exp/req" caption
-	public static final int XP_TEXT_Y = 20;
+	public static final int XP_TEXT_X = 25; // "exp/req" caption
+	public static final int XP_TEXT_Y = 22;
 	public static final int LEVEL_TEXT_COLOR = 0xFFFFDD55;
 	public static final int XP_BAR_BG_COLOR = 0xFF201D14;
 	public static final int XP_BAR_FILL_COLOR = 0xFFFFDD55;
@@ -96,11 +96,11 @@ public final class WitcherGuiLayout {
 	}
 
 	public static final Background[] BACKGROUNDS = {
-			new Background("inventory", "witchercraft:textures/gui/shell/backgrounds/inventory.png"),
-			new Background("skills", "witchercraft:textures/gui/shell/backgrounds/skills.png"),
-			new Background("alchemy", "witchercraft:textures/gui/shell/backgrounds/alchemy.png"),
-			new Background("map", "witchercraft:textures/gui/shell/backgrounds/map.png"),
 			new Background("glossary", "witchercraft:textures/gui/shell/backgrounds/glossary.png"),
+			new Background("alchemy", "witchercraft:textures/gui/shell/backgrounds/alchemy.png"),
+			new Background("inventory", "witchercraft:textures/gui/shell/backgrounds/inventory.png"),
+			new Background("map", "witchercraft:textures/gui/shell/backgrounds/map.png"),
+			new Background("skills", "witchercraft:textures/gui/shell/backgrounds/skills.png"),
 			new Background("meditation", "witchercraft:textures/gui/shell/backgrounds/meditation.png"),
 	};
 
