@@ -17,6 +17,7 @@ Anything marked **tunable** is a value you are expected to change. Anything desc
 2. [Character Stats and Attributes](#2-character-stats-and-attributes)
 3. [The GUI shell](#3-the-gui-shell)
 4. [Cockatrice and hybrid mob movement](#4-cockatrice-and-hybrid-mob-movement)
+5. [World map terrain pipeline](#5-world-map-terrain-pipeline)
 
 ---
 
@@ -993,3 +994,162 @@ walking-animation path and its normal walk progress. The attack animations last 
 Natural spawning is off. Test with the Cockatrice spawn egg until ground movement, clearance during
 takeoff, landing on uneven terrain, collision around trees, and aerial attack reach have been checked
 in game. Enabling biome spawning is an editor task after those checks, not a Java change.
+
+---
+
+## 5. World map terrain pipeline
+
+### 5.1 Milestone 2A ownership
+
+`WorldMapTerrainCapture` and `WorldMapTerrainTile` are locked code elements in the base package.
+They own server observation, capture scheduling, terrain serialization, and exploration-mask
+serialization. Do not move these collections into generated `PlayerVariables`.
+
+Blockly remains the preferred place for ordinary gameplay triggers and effects. It cannot safely
+express chunk-watch events, bounded queues, atomic files, checksums, or background I/O, so the 2A
+core stays in locked Java. Later Blockly procedures may call narrow locked procedures when a map
+action needs to connect to generated gameplay.
+
+### 5.2 Legitimate exploration contract
+
+The capture entry point is NeoForge `ChunkWatchEvent.Watch`. This event means the server is sending
+an already loaded `LevelChunk` to a specific player. It supplies both facts the map needs. The player
+may reveal that chunk, and the shared terrain tile may be captured. Do not replace it with a general
+chunk-load event, which would record spawn chunks, tickets, and automation that no player explored.
+
+The queue stores only dimension keys and packed chunk positions. Processing calls
+`ServerChunkCache.getChunkNow`. A null result increments `skipped_unloaded` and ends that job. Never
+replace this with `getChunk`, a future request, or a ticket because those paths can load or generate
+terrain.
+
+Only the Overworld enters the pipeline in this milestone. Storage paths and records retain a
+dimension key so later dimensions can use separate data without changing the formats.
+
+### 5.3 Terrain tile format
+
+Each `c.<chunkX>.<chunkZ>.wct` file represents one 16 by 16 chunk at one fixed sample per horizontal
+block. Files live under the dimension folder at
+`data/witchercraft_world_map/terrain/r.<regionX>.<regionZ>/`.
+
+Version 2 is big-endian and contains:
+
+1. Magic `WCTM`, format version, chunk coordinates, sample count, and capture game time.
+2. Exactly 256 records in local Z-major order. Each record stores ground height, map-color ID, tint
+   kind, and resolved tint; foliage height, color, tint kind, and tint; plus water-surface height and
+   resolved water tint.
+3. A CRC32 of every preceding byte.
+
+The signed-short sentinel `Short.MIN_VALUE` means that a foliage or water layer is absent. Capture
+starts at `WORLD_SURFACE` and scans downward within the already loaded column. It ignores non-colliding
+decorative plants. Blocks in the standard leaves or logs tags enter the foliage layer. Water records
+its highest surface and the scan continues to the underwater ground. The first remaining block with a
+non-empty collision shape becomes ground. This keeps grass tufts and tree canopies out of ground height
+and hillshade while retaining trees as a separate visual layer.
+
+The reader rejects version-one terrain tiles, so old captures behave as missing until a legitimate
+chunk-watch event recaptures them. Exploration files remain version one and are not reset. The format
+change does not alter storage paths, authorization, or the one-chunk packet and persistence unit.
+
+Tint kind `0` means no biome tint, `1` grass, `2` foliage, and `3` water. Capturing the resolved tint
+keeps rendering independent of loaded chunks. The tile constructor rejects any array that is not
+exactly 256 samples. The reader rejects unknown versions, bad coordinates, wrong sample counts,
+oversized files, trailing bytes, and checksum failures.
+
+Writes use a unique temporary sibling and then atomic replacement when the filesystem supports it.
+A failed or interrupted write leaves the previous complete tile intact. Missing or unreadable tiles
+mean absent terrain and must never affect markers or exploration data.
+
+### 5.4 Exploration-mask format
+
+Each player has a separate `<uuid>.wce` file under
+`data/witchercraft_world_map/exploration/` in each dimension folder. Version 1 contains magic
+`WCEX`, the player UUID, a bounded count, sorted packed chunk positions, and CRC32. Runtime growth and
+decoding share a hard safety ceiling of 2,000,000 chunks per player per dimension. Bad files load as
+an empty mask and produce a warning.
+
+Masks become dirty only when a new chunk is added. The server snapshots dirty masks every 200 ticks
+and writes them on the I/O executor. A mask stays logically dirty until its write succeeds. Server
+shutdown waits for outstanding writes and retries a failed dirty mask once.
+
+### 5.5 Work queue and diagnostics
+
+The prototype processes one terrain tile per server tick. This is a measurement starting point, not
+a final configuration default. Watched chunks nearer the observing player sort ahead of distant
+ones. Packed positions are deduplicated, and the hard pending ceiling is 32,768 captures.
+
+Every 1,200 ticks the server logs total queued and captured tiles, current pending work, unloaded
+skips, queue-full drops, and storage failures. Profile this in the development client before changing
+the per-tick budget or adding a refresh cooldown. Tile and exploration writes run on Minecraft's I/O
+executor. Column sampling remains on the server thread because chunk state is not safe to read from
+the background writer.
+
+### 5.6 Milestone 2B networking
+
+`WorldMapTileRequestMessage` carries at most 64 packed chunk positions. Its decoder rejects larger
+batches before allocation. `WorldMapTerrainCapture.requestTiles` accepts requests only from a player
+in the Overworld, applies a server-side ceiling of 128 requested tiles per 20 ticks, and checks every
+position against that player's exploration mask. Client coordinates never grant visibility.
+
+Authorized tile reads run on Minecraft's I/O executor. The server sends each successful read as one
+fixed-size `WorldMapTileDataMessage` after returning to the server thread. Missing or corrupt files
+produce no tile response. The client retries a missing visible tile after five seconds, which also
+covers the short race between watching a new chunk and its first atomic terrain write.
+
+`WorldMapClientTileCache` requests the visible rectangle plus a one-chunk margin. When more than 64
+tiles are missing, it selects the nearest 64. This keeps minimum zoom from creating a huge packet.
+One view processes at most two batches, matching the server limit of 128 requested tiles per 20
+ticks.
+
+Each request has a positive ID. After all authorized disk reads finish and all available tile
+messages enter the connection, the server sends `WorldMapTileRequestCompleteMessage` with that ID.
+The map page reports itself as non-pausing while a view is dirty or a request is in flight. It sends
+the next batch directly from the completion handler, without relying on player ticks that stop while
+single-player is paused. After two batches, or when no candidates remain, the page becomes
+pause-capable again. Changing the visible chunk bounds through pan, zoom, or center starts another
+short request chain. Rejected rate-limited requests still receive completion, so malformed timing
+cannot leave single-player permanently unpaused.
+
+### 5.7 Milestone 2C client renderer
+
+`WorldMapClientTileCache` keeps received messages as decoded CPU samples. It does not create a GPU
+texture per chunk. The decoded cache holds at most 2,048 chunks in access order. The chunk tile remains
+the storage, authorization, and network unit. `WorldMapTileDataMessage` carries the version-two ground,
+foliage, and water fields for one authorized chunk.
+
+The client groups samples on a 16 by 16-chunk grid using floor division, including at negative
+coordinates. Each region covers 256 by 256 blocks and tracks which of its 256 authorized chunk samples
+are present. Missing samples produce transparent pixels. `MapPage` fills the viewport with fog before
+drawing terrain, so transparency never exposes neighboring or unauthorized data.
+
+The renderer builds region images lazily at one, two, or four blocks per source pixel. It averages base
+colors and heights before shading a lower-detail pixel. Zoom thresholds use separate entry and exit
+values to stop adjacent levels alternating near a boundary. A region revision invalidates derived images
+when one of its chunks changes. A tile arriving on a region's east or south dependency edge also dirties
+the neighboring region that reads its height for west or north shading.
+
+Ground and foliage colors start with `MapColor` at normal brightness. A `MapColor.NONE` sample remains
+transparent through region reduction and hillshade. For tinted blocks, each channel is two parts base
+color and one part stored biome tint. Water uses the stored biome water color and darkens with captured
+depth. It remains opaque until water transparency is designed. Foliage blends over ground at 75 percent
+opacity. Decorative grass and flowers do not enter either layer.
+
+Hillshade compares averaged ground height with west and north ground samples at the same detail level.
+It never uses foliage height, so canopies do not cast terrain cliffs. Available samples cross chunk and
+region boundaries. A missing neighbor uses neutral slope and causes no request or inferred exploration.
+
+All region screen edges come from one origin, `viewportCenter - mapCenter * zoom`, and the edge's world
+coordinate. Adjacent regions therefore calculate the same shared pixel edge. The 26.1.2 long `blit`
+overload receives independent destination, source, and texture dimensions, so each selected region image
+uses UV coordinates zero through one exactly once at every supported zoom.
+
+The decoded cache and the 64-entry GPU region cache have separate limits. Every uploaded LOD texture is
+released when replaced, evicted, or when the client connection changes. A debug diagnostic emitted every
+five seconds while rendering reports decoded and GPU cache estimates, selected LOD, region rebuilds,
+uploads, draw calls, and average map-render time. Region size and cache limits remain profiling constants,
+not persistent-format fields.
+
+Water transparency, separate lighting, and richer material blending remain Milestone 2D tuning work.
+
+`MapPage` fills the viewport with its fog color first, then draws cached authorized tiles, the player
+marker, and the existing controls. A missing tile therefore reveals nothing. The cache is scoped to
+the current client connection so terrain from one server cannot appear while connected to another.

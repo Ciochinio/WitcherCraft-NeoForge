@@ -106,6 +106,11 @@ public interface GuiPage {
 		return false;
 	}
 
+	/** Whether this page permits an integrated single-player server to pause. */
+	default boolean pausesGame() {
+		return true;
+	}
+
 	/** Called when this page becomes the active tab. */
 	default void onShown() {
 	}

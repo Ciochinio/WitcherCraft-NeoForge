@@ -29,6 +29,12 @@ public final class MapPage implements GuiPage {
 	@Override
 	public void onShown() {
 		centerOnPlayer();
+		WorldMapClientTileCache.markViewDirty();
+	}
+
+	@Override
+	public boolean pausesGame() {
+		return WorldMapClientTileCache.canPause();
 	}
 
 	@Override
@@ -39,7 +45,7 @@ public final class MapPage implements GuiPage {
 		int vh = Math.min(MapLayout.VIEW_H, h - MapLayout.VIEW_Y);
 		g.fill(vx, vy, vx + vw, vy + vh, MapLayout.VIEW_BG);
 		g.enableScissor(vx, vy, vx + vw, vy + vh);
-		drawGrid(g, vx, vy, vw, vh);
+		WorldMapClientTileCache.renderAndRequest(g, vx, vy, vw, vh, centerX, centerZ, zoom);
 		drawPlayer(g, vx, vy, vw, vh);
 		g.disableScissor();
 		drawBorder(g, vx, vy, vw, vh, MapLayout.VIEW_BORDER);
@@ -102,6 +108,7 @@ public final class MapPage implements GuiPage {
 			centerX -= dragX / zoom;
 			centerZ -= dragY / zoom;
 			clampToWorldBorder();
+			WorldMapClientTileCache.markViewDirty();
 			return true;
 		}
 		return false;
@@ -129,6 +136,7 @@ public final class MapPage implements GuiPage {
 		centerZ = anchorZ - (mouseY - (vy + MapLayout.VIEW_H / 2.0)) / next;
 		zoom = next;
 		clampToWorldBorder();
+		WorldMapClientTileCache.markViewDirty();
 	}
 
 	private void clampToWorldBorder() {
@@ -143,6 +151,7 @@ public final class MapPage implements GuiPage {
 		if (Minecraft.getInstance().player != null) {
 			centerX = Minecraft.getInstance().player.getX();
 			centerZ = Minecraft.getInstance().player.getZ();
+			WorldMapClientTileCache.markViewDirty();
 		}
 	}
 

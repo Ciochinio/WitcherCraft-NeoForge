@@ -569,11 +569,31 @@ ONE of them is enough - multiple parents are alternative routes into that node, 
 have to clear in full, so a tree can branch and re-converge without gating a node behind everything
 that feeds into it. Hovering a node or a slotted perk shows its name (in its branch's colour) and a
 one-line description; whether it's locked, available, or equipped is left to the art alone. The Map
-tab now has an interactive shell with a diagnostic grid. Dragging pans the view, the mouse
-wheel zooms toward the cursor, and the bottom bar provides center and zoom controls. The grid is
-temporary. Explored terrain, fog, markers, waypoints, and filters arrive in later world-map
-milestones. The remaining unfinished tabs use placeholders until those systems get their own
-screens.
+tab now has an interactive terrain view. Dragging pans the view, the mouse wheel zooms toward the
+cursor, and the bottom bar provides center and zoom controls. Markers, waypoints, and filters arrive
+in later world-map milestones. The remaining unfinished tabs use placeholders until those systems
+get their own screens.
+
+World-map exploration begins when the server sends a loaded Overworld chunk to a player. That event
+records the chunk in that player's private exploration history and queues a shared terrain sample.
+The map system never generates or force-loads a chunk. If the chunk unloads before its queued turn,
+the capture is skipped. Each horizontal block column records separate ground, tree-foliage, and water
+information. Decorative grass and flowers do not replace the ground color. Tree height does not affect
+terrain shading, and water retains its biome color and captured depth for later transparency work.
+Blocks without a map color remain transparent instead of producing black terrain pixels.
+
+The map requests visible terrain from the server in small batches. The server checks every requested
+chunk against that player's exploration history before returning a tile. The client combines
+authorized chunk samples into 256 by 256-block regions. It blends stored biome tint with Minecraft
+map color, draws foliage over shaded ground, colors water by biome and depth, and selects a lower-detail region image
+when zoomed out. Unexplored chunks and captured tiles that have not arrived yet remain covered by
+fog. Decoded terrain and uploaded region images have separate bounded caches, so long journeys do
+not keep every visited area in memory.
+
+Opening the map still pauses single-player once its current terrain request finishes. A new view
+briefly resumes the integrated server for at most two bounded request batches, then pauses again.
+This prevents the fullscreen map from leaving the player exposed while still allowing its
+server-owned terrain data to load. Multiplayer servers continue running normally.
 
 The whole hub is a **reskinnable shell**: the navbar and every page's layout live in one data file,
 so tabs and panels can be rearranged, relabelled, or repointed without touching game logic. Each perk now

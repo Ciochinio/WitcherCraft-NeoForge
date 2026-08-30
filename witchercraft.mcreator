@@ -452,6 +452,30 @@
       "path": "~/Meditation"
     },
     {
+      "name": "WorldMapTerrainTile",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_terrain_tile",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapTerrainTile.java"
+        ]
+      }
+    },
+    {
+      "name": "WorldMapTerrainCapture",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_terrain_capture",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapTerrainCapture.java"
+        ]
+      }
+    },
+    {
       "name": "PauseMenuGuiOpen",
       "type": "procedure",
       "compiles": true,
@@ -485,6 +509,54 @@
         ]
       },
       "path": "~/Pause Menu"
+    },
+    {
+      "name": "WorldMapTileRequestCompleteMessage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_tile_request_complete_message",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapTileRequestCompleteMessage.java"
+        ]
+      }
+    },
+    {
+      "name": "WorldMapClientTileCache",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_client_tile_cache",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapClientTileCache.java"
+        ]
+      }
+    },
+    {
+      "name": "WorldMapTileDataMessage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_tile_data_message",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapTileDataMessage.java"
+        ]
+      }
+    },
+    {
+      "name": "WorldMapTileRequestMessage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_tile_request_message",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapTileRequestMessage.java"
+        ]
+      }
     },
     {
       "name": "AlchemyGui",
