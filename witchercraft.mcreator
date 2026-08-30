@@ -415,6 +415,30 @@
       "path": "~/Meditation"
     },
     {
+      "name": "MapPage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "map_page",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/MapPage.java"
+        ]
+      }
+    },
+    {
+      "name": "MapLayout",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "map_layout",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/MapLayout.java"
+        ]
+      }
+    },
+    {
       "name": "MeditationRejectMessage",
       "type": "code",
       "compiles": true,
@@ -10005,6 +10029,9 @@
       "gui.witchercraft.shell.meditation.cancel": "Cancel",
       "gui.witchercraft.shell.meditation.blocked_monster": "Monsters are nearby - you cannot meditate.",
       "gui.witchercraft.shell.meditation.blocked_space": "Not enough open space to meditate here.",
+      "gui.witchercraft.map.waypoints": "Waypoints",
+      "gui.witchercraft.map.filters": "Filters",
+      "gui.witchercraft.map.center": "Center",
       "key.witchercraft.open_shell.inventory": "WitcherCraft: Inventory",
       "key.witchercraft.open_shell.skills": "WitcherCraft: Skills",
       "key.witchercraft.open_shell.alchemy": "WitcherCraft: Alchemy",

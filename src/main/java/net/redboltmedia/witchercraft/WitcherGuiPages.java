@@ -33,6 +33,9 @@ public final class WitcherGuiPages {
 		// The meditation clock dial.
 		MeditationPage meditation = new MeditationPage("meditation");
 		CUSTOM.put(meditation.id(), meditation);
+
+		MapPage map = new MapPage();
+		CUSTOM.put(map.id(), map);
 	}
 
 	/** The page handling a given id (never null - falls back to a PlaceholderPage). */

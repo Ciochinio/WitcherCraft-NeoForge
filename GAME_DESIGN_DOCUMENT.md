@@ -568,8 +568,12 @@ manual unequip first. When a node has more than one connecting line to earlier p
 ONE of them is enough - multiple parents are alternative routes into that node, not a checklist you
 have to clear in full, so a tree can branch and re-converge without gating a node behind everything
 that feeds into it. Hovering a node or a slotted perk shows its name (in its branch's colour) and a
-one-line description; whether it's locked, available, or equipped is left to the art alone. The
-remaining tabs are placeholders for now, filled in as those systems get their own screens.
+one-line description; whether it's locked, available, or equipped is left to the art alone. The Map
+tab now has an interactive shell with a diagnostic grid. Dragging pans the view, the mouse
+wheel zooms toward the cursor, and the bottom bar provides center and zoom controls. The grid is
+temporary. Explored terrain, fog, markers, waypoints, and filters arrive in later world-map
+milestones. The remaining unfinished tabs use placeholders until those systems get their own
+screens.
 
 The whole hub is a **reskinnable shell**: the navbar and every page's layout live in one data file,
 so tabs and panels can be rearranged, relabelled, or repointed without touching game logic. Each perk now

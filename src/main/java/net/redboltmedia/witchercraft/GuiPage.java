@@ -54,6 +54,21 @@ public interface GuiPage {
 		return false;
 	}
 
+	/** Handle a mouse-button release. Region, mouse, and drag deltas use design coords. */
+	default boolean mouseReleased(int x, int y, int w, int h, double mouseX, double mouseY, int button) {
+		return false;
+	}
+
+	/** Handle a held-button drag. Region, mouse, and drag deltas use design coords. */
+	default boolean mouseDragged(int x, int y, int w, int h, double mouseX, double mouseY, int button, double dragX, double dragY) {
+		return false;
+	}
+
+	/** Handle wheel input at a design-space cursor position. */
+	default boolean mouseScrolled(int x, int y, int w, int h, double mouseX, double mouseY, double scrollX, double scrollY) {
+		return false;
+	}
+
 	/** Handle a key press. Return true to consume (blocks default Esc-close, etc.). */
 	default boolean keyPressed(int keyCode) {
 		return false;

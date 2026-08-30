@@ -593,11 +593,12 @@ Two consequences to know:
 
 ### 3.3 The pieces
 
-All hand-written, none owned by an MCreator element (the same "orphaned helper class" pattern as
-`PerkEquipLayout` / `PerkTree` / `PerkRegistry`), so MCreator never regenerates them:
+All hand-written. Classes that must open in MCreator's code editor use locked code elements, while
+small helpers may remain unowned. MCreator does not regenerate either form:
 
-- **`GuiPage`** - the page interface. `render(g, x, y, w, h, mouseX, mouseY, partial)` +
-  `mouseClicked(x, y, w, h, ...)` / `keyPressed` / `pollTooltip` / `onShown` / `onClose`. The shell
+- **`GuiPage`** - the page interface. `render(g, x, y, w, h, mouseX, mouseY, partial)` plus design-space
+  mouse click, release, drag, and scroll callbacks, then `keyPressed` / `pollTooltip` / `onShown` /
+  `onClose`. The shell
   hands every page the **content region** - the whole area below the navbar - as a design-coords rect;
   the page fills it however it likes. All coords are design-canvas pixels (see 3.3a).
 - **`WitcherGuiScreen`** - the shell. Renders against a **fixed virtual design canvas**
@@ -609,7 +610,9 @@ All hand-written, none owned by an MCreator element (the same "orphaned helper c
   content region, then the navbar (a **centred group of fixed-width tabs**, icon + label) **on top** so
   page content never covers the tabs, then pops the transform and renders the page's tooltip
   (`pollTooltip`) in screen space at the real cursor. Input is transformed screen->design before
-  hit-testing. A `WitcherGuiScreen(String pageId)` constructor opens straight onto a tab.
+  hit-testing. Drag deltas are divided by the same shell scale. A
+  `WitcherGuiScreen(String pageId)` constructor opens straight onto a tab. The screen reports itself
+  as pause-capable, which pauses an integrated single-player server but does not pause multiplayer.
 - **`WitcherGuiLayout`** - the tool-generated data holder for shell **chrome only** (no page content).
   The **design canvas** (`DESIGN_W/H`), a `BG` fallback texture, navbar sizing (`NAV_Y/H`,
   `NAV_TAB_W`, `NAV_GAP`, `NAV_ICON`), a `CONTENT_MARGIN`, a `NAV[]` of tabs (each `pageId` + label key
@@ -623,6 +626,11 @@ All hand-written, none owned by an MCreator element (the same "orphaned helper c
   region. Every navbar page with no bespoke `GuiPage` uses it, until that page gets its own class +
   its own placer tool (the Skills pattern).
 - **`PerkPage`** - the perk tree + equip grid, fit-scaled into the content region (see 3.5).
+- **`MapPage`** - the first world-map milestone. It owns only client view state and renders a clipped
+  diagnostic grid, player marker, cursor coordinates, and bottom-bar controls. Terrain, fog, POIs,
+  and waypoints are absent. Wheel zoom preserves the world position under the cursor.
+- **`MapLayout`** - tool-generated map viewport, bottom-bar, control, text, and color constants. Its
+  editor is `tools/map-layout-creator.html`, which can import the checked-in Java values.
 - **`WitcherGuiKeybind`** - a hand-written `@EventBusSubscriber(Dist.CLIENT)` that registers the **P**
   mapping plus one **per-page** mapping built from `NAV[]` (`key.witchercraft.open_shell.<pageId>`; the
   six known pages get conflict-free defaults - I / K / J / N / M / G - via a `DEFAULT_KEYS` map, any
@@ -762,8 +770,8 @@ divergence risk the way the `en_us.json` gotcha (3.11) is.
 
 ### 3.8 Known limitations
 
-- **Placeholder pages.** Only Skills is a real page; Inventory / Alchemy / Bombs / Map / Glossary are
-  `PlaceholderPage` "coming soon" tabs until each is built (own class + own tool). None wire real
+- **Placeholder pages.** Skills, Meditation, and Map have real pages. Inventory, Alchemy, and Glossary
+  remain `PlaceholderPage` "coming soon" tabs until each is built (own class + own tool). None wire real
   item slots yet - a page that needs live inventory slots must bring a container.
 - **Existing standalone screens are only partly folded in.** The perk screen (Skills) and Meditation
   are now real shell pages; Meditation's old container GUI + in-world opener were deleted outright in

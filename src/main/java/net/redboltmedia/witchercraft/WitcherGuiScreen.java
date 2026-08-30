@@ -256,6 +256,36 @@ public class WitcherGuiScreen extends Screen {
 	}
 
 	@Override
+	public boolean mouseReleased(MouseButtonEvent event) {
+		float s = layoutScale();
+		float ox = offsetX(s), oy = offsetY(s);
+		int dmx = toDesignX(event.x(), ox, s), dmy = toDesignY(event.y(), oy, s);
+		if (activePage().mouseReleased(WitcherGuiLayout.contentX(), WitcherGuiLayout.contentY(), WitcherGuiLayout.contentW(), WitcherGuiLayout.contentH(), dmx, dmy, event.button()))
+			return true;
+		return super.mouseReleased(event);
+	}
+
+	@Override
+	public boolean mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
+		float s = layoutScale();
+		float ox = offsetX(s), oy = offsetY(s);
+		int dmx = toDesignX(event.x(), ox, s), dmy = toDesignY(event.y(), oy, s);
+		if (activePage().mouseDragged(WitcherGuiLayout.contentX(), WitcherGuiLayout.contentY(), WitcherGuiLayout.contentW(), WitcherGuiLayout.contentH(), dmx, dmy, event.button(), dragX / s, dragY / s))
+			return true;
+		return super.mouseDragged(event, dragX, dragY);
+	}
+
+	@Override
+	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+		float s = layoutScale();
+		float ox = offsetX(s), oy = offsetY(s);
+		int dmx = toDesignX(mouseX, ox, s), dmy = toDesignY(mouseY, oy, s);
+		if (activePage().mouseScrolled(WitcherGuiLayout.contentX(), WitcherGuiLayout.contentY(), WitcherGuiLayout.contentW(), WitcherGuiLayout.contentH(), dmx, dmy, scrollX, scrollY))
+			return true;
+		return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+	}
+
+	@Override
 	public boolean keyPressed(KeyEvent event) {
 		int key = InputConstants.getKey(event).getValue();
 		if (activePage().keyPressed(key))
@@ -279,6 +309,6 @@ public class WitcherGuiScreen extends Screen {
 
 	@Override
 	public boolean isPauseScreen() {
-		return false;
+		return true;
 	}
 }
