@@ -46,6 +46,7 @@ public class WitchercraftMod {
 
 	public WitchercraftMod(IEventBus modEventBus) {
 		// Start of user code block mod constructor
+		WorldMapClientConfig.register();
 		// End of user code block mod constructor
 		NeoForge.EVENT_BUS.register(this);
 		modEventBus.addListener(this::registerNetworking);

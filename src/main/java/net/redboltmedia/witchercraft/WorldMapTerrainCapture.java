@@ -31,6 +31,7 @@ import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 import net.minecraft.util.Util;
+import net.minecraft.commands.arguments.blocks.BlockStateParser;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
@@ -129,7 +130,10 @@ public final class WorldMapTerrainCapture {
 		java.util.Arrays.fill(foliageHeights, WorldMapTerrainTile.NO_HEIGHT);
 		java.util.Arrays.fill(waterHeights, WorldMapTerrainTile.NO_HEIGHT);
 		byte[] groundColors = new byte[count], groundTintKinds = new byte[count], foliageColors = new byte[count], foliageTintKinds = new byte[count];
-		int[] groundTints = new int[count], foliageTints = new int[count], waterTints = new int[count];
+		byte[] decorationKinds = new byte[count], decorationColors = new byte[count], decorationTintKinds = new byte[count];
+		int[] groundTints = new int[count], foliageTints = new int[count], waterTints = new int[count], decorationTints = new int[count];
+		short[] groundStateIndices = new short[count], foliageStateIndices = new short[count], decorationStateIndices = new short[count];
+		StatePalette statePalette = new StatePalette();
 		ChunkPos chunkPos = chunk.getPos();
 		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 		for (int localZ = 0; localZ < 16; localZ++) {
@@ -154,20 +158,45 @@ public final class WorldMapTerrainCapture {
 					if (state.is(BlockTags.LEAVES) || state.is(BlockTags.LOGS)) {
 						if (foliageHeights[index] == WorldMapTerrainTile.NO_HEIGHT) {
 							foliageHeights[index] = (short)y;
+							foliageStateIndices[index] = statePalette.index(state);
 							storeColor(state.getMapColor(chunk, pos), biome, worldX, worldZ, index, foliageColors, foliageTintKinds, foliageTints);
 						}
 						continue;
 					}
-					if (state.getCollisionShape(chunk, pos).isEmpty())
+					if (state.getCollisionShape(chunk, pos).isEmpty()) {
+						MapColor decorationColor = state.getMapColor(chunk, pos);
+						if (decorationKinds[index] == 0 && decorationColor != MapColor.NONE) {
+							decorationKinds[index] = 1;
+							decorationStateIndices[index] = statePalette.index(state);
+							storeColor(decorationColor, biome, worldX, worldZ, index, decorationColors, decorationTintKinds, decorationTints);
+						}
 						continue;
+					}
 					groundHeights[index] = (short)y;
+					groundStateIndices[index] = statePalette.index(state);
 					storeColor(state.getMapColor(chunk, pos), biome, worldX, worldZ, index, groundColors, groundTintKinds, groundTints);
 					break;
 				}
 			}
 		}
 		return new WorldMapTerrainTile(chunkPos.x(), chunkPos.z(), gameTime, groundHeights, groundColors, groundTintKinds, groundTints,
-			foliageHeights, foliageColors, foliageTintKinds, foliageTints, waterHeights, waterTints);
+			foliageHeights, foliageColors, foliageTintKinds, foliageTints, waterHeights, waterTints,
+			decorationKinds, decorationColors, decorationTintKinds, decorationTints,
+			statePalette.entries(), groundStateIndices, foliageStateIndices, decorationStateIndices);
+	}
+
+	private static final class StatePalette {
+		private final java.util.List<String> entries = new java.util.ArrayList<>(java.util.List.of(""));
+		private final Map<String, Short> indices = new HashMap<>();
+		private short index(BlockState state) {
+			String serialized = BlockStateParser.serialize(state);
+			if (serialized.length() > WorldMapTerrainTile.MAX_STATE_LENGTH) return 0;
+			Short existing = indices.get(serialized);
+			if (existing != null) return existing;
+			if (entries.size() >= WorldMapTerrainTile.MAX_PALETTE_SIZE) return 0;
+			short index = (short)entries.size(); entries.add(serialized); indices.put(serialized, index); return index;
+		}
+		private String[] entries() { return entries.toArray(String[]::new); }
 	}
 
 	private static void storeColor(MapColor color, Biome biome, int worldX, int worldZ, int index, byte[] colors, byte[] tintKinds, int[] tints) {
@@ -259,7 +288,9 @@ public final class WorldMapTerrainCapture {
 					continue;
 				}
 				WorldMapTerrainTile tile = capture(chunk, level.getGameTime());
-				submitWrite(() -> tile.writeAtomically(tilePath(server, pending.dimension(), pos)), true);
+				submitWrite(() -> tile.writeAtomically(tilePath(server, pending.dimension(), pos)), true,
+					() -> server.execute(() -> PacketDistributor.sendToPlayersTrackingChunk(level, pos, WorldMapTileDataMessage.from(tile))), () -> {
+					});
 			}
 			int tick = server.getTickCount();
 			if (tick % EXPLORATION_SAVE_INTERVAL_TICKS == 0)

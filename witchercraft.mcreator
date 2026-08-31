@@ -523,6 +523,18 @@
       }
     },
     {
+      "name": "WorldMapClientConfig",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_client_config",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapClientConfig.java"
+        ]
+      }
+    },
+    {
       "name": "WorldMapClientTileCache",
       "type": "code",
       "compiles": true,

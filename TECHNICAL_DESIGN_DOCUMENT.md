@@ -1031,13 +1031,15 @@ Each `c.<chunkX>.<chunkZ>.wct` file represents one 16 by 16 chunk at one fixed s
 block. Files live under the dimension folder at
 `data/witchercraft_world_map/terrain/r.<regionX>.<regionZ>/`.
 
-Version 2 is big-endian and contains:
+Version 4 is big-endian and contains:
 
 1. Magic `WCTM`, format version, chunk coordinates, sample count, and capture game time.
-2. Exactly 256 records in local Z-major order. Each record stores ground height, map-color ID, tint
+2. A bounded palette of serialized block states. Entry zero means that no block state is available.
+3. Exactly 256 records in local Z-major order. Each record stores ground height, map-color ID, tint
    kind, and resolved tint; foliage height, color, tint kind, and tint; plus water-surface height and
-   resolved water tint.
-3. A CRC32 of every preceding byte.
+   resolved water tint; plus decoration kind, map color, tint kind, and resolved tint; plus block-state
+   palette indices for the ground, foliage, and decoration layers.
+4. A CRC32 of every preceding byte.
 
 The signed-short sentinel `Short.MIN_VALUE` means that a foliage or water layer is absent. Capture
 starts at `WORLD_SURFACE` and scans downward within the already loaded column. It ignores non-colliding
@@ -1046,9 +1048,16 @@ its highest surface and the scan continues to the underwater ground. The first r
 non-empty collision shape becomes ground. This keeps grass tufts and tree canopies out of ground height
 and hillshade while retaining trees as a separate visual layer.
 
-The reader rejects version-one terrain tiles, so old captures behave as missing until a legitimate
-chunk-watch event recaptures them. Exploration files remain version one and are not reset. The format
-change does not alter storage paths, authorization, or the one-chunk packet and persistence unit.
+Decoration kind `0` means absent and `1` means a visible non-colliding block such as grass, a flower,
+fern, mushroom, petals, or a tagged modded plant. Capture stores decorations regardless of the client
+display setting. The full-resolution renderer shows configured decorations at all zooms.
+
+The reader accepts versions one through four. It supplies absent arrays and an empty block-state palette
+for fields that did not exist in an older format. Exploration files remain version one and are not reset.
+The format change does not alter storage paths, authorization, or the one-chunk packet and persistence unit.
+After a captured tile reaches durable storage, the server sends that tile to players currently tracking
+the chunk. This replaces an old-format fallback that the client may have requested before recapture
+finished, without generating or force-loading terrain.
 
 Tint kind `0` means no biome tint, `1` grass, `2` foliage, and `3` water. Capturing the resolved tint
 keeps rendering independent of loaded chunks. The tile constructor rejects any array that is not
@@ -1091,7 +1100,8 @@ in the Overworld, applies a server-side ceiling of 128 requested tiles per 20 ti
 position against that player's exploration mask. Client coordinates never grant visibility.
 
 Authorized tile reads run on Minecraft's I/O executor. The server sends each successful read as one
-fixed-size `WorldMapTileDataMessage` after returning to the server thread. Missing or corrupt files
+bounded `WorldMapTileDataMessage` after returning to the server thread. Its size varies with the v4
+block-state palette. Missing or corrupt files
 produce no tile response. The client retries a missing visible tile after five seconds, which also
 covers the short race between watching a new chunk and its first atomic terrain write.
 
@@ -1113,42 +1123,72 @@ cannot leave single-player permanently unpaused.
 
 `WorldMapClientTileCache` keeps received messages as decoded CPU samples. It does not create a GPU
 texture per chunk. The decoded cache holds at most 2,048 chunks in access order. The chunk tile remains
-the storage, authorization, and network unit. `WorldMapTileDataMessage` carries the version-two ground,
-foliage, and water fields for one authorized chunk.
+the storage, authorization, and network unit. `WorldMapTileDataMessage` carries the version-four layered
+samples and block-state palette for one authorized chunk.
 
 The client groups samples on a 16 by 16-chunk grid using floor division, including at negative
 coordinates. Each region covers 256 by 256 blocks and tracks which of its 256 authorized chunk samples
 are present. Missing samples produce transparent pixels. `MapPage` fills the viewport with fog before
 drawing terrain, so transparency never exposes neighboring or unauthorized data.
 
-The renderer builds region images lazily at one, two, or four blocks per source pixel. It averages base
-colors and heights before shading a lower-detail pixel. Zoom thresholds use separate entry and exit
-values to stop adjacent levels alternating near a boundary. A region revision invalidates derived images
+The renderer builds each region image lazily at one block per source pixel. Every zoom level uses that
+full-resolution image, so zooming cannot replace structures and shorelines with box-averaged pixels.
+A region revision invalidates the image
 when one of its chunks changes. A tile arriving on a region's east or south dependency edge also dirties
 the neighboring region that reads its height for west or north shading.
 
-Ground and foliage colors start with `MapColor` at normal brightness. A `MapColor.NONE` sample remains
-transparent through region reduction and hillshade. For tinted blocks, each channel is two parts base
-color and one part stored biome tint. Water uses the stored biome water color and darkens with captured
-depth. It remains opaque until water transparency is designed. Foliage blends over ground at 75 percent
-opacity. Decorative grass and flowers do not enter either layer.
+Version 4 terrain tiles add a palette of serialized block states plus palette indices for ground,
+foliage, and decoration samples. The server still stores `MapColor` as a fallback. On the client, each
+serialized state resolves through the block registry and active baked-model set. The resolver chooses
+the largest upward-facing quad, including uncullable model quads, and falls back to the model's particle
+sprite. It calculates an alpha-weighted average of the sprite pixels and caches that color by serialized
+state. Tinted texture colors are multiplied by the captured biome tint at the configured strength, which
+matches Minecraft's material-tint relationship instead of replacing the texture color with the tint.
+A missing state, model, or readable sprite uses the stored `MapColor`. `MapColor.NONE` remains transparent.
+The client clears block colors and invalidates region images after a resource reload, so changing a
+resource pack updates the map without recapturing server terrain.
 
-Hillshade compares averaged ground height with west and north ground samples at the same detail level.
-It never uses foliage height, so canopies do not cast terrain cliffs. Available samples cross chunk and
-region boundaries. A missing neighbor uses neutral slope and causes no request or inferred exploration.
+Water uses a muted stored biome color at 75 percent opacity over the underwater ground and darkens
+gradually with depth. Foliage blends over ground at 75 percent opacity.
+
+Hillshade compares the cardinal ground heights around each full-resolution pixel and applies bounded
+northwest directional shading. It never uses foliage or decoration height, so plants and canopies do not
+cast terrain cliffs. Water reduces the shading strength. Available samples cross chunk and region
+boundaries. A missing neighbor uses the center height and causes no request or inferred exploration.
+
+`WorldMapClientConfig` registers a NeoForge client configuration with terrain brightness, biome-color
+strength, hillshade strength, and a decoration visibility toggle. A setting change revises cached region
+images but does not alter server capture or saved terrain. The defaults are 1.0 brightness, 0.9 biome
+color strength, 0.75 hillshade strength, and decorations enabled.
+
+MCreator's generated `WitchercraftMod` constructor calls `WorldMapClientConfig.register()` only from its
+preserved user-code block. The locked config class resolves the active mod container by mod ID. Do not add
+a `ModContainer` parameter to the generated constructor because MCreator removes that signature change
+during regeneration while preserving the user-code body.
 
 All region screen edges come from one origin, `viewportCenter - mapCenter * zoom`, and the edge's world
 coordinate. Adjacent regions therefore calculate the same shared pixel edge. The 26.1.2 long `blit`
 overload receives independent destination, source, and texture dimensions, so each selected region image
 uses UV coordinates zero through one exactly once at every supported zoom.
 
-The decoded cache and the 64-entry GPU region cache have separate limits. Every uploaded LOD texture is
-released when replaced, evicted, or when the client connection changes. A debug diagnostic emitted every
-five seconds while rendering reports decoded and GPU cache estimates, selected LOD, region rebuilds,
+The decoded cache and the 64-entry GPU region cache have separate limits. The visible viewport may
+temporarily exceed the region limit because a region referenced by the current GUI extraction cannot be
+evicted. Replaced and evicted textures receive versioned identifiers and enter a retirement queue. The
+client releases them during a later GUI frame, after Minecraft has executed the deferred draw commands
+that can still reference their texture views. A debug diagnostic emitted every
+five seconds while rendering reports decoded and GPU cache estimates, source level, region rebuilds,
 uploads, draw calls, and average map-render time. Region size and cache limits remain profiling constants,
 not persistent-format fields.
 
-Water transparency, separate lighting, and richer material blending remain Milestone 2D tuning work.
+Terrain tile version 4 is the write format. The reader also accepts versions 1 through 3, initializes
+layers and block-state palettes that did not exist in those formats as absent, and verifies their original CRC. This preserves
+previously explored terrain after a renderer upgrade without loading or regenerating old chunks.
+
+Milestone 2C is complete. Milestone 2D visual validation is in progress. The full-resolution renderer
+removed the damaging box-averaged LOD levels, but directional hillshade currently reads flatter than the
+earlier Sobel prototype. Tune relief without reintroducing spatial color blur. Separate stored lighting
+remains a possible later refinement. Milestone 2D must pass representative in-game visual, restart, and
+performance checks before waypoint work begins.
 
 `MapPage` fills the viewport with its fog color first, then draws cached authorized tiles, the player
 marker, and the existing controls. A missing tile therefore reveals nothing. The cache is scoped to

@@ -577,16 +577,22 @@ get their own screens.
 World-map exploration begins when the server sends a loaded Overworld chunk to a player. That event
 records the chunk in that player's private exploration history and queues a shared terrain sample.
 The map system never generates or force-loads a chunk. If the chunk unloads before its queued turn,
-the capture is skipped. Each horizontal block column records separate ground, tree-foliage, and water
-information. Decorative grass and flowers do not replace the ground color. Tree height does not affect
-terrain shading, and water retains its biome color and captured depth for later transparency work.
-Blocks without a map color remain transparent instead of producing black terrain pixels.
+the capture is skipped. Each horizontal block column records separate ground, tree-foliage, water, and
+decoration information. Decorative grass and flowers do not replace the ground color, but players can
+show them as a separate map layer. Tree and decoration height do not affect terrain shading. Water retains
+its biome color and captured depth. The renderer uses that depth while compositing translucent water over
+the captured underwater ground.
+On new-format tiles, a captured block without a map color can still use its baked texture. Legacy tiles
+without either source remain transparent instead of producing black terrain pixels.
 
 The map requests visible terrain from the server in small batches. The server checks every requested
 chunk against that player's exploration history before returning a tile. The client combines
-authorized chunk samples into 256 by 256-block regions. It blends stored biome tint with Minecraft
-map color, draws foliage over shaded ground, colors water by biome and depth, and selects a lower-detail region image
-when zoomed out. Unexplored chunks and captured tiles that have not arrived yet remain covered by
+authorized chunk samples into 256 by 256-block regions. New terrain samples retain a compact palette of
+block states. The client derives their map colors from the active resource pack's baked block textures,
+multiplies tinted textures by the stored biome color, draws foliage and optional decorations over shaded
+ground, and composites biome-colored water over the captured seabed. Older samples fall back to their
+stored Minecraft map colors. The terrain image remains at one block per texture pixel at every zoom level.
+Unexplored chunks and captured tiles that have not arrived yet remain covered by
 fog. Decoded terrain and uploaded region images have separate bounded caches, so long journeys do
 not keep every visited area in memory.
 
