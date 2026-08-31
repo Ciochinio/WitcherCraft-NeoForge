@@ -17,6 +17,7 @@ public final class WorldMapClientConfig {
 	private static final ModConfigSpec.DoubleValue CANOPY_SHADOW_STRENGTH;
 	private static final ModConfigSpec.DoubleValue FOLIAGE_OPACITY_SCALE;
 	private static final ModConfigSpec.DoubleValue DECORATION_OPACITY_SCALE;
+	private static final ModConfigSpec.DoubleValue MARKER_SCALE;
 
 	static {
 		ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
@@ -30,6 +31,7 @@ public final class WorldMapClientConfig {
 		CANOPY_SHADOW_STRENGTH = builder.comment("Maximum contact-shadow darkness beside raised foliage on the world map.").defineInRange("canopyShadowStrength", 0.35, 0.0, 0.6);
 		FOLIAGE_OPACITY_SCALE = builder.comment("Multiplier for texture-derived foliage coverage on the world map.").defineInRange("foliageOpacityScale", 1.0, 0.0, 2.0);
 		DECORATION_OPACITY_SCALE = builder.comment("Multiplier for texture-derived flower, grass, and decoration coverage on the world map.").defineInRange("decorationOpacityScale", 1.0, 0.0, 2.0);
+		MARKER_SCALE = builder.comment("Screen-size multiplier for the world-map player marker.").defineInRange("markerScale", 1.0, 0.5, 2.0);
 		builder.pop();
 		SPEC = builder.build();
 	}
@@ -49,4 +51,5 @@ public final class WorldMapClientConfig {
 	public static double canopyShadowStrength() { return CANOPY_SHADOW_STRENGTH.getAsDouble(); }
 	public static double foliageOpacityScale() { return FOLIAGE_OPACITY_SCALE.getAsDouble(); }
 	public static double decorationOpacityScale() { return DECORATION_OPACITY_SCALE.getAsDouble(); }
+	public static double markerScale() { return MARKER_SCALE.getAsDouble(); }
 }

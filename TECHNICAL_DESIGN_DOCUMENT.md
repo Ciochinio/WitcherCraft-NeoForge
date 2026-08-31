@@ -1128,8 +1128,9 @@ samples and block-state palette for one authorized chunk.
 
 The client groups samples on a 16 by 16-chunk grid using floor division, including at negative
 coordinates. Each region covers 256 by 256 blocks and tracks which of its 256 authorized chunk samples
-are present. Missing samples produce transparent pixels. `MapPage` fills the viewport with fog before
-drawing terrain, so transparency never exposes neighboring or unauthorized data.
+are present. Missing samples produce transparent pixels over the black map background. `MapPage` fills the
+viewport before drawing regions, so a missing or not-yet-built region never exposes neighboring or
+unauthorized data.
 
 The renderer builds each region image lazily at one block per source pixel. Every zoom level uses that
 full-resolution image, so zooming cannot replace structures and shorelines with box-averaged pixels.
@@ -1194,11 +1195,12 @@ neighbor, and a southeast-corner change also invalidates the diagonal region tha
 
 `WorldMapClientConfig` registers a NeoForge client configuration with terrain brightness, biome-color
 strength, hillshade strength, hillshade slope sensitivity, canopy relief strength, canopy shadow strength,
-foliage opacity scale, decoration opacity scale, and a decoration visibility toggle. A setting change
-revises cached region images but does not alter server capture or saved terrain. The defaults are 1.0
+foliage opacity scale, decoration opacity scale, marker scale, and a decoration visibility toggle. A terrain
+setting change revises cached region images, while marker scale applies directly on its next draw. Neither
+path alters server capture or saved terrain. The defaults are 1.0
 brightness, 0.9 biome color strength, 0.75 hillshade strength, 1.0 slope sensitivity, 1.35 canopy relief
-strength, 0.35 canopy shadow strength, 1.0 foliage opacity scale, 1.0 decoration opacity scale, and
-decorations enabled.
+strength, 0.35 canopy shadow strength, 1.0 foliage opacity scale, 1.0 decoration opacity scale, 1.0 marker
+scale, and decorations enabled.
 
 MCreator's generated `WitchercraftMod` constructor calls `WorldMapClientConfig.register()` only from its
 preserved user-code block. The locked config class resolves the active mod container by mod ID. Do not add
@@ -1231,10 +1233,18 @@ shadow on adjacent lower ground. A separate canopy-relief multiplier controls co
 foliage heights. Milestone 2D.3 replaces fixed foliage and decoration blending with texture-derived alpha
 coverage and configurable opacity scales. Milestone 2D.5 derives water color from the active still-water
 texture and biome tint, preserves shallow seabeds, and increases opacity and darkness gradually with depth.
-Later Milestone 2D sections will evaluate final color tuning.
+Milestone 2D.7 leaves missing tiles transparent over the black map background. The postponed cloud and
+edge-fade experiments were removed because rebuilding those masks caused unacceptable map lag. Empty
+regions do not create GPU textures, and no fog state enters terrain capture, persistence, or network
+messages.
+Milestone 2D.8 replaces the diagnostic cross with the 64 by 64 resource-pack texture
+`textures/gui/map/player_arrow.png`. `MapPage` draws it at a base 16 by 16 screen pixels and rotates it
+around the player position using client player yaw. Map zoom changes its position but never its screen
+size. The client `markerScale` setting ranges from 0.5 to 2.0, producing an 8 to 32-pixel marker at the
+default texture. Marker-style configuration remains postponed.
 Separate stored lighting remains a possible later refinement. Milestone 2D must pass representative
 in-game visual, restart, and performance checks before waypoint work begins.
 
-`MapPage` fills the viewport with its fog color first, then draws cached authorized tiles, the player
-marker, and the existing controls. A missing tile therefore reveals nothing. The cache is scoped to
+`MapPage` fills the viewport with its black background first, then the region renderer draws terrain,
+followed by the player marker and existing controls. A missing tile therefore reveals nothing. The cache is scoped to
 the current client connection so terrain from one server cannot appear while connected to another.

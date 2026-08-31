@@ -571,7 +571,9 @@ that feeds into it. Hovering a node or a slotted perk shows its name (in its bra
 one-line description; whether it's locked, available, or equipped is left to the art alone. The Map
 tab now has an interactive terrain view. Dragging pans the view, the mouse wheel zooms toward the
 cursor, and the bottom bar provides center and zoom controls. Markers, waypoints, and filters arrive
-in later world-map milestones. The remaining unfinished tabs use placeholders until those systems
+in later world-map milestones. The player appears as a fixed-size gold directional triangle with a dark
+outline. It rotates with the player's facing, does not scale with map zoom, and has a client-side size
+setting. The remaining unfinished tabs use placeholders until those systems
 get their own screens.
 
 World-map exploration begins when the server sends a loaded Overworld chunk to a player. That event
@@ -608,8 +610,8 @@ unresolved textures retain a 75 percent fallback.
 Ground remains opaque, and biome-colored water keeps its separate seabed composite. Terrain relief compares each visible height with its northern and northwestern
 neighbors and applies stepped light or dark shading. Players can configure the height-difference sensitivity
 separately from the brightness contrast. The terrain image remains at one block per texture pixel at every zoom level.
-Unexplored chunks and captured tiles that have not arrived yet remain covered by
-fog. Decoded terrain and uploaded region images have separate bounded caches, so long journeys do
+Unexplored chunks and captured tiles that have not arrived yet remain hidden by the black map background.
+Decoded terrain and uploaded region images have separate bounded caches, so long journeys do
 not keep every visited area in memory.
 
 Opening the map still pauses single-player once its current terrain request finishes. A new view

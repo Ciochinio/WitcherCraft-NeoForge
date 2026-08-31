@@ -3,13 +3,17 @@ package net.redboltmedia.witchercraft;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 
 /** Interactive diagnostic map shell. Terrain and marker data arrive in later milestones. */
 public final class MapPage implements GuiPage {
 	private static final double MIN_ZOOM = 0.25;
 	private static final double MAX_ZOOM = 16.0;
 	private static final double ZOOM_STEP = 1.25;
+	private static final int MARKER_BASE_SIZE = 16;
+	private static final Identifier PLAYER_MARKER = Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "textures/gui/map/player_arrow.png");
 
 	private double centerX;
 	private double centerZ;
@@ -176,12 +180,17 @@ public final class MapPage implements GuiPage {
 	}
 
 	private void drawPlayer(GuiGraphicsExtractor g, int x, int y, int w, int h) {
-		if (Minecraft.getInstance().player == null)
+		var player = Minecraft.getInstance().player;
+		if (player == null)
 			return;
-		int px = (int) Math.round(x + w / 2.0 + (Minecraft.getInstance().player.getX() - centerX) * zoom);
-		int py = (int) Math.round(y + h / 2.0 + (Minecraft.getInstance().player.getZ() - centerZ) * zoom);
-		g.fill(px - 3, py - 1, px + 4, py + 2, MapLayout.PLAYER);
-		g.fill(px - 1, py - 3, px + 2, py + 4, MapLayout.PLAYER);
+		int px = (int) Math.round(x + w / 2.0 + (player.getX() - centerX) * zoom);
+		int py = (int) Math.round(y + h / 2.0 + (player.getZ() - centerZ) * zoom);
+		g.pose().pushMatrix();
+		g.pose().translate(px, py);
+		g.pose().rotate((float) Math.toRadians(player.getYRot()));
+		int size = Math.max(1, (int) Math.round(MARKER_BASE_SIZE * WorldMapClientConfig.markerScale()));
+		g.blit(RenderPipelines.GUI_TEXTURED, PLAYER_MARKER, -size / 2, -size / 2, 0.0F, 0.0F, size, size, 64, 64, 64, 64);
+		g.pose().popMatrix();
 	}
 
 	private void drawButton(GuiGraphicsExtractor g, Font font, int x, int y, int w, Component label, int mouseX, int mouseY, boolean enabled) {

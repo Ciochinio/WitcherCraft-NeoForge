@@ -40,5 +40,4 @@ public final class MapLayout {
 	public static final int BUTTON_DISABLED = 0xFF19191E;
 	public static final int TEXT = 0xFFE4DDCB;
 	public static final int TEXT_DIM = 0xFF777781;
-	public static final int PLAYER = 0xFFFFDD55;
 }
