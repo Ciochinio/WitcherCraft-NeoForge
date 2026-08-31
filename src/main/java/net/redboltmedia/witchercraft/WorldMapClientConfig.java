@@ -15,6 +15,8 @@ public final class WorldMapClientConfig {
 	private static final ModConfigSpec.DoubleValue HILLSHADE_SLOPE_SENSITIVITY;
 	private static final ModConfigSpec.DoubleValue CANOPY_RELIEF_STRENGTH;
 	private static final ModConfigSpec.DoubleValue CANOPY_SHADOW_STRENGTH;
+	private static final ModConfigSpec.DoubleValue FOLIAGE_OPACITY_SCALE;
+	private static final ModConfigSpec.DoubleValue DECORATION_OPACITY_SCALE;
 
 	static {
 		ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
@@ -26,6 +28,8 @@ public final class WorldMapClientConfig {
 		HILLSHADE_SLOPE_SENSITIVITY = builder.comment("Sensitivity of world-map terrain shading to height differences between neighboring blocks.").defineInRange("hillshadeSlopeSensitivity", 1.0, 0.25, 4.0);
 		CANOPY_RELIEF_STRENGTH = builder.comment("Multiplier for slope contrast within and along raised foliage on the world map.").defineInRange("canopyReliefStrength", 1.35, 0.0, 3.0);
 		CANOPY_SHADOW_STRENGTH = builder.comment("Maximum contact-shadow darkness beside raised foliage on the world map.").defineInRange("canopyShadowStrength", 0.35, 0.0, 0.6);
+		FOLIAGE_OPACITY_SCALE = builder.comment("Multiplier for texture-derived foliage coverage on the world map.").defineInRange("foliageOpacityScale", 1.0, 0.0, 2.0);
+		DECORATION_OPACITY_SCALE = builder.comment("Multiplier for texture-derived flower, grass, and decoration coverage on the world map.").defineInRange("decorationOpacityScale", 1.0, 0.0, 2.0);
 		builder.pop();
 		SPEC = builder.build();
 	}
@@ -43,4 +47,6 @@ public final class WorldMapClientConfig {
 	public static double hillshadeSlopeSensitivity() { return HILLSHADE_SLOPE_SENSITIVITY.getAsDouble(); }
 	public static double canopyReliefStrength() { return CANOPY_RELIEF_STRENGTH.getAsDouble(); }
 	public static double canopyShadowStrength() { return CANOPY_SHADOW_STRENGTH.getAsDouble(); }
+	public static double foliageOpacityScale() { return FOLIAGE_OPACITY_SCALE.getAsDouble(); }
+	public static double decorationOpacityScale() { return DECORATION_OPACITY_SCALE.getAsDouble(); }
 }

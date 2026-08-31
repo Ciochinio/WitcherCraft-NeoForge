@@ -1141,15 +1141,38 @@ Version 4 terrain tiles add a palette of serialized block states plus palette in
 foliage, and decoration samples. The server still stores `MapColor` as a fallback. On the client, each
 serialized state resolves through the block registry and active baked-model set. The resolver chooses
 the largest upward-facing quad, including uncullable model quads, and falls back to the model's particle
-sprite. It calculates an alpha-weighted average of the sprite pixels and caches that color by serialized
-state. Tinted texture colors are multiplied by the captured biome tint at the configured strength, which
-matches Minecraft's material-tint relationship instead of replacing the texture color with the tint.
+sprite. If a model has no upward-facing quad, the resolver uses its largest uncullable quad before the
+particle fallback. This covers crossed flower and grass models. It calculates an alpha-weighted average of the sprite pixels and caches that color by serialized
+state. The cached texture sample also stores alpha coverage as the sum of accepted pixel alpha divided by
+the sprite's fully opaque alpha, plus the selected quad's model tint flag. The renderer multiplies a
+texture color by the captured biome tint only when `BakedQuad.MaterialInfo.isTinted()` is true. This keeps
+untinted model faces at their resource-pack color. A tint flag alone is insufficient for flowers because
+some crossed flower models expose a tinted material even though their petals must retain authored colors.
+The resolver therefore suppresses biome tint for every block in `BlockTags.FLOWERS`. This covers vanilla
+flowers and modded flowers that use the standard tag while allowing tintable grass, foliage, and other
+plant models to use biome color. Flower color extraction rejects pixels whose green channel exceeds both
+other channels by more than 15 percent, then ranks the remaining pixels by brightness and saturation and
+alpha-averages the highest-scoring quarter. This selects petal colors instead of stems without hardcoding
+flower IDs or colors. Tall flowers use the captured upper-half state, so sunflower petals participate in
+the same rule. Alpha coverage still uses the whole sprite rather than only the selected accent pixels. A
+particle-only fallback retains no model tint flag.
 A missing state, model, or readable sprite uses the stored `MapColor`. `MapColor.NONE` remains transparent.
 The client clears block colors and invalidates region images after a resource reload, so changing a
 resource pack updates the map without recapturing server terrain.
 
-Water uses a muted stored biome color at 75 percent opacity over the underwater ground and darkens
-gradually with depth. Foliage blends over ground at 75 percent opacity.
+Water alpha-averages the active resource pack's still-water texture, multiplies it by the captured biome
+water tint, then blends 60 percent of that tint back into the result. Its opacity follows
+`0.50 + 0.30 * (1 - exp(-depth / 8))`, starting near 54 percent at one block and approaching 80 percent
+in deep water. The same depth factor darkens the finished composite
+by up to 18 percent. This keeps shallow seabeds visible while separating deep water without generated
+noise. Water uses 35 percent of ordinary terrain hillshade strength. Resource reload clears the cached
+water sample together with block texture colors and invalidates region images. If the water sprite cannot
+resolve, the renderer retains the previous muted-biome-color fallback. Foliage and decorations blend over ground using texture-derived alpha coverage
+multiplied by their separate client opacity scales and clamped to full opacity. Decoration coverage has a
+65 percent minimum before its scale applies. This keeps sparse flower and grass sprites visible when one
+block column becomes one map pixel. A zero decoration scale still hides the layer. Ground stays opaque
+because the tile does not store a general deeper layer beneath collidable transparent blocks. Legacy tiles
+and states whose texture cannot resolve use 75 percent opacity for foliage or decoration compositing.
 
 Hillshade compares each full-resolution visible height with the northern and northwestern samples. Open
 ground uses ground height, rendered foliage uses foliage height, and water uses water-surface height.
@@ -1157,7 +1180,7 @@ Decorations keep ground height. The renderer assigns each signed difference to o
 The northern band carries twice the brightness weight
 of the northwestern band, which keeps the light direction readable while preserving diagonal terrain
 steps. Slope sensitivity controls which band receives a height difference, while hillshade strength
-controls the resulting brightness contrast. The final factor stays bounded between 0.65 and 1.35 before
+controls the resulting brightness contrast. Water uses 35 percent of that strength. The final factor stays bounded between 0.65 and 1.35 before
 terrain brightness applies. Foliage uses all three slope bands. A lower non-water, non-foliage pixel also
 checks higher foliage immediately to its west, north, and northwest. This adds a one-pixel contact shadow
 east, south, and southeast of raised foliage, matching the northwest light direction. The shadow reaches
@@ -1171,10 +1194,11 @@ neighbor, and a southeast-corner change also invalidates the diagonal region tha
 
 `WorldMapClientConfig` registers a NeoForge client configuration with terrain brightness, biome-color
 strength, hillshade strength, hillshade slope sensitivity, canopy relief strength, canopy shadow strength,
-and a decoration visibility toggle. A setting change revises cached region images but does not alter
-server capture or saved terrain. The defaults are 1.0 brightness, 0.9 biome color strength, 0.75 hillshade
-strength, 1.0 slope sensitivity, 1.35 canopy relief strength, 0.35 canopy shadow strength, and decorations
-enabled.
+foliage opacity scale, decoration opacity scale, and a decoration visibility toggle. A setting change
+revises cached region images but does not alter server capture or saved terrain. The defaults are 1.0
+brightness, 0.9 biome color strength, 0.75 hillshade strength, 1.0 slope sensitivity, 1.35 canopy relief
+strength, 0.35 canopy shadow strength, 1.0 foliage opacity scale, 1.0 decoration opacity scale, and
+decorations enabled.
 
 MCreator's generated `WitchercraftMod` constructor calls `WorldMapClientConfig.register()` only from its
 preserved user-code block. The locked config class resolves the active mod container by mod ID. Do not add
@@ -1204,8 +1228,10 @@ removed the damaging box-averaged LOD levels. Milestone 2D.1 replaces the flat c
 discrete north and northwest slope shading without reintroducing spatial color blur. Milestone 2D.2 uses
 the visible ground, foliage, or water height. Raised foliage also casts a height-scaled directional contact
 shadow on adjacent lower ground. A separate canopy-relief multiplier controls contrast between neighboring
-foliage heights. Later Milestone 2D sections will evaluate texture-alpha compositing, water, and final color
-tuning.
+foliage heights. Milestone 2D.3 replaces fixed foliage and decoration blending with texture-derived alpha
+coverage and configurable opacity scales. Milestone 2D.5 derives water color from the active still-water
+texture and biome tint, preserves shallow seabeds, and increases opacity and darkness gradually with depth.
+Later Milestone 2D sections will evaluate final color tuning.
 Separate stored lighting remains a possible later refinement. Milestone 2D must pass representative
 in-game visual, restart, and performance checks before waypoint work begins.
 

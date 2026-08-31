@@ -13,6 +13,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.renderer.block.FluidModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.Direction;
@@ -21,9 +22,11 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.MapColor;
 
 /** Bounded decoded-tile and region-texture caches for authorized world-map terrain. */
@@ -36,8 +39,10 @@ public final class WorldMapClientTileCache {
 	private static final LinkedHashMap<Long, DecodedTile> TILES = new LinkedHashMap<>(256, .75f, true);
 	private static final LinkedHashMap<Long, ClientRegion> REGIONS = new LinkedHashMap<>(32, .75f, true);
 	private static final Map<Long, Long> REQUESTED = new HashMap<>();
-	private static final Map<String, Integer> BLOCK_TEXTURE_COLORS = new HashMap<>();
+	private static final Map<String, TextureSample> BLOCK_TEXTURE_COLORS = new HashMap<>();
 	private static final Set<String> FAILED_BLOCK_TEXTURE_COLORS = new HashSet<>();
+	private static TextureSample waterTextureColor;
+	private static boolean waterTextureColorFailed;
 	private static final ArrayDeque<RetiredTexture> RETIRED_TEXTURES = new ArrayDeque<>();
 	private static Object connectionIdentity;
 	private static int nextRequestId = 1, inFlightRequestId, batchesForView, selectedLod;
@@ -55,6 +60,8 @@ public final class WorldMapClientTileCache {
 		event.addListener(Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "world_map_block_colors"), (ResourceManagerReloadListener) manager -> {
 			BLOCK_TEXTURE_COLORS.clear();
 			FAILED_BLOCK_TEXTURE_COLORS.clear();
+			waterTextureColor = null;
+			waterTextureColorFailed = false;
 			for (ClientRegion region : REGIONS.values()) region.revision++;
 		});
 	}
@@ -169,64 +176,91 @@ public final class WorldMapClientTileCache {
 
 	private static Sample columnSample(DecodedTile tile, int index) {
 		int groundHeight = tile.groundHeights[index] == WorldMapTerrainTile.NO_HEIGHT ? 0 : tile.groundHeights[index];
-		int ground = layerColor(tile, tile.groundColors[index], tile.groundTintKinds[index], tile.groundTints[index], tile.groundStateIndices[index]);
+		LayerSample ground = layerSample(tile, tile.groundColors[index], tile.groundTintKinds[index], tile.groundTints[index], tile.groundStateIndices[index]);
 		if (tile.waterHeights[index] != WorldMapTerrainTile.NO_HEIGHT) {
 			int depth = tile.groundHeights[index] == WorldMapTerrainTile.NO_HEIGHT ? 1 : Math.max(1, tile.waterHeights[index] - tile.groundHeights[index]);
-			int water = scaleColor(0xFF000000 | tile.waterTints[index], 0.88);
-			int color = ground == 0 ? water : mix(ground, water, 3, 4);
-			double factor = Math.max(0.82, 1.01 - Math.min(32, depth) * 0.006);
-			return new Sample(scaleColor(color, factor), tile.waterHeights[index], true, false);
+			TextureSample texture = waterTextureColor();
+			int tint = 0xFF000000 | tile.waterTints[index];
+			int water = texture == null ? scaleColor(tint, 0.88) : mix(multiply(texture.argb, tint), tint, 60, 100);
+			double depthFactor = 1.0 - Math.exp(-depth / 8.0);
+			double opacity = 0.50 + 0.30 * depthFactor;
+			int color = ground.argb == 0 ? water : blend(ground.argb, water, opacity);
+			return new Sample(scaleColor(color, 1.0 - 0.18 * depthFactor), tile.waterHeights[index], true, false);
 		}
 		if (tile.foliageHeights[index] != WorldMapTerrainTile.NO_HEIGHT) {
-			int foliage = layerColor(tile, tile.foliageColors[index], tile.foliageTintKinds[index], tile.foliageTints[index], tile.foliageStateIndices[index]);
-			if (foliage != 0) return new Sample(ground == 0 ? foliage : mix(ground, foliage, 3, 4), tile.foliageHeights[index], false, true);
+			LayerSample foliage = layerSample(tile, tile.foliageColors[index], tile.foliageTintKinds[index], tile.foliageTints[index], tile.foliageStateIndices[index]);
+			double opacity = Math.min(1.0, foliage.opacity * WorldMapClientConfig.foliageOpacityScale());
+			if (foliage.argb != 0 && opacity > 0.0) return new Sample(ground.argb == 0 ? foliage.argb : blend(ground.argb, foliage.argb, opacity), tile.foliageHeights[index], false, true);
 		}
 		if (WorldMapClientConfig.showDecorations() && tile.decorationKinds[index] != 0) {
-			int decoration = layerColor(tile, tile.decorationColors[index], tile.decorationTintKinds[index], tile.decorationTints[index], tile.decorationStateIndices[index]);
-			if (decoration != 0) return new Sample(ground == 0 ? decoration : mix(ground, decoration, 3, 4), groundHeight, false, false);
+			LayerSample decoration = layerSample(tile, tile.decorationColors[index], tile.decorationTintKinds[index], tile.decorationTints[index], tile.decorationStateIndices[index]);
+			double opacity = Math.min(1.0, Math.max(0.65, decoration.opacity) * WorldMapClientConfig.decorationOpacityScale());
+			if (decoration.argb != 0 && opacity > 0.0) return new Sample(ground.argb == 0 ? decoration.argb : blend(ground.argb, decoration.argb, opacity), groundHeight, false, false);
 		}
-		return new Sample(ground, groundHeight, false, false);
+		return new Sample(ground.argb, groundHeight, false, false);
 	}
 
 	private static DecodedTile tileAt(int wx, int wz) {
 		return TILES.get(ChunkPos.pack(Math.floorDiv(wx, CHUNK), Math.floorDiv(wz, CHUNK)));
 	}
 
-	private static int layerColor(DecodedTile tile, byte colorId, byte tintKind, int tint, short stateIndex) {
+	private static LayerSample layerSample(DecodedTile tile, byte colorId, byte tintKind, int tint, short stateIndex) {
 		int base = MapColor.byId(Byte.toUnsignedInt(colorId)).calculateARGBColor(MapColor.Brightness.NORMAL);
-		boolean textureResolved = false;
+		TextureSample texture = null;
 		int paletteIndex = Short.toUnsignedInt(stateIndex);
 		if (paletteIndex > 0 && paletteIndex < tile.blockStatePalette.length) {
-			String state = tile.blockStatePalette[paletteIndex]; Integer resolved = BLOCK_TEXTURE_COLORS.get(state);
+			String state = tile.blockStatePalette[paletteIndex]; TextureSample resolved = BLOCK_TEXTURE_COLORS.get(state);
 			if (resolved == null && !FAILED_BLOCK_TEXTURE_COLORS.contains(state)) {
-				resolved = resolveBlockTextureColor(state);
+				resolved = resolveBlockTextureSample(state);
 				if (resolved == null) FAILED_BLOCK_TEXTURE_COLORS.add(state); else BLOCK_TEXTURE_COLORS.put(state, resolved);
 			}
-			if (resolved != null) { base = resolved; textureResolved = true; }
+			if (resolved != null) { texture = resolved; base = resolved.argb; }
 		}
-		if (base == 0 || tintKind == 0) return base;
-		if (!textureResolved) {
+		double opacity = texture == null ? 0.75 : texture.coverage;
+		if (base == 0 || tintKind == 0) return new LayerSample(base, opacity);
+		if (texture == null) {
 			int biome = scaleColor(0xFF000000 | tint, 0.82);
-			return mix(base, biome, (int)Math.round(WorldMapClientConfig.biomeColorStrength() * 35.0), 100);
+			return new LayerSample(mix(base, biome, (int)Math.round(WorldMapClientConfig.biomeColorStrength() * 35.0), 100), opacity);
 		}
+		if (!texture.tinted) return new LayerSample(base, opacity);
 		int tinted = multiply(base, 0xFF000000 | tint);
-		return mix(base, tinted, (int)Math.round(WorldMapClientConfig.biomeColorStrength() * 100.0), 100);
+		return new LayerSample(mix(base, tinted, (int)Math.round(WorldMapClientConfig.biomeColorStrength() * 100.0), 100), opacity);
 	}
-	private static Integer resolveBlockTextureColor(String serializedState) {
+	private static TextureSample resolveBlockTextureSample(String serializedState) {
 		try {
 			BlockState state = BlockStateParser.parseForBlock(BuiltInRegistries.BLOCK, serializedState, false).blockState();
 			BlockStateModel model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(state);
 			List<BlockStateModelPart> parts = new ArrayList<>(); model.collectParts(RandomSource.create(serializedState.hashCode()), parts);
-			BakedQuad selected = null; double selectedArea = -1.0;
+			BakedQuad selected = null, fallback = null; double selectedArea = -1.0, fallbackArea = -1.0;
 			for (BlockStateModelPart part : parts) {
 				for (BakedQuad quad : part.getQuads(Direction.UP)) { double area = quadArea(quad); if (area > selectedArea) { selected = quad; selectedArea = area; } }
-				for (BakedQuad quad : part.getQuads(null)) if (quad.direction() == Direction.UP) { double area = quadArea(quad); if (area > selectedArea) { selected = quad; selectedArea = area; } }
+				for (BakedQuad quad : part.getQuads(null)) {
+					double area = quadArea(quad);
+					if (area > fallbackArea) { fallback = quad; fallbackArea = area; }
+					if (quad.direction() == Direction.UP && area > selectedArea) { selected = quad; selectedArea = area; }
+				}
 			}
+			if (selected == null) selected = fallback;
 			TextureAtlasSprite sprite = selected == null ? model.particleMaterial().sprite() : selected.materialInfo().sprite();
-			int color = averageSprite(sprite); return color == 0 ? null : color;
+			boolean flower = state.is(BlockTags.FLOWERS);
+			boolean tinted = selected != null && selected.materialInfo().isTinted() && !flower;
+			return averageSprite(sprite, tinted, flower);
 		} catch (CommandSyntaxException | RuntimeException exception) {
 			return null;
 		}
+	}
+	private static TextureSample waterTextureColor() {
+		if (waterTextureColor != null) return waterTextureColor;
+		if (waterTextureColorFailed) return null;
+		try {
+			FluidModel model = Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(Fluids.WATER.defaultFluidState());
+			waterTextureColor = averageSprite(model.stillMaterial().sprite(), false, false);
+		} catch (RuntimeException ignored) {
+			waterTextureColorFailed = true;
+			return null;
+		}
+		if (waterTextureColor == null) waterTextureColorFailed = true;
+		return waterTextureColor;
 	}
 	private static double quadArea(BakedQuad quad) {
 		double ax=quad.position1().x()-quad.position0().x(), ay=quad.position1().y()-quad.position0().y(), az=quad.position1().z()-quad.position0().z();
@@ -234,13 +268,33 @@ public final class WorldMapClientTileCache {
 		double cx=ay*bz-az*by, cy=az*bx-ax*bz, cz=ax*by-ay*bx;
 		return Math.sqrt(cx*cx+cy*cy+cz*cz) * 0.5;
 	}
-	private static int averageSprite(TextureAtlasSprite sprite) {
+	private static TextureSample averageSprite(TextureAtlasSprite sprite, boolean tinted, boolean flower) {
 		NativeImage image = sprite.contents().getOriginalImage(); long r=0,g=0,b=0,weight=0;
+		List<SpritePixel> flowerCandidates = flower ? new ArrayList<>() : List.of();
 		for(int y=0;y<image.getHeight();y++)for(int x=0;x<image.getWidth();x++){
 			int pixel=image.getPixel(x,y),alpha=pixel>>>24;if(alpha<=10)continue;
-			r+=(long)(pixel>>16&255)*alpha;g+=(long)(pixel>>8&255)*alpha;b+=(long)(pixel&255)*alpha;weight+=alpha;
+			int red=pixel>>16&255,green=pixel>>8&255,blue=pixel&255;
+			r+=(long)red*alpha;g+=(long)green*alpha;b+=(long)blue*alpha;weight+=alpha;
+			if (flower && !(green * 100 > red * 115 && green * 100 > blue * 115)) {
+				int maximum=Math.max(red,Math.max(green,blue)),minimum=Math.min(red,Math.min(green,blue));
+				double saturation=maximum==0?0.0:(maximum-minimum)/(double)maximum;
+				flowerCandidates.add(new SpritePixel(red,green,blue,alpha,maximum*(0.55+0.45*saturation)));
+			}
 		}
-		return weight==0?0:0xFF000000|(int)(r/weight)<<16|(int)(g/weight)<<8|(int)(b/weight);
+		if (weight == 0) return null;
+		long coverageWeight=weight;
+		if (!flowerCandidates.isEmpty()) {
+			flowerCandidates.sort(Comparator.comparingDouble(SpritePixel::score).reversed());
+			int selectedCount=Math.max(1,(flowerCandidates.size()+3)/4);
+			r=g=b=weight=0;
+			for(int i=0;i<selectedCount;i++){
+				SpritePixel pixel=flowerCandidates.get(i);
+				r+=(long)pixel.red*pixel.alpha;g+=(long)pixel.green*pixel.alpha;b+=(long)pixel.blue*pixel.alpha;weight+=pixel.alpha;
+			}
+		}
+		int color = 0xFF000000|(int)(r/weight)<<16|(int)(g/weight)<<8|(int)(b/weight);
+		double coverage = Math.min(1.0, coverageWeight / (255.0 * image.getWidth() * image.getHeight()));
+		return new TextureSample(color, coverage, tinted);
 	}
 	private static int multiply(int base, int tint) {
 		return 0xFF000000 | (base>>16&255)*(tint>>16&255)/255<<16 | (base>>8&255)*(tint>>8&255)/255<<8 | (base&255)*(tint&255)/255;
@@ -252,6 +306,10 @@ public final class WorldMapClientTileCache {
 		int b = ((base & 255) * baseWeight + (overlay & 255) * overlayWeight) / totalWeight;
 		return 0xFF000000 | r << 16 | g << 8 | b;
 	}
+	private static int blend(int base, int overlay, double opacity) {
+		int weight = Math.max(0, Math.min(1000, (int)Math.round(opacity * 1000.0)));
+		return mix(base, overlay, weight, 1000);
+	}
 	private static int scaleColor(int color, double factor) {
 		return 0xFF000000 | Math.min(255,(int)((color>>16&255)*factor))<<16 | Math.min(255,(int)((color>>8&255)*factor))<<8 | Math.min(255,(int)((color&255)*factor));
 	}
@@ -261,7 +319,7 @@ public final class WorldMapClientTileCache {
 		double sensitivity = WorldMapClientConfig.hillshadeSlopeSensitivity();
 		int northBand = slopeBand(height - northHeight, sensitivity);
 		int northwestBand = slopeBand(height - northwestHeight, sensitivity);
-		double strength = WorldMapClientConfig.hillshadeStrength() * (water ? 0.55 : 1.0);
+		double strength = WorldMapClientConfig.hillshadeStrength() * (water ? 0.35 : 1.0);
 		if (canopyRelief) strength *= WorldMapClientConfig.canopyReliefStrength();
 		double factor = 1.0 + (northBand * 0.12 + northwestBand * 0.06) * strength;
 		factor = Math.max(0.65, Math.min(1.35, factor));
@@ -286,6 +344,8 @@ public final class WorldMapClientTileCache {
 		key = 31 * key + Double.doubleToLongBits(WorldMapClientConfig.hillshadeSlopeSensitivity());
 		key = 31 * key + Double.doubleToLongBits(WorldMapClientConfig.canopyReliefStrength());
 		key = 31 * key + Double.doubleToLongBits(WorldMapClientConfig.canopyShadowStrength());
+		key = 31 * key + Double.doubleToLongBits(WorldMapClientConfig.foliageOpacityScale());
+		key = 31 * key + Double.doubleToLongBits(WorldMapClientConfig.decorationOpacityScale());
 		if (key == visualSettingsKey) return;
 		visualSettingsKey = key;
 		for (ClientRegion region : REGIONS.values()) region.revision++;
@@ -393,6 +453,9 @@ public final class WorldMapClientTileCache {
 	private static int argbToAbgr(int c) { return c & 0xFF00FF00 | (c & 0x00FF0000) >> 16 | (c & 0xFF) << 16; }
 
 	private record TileDistance(long position, double distanceSquared) {}
+	private record SpritePixel(int red, int green, int blue, int alpha, double score) {}
+	private record TextureSample(int argb, double coverage, boolean tinted) {}
+	private record LayerSample(int argb, double opacity) {}
 	private record Sample(int argb, int height, boolean water, boolean foliage) {}
 	private record RetiredTexture(Identifier id, long releaseFrame) {}
 	private record DecodedTile(int chunkX, int chunkZ, short[] groundHeights, byte[] groundColors, byte[] groundTintKinds, int[] groundTints,

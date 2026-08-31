@@ -585,7 +585,9 @@ one-pixel contact shadow onto lower ground to its east, south, and southeast. Sh
 the height difference and has its own client setting. A separate canopy-relief setting controls the slope
 contrast within and along tree crowns without increasing contrast across all terrain. Decorations keep the
 ground height. Water retains its biome color and captured depth. The renderer uses that depth while
-compositing translucent water over the captured underwater ground.
+compositing translucent water over the captured underwater ground. Shallow water preserves more of the
+seabed, while opacity and darkening increase gradually with depth. The water color combines the active
+resource pack's still-water texture with a strong contribution from the captured biome tint.
 On new-format tiles, a captured block without a map color can still use its baked texture. Legacy tiles
 without either source remain transparent instead of producing black terrain pixels.
 
@@ -593,9 +595,17 @@ The map requests visible terrain from the server in small batches. The server ch
 chunk against that player's exploration history before returning a tile. The client combines
 authorized chunk samples into 256 by 256-block regions. New terrain samples retain a compact palette of
 block states. The client derives their map colors from the active resource pack's baked block textures,
-multiplies tinted textures by the stored biome color, draws foliage and optional decorations over shaded
-ground, and composites biome-colored water over the captured seabed. Older samples fall back to their
-stored Minecraft map colors. Terrain relief compares each visible height with its northern and northwestern
+checks the selected model quad to determine whether the texture accepts biome tint, and measures each
+texture's alpha coverage. Blocks in Minecraft's flower tag never receive biome tint on the map, so vanilla
+and properly tagged modded flowers keep their texture color. For those flower textures, the resolver
+discards stem-green candidates, ranks the remaining pixels by brightness and saturation, and averages the
+highest-scoring quarter. This makes petals determine the single map-pixel color, including the upper half
+of sunflowers. Other tintable grass, foliage, and plant models receive the captured biome color. Foliage
+and optional decorations blend over the ground according to that coverage. Separate client scales can
+strengthen or reduce either layer. Decorations have a 65 percent minimum before their scale applies, so
+sparse flower sprites remain visible when one world column becomes one map pixel. Older samples and
+unresolved textures retain a 75 percent fallback.
+Ground remains opaque, and biome-colored water keeps its separate seabed composite. Terrain relief compares each visible height with its northern and northwestern
 neighbors and applies stepped light or dark shading. Players can configure the height-difference sensitivity
 separately from the brightness contrast. The terrain image remains at one block per texture pixel at every zoom level.
 Unexplored chunks and captured tiles that have not arrived yet remain covered by
