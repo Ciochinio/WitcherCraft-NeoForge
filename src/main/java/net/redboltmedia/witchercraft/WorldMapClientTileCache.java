@@ -134,13 +134,19 @@ public final class WorldMapClientTileCache {
 			Sample sample = sampleAt(wx, wz);
 			if (sample == null) { image.setPixelABGR(px, pz, 0); continue; }
 			any = true;
-			int[] heights = new int[9];
-			int h = 0;
-			for (int dz = -1; dz <= 1; dz++) for (int dx = -1; dx <= 1; dx++) {
-				Sample neighbor = sampleAt(wx + dx, wz + dz);
-				heights[h++] = neighbor == null ? sample.height : neighbor.height;
+			Sample north = sampleAt(wx, wz - 1);
+			Sample northwest = sampleAt(wx - 1, wz - 1);
+			Sample west = sampleAt(wx - 1, wz);
+			int northHeight = north == null ? sample.height : north.height;
+			int northwestHeight = northwest == null ? sample.height : northwest.height;
+			boolean canopyRelief = sample.foliage || north != null && north.foliage || northwest != null && northwest.foliage;
+			int canopyShadowDifference = 0;
+			if (!sample.foliage && !sample.water) {
+				if (north != null && north.foliage) canopyShadowDifference = Math.max(canopyShadowDifference, north.height - sample.height);
+				if (northwest != null && northwest.foliage) canopyShadowDifference = Math.max(canopyShadowDifference, northwest.height - sample.height);
+				if (west != null && west.foliage) canopyShadowDifference = Math.max(canopyShadowDifference, west.height - sample.height);
 			}
-			image.setPixelABGR(px, pz, argbToAbgr(shade(sample.argb, heights, sample.water)));
+			image.setPixelABGR(px, pz, argbToAbgr(shade(sample.argb, sample.height, northHeight, northwestHeight, sample.water, canopyRelief, canopyShadowDifference)));
 		}
 		Minecraft mc = Minecraft.getInstance();
 		RegionTexture old = region.textures[lod];
@@ -158,33 +164,32 @@ public final class WorldMapClientTileCache {
 		DecodedTile tile = tileAt(wx, wz);
 		if (tile == null) return null;
 		int index = Math.floorMod(wx, CHUNK) + Math.floorMod(wz, CHUNK) * CHUNK;
+		return columnSample(tile, index);
+	}
+
+	private static Sample columnSample(DecodedTile tile, int index) {
 		int groundHeight = tile.groundHeights[index] == WorldMapTerrainTile.NO_HEIGHT ? 0 : tile.groundHeights[index];
-		boolean water = tile.waterHeights[index] != WorldMapTerrainTile.NO_HEIGHT;
-		return new Sample(columnColor(tile, index), groundHeight, water);
-	}
-
-	private static DecodedTile tileAt(int wx, int wz) {
-		return TILES.get(ChunkPos.pack(Math.floorDiv(wx, CHUNK), Math.floorDiv(wz, CHUNK)));
-	}
-
-	private static int columnColor(DecodedTile tile, int index) {
 		int ground = layerColor(tile, tile.groundColors[index], tile.groundTintKinds[index], tile.groundTints[index], tile.groundStateIndices[index]);
 		if (tile.waterHeights[index] != WorldMapTerrainTile.NO_HEIGHT) {
 			int depth = tile.groundHeights[index] == WorldMapTerrainTile.NO_HEIGHT ? 1 : Math.max(1, tile.waterHeights[index] - tile.groundHeights[index]);
 			int water = scaleColor(0xFF000000 | tile.waterTints[index], 0.88);
 			int color = ground == 0 ? water : mix(ground, water, 3, 4);
 			double factor = Math.max(0.82, 1.01 - Math.min(32, depth) * 0.006);
-			return scaleColor(color, factor);
+			return new Sample(scaleColor(color, factor), tile.waterHeights[index], true, false);
 		}
 		if (tile.foliageHeights[index] != WorldMapTerrainTile.NO_HEIGHT) {
 			int foliage = layerColor(tile, tile.foliageColors[index], tile.foliageTintKinds[index], tile.foliageTints[index], tile.foliageStateIndices[index]);
-			if (foliage != 0) return ground == 0 ? foliage : mix(ground, foliage, 3, 4);
+			if (foliage != 0) return new Sample(ground == 0 ? foliage : mix(ground, foliage, 3, 4), tile.foliageHeights[index], false, true);
 		}
 		if (WorldMapClientConfig.showDecorations() && tile.decorationKinds[index] != 0) {
 			int decoration = layerColor(tile, tile.decorationColors[index], tile.decorationTintKinds[index], tile.decorationTints[index], tile.decorationStateIndices[index]);
-			if (decoration != 0) return ground == 0 ? decoration : mix(ground, decoration, 3, 4);
+			if (decoration != 0) return new Sample(ground == 0 ? decoration : mix(ground, decoration, 3, 4), groundHeight, false, false);
 		}
-		return ground;
+		return new Sample(ground, groundHeight, false, false);
+	}
+
+	private static DecodedTile tileAt(int wx, int wz) {
+		return TILES.get(ChunkPos.pack(Math.floorDiv(wx, CHUNK), Math.floorDiv(wz, CHUNK)));
 	}
 
 	private static int layerColor(DecodedTile tile, byte colorId, byte tintKind, int tint, short stateIndex) {
@@ -251,19 +256,36 @@ public final class WorldMapClientTileCache {
 		return 0xFF000000 | Math.min(255,(int)((color>>16&255)*factor))<<16 | Math.min(255,(int)((color>>8&255)*factor))<<8 | Math.min(255,(int)((color&255)*factor));
 	}
 
-	private static int shade(int argb, int[] h, boolean water) {
+	private static int shade(int argb, int height, int northHeight, int northwestHeight, boolean water, boolean canopyRelief, int canopyShadowDifference) {
 		if (argb == 0) return 0;
-		int directionalSlope = Math.max(-6, Math.min(6, (h[3] - h[5]) + (h[1] - h[7])));
+		double sensitivity = WorldMapClientConfig.hillshadeSlopeSensitivity();
+		int northBand = slopeBand(height - northHeight, sensitivity);
+		int northwestBand = slopeBand(height - northwestHeight, sensitivity);
 		double strength = WorldMapClientConfig.hillshadeStrength() * (water ? 0.55 : 1.0);
-		double factor = 1.0 + directionalSlope * 0.028 * strength;
-		factor = Math.max(0.72, Math.min(1.28, factor)) * WorldMapClientConfig.terrainBrightness();
+		if (canopyRelief) strength *= WorldMapClientConfig.canopyReliefStrength();
+		double factor = 1.0 + (northBand * 0.12 + northwestBand * 0.06) * strength;
+		factor = Math.max(0.65, Math.min(1.35, factor));
+		if (canopyShadowDifference > 0) {
+			double shadow = WorldMapClientConfig.canopyShadowStrength() * Math.min(1.0, canopyShadowDifference / 12.0);
+			factor = Math.max(0.5, factor * (1.0 - shadow));
+		}
+		factor *= WorldMapClientConfig.terrainBrightness();
 		return scaleColor(argb, factor);
+	}
+	private static int slopeBand(int difference, double sensitivity) {
+		double adjusted = Math.abs(difference) * sensitivity;
+		if (adjusted < 0.5) return 0;
+		int band = adjusted < 1.5 ? 1 : adjusted < 3.5 ? 2 : 3;
+		return difference < 0 ? -band : band;
 	}
 	private static void refreshVisualSettings() {
 		long key = WorldMapClientConfig.showDecorations() ? 1 : 0;
 		key = 31 * key + Double.doubleToLongBits(WorldMapClientConfig.terrainBrightness());
 		key = 31 * key + Double.doubleToLongBits(WorldMapClientConfig.biomeColorStrength());
 		key = 31 * key + Double.doubleToLongBits(WorldMapClientConfig.hillshadeStrength());
+		key = 31 * key + Double.doubleToLongBits(WorldMapClientConfig.hillshadeSlopeSensitivity());
+		key = 31 * key + Double.doubleToLongBits(WorldMapClientConfig.canopyReliefStrength());
+		key = 31 * key + Double.doubleToLongBits(WorldMapClientConfig.canopyShadowStrength());
 		if (key == visualSettingsKey) return;
 		visualSettingsKey = key;
 		for (ClientRegion region : REGIONS.values()) region.revision++;
@@ -281,9 +303,12 @@ public final class WorldMapClientTileCache {
 
 	private static void invalidate(int chunkX, int chunkZ) {
 		int rx = Math.floorDiv(chunkX, REGION_CHUNKS), rz = Math.floorDiv(chunkZ, REGION_CHUNKS);
+		boolean eastEdge = Math.floorMod(chunkX, REGION_CHUNKS) == REGION_CHUNKS - 1;
+		boolean southEdge = Math.floorMod(chunkZ, REGION_CHUNKS) == REGION_CHUNKS - 1;
 		dirty(rx, rz);
-		if (Math.floorMod(chunkX, REGION_CHUNKS) == REGION_CHUNKS - 1) dirty(rx + 1, rz);
-		if (Math.floorMod(chunkZ, REGION_CHUNKS) == REGION_CHUNKS - 1) dirty(rx, rz + 1);
+		if (eastEdge) dirty(rx + 1, rz);
+		if (southEdge) dirty(rx, rz + 1);
+		if (eastEdge && southEdge) dirty(rx + 1, rz + 1);
 	}
 	private static ClientRegion regionForChunk(int chunkX, int chunkZ) {
 		int rx = Math.floorDiv(chunkX, REGION_CHUNKS), rz = Math.floorDiv(chunkZ, REGION_CHUNKS);
@@ -368,7 +393,7 @@ public final class WorldMapClientTileCache {
 	private static int argbToAbgr(int c) { return c & 0xFF00FF00 | (c & 0x00FF0000) >> 16 | (c & 0xFF) << 16; }
 
 	private record TileDistance(long position, double distanceSquared) {}
-	private record Sample(int argb, int height, boolean water) {}
+	private record Sample(int argb, int height, boolean water, boolean foliage) {}
 	private record RetiredTexture(Identifier id, long releaseFrame) {}
 	private record DecodedTile(int chunkX, int chunkZ, short[] groundHeights, byte[] groundColors, byte[] groundTintKinds, int[] groundTints,
 		short[] foliageHeights, byte[] foliageColors, byte[] foliageTintKinds, int[] foliageTints, short[] waterHeights, int[] waterTints,

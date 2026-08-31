@@ -1046,7 +1046,7 @@ starts at `WORLD_SURFACE` and scans downward within the already loaded column. I
 decorative plants. Blocks in the standard leaves or logs tags enter the foliage layer. Water records
 its highest surface and the scan continues to the underwater ground. The first remaining block with a
 non-empty collision shape becomes ground. This keeps grass tufts and tree canopies out of ground height
-and hillshade while retaining trees as a separate visual layer.
+while retaining foliage height as a separate input to visible-surface shading.
 
 Decoration kind `0` means absent and `1` means a visible non-colliding block such as grass, a flower,
 fern, mushroom, petals, or a tagged modded plant. Capture stores decorations regardless of the client
@@ -1151,15 +1151,30 @@ resource pack updates the map without recapturing server terrain.
 Water uses a muted stored biome color at 75 percent opacity over the underwater ground and darkens
 gradually with depth. Foliage blends over ground at 75 percent opacity.
 
-Hillshade compares the cardinal ground heights around each full-resolution pixel and applies bounded
-northwest directional shading. It never uses foliage or decoration height, so plants and canopies do not
-cast terrain cliffs. Water reduces the shading strength. Available samples cross chunk and region
-boundaries. A missing neighbor uses the center height and causes no request or inferred exploration.
+Hillshade compares each full-resolution visible height with the northern and northwestern samples. Open
+ground uses ground height, rendered foliage uses foliage height, and water uses water-surface height.
+Decorations keep ground height. The renderer assigns each signed difference to one of three slope bands.
+The northern band carries twice the brightness weight
+of the northwestern band, which keeps the light direction readable while preserving diagonal terrain
+steps. Slope sensitivity controls which band receives a height difference, while hillshade strength
+controls the resulting brightness contrast. The final factor stays bounded between 0.65 and 1.35 before
+terrain brightness applies. Foliage uses all three slope bands. A lower non-water, non-foliage pixel also
+checks higher foliage immediately to its west, north, and northwest. This adds a one-pixel contact shadow
+east, south, and southeast of raised foliage, matching the northwest light direction. The shadow reaches
+its configured maximum at a twelve-block height difference and cannot lower the pre-brightness factor
+below 0.5. If the current, northern, or northwestern slope sample is foliage, canopy relief multiplies the
+ordinary hillshade contrast before its bounds apply. Water reduces the ordinary slope-shading strength and
+receives no canopy contact shadow.
+Available samples cross chunk and region boundaries. A missing neighbor uses the center height and causes
+no request or inferred exploration. Tile changes on a region's east or south edge invalidate the dependent
+neighbor, and a southeast-corner change also invalidates the diagonal region that reads it as northwest.
 
 `WorldMapClientConfig` registers a NeoForge client configuration with terrain brightness, biome-color
-strength, hillshade strength, and a decoration visibility toggle. A setting change revises cached region
-images but does not alter server capture or saved terrain. The defaults are 1.0 brightness, 0.9 biome
-color strength, 0.75 hillshade strength, and decorations enabled.
+strength, hillshade strength, hillshade slope sensitivity, canopy relief strength, canopy shadow strength,
+and a decoration visibility toggle. A setting change revises cached region images but does not alter
+server capture or saved terrain. The defaults are 1.0 brightness, 0.9 biome color strength, 0.75 hillshade
+strength, 1.0 slope sensitivity, 1.35 canopy relief strength, 0.35 canopy shadow strength, and decorations
+enabled.
 
 MCreator's generated `WitchercraftMod` constructor calls `WorldMapClientConfig.register()` only from its
 preserved user-code block. The locked config class resolves the active mod container by mod ID. Do not add
@@ -1185,10 +1200,14 @@ layers and block-state palettes that did not exist in those formats as absent, a
 previously explored terrain after a renderer upgrade without loading or regenerating old chunks.
 
 Milestone 2C is complete. Milestone 2D visual validation is in progress. The full-resolution renderer
-removed the damaging box-averaged LOD levels, but directional hillshade currently reads flatter than the
-earlier Sobel prototype. Tune relief without reintroducing spatial color blur. Separate stored lighting
-remains a possible later refinement. Milestone 2D must pass representative in-game visual, restart, and
-performance checks before waypoint work begins.
+removed the damaging box-averaged LOD levels. Milestone 2D.1 replaces the flat centered gradient with
+discrete north and northwest slope shading without reintroducing spatial color blur. Milestone 2D.2 uses
+the visible ground, foliage, or water height. Raised foliage also casts a height-scaled directional contact
+shadow on adjacent lower ground. A separate canopy-relief multiplier controls contrast between neighboring
+foliage heights. Later Milestone 2D sections will evaluate texture-alpha compositing, water, and final color
+tuning.
+Separate stored lighting remains a possible later refinement. Milestone 2D must pass representative
+in-game visual, restart, and performance checks before waypoint work begins.
 
 `MapPage` fills the viewport with its fog color first, then draws cached authorized tiles, the player
 marker, and the existing controls. A missing tile therefore reveals nothing. The cache is scoped to

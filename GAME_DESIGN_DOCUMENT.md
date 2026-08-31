@@ -579,9 +579,13 @@ records the chunk in that player's private exploration history and queues a shar
 The map system never generates or force-loads a chunk. If the chunk unloads before its queued turn,
 the capture is skipped. Each horizontal block column records separate ground, tree-foliage, water, and
 decoration information. Decorative grass and flowers do not replace the ground color, but players can
-show them as a separate map layer. Tree and decoration height do not affect terrain shading. Water retains
-its biome color and captured depth. The renderer uses that depth while compositing translucent water over
-the captured underwater ground.
+show them as a separate map layer. Terrain shading follows the visible layer: open columns use ground
+height, tree-covered columns use foliage height, and water uses its surface height. Raised foliage casts a
+one-pixel contact shadow onto lower ground to its east, south, and southeast. Shadow darkness scales with
+the height difference and has its own client setting. A separate canopy-relief setting controls the slope
+contrast within and along tree crowns without increasing contrast across all terrain. Decorations keep the
+ground height. Water retains its biome color and captured depth. The renderer uses that depth while
+compositing translucent water over the captured underwater ground.
 On new-format tiles, a captured block without a map color can still use its baked texture. Legacy tiles
 without either source remain transparent instead of producing black terrain pixels.
 
@@ -591,7 +595,9 @@ authorized chunk samples into 256 by 256-block regions. New terrain samples reta
 block states. The client derives their map colors from the active resource pack's baked block textures,
 multiplies tinted textures by the stored biome color, draws foliage and optional decorations over shaded
 ground, and composites biome-colored water over the captured seabed. Older samples fall back to their
-stored Minecraft map colors. The terrain image remains at one block per texture pixel at every zoom level.
+stored Minecraft map colors. Terrain relief compares each visible height with its northern and northwestern
+neighbors and applies stepped light or dark shading. Players can configure the height-difference sensitivity
+separately from the brightness contrast. The terrain image remains at one block per texture pixel at every zoom level.
 Unexplored chunks and captured tiles that have not arrived yet remain covered by
 fog. Decoded terrain and uploaded region images have separate bounded caches, so long journeys do
 not keep every visited area in memory.
