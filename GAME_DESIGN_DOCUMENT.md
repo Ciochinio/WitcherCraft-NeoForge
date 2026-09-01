@@ -596,7 +596,11 @@ without either source remain transparent instead of producing black terrain pixe
 
 The map requests visible terrain from the server in small batches. The server checks every requested
 chunk against that player's exploration history before returning a tile. The client combines
-authorized chunk samples into 256 by 256-block regions. New terrain samples retain a compact palette of
+authorized chunk samples into 256 by 256-block regions. Requests continue at the server's permitted
+rate until every chunk in the current view has been checked. Region color and hillshade construction
+runs outside GUI rendering, combines multiple arriving chunks into one pending rebuild, and keeps the
+previous region image visible until its replacement is ready. The render thread uploads at most one
+finished region image per frame. New terrain samples retain a compact palette of
 block states. The client derives their map colors from the active resource pack's baked block textures,
 checks the selected model quad to determine whether the texture accepts biome tint, and measures each
 texture's alpha coverage. Blocks in Minecraft's flower tag never receive biome tint on the map, so vanilla
@@ -612,13 +616,26 @@ Ground remains opaque, and biome-colored water keeps its separate seabed composi
 neighbors and applies stepped light or dark shading. Players can configure the height-difference sensitivity
 separately from the brightness contrast. The terrain image remains at one block per texture pixel at every zoom level.
 Unexplored chunks and captured tiles that have not arrived yet remain hidden by the black map background.
-Decoded terrain and uploaded region images have separate bounded caches, so long journeys do
-not keep every visited area in memory.
+Each time the map page opens, it centers on the player at 1.00x zoom. Zoom changes made during that view
+do not carry into the next opening.
+After the server authorizes a terrain tile, the client retains its raw samples and completed 64 by 64-block leaf
+image in a private disk cache scoped to the world, player, dimension, format, resource packs, and terrain
+display settings. Panning may release decoded samples or GPU textures, but returning to that area loads
+the retained image instead of downloading and rendering it again. The server remains authoritative and
+checks cached tile capture times in the background, sending replacements only when its copy is newer.
+Each saved leaf records which of its 16 chunks contributed to the image. A coverage mismatch marks the
+PNG for repair, but the client may display that older image until its replacement is complete. The map
+also prepares 256 blocks of leaves beyond each viewport edge so ordinary panning
+is less likely to expose an unbuilt strip. Terrain captured while the map is closed is combined after a
+short delay and written as a finished leaf image in the background, without allocating a GPU texture.
+Deleting or corrupting the client cache loses no permanent exploration data because the server can send
+authorized terrain again. Decoded terrain and uploaded leaf images remain separately bounded in memory,
+so long journeys do not keep every visited area in RAM or GPU memory.
 
-Opening the map still pauses single-player once its current terrain request finishes. A new view
-briefly resumes the integrated server for at most two bounded request batches, then pauses again.
-This prevents the fullscreen map from leaving the player exposed while still allowing its
-server-owned terrain data to load. Multiplayer servers continue running normally.
+Opening the map still pauses single-player once every chunk in its current view has been checked. A new
+view resumes the integrated server while its bounded request chain runs. At distant zoom this can take
+longer than a close view because the persistent client cache and overview levels belong to later work.
+Multiplayer servers continue running normally.
 
 The whole hub is a **reskinnable shell**: the navbar and every page's layout live in one data file,
 so tabs and panels can be rearranged, relabelled, or repointed without touching game logic. Each perk now

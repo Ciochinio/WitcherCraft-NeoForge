@@ -1101,42 +1101,50 @@ position against that player's exploration mask. Client coordinates never grant 
 
 Authorized tile reads run on Minecraft's I/O executor. The server sends each successful read as one
 bounded `WorldMapTileDataMessage` after returning to the server thread. Its size varies with the v4
-block-state palette. Missing or corrupt files
-produce no tile response. The client retries a missing visible tile after five seconds, which also
-covers the short race between watching a new chunk and its first atomic terrain write.
+block-state palette. Missing, corrupt, or unauthorized files produce no tile response. An accepted
+completion causes the client to suppress those requested positions for the rest of the connection. A
+later live tile update removes that suppression, which covers the race between watching a new chunk and
+its first atomic write.
 
 `WorldMapClientTileCache` requests the visible rectangle plus a one-chunk margin. When more than 64
-tiles are missing, it selects the nearest 64. This keeps minimum zoom from creating a huge packet.
-One view processes at most two batches, matching the server limit of 128 requested tiles per 20
-ticks.
+tiles are missing, it selects the nearest 64. It paces requests at one batch per 500 milliseconds,
+matching the server limit of 128 requested tiles per 20 ticks without increasing packet size. The
+chain continues until every candidate in the current view has been returned or checked as absent.
 
 Each request has a positive ID. After all authorized disk reads finish and all available tile
-messages enter the connection, the server sends `WorldMapTileRequestCompleteMessage` with that ID.
-The map page reports itself as non-pausing while a view is dirty or a request is in flight. It sends
-the next batch directly from the completion handler, without relying on player ticks that stop while
-single-player is paused. After two batches, or when no candidates remain, the page becomes
-pause-capable again. Changing the visible chunk bounds through pan, zoom, or center starts another
-short request chain. Rejected rate-limited requests still receive completion, so malformed timing
-cannot leave single-player permanently unpaused.
+messages enter the connection, the server sends `WorldMapTileRequestCompleteMessage` with that ID and
+an accepted flag. The flag is false when rate limiting rejects the request. The client retries those
+positions after its pacing interval instead of recording them as absent. The map page reports itself
+as non-pausing while a view is dirty or a request is in flight. Render frames start later batches, so
+the integrated server keeps running until the visible request chain finishes. Changing the visible
+chunk bounds through pan, zoom, or center reprioritizes the remaining candidates around the new center.
 
 ### 5.7 Milestone 2C client renderer
 
 `WorldMapClientTileCache` keeps received messages as decoded CPU samples. It does not create a GPU
-texture per chunk. The decoded cache holds at most 2,048 chunks in access order. The chunk tile remains
+texture per chunk. The decoded cache targets 4,096 chunks in access order, but it retains all chunks
+inside the current view and its 256-block prefetch band until that view finishes. The chunk tile remains
 the storage, authorization, and network unit. `WorldMapTileDataMessage` carries the version-four layered
 samples and block-state palette for one authorized chunk.
 
-The client groups samples on a 16 by 16-chunk grid using floor division, including at negative
-coordinates. Each region covers 256 by 256 blocks and tracks which of its 256 authorized chunk samples
-are present. Missing samples produce transparent pixels over the black map background. `MapPage` fills the
-viewport before drawing regions, so a missing or not-yet-built region never exposes neighboring or
+The client groups samples into independently replaceable 4 by 4-chunk leaf images using floor division,
+including at negative coordinates. Each leaf covers 64 by 64 blocks and tracks which of its 16 authorized
+chunk samples are present. Missing samples produce transparent pixels over the black map background. `MapPage` fills the
+viewport before drawing leaves, so a missing or not-yet-built leaf never exposes neighboring or
 unauthorized data.
 
-The renderer builds each region image lazily at one block per source pixel. Every zoom level uses that
-full-resolution image, so zooming cannot replace structures and shorelines with box-averaged pixels.
-A region revision invalidates the image
-when one of its chunks changes. A tile arriving on a region's east or south dependency edge also dirties
-the neighboring region that reads its height for west or north shading.
+The client thread resolves each received tile's 256 display samples because baked models and
+resource-pack sprites are not safe to access from a worker. A single daemon worker builds leaf pixels and
+hillshade from immutable tile snapshots. GUI rendering never runs the 4,096-pixel leaf loop. At most eight
+builds may be pending, and visible leaves nearer the view center enter the queue first. A leaf revision
+combines multiple arriving chunks into one pending rebuild. If newer terrain arrives during a build, the
+client publishes the completed authorized snapshot instead of leaving the leaf black, then schedules one
+combined follow-up. An older GPU texture remains visible until its replacement is ready, and the render
+thread registers at most four completed build textures per frame.
+
+Every zoom level uses the full-resolution image, so zooming cannot replace structures and shorelines
+with box-averaged pixels. A tile arriving on a leaf's east or south dependency edge also dirties the
+neighboring leaf that reads its height for west or north shading.
 
 Version 4 terrain tiles add a palette of serialized block states plus palette indices for ground,
 foliage, and decoration samples. The server still stores `MapColor` as a fallback. On the client, each
@@ -1207,23 +1215,66 @@ preserved user-code block. The locked config class resolves the active mod conta
 a `ModContainer` parameter to the generated constructor because MCreator removes that signature change
 during regeneration while preserving the user-code body.
 
-All region screen edges come from one origin, `viewportCenter - mapCenter * zoom`, and the edge's world
-coordinate. Adjacent regions therefore calculate the same shared pixel edge. The 26.1.2 long `blit`
-overload receives independent destination, source, and texture dimensions, so each selected region image
+All leaf screen edges come from one origin, `viewportCenter - mapCenter * zoom`, and the edge's world
+coordinate. Adjacent leaves therefore calculate the same shared pixel edge. The 26.1.2 long `blit`
+overload receives independent destination, source, and texture dimensions, so each selected leaf image
 uses UV coordinates zero through one exactly once at every supported zoom.
 
-The decoded cache and the 64-entry GPU region cache have separate limits. The visible viewport may
-temporarily exceed the region limit because a region referenced by the current GUI extraction cannot be
+The decoded cache and the 512-entry GPU leaf cache have separate limits. The visible viewport may
+temporarily exceed the leaf limit because a leaf referenced by the current GUI extraction cannot be
 evicted. Replaced and evicted textures receive versioned identifiers and enter a retirement queue. The
 client releases them during a later GUI frame, after Minecraft has executed the deferred draw commands
 that can still reference their texture views. A debug diagnostic emitted every
-five seconds while rendering reports decoded and GPU cache estimates, source level, region rebuilds,
-uploads, draw calls, and average map-render time. Region size and cache limits remain profiling constants,
+five seconds while rendering reports decoded and GPU cache estimates, source level, leaf rebuilds,
+uploads, draw calls, and average map-render time. Leaf size and cache limits remain profiling constants,
 not persistent-format fields.
 
 Terrain tile version 4 is the write format. The reader also accepts versions 1 through 3, initializes
 layers and block-state palettes that did not exist in those formats as absent, and verifies their original CRC. This preserves
 previously explored terrain after a renderer upgrade without loading or regenerating old chunks.
+
+### 5.8 Persistent authorized client cache
+
+The server persists a random world-map UUID in the world root. It sends that UUID to each player during
+login through the existing request-completion payload using request ID zero. Ordinary completions also
+carry the UUID. The client cache path includes format version, world UUID, player UUID, and dimension.
+This prevents two players, recreated worlds, or reset servers at the same address from sharing terrain.
+
+The client indexes cached tile filenames on two daemon I/O workers before issuing map requests. It loads
+cached leaf PNG files nearest the current view first and then loads up to 256 nearby raw tiles
+at a time. The render thread registers loaded PNGs, while raw tile decoding and file reads stay on the I/O
+workers. GPU and decoded-memory eviction do not delete these files. Returning to an evicted area can
+therefore restore its finished image without another color and hillshade build.
+The load area extends by four leaves, or 256 blocks, beyond every viewport edge. Visible leaves enter
+the build queue first, followed by prefetched leaves ordered by distance from the view center. Loading
+raw cached tiles still revises their leaf. This repairs an image saved while that leaf was only partly
+populated. A valid GPU texture remains visible until the combined replacement build finishes.
+
+Each authorized network tile is written atomically using the version-four terrain format and its CRC.
+Each finished leaf image is written through a temporary PNG and atomic replacement. Leaf
+filenames include the terrain visual-settings key and ordered active resource-pack IDs. A settings or
+resource-pack change selects a different cached image and rebuilds from raw tiles. Every PNG has a
+versioned coverage sidecar containing one bit for each of the leaf's 16 raw chunks. The
+loader compares the mask with the indexed raw tile files. It publishes an exact match immediately and
+may publish a stale PNG as a temporary fallback while the leaf builder replaces it. The fallback avoids
+black leaves while raw tiles are still entering memory. A missing or invalid sidecar also makes the PNG
+stale. Per-path locking prevents the I/O loader from holding a PNG open while the builder atomically
+replaces it on Windows. A corrupt tile acts as
+absent. A corrupt PNG is deleted and rebuilt. Cache scanning logs tile count, file count, and total size.
+No automatic pruning runs in this milestone.
+
+Live tile arrivals mark their owning leaf dirty even when the map is closed. A two-second debounce
+combines nearby arrivals. A single maintenance worker then snapshots one due leaf at a time, builds it
+with the same CPU renderer, and writes its PNG and coverage sidecar without creating or uploading a GPU
+texture. Maintenance pauses while the map is open because visible and prefetched leaves already use the
+priority build queue. Block-model and resource-pack sprite resolution remains on the Minecraft client
+thread before either builder receives its immutable tile snapshot.
+
+`WorldMapTileRequestMessage` pairs every position with the capture time held by the client, or negative
+one when it has no tile. Cached images display before validation finishes. The server still checks the
+player's exploration mask, reads authorized tiles on its I/O executor, and sends data only when the server
+capture time is newer. An accepted completion marks every position in that batch as validated for the
+connection. Live capture updates replace cached data and dirty the affected leaf normally.
 
 Milestone 2C is complete. Milestone 2D visual validation is in progress. The full-resolution renderer
 removed the damaging box-averaged LOD levels. Milestone 2D.1 replaces the flat centered gradient with
@@ -1246,5 +1297,6 @@ Separate stored lighting remains a possible later refinement. Milestone 2D must 
 in-game visual, restart, and performance checks before waypoint work begins.
 
 `MapPage` fills the viewport with its black background first, then the region renderer draws terrain,
-followed by the player marker and existing controls. A missing tile therefore reveals nothing. The cache is scoped to
-the current client connection so terrain from one server cannot appear while connected to another.
+followed by the player marker and existing controls. A missing tile therefore reveals nothing. In-memory
+state is scoped to the current connection. Persistent files use the server-issued world UUID and player
+UUID, so terrain from another world or player cannot appear.

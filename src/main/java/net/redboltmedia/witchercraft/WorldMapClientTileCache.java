@@ -1,6 +1,9 @@
 package net.redboltmedia.witchercraft;
 
 import java.util.*;
+import java.util.concurrent.*;
+import java.io.*;
+import java.nio.file.*;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.neoforged.api.distmarker.Dist;
@@ -29,31 +32,59 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.MapColor;
 
-/** Bounded decoded-tile and region-texture caches for authorized world-map terrain. */
+/** Bounded decoded-tile and independently replaceable leaf-texture caches for authorized world-map terrain. */
 @EventBusSubscriber(Dist.CLIENT)
 public final class WorldMapClientTileCache {
-	private static final int CHUNK = 16, REGION_CHUNKS = 16, REGION = 256, LOD_COUNT = 1;
-	private static final int MAX_TILES = 2048, MAX_REGIONS = 64, BATCHES_PER_VIEW = 2;
-	private static final long RETRY_NANOS = 5_000_000_000L, DIAGNOSTIC_NANOS = 5_000_000_000L;
+	/*
+	 * A drawable leaf covers 4 by 4 chunks. Keeping this unit small is important:
+	 * one arriving chunk must not suppress or rebuild a 256 by 256-block image.
+	 */
+	private static final int CHUNK = 16, REGION_CHUNKS = 4, REGION = 64, LOD_COUNT = 1, PREFETCH_REGIONS = 4;
+	private static final int MAX_TILES = 4096, MAX_REGIONS = 512, MAX_PENDING_BUILDS = 8, MAX_UPLOADS_PER_FRAME = 4, MAX_CACHED_UPLOADS_PER_FRAME = 8;
+	private static final long REQUEST_INTERVAL_NANOS = 500_000_000L, DIAGNOSTIC_NANOS = 5_000_000_000L, BACKGROUND_DEBOUNCE_NANOS = 2_000_000_000L;
 	private static final double[] REGRESSION_ZOOMS = { 0.25, 1.0, 1.37, 5.24, 16.0 };
 	private static final LinkedHashMap<Long, DecodedTile> TILES = new LinkedHashMap<>(256, .75f, true);
 	private static final LinkedHashMap<Long, ClientRegion> REGIONS = new LinkedHashMap<>(32, .75f, true);
-	private static final Map<Long, Long> REQUESTED = new HashMap<>();
+	private static final Set<Long> KNOWN_ABSENT = new HashSet<>();
+	private static final Set<Long> VALIDATED = new HashSet<>();
 	private static final Map<String, TextureSample> BLOCK_TEXTURE_COLORS = new HashMap<>();
 	private static final Set<String> FAILED_BLOCK_TEXTURE_COLORS = new HashSet<>();
 	private static TextureSample waterTextureColor;
 	private static boolean waterTextureColorFailed;
 	private static final ArrayDeque<RetiredTexture> RETIRED_TEXTURES = new ArrayDeque<>();
+	private static final ConcurrentLinkedQueue<CompletedBuild> COMPLETED_BUILDS = new ConcurrentLinkedQueue<>();
+	private static final ConcurrentLinkedQueue<CachedRegion> CACHED_REGIONS = new ConcurrentLinkedQueue<>();
+	private static final ConcurrentLinkedQueue<CachedTile> CACHED_TILES = new ConcurrentLinkedQueue<>();
+	private static final ConcurrentLinkedQueue<Long> CACHE_MISSES = new ConcurrentLinkedQueue<>();
+	private static final ConcurrentLinkedQueue<Long> STALE_CACHED_REGIONS = new ConcurrentLinkedQueue<>();
+	private static final Map<Long, Long> BACKGROUND_DIRTY = new HashMap<>();
+	private static final ExecutorService REGION_BUILDER = Executors.newSingleThreadExecutor(task -> {
+		Thread thread = new Thread(task, "WitcherCraft world map leaf builder");
+		thread.setDaemon(true);
+		return thread;
+	});
+	private static final ScheduledExecutorService CACHE_MAINTENANCE = Executors.newSingleThreadScheduledExecutor(task -> {
+		Thread thread = new Thread(task, "WitcherCraft world map cache maintenance"); thread.setDaemon(true); return thread;
+	});
 	private static Object connectionIdentity;
-	private static int nextRequestId = 1, inFlightRequestId, batchesForView, selectedLod;
-	private static long viewGeneration, inFlightGeneration, renderFrame, textureSequence;
+	private static int nextRequestId = 1, inFlightRequestId, selectedLod, pendingBuilds;
+	private static long[] inFlightPositions = new long[0];
+	private static long viewGeneration, inFlightGeneration, cacheGeneration, renderFrame, textureSequence;
+	private static long nextRequestNanos;
+	private static long lastMapRenderNanos;
 	private static boolean viewDirty = true, haveViewBounds;
 	private static int lastMinChunkX, lastMaxChunkX, lastMinChunkZ, lastMaxChunkZ, lastViewportW, lastViewportH;
 	private static double lastCenterX, lastCenterZ, lastZoom;
-	private static long rebuilds, uploads, draws, frames, renderNanos, lastDiagnostic;
+	private static long rebuilds, uploads, draws, frames, renderNanos, lastDiagnostic, requestedTiles, completedBuilds, staleBuilds;
 	private static long visualSettingsKey;
 
-	static { validateRegressionGeometry(); }
+	static {
+		validateRegressionGeometry();
+		CACHE_MAINTENANCE.scheduleWithFixedDelay(() -> {
+			Minecraft minecraft = Minecraft.getInstance();
+			if (minecraft != null) minecraft.execute(() -> maintainCache(minecraft));
+		}, 500, 500, TimeUnit.MILLISECONDS);
+	}
 	private WorldMapClientTileCache() {}
 	@SubscribeEvent
 	public static void registerReloadListener(AddClientReloadListenersEvent event) {
@@ -70,80 +101,267 @@ public final class WorldMapClientTileCache {
 		long started = System.nanoTime();
 		Minecraft mc = Minecraft.getInstance();
 		if (mc.player == null || mc.level == null || mc.getConnection() == null) return;
+		lastMapRenderNanos = System.nanoTime();
 		renderFrame++;
 		releaseRetiredTextures(mc);
-		if (connectionIdentity != mc.getConnection()) { clear(); connectionIdentity = mc.getConnection(); }
+		ensureConnection(mc);
 		rememberView(vw, vh, centerX, centerZ, zoom);
 		refreshVisualSettings();
+		DiskCache.updateVisible(lastMinChunkX, lastMaxChunkX, lastMinChunkZ, lastMaxChunkZ, centerX, centerZ, visualSettingsKey, cacheGeneration);
+		applyCachedTiles();
+		applyCachedRegions(mc);
+		applyCompletedBuilds(mc);
 		selectedLod = 0;
 		double originX = vx + vw / 2.0 - centerX * zoom;
 		double originY = vy + vh / 2.0 - centerZ * zoom;
 		int minRX = Math.floorDiv(lastMinChunkX, REGION_CHUNKS), maxRX = Math.floorDiv(lastMaxChunkX, REGION_CHUNKS);
 		int minRZ = Math.floorDiv(lastMinChunkZ, REGION_CHUNKS), maxRZ = Math.floorDiv(lastMaxChunkZ, REGION_CHUNKS);
+		List<ClientRegion> visibleRegions = new ArrayList<>();
 		for (int rz = minRZ; rz <= maxRZ; rz++) for (int rx = minRX; rx <= maxRX; rx++) {
 			long key = ChunkPos.pack(rx, rz);
 			ClientRegion region = REGIONS.get(key);
 			if (region == null) { region = createRegion(rx, rz); REGIONS.put(key, region); }
-			if (region.needsBuild(selectedLod)) buildTexture(region, selectedLod);
+			visibleRegions.add(region);
+			region.lastUsedFrame = renderFrame;
 			RegionTexture texture = region.current(selectedLod);
 			if (texture == null) continue;
 			int worldX = rx * REGION, worldZ = rz * REGION;
 			int left = edge(originX, worldX, zoom), top = edge(originY, worldZ, zoom);
 			int right = edge(originX, worldX + REGION, zoom), bottom = edge(originY, worldZ + REGION, zoom);
 			if (right <= vx || bottom <= vy || left >= vx + vw || top >= vy + vh) continue;
-			region.lastUsedFrame = renderFrame;
 			int sourceSize = REGION >> selectedLod;
 			g.blit(RenderPipelines.GUI_TEXTURED, texture.id, left, top, 0, 0,
 				Math.max(1, right - left), Math.max(1, bottom - top), sourceSize, sourceSize, sourceSize, sourceSize);
 			draws++;
 		}
+		visibleRegions.sort(Comparator.comparingDouble(region -> region.distanceSquared(centerX, centerZ)));
+		for (ClientRegion region : visibleRegions) {
+			if (pendingBuilds >= MAX_PENDING_BUILDS) break;
+			queueBuild(region, selectedLod, false);
+		}
+		if (pendingBuilds < MAX_PENDING_BUILDS) {
+			List<int[]> prefetchedRegions = new ArrayList<>();
+			for (int rz = minRZ - PREFETCH_REGIONS; rz <= maxRZ + PREFETCH_REGIONS; rz++) for (int rx = minRX - PREFETCH_REGIONS; rx <= maxRX + PREFETCH_REGIONS; rx++) {
+				if (rx >= minRX && rx <= maxRX && rz >= minRZ && rz <= maxRZ) continue;
+				prefetchedRegions.add(new int[] { rx, rz });
+			}
+			prefetchedRegions.sort(Comparator.comparingDouble(position -> {
+				double dx = (position[0] + 0.5) * REGION - centerX, dz = (position[1] + 0.5) * REGION - centerZ;
+				return dx * dx + dz * dz;
+			}));
+			for (int[] position : prefetchedRegions) {
+				if (pendingBuilds >= MAX_PENDING_BUILDS) break;
+				long key = ChunkPos.pack(position[0], position[1]);
+				ClientRegion region = REGIONS.get(key);
+				if (region == null) { region = createRegion(position[0], position[1]); REGIONS.put(key, region); }
+				queueBuild(region, selectedLod, false);
+			}
+		}
 		trimRegions();
-		if (viewDirty && inFlightRequestId == 0) startRequest();
+		if (viewDirty && inFlightRequestId == 0 && DiskCache.readyOrUnconfigured() && System.nanoTime() >= nextRequestNanos && !startRequest()) viewDirty = false;
 		frames++; renderNanos += System.nanoTime() - started; logDiagnostics();
 	}
 
 	public static boolean canPause() { return !viewDirty && inFlightRequestId == 0; }
-	public static void markViewDirty() { viewDirty = true; viewGeneration++; batchesForView = 0; }
+	public static void markViewDirty() { viewDirty = true; viewGeneration++; }
 
-	public static void completeRequest(int requestId) {
+	public static void completeRequest(int requestId, boolean accepted, UUID worldId) {
+		ensureConnection(Minecraft.getInstance());
+		if (worldId.getMostSignificantBits() != 0L || worldId.getLeastSignificantBits() != 0L) {
+			var player = Minecraft.getInstance().player;
+			if (player != null) DiskCache.configure(worldId, player.getUUID(), cacheGeneration);
+		}
+		if (requestId == 0) return;
 		if (requestId != inFlightRequestId) return;
+		if (accepted) for (long position : inFlightPositions) {
+			VALIDATED.add(position);
+			if (!TILES.containsKey(position) && !DiskCache.hasTile(position)) KNOWN_ABSENT.add(position);
+		}
 		inFlightRequestId = 0;
-		batchesForView = inFlightGeneration == viewGeneration ? batchesForView + 1 : 0;
-		if (batchesForView < BATCHES_PER_VIEW && startRequest()) return;
-		viewDirty = false;
+		inFlightPositions = new long[0];
+		nextRequestNanos = System.nanoTime() + REQUEST_INTERVAL_NANOS;
+		if (inFlightGeneration != viewGeneration) viewDirty = true;
+	}
+
+	private static void ensureConnection(Minecraft minecraft) {
+		if (connectionIdentity != minecraft.getConnection()) { clear(); connectionIdentity = minecraft.getConnection(); }
 	}
 
 	public static void accept(WorldMapTileDataMessage message) {
 		if (Minecraft.getInstance().getConnection() == null) return;
-		long key = ChunkPos.pack(message.chunkX(), message.chunkZ());
-		REQUESTED.remove(key); TILES.remove(key);
-		TILES.put(key, new DecodedTile(message.chunkX(), message.chunkZ(), message.groundHeights().clone(), message.groundColors().clone(),
-			message.groundTintKinds().clone(), message.groundTints().clone(), message.foliageHeights().clone(), message.foliageColors().clone(),
-			message.foliageTintKinds().clone(), message.foliageTints().clone(), message.waterHeights().clone(), message.waterTints().clone(),
-			message.decorationKinds().clone(), message.decorationColors().clone(), message.decorationTintKinds().clone(), message.decorationTints().clone(),
-			message.blockStatePalette().clone(), message.groundStateIndices().clone(), message.foliageStateIndices().clone(), message.decorationStateIndices().clone()));
-		regionForChunk(message.chunkX(), message.chunkZ()).setPresent(message.chunkX(), message.chunkZ(), true);
-		invalidate(message.chunkX(), message.chunkZ()); trimTiles();
+		WorldMapTerrainTile tile = new WorldMapTerrainTile(message.chunkX(), message.chunkZ(), message.capturedGameTime(), message.groundHeights(), message.groundColors(),
+			message.groundTintKinds(), message.groundTints(), message.foliageHeights(), message.foliageColors(), message.foliageTintKinds(), message.foliageTints(),
+			message.waterHeights(), message.waterTints(), message.decorationKinds(), message.decorationColors(), message.decorationTintKinds(), message.decorationTints(),
+			message.blockStatePalette(), message.groundStateIndices(), message.foliageStateIndices(), message.decorationStateIndices());
+		acceptTile(tile, true, true);
+	}
+
+	private static void acceptTile(WorldMapTerrainTile source, boolean persist, boolean invalidateRegion) {
+		long key = ChunkPos.pack(source.chunkX(), source.chunkZ());
+		KNOWN_ABSENT.remove(key); TILES.remove(key);
+		if (persist) VALIDATED.add(key); else viewDirty = true;
+		DecodedTile tile = new DecodedTile(source.chunkX(), source.chunkZ(), source.capturedGameTime(), source.groundHeights(), source.groundColors(), source.groundTintKinds(), source.groundTints(),
+			source.foliageHeights(), source.foliageColors(), source.foliageTintKinds(), source.foliageTints(), source.waterHeights(), source.waterTints(),
+			source.decorationKinds(), source.decorationColors(), source.decorationTintKinds(), source.decorationTints(), source.blockStatePalette(),
+			source.groundStateIndices(), source.foliageStateIndices(), source.decorationStateIndices());
+		tile.resolveSamples();
+		TILES.put(key, tile);
+		regionForChunk(source.chunkX(), source.chunkZ()).setPresent(source.chunkX(), source.chunkZ(), true);
+		if (invalidateRegion) invalidate(source.chunkX(), source.chunkZ());
+		if (persist) DiskCache.saveTile(source);
+		if (persist) BACKGROUND_DIRTY.put(ChunkPos.pack(Math.floorDiv(source.chunkX(), REGION_CHUNKS), Math.floorDiv(source.chunkZ(), REGION_CHUNKS)), System.nanoTime() + BACKGROUND_DEBOUNCE_NANOS);
+		trimTiles();
 	}
 
 	public static void clear() {
 		for (ClientRegion region : REGIONS.values()) region.retireTextures();
-		REGIONS.clear(); TILES.clear(); REQUESTED.clear();
-		inFlightRequestId = 0; viewDirty = true; viewGeneration++; batchesForView = 0; haveViewBounds = false; selectedLod = 0;
+		REGIONS.clear(); TILES.clear(); KNOWN_ABSENT.clear(); VALIDATED.clear(); BACKGROUND_DIRTY.clear(); COMPLETED_BUILDS.clear(); CACHED_REGIONS.clear(); CACHED_TILES.clear(); CACHE_MISSES.clear(); STALE_CACHED_REGIONS.clear(); DiskCache.clear();
+		inFlightRequestId = 0; inFlightPositions = new long[0]; viewDirty = true; viewGeneration++; cacheGeneration++; haveViewBounds = false; selectedLod = 0; pendingBuilds = 0; nextRequestNanos = 0;
 	}
 
-	private static RegionTexture buildTexture(ClientRegion region, int lod) {
+	private static void queueBuild(ClientRegion region, int lod, boolean diskOnly) {
+		if (!region.needsBuild(lod) || region.presentChunks.isEmpty()) return;
+		long revision = region.revision;
+		region.queuedRevisions[lod] = revision;
+		Map<Long, DecodedTile> tiles = new HashMap<>();
+		int firstChunkX = region.x * REGION_CHUNKS - 1, firstChunkZ = region.z * REGION_CHUNKS - 1;
+		for (int z = firstChunkZ; z <= region.z * REGION_CHUNKS + REGION_CHUNKS - 1; z++)
+			for (int x = firstChunkX; x <= region.x * REGION_CHUNKS + REGION_CHUNKS - 1; x++) {
+				DecodedTile tile = TILES.get(ChunkPos.pack(x, z));
+				if (tile != null) tiles.put(ChunkPos.pack(x, z), tile);
+			}
+		RegionSnapshot snapshot = new RegionSnapshot(region.x, region.z, revision, cacheGeneration, tiles, RenderSettings.capture(), DiskCache.regionPath(region.x, region.z, visualSettingsKey), coverage(region.x, region.z, tiles));
+		pendingBuilds++;
+		REGION_BUILDER.execute(() -> {
+			NativeImage image = null;
+			try {
+				image = buildImage(snapshot);
+				if (image != null && snapshot.imageTarget != null) DiskCache.writeRegion(snapshot.imageTarget, image, snapshot.coverage);
+			} catch (RuntimeException exception) {
+				WitchercraftMod.LOGGER.error("Failed to build world map region {},{}", snapshot.x, snapshot.z, exception);
+			}
+			COMPLETED_BUILDS.add(new CompletedBuild(snapshot.x, snapshot.z, lod, snapshot.revision, snapshot.generation, diskOnly, image));
+		});
+	}
+
+	private static long[] coverage(int regionX, int regionZ, Map<Long, DecodedTile> tiles) {
+		BitSet coverage = new BitSet(REGION_CHUNKS * REGION_CHUNKS);
+		for (long position : tiles.keySet()) {
+			ChunkPos pos = ChunkPos.unpack(position);
+			if (Math.floorDiv(pos.x(), REGION_CHUNKS) == regionX && Math.floorDiv(pos.z(), REGION_CHUNKS) == regionZ)
+				coverage.set(Math.floorMod(pos.x(), REGION_CHUNKS) + Math.floorMod(pos.z(), REGION_CHUNKS) * REGION_CHUNKS);
+		}
+		return Arrays.copyOf(coverage.toLongArray(), 4);
+	}
+
+	private static void maintainCache(Minecraft minecraft) {
+		if (minecraft.getConnection() == null) return;
+		applyCompletedBuilds(minecraft);
+		if (System.nanoTime() - lastMapRenderNanos < 1_000_000_000L || pendingBuilds > 0 || !DiskCache.readyOrUnconfigured()) return;
+		long now = System.nanoTime();
+		Iterator<Map.Entry<Long, Long>> iterator = BACKGROUND_DIRTY.entrySet().iterator();
+		while (iterator.hasNext()) {
+			Map.Entry<Long, Long> entry = iterator.next();
+			if (entry.getValue() > now) continue;
+			iterator.remove();
+			ChunkPos pos = ChunkPos.unpack(entry.getKey());
+			ClientRegion region = REGIONS.get(entry.getKey());
+			if (region == null) { region = createRegion(pos.x(), pos.z()); REGIONS.put(entry.getKey(), region); }
+			queueBuild(region, 0, true);
+			return;
+		}
+	}
+
+	private static void applyCachedTiles() {
+		while (CACHE_MISSES.poll() != null) viewDirty = true;
+		Long staleRegion;
+		while ((staleRegion = STALE_CACHED_REGIONS.poll()) != null) BACKGROUND_DIRTY.put(staleRegion, System.nanoTime());
+		for (int applied = 0; applied < 64; applied++) {
+			CachedTile cached = CACHED_TILES.poll();
+			if (cached == null) return;
+			DiskCache.finishedTileLoad(cached.position);
+			if (cached.generation != cacheGeneration) continue;
+			WorldMapTerrainTile tile = cached.tile;
+			if (!TILES.containsKey(ChunkPos.pack(tile.chunkX(), tile.chunkZ()))) acceptTile(tile, false, true);
+		}
+	}
+
+	private static void applyCachedRegions(Minecraft mc) {
+		for (int applied = 0; applied < MAX_CACHED_UPLOADS_PER_FRAME; applied++) {
+			CachedRegion cached = CACHED_REGIONS.poll();
+			if (cached == null) return;
+			CachedRegion loaded = cached;
+			DiskCache.finishedRegionLoad(loaded.loadingKey);
+			if (loaded.generation != cacheGeneration || loaded.settingsKey != visualSettingsKey) { loaded.image.close(); continue; }
+			ClientRegion region = regionForChunk(loaded.x * REGION_CHUNKS, loaded.z * REGION_CHUNKS);
+			if (region.textures[0] != null) { loaded.image.close(); continue; }
+			Identifier id = Identifier.fromNamespaceAndPath(WitchercraftMod.MODID,
+				"world_map/cached_region_" + loaded.x + "_" + loaded.z + "_v_" + textureSequence++);
+			mc.getTextureManager().register(id, new DynamicTexture(() -> "WitcherCraft cached map region " + loaded.x + "," + loaded.z, loaded.image));
+			region.textures[0] = new RegionTexture(id);
+			region.builtRevisions[0] = loaded.stale ? 0 : region.revision;
+			uploads++;
+		}
+	}
+
+	private static void applyCompletedBuilds(Minecraft mc) {
+		for (int applied = 0; applied < MAX_UPLOADS_PER_FRAME; applied++) {
+			CompletedBuild completed = COMPLETED_BUILDS.poll();
+			if (completed == null) return;
+			if (completed.generation != cacheGeneration) {
+				if (completed.image != null) completed.image.close();
+				continue;
+			}
+			pendingBuilds = Math.max(0, pendingBuilds - 1);
+			ClientRegion region = REGIONS.get(ChunkPos.pack(completed.x, completed.z));
+			if (region == null) {
+				if (completed.image != null) completed.image.close();
+				continue;
+			}
+			boolean superseded = region.revision != completed.revision;
+			if (superseded) staleBuilds++;
+			if (completed.diskOnly) {
+				if (completed.image != null) completed.image.close();
+				if (region.queuedRevisions[completed.lod] == completed.revision) region.queuedRevisions[completed.lod] = 0;
+				completedBuilds++;
+				rebuilds++;
+				continue;
+			}
+			RegionTexture old = region.textures[completed.lod];
+			if (completed.image == null) {
+				// Keep an older valid texture on screen if a replacement could not be published.
+			} else {
+				Identifier id = Identifier.fromNamespaceAndPath(WitchercraftMod.MODID,
+					"world_map/region_" + region.x + "_" + region.z + "_lod_" + completed.lod + "_v_" + textureSequence++);
+				mc.getTextureManager().register(id, new DynamicTexture(() -> "WitcherCraft map region " + region.x + "," + region.z + " LOD " + completed.lod, completed.image));
+				region.textures[completed.lod] = new RegionTexture(id);
+				if (old != null) retireTexture(old.id);
+				uploads++;
+			}
+			/*
+			 * A superseded image is still a useful, authorized snapshot. Publish it
+			 * now and let needsBuild() schedule one combined follow-up. Discarding it
+			 * is what previously left complete regions black during tile bursts.
+			 */
+			region.builtRevisions[completed.lod] = completed.revision;
+			if (region.queuedRevisions[completed.lod] == completed.revision) region.queuedRevisions[completed.lod] = 0;
+			completedBuilds++;
+			rebuilds++;
+		}
+	}
+
+	private static NativeImage buildImage(RegionSnapshot snapshot) {
 		int scale = 1, size = REGION;
 		NativeImage image = new NativeImage(size, size, false);
 		boolean any = false;
 		for (int pz = 0; pz < size; pz++) for (int px = 0; px < size; px++) {
-			int wx = region.x * REGION + px * scale, wz = region.z * REGION + pz * scale;
-			Sample sample = sampleAt(wx, wz);
+			int wx = snapshot.x * REGION + px * scale, wz = snapshot.z * REGION + pz * scale;
+			Sample sample = snapshot.sampleAt(wx, wz);
 			if (sample == null) { image.setPixelABGR(px, pz, 0); continue; }
 			any = true;
-			Sample north = sampleAt(wx, wz - 1);
-			Sample northwest = sampleAt(wx - 1, wz - 1);
-			Sample west = sampleAt(wx - 1, wz);
+			Sample north = snapshot.sampleAt(wx, wz - 1);
+			Sample northwest = snapshot.sampleAt(wx - 1, wz - 1);
+			Sample west = snapshot.sampleAt(wx - 1, wz);
 			int northHeight = north == null ? sample.height : north.height;
 			int northwestHeight = northwest == null ? sample.height : northwest.height;
 			boolean canopyRelief = sample.foliage || north != null && north.foliage || northwest != null && northwest.foliage;
@@ -153,25 +371,17 @@ public final class WorldMapClientTileCache {
 				if (northwest != null && northwest.foliage) canopyShadowDifference = Math.max(canopyShadowDifference, northwest.height - sample.height);
 				if (west != null && west.foliage) canopyShadowDifference = Math.max(canopyShadowDifference, west.height - sample.height);
 			}
-			image.setPixelABGR(px, pz, argbToAbgr(shade(sample.argb, sample.height, northHeight, northwestHeight, sample.water, canopyRelief, canopyShadowDifference)));
+			image.setPixelABGR(px, pz, argbToAbgr(snapshot.settings.shade(sample, northHeight, northwestHeight, canopyRelief, canopyShadowDifference)));
 		}
-		Minecraft mc = Minecraft.getInstance();
-		RegionTexture old = region.textures[lod];
-		if (old != null) { retireTexture(old.id); region.textures[lod] = null; }
-		region.builtRevisions[lod] = region.revision; rebuilds++;
 		if (!any) { image.close(); return null; }
-		Identifier id = Identifier.fromNamespaceAndPath(WitchercraftMod.MODID,
-			"world_map/region_" + region.x + "_" + region.z + "_lod_" + lod + "_v_" + textureSequence++);
-		mc.getTextureManager().register(id, new DynamicTexture(() -> "WitcherCraft map region " + region.x + "," + region.z + " LOD " + lod, image));
-		RegionTexture result = new RegionTexture(id); region.textures[lod] = result; uploads++;
-		return result;
+		return image;
 	}
 
 	private static Sample sampleAt(int wx, int wz) {
 		DecodedTile tile = tileAt(wx, wz);
 		if (tile == null) return null;
 		int index = Math.floorMod(wx, CHUNK) + Math.floorMod(wz, CHUNK) * CHUNK;
-		return columnSample(tile, index);
+		return tile.samples[index];
 	}
 
 	private static Sample columnSample(DecodedTile tile, int index) {
@@ -346,8 +556,10 @@ public final class WorldMapClientTileCache {
 		key = 31 * key + Double.doubleToLongBits(WorldMapClientConfig.canopyShadowStrength());
 		key = 31 * key + Double.doubleToLongBits(WorldMapClientConfig.foliageOpacityScale());
 		key = 31 * key + Double.doubleToLongBits(WorldMapClientConfig.decorationOpacityScale());
+		for (var pack : Minecraft.getInstance().getResourceManager().listPacks().toList()) key = 31 * key + pack.packId().hashCode();
 		if (key == visualSettingsKey) return;
 		visualSettingsKey = key;
+		for (DecodedTile tile : TILES.values()) tile.resolveSamples();
 		for (ClientRegion region : REGIONS.values()) region.revision++;
 	}
 
@@ -399,11 +611,10 @@ public final class WorldMapClientTileCache {
 
 	private static boolean startRequest() {
 		if (!haveViewBounds || inFlightRequestId != 0) return false;
-		long now = System.nanoTime();
 		PriorityQueue<TileDistance> nearest = new PriorityQueue<>(Comparator.comparingDouble(TileDistance::distanceSquared).reversed());
 		for (int z = lastMinChunkZ; z <= lastMaxChunkZ; z++) for (int x = lastMinChunkX; x <= lastMaxChunkX; x++) {
-			long key = ChunkPos.pack(x, z); if (TILES.containsKey(key)) continue;
-			Long at = REQUESTED.get(key); if (at != null && now - at < RETRY_NANOS && now >= at) continue;
+			long key = ChunkPos.pack(x, z); if (VALIDATED.contains(key) || KNOWN_ABSENT.contains(key)) continue;
+			if (!TILES.containsKey(key) && DiskCache.hasTile(key)) continue;
 			double dx = x * CHUNK + 8 - lastCenterX, dz = z * CHUNK + 8 - lastCenterZ;
 			nearest.add(new TileDistance(key, dx * dx + dz * dz));
 			if (nearest.size() > WorldMapTileRequestMessage.MAX_POSITIONS) nearest.poll();
@@ -411,16 +622,24 @@ public final class WorldMapClientTileCache {
 		if (nearest.isEmpty()) return false;
 		List<TileDistance> ordered = new ArrayList<>(nearest); ordered.sort(Comparator.comparingDouble(TileDistance::distanceSquared));
 		long[] positions = new long[ordered.size()];
-		for (int i = 0; i < ordered.size(); i++) { positions[i] = ordered.get(i).position; REQUESTED.put(positions[i], now); }
+		long[] capturedTimes = new long[ordered.size()];
+		for (int i = 0; i < ordered.size(); i++) {
+			positions[i] = ordered.get(i).position;
+			DecodedTile tile = TILES.get(positions[i]); capturedTimes[i] = tile == null ? -1L : tile.capturedGameTime;
+		}
 		int id = nextRequestId++; if (nextRequestId <= 0) nextRequestId = 1;
-		inFlightRequestId = id; inFlightGeneration = viewGeneration;
-		ClientPacketDistributor.sendToServer(new WorldMapTileRequestMessage(id, positions)); return true;
+		inFlightRequestId = id; inFlightGeneration = viewGeneration; inFlightPositions = positions; requestedTiles += positions.length;
+		ClientPacketDistributor.sendToServer(new WorldMapTileRequestMessage(id, positions, capturedTimes)); return true;
 	}
 
 	private static void trimTiles() {
 		Iterator<DecodedTile> it = TILES.values().iterator();
 		while (TILES.size() > MAX_TILES && it.hasNext()) {
-			DecodedTile tile = it.next(); it.remove();
+			DecodedTile tile = it.next();
+			int prefetchChunks = PREFETCH_REGIONS * REGION_CHUNKS;
+			if (haveViewBounds && tile.chunkX >= lastMinChunkX - prefetchChunks && tile.chunkX <= lastMaxChunkX + prefetchChunks
+				&& tile.chunkZ >= lastMinChunkZ - prefetchChunks && tile.chunkZ <= lastMaxChunkZ + prefetchChunks) continue;
+			it.remove();
 			regionForChunk(tile.chunkX, tile.chunkZ).setPresent(tile.chunkX, tile.chunkZ, false); invalidate(tile.chunkX, tile.chunkZ);
 		}
 	}
@@ -446,9 +665,9 @@ public final class WorldMapClientTileCache {
 		if (now - lastDiagnostic < DIAGNOSTIC_NANOS) return;
 		long cpu = TILES.size() * 256L * 29, gpu = 0; for (ClientRegion r : REGIONS.values()) gpu += r.gpuBytes();
 		double ms = frames == 0 ? 0 : renderNanos / 1_000_000.0 / frames;
-		WitchercraftMod.LOGGER.debug("World map renderer: decoded_tiles={}, cpu_kib={}, gpu_regions={}, gpu_kib={}, lod={}, rebuilds={}, uploads={}, draw_calls={}, avg_render_ms={}",
-			TILES.size(), cpu / 1024, REGIONS.size(), gpu / 1024, selectedLod, rebuilds, uploads, draws, String.format(Locale.ROOT, "%.3f", ms));
-		rebuilds = uploads = draws = frames = renderNanos = 0; lastDiagnostic = now;
+		WitchercraftMod.LOGGER.debug("World map renderer: decoded_tiles={}, cpu_kib={}, gpu_leaves={}, gpu_kib={}, lod={}, requested_tiles={}, pending_builds={}, completed_builds={}, superseded_builds={}, rebuilds={}, uploads={}, draw_calls={}, avg_render_ms={}",
+			TILES.size(), cpu / 1024, REGIONS.size(), gpu / 1024, selectedLod, requestedTiles, pendingBuilds, completedBuilds, staleBuilds, rebuilds, uploads, draws, String.format(Locale.ROOT, "%.3f", ms));
+		requestedTiles = completedBuilds = staleBuilds = rebuilds = uploads = draws = frames = renderNanos = 0; lastDiagnostic = now;
 	}
 	private static int argbToAbgr(int c) { return c & 0xFF00FF00 | (c & 0x00FF0000) >> 16 | (c & 0xFF) << 16; }
 
@@ -458,20 +677,207 @@ public final class WorldMapClientTileCache {
 	private record LayerSample(int argb, double opacity) {}
 	private record Sample(int argb, int height, boolean water, boolean foliage) {}
 	private record RetiredTexture(Identifier id, long releaseFrame) {}
-	private record DecodedTile(int chunkX, int chunkZ, short[] groundHeights, byte[] groundColors, byte[] groundTintKinds, int[] groundTints,
-		short[] foliageHeights, byte[] foliageColors, byte[] foliageTintKinds, int[] foliageTints, short[] waterHeights, int[] waterTints,
-		byte[] decorationKinds, byte[] decorationColors, byte[] decorationTintKinds, int[] decorationTints,
-		String[] blockStatePalette, short[] groundStateIndices, short[] foliageStateIndices, short[] decorationStateIndices) {}
+	private record CompletedBuild(int x, int z, int lod, long revision, long generation, boolean diskOnly, NativeImage image) {}
+	private record RenderSettings(double brightness, double hillshadeStrength, double slopeSensitivity, double canopyReliefStrength, double canopyShadowStrength) {
+		static RenderSettings capture() {
+			return new RenderSettings(WorldMapClientConfig.terrainBrightness(), WorldMapClientConfig.hillshadeStrength(), WorldMapClientConfig.hillshadeSlopeSensitivity(),
+				WorldMapClientConfig.canopyReliefStrength(), WorldMapClientConfig.canopyShadowStrength());
+		}
+		int shade(Sample sample, int northHeight, int northwestHeight, boolean canopyRelief, int canopyShadowDifference) {
+			if (sample.argb == 0) return 0;
+			int northBand = slopeBand(sample.height - northHeight, slopeSensitivity);
+			int northwestBand = slopeBand(sample.height - northwestHeight, slopeSensitivity);
+			double strength = hillshadeStrength * (sample.water ? 0.35 : 1.0);
+			if (canopyRelief) strength *= canopyReliefStrength;
+			double factor = 1.0 + (northBand * 0.12 + northwestBand * 0.06) * strength;
+			factor = Math.max(0.65, Math.min(1.35, factor));
+			if (canopyShadowDifference > 0) {
+				double shadow = canopyShadowStrength * Math.min(1.0, canopyShadowDifference / 12.0);
+				factor = Math.max(0.5, factor * (1.0 - shadow));
+			}
+			return scaleColor(sample.argb, factor * brightness);
+		}
+	}
+	private record RegionSnapshot(int x, int z, long revision, long generation, Map<Long, DecodedTile> tiles, RenderSettings settings, Path imageTarget, long[] coverage) {
+		Sample sampleAt(int wx, int wz) {
+			DecodedTile tile = tiles.get(ChunkPos.pack(Math.floorDiv(wx, CHUNK), Math.floorDiv(wz, CHUNK)));
+			if (tile == null) return null;
+			return tile.samples[Math.floorMod(wx, CHUNK) + Math.floorMod(wz, CHUNK) * CHUNK];
+		}
+	}
+	private record CachedRegion(int x, int z, long settingsKey, long generation, boolean stale, String loadingKey, NativeImage image) {}
+	private record CachedTile(long position, WorldMapTerrainTile tile, long generation) {}
+	private static final class DecodedTile {
+		final int chunkX, chunkZ; final long capturedGameTime; final short[] groundHeights; final byte[] groundColors, groundTintKinds; final int[] groundTints;
+		final short[] foliageHeights; final byte[] foliageColors, foliageTintKinds; final int[] foliageTints;
+		final short[] waterHeights; final int[] waterTints; final byte[] decorationKinds, decorationColors, decorationTintKinds; final int[] decorationTints;
+		final String[] blockStatePalette; final short[] groundStateIndices, foliageStateIndices, decorationStateIndices; volatile Sample[] samples;
+		DecodedTile(int chunkX, int chunkZ, long capturedGameTime, short[] groundHeights, byte[] groundColors, byte[] groundTintKinds, int[] groundTints,
+			short[] foliageHeights, byte[] foliageColors, byte[] foliageTintKinds, int[] foliageTints, short[] waterHeights, int[] waterTints,
+			byte[] decorationKinds, byte[] decorationColors, byte[] decorationTintKinds, int[] decorationTints, String[] blockStatePalette,
+			short[] groundStateIndices, short[] foliageStateIndices, short[] decorationStateIndices) {
+			this.chunkX=chunkX; this.chunkZ=chunkZ; this.capturedGameTime=capturedGameTime; this.groundHeights=groundHeights; this.groundColors=groundColors; this.groundTintKinds=groundTintKinds; this.groundTints=groundTints;
+			this.foliageHeights=foliageHeights; this.foliageColors=foliageColors; this.foliageTintKinds=foliageTintKinds; this.foliageTints=foliageTints;
+			this.waterHeights=waterHeights; this.waterTints=waterTints; this.decorationKinds=decorationKinds; this.decorationColors=decorationColors;
+			this.decorationTintKinds=decorationTintKinds; this.decorationTints=decorationTints; this.blockStatePalette=blockStatePalette;
+			this.groundStateIndices=groundStateIndices; this.foliageStateIndices=foliageStateIndices; this.decorationStateIndices=decorationStateIndices;
+		}
+		void resolveSamples() {
+			Sample[] resolved = new Sample[WorldMapTerrainTile.SAMPLE_COUNT];
+			for (int i = 0; i < resolved.length; i++) resolved[i] = columnSample(this, i);
+			samples = resolved;
+		}
+	}
+	private static final class DiskCache {
+		private static final ExecutorService IO = Executors.newFixedThreadPool(2, task -> {
+			Thread thread = new Thread(task, "WitcherCraft world map cache I/O"); thread.setDaemon(true); return thread;
+		});
+		private static final ExecutorService WRITES = Executors.newSingleThreadExecutor(task -> {
+			Thread thread = new Thread(task, "WitcherCraft world map cache writer"); thread.setDaemon(true); return thread;
+		});
+		private static final Set<Long> tiles = ConcurrentHashMap.newKeySet();
+		private static final Set<Long> loadingTiles = ConcurrentHashMap.newKeySet();
+		private static final Set<String> loadingRegions = ConcurrentHashMap.newKeySet();
+		private static final Object[] regionFileLocks = new Object[64];
+		private static volatile Path root;
+		private static volatile boolean configured, ready;
+		private static long serial;
+		static { Arrays.setAll(regionFileLocks, ignored -> new Object()); }
+
+		static synchronized void configure(UUID worldId, UUID playerId, long generation) {
+			Path next = Minecraft.getInstance().gameDirectory.toPath().resolve("witchercraft-map-cache").resolve("v1")
+				.resolve(worldId.toString()).resolve(playerId.toString()).resolve("overworld");
+			if (configured && next.equals(root)) return;
+			root = next; configured = true; ready = false; tiles.clear(); loadingTiles.clear(); loadingRegions.clear();
+			long scanSerial = ++serial;
+			IO.execute(() -> scan(next, scanSerial));
+		}
+
+		private static void scan(Path expectedRoot, long expectedSerial) {
+			Set<Long> found = new HashSet<>();
+			Path tileRoot = expectedRoot.resolve("tiles");
+			if (Files.isDirectory(tileRoot)) try (var paths = Files.walk(tileRoot)) {
+				paths.filter(Files::isRegularFile).forEach(path -> {
+					String[] parts = path.getFileName().toString().split("\\.");
+					if (parts.length != 4 || !parts[0].equals("c") || !parts[3].equals("wct")) return;
+					try { found.add(ChunkPos.pack(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]))); }
+					catch (NumberFormatException ignored) {}
+				});
+			} catch (IOException exception) {
+				WitchercraftMod.LOGGER.warn("Cannot scan world map client cache {}", tileRoot, exception);
+			}
+			synchronized (DiskCache.class) {
+				if (serial != expectedSerial || !Objects.equals(root, expectedRoot)) return;
+				tiles.addAll(found); ready = true;
+			}
+			long files=0,bytes=0;
+			if(Files.isDirectory(expectedRoot))try(var paths=Files.walk(expectedRoot)){for(Path path:paths.filter(Files::isRegularFile).toList()){files++;try{bytes+=Files.size(path);}catch(IOException ignored){}}}catch(IOException ignored){}
+			WitchercraftMod.LOGGER.info("World map client cache ready: tiles={}, files={}, size_mib={}",found.size(),files,String.format(Locale.ROOT,"%.2f",bytes/1048576.0));
+		}
+
+		static boolean readyOrUnconfigured() { return !configured || ready; }
+		static boolean hasTile(long key) { return configured && tiles.contains(key); }
+
+		static void updateVisible(int minX, int maxX, int minZ, int maxZ, double centerX, double centerZ, long settingsKey, long generation) {
+			Path currentRoot = root; if (!configured || !ready || currentRoot == null) return;
+			int minRX=Math.floorDiv(minX,REGION_CHUNKS)-PREFETCH_REGIONS,maxRX=Math.floorDiv(maxX,REGION_CHUNKS)+PREFETCH_REGIONS,minRZ=Math.floorDiv(minZ,REGION_CHUNKS)-PREFETCH_REGIONS,maxRZ=Math.floorDiv(maxZ,REGION_CHUNKS)+PREFETCH_REGIONS;
+			List<int[]> regions = new ArrayList<>();
+			for(int z=minRZ;z<=maxRZ;z++)for(int x=minRX;x<=maxRX;x++)regions.add(new int[]{x,z});
+			regions.sort(Comparator.comparingDouble(p -> { double dx=(p[0]+0.5)*REGION-centerX,dz=(p[1]+0.5)*REGION-centerZ; return dx*dx+dz*dz; }));
+			for(int[] region:regions) {
+				Path path=regionPath(region[0],region[1],settingsKey); String key=path.toString();
+				ClientRegion inMemory=REGIONS.get(ChunkPos.pack(region[0],region[1]));
+				if(inMemory!=null&&inMemory.textures[0]!=null)continue;
+				if(!Files.isRegularFile(path)||!loadingRegions.add(key))continue;
+				IO.execute(() -> loadRegion(path,region[0],region[1],settingsKey,generation,key));
+			}
+			PriorityQueue<TileDistance> nearest=new PriorityQueue<>(Comparator.comparingDouble(TileDistance::distanceSquared).reversed());
+			int prefetchMinX=minRX*REGION_CHUNKS,prefetchMaxX=(maxRX+1)*REGION_CHUNKS-1,prefetchMinZ=minRZ*REGION_CHUNKS,prefetchMaxZ=(maxRZ+1)*REGION_CHUNKS-1;
+			for(int z=prefetchMinZ;z<=prefetchMaxZ;z++)for(int x=prefetchMinX;x<=prefetchMaxX;x++){
+				long key=ChunkPos.pack(x,z); if(!tiles.contains(key)||TILES.containsKey(key)||loadingTiles.contains(key))continue;
+				double dx=x*CHUNK+8-centerX,dz=z*CHUNK+8-centerZ;nearest.add(new TileDistance(key,dx*dx+dz*dz));if(nearest.size()>256)nearest.poll();
+			}
+			for(TileDistance candidate:nearest)if(loadingTiles.add(candidate.position))IO.execute(() -> loadTile(currentRoot,candidate.position,generation));
+		}
+
+		private static void loadRegion(Path path,int x,int z,long settingsKey,long generation,String loadingKey) {
+			try {
+				synchronized(regionFileLock(path)) {
+					long[] savedCoverage=readCoverage(path);
+					long[] currentCoverage=coverageFromIndex(x,z);
+					boolean stale=savedCoverage==null||!Arrays.equals(savedCoverage,currentCoverage);
+					try(InputStream input=Files.newInputStream(path)){
+						NativeImage image=NativeImage.read(input);
+						if(image.getWidth()!=REGION||image.getHeight()!=REGION){image.close();throw new IOException("Unexpected world-map leaf size");}
+						CACHED_REGIONS.add(new CachedRegion(x,z,settingsKey,generation,stale,loadingKey,image));
+					}
+					if(stale)STALE_CACHED_REGIONS.add(ChunkPos.pack(x,z));
+				}
+			}
+			catch(IOException|RuntimeException exception){ loadingRegions.remove(loadingKey);try{Files.deleteIfExists(path);}catch(IOException ignored){} }
+		}
+
+		static void finishedRegionLoad(String loadingKey){loadingRegions.remove(loadingKey);}
+
+		private static void loadTile(Path expectedRoot,long key,long generation) {
+			ChunkPos pos=ChunkPos.unpack(key);
+			Path path=tilePath(expectedRoot,pos.x(),pos.z());
+			boolean queued=false;
+			try { Optional<WorldMapTerrainTile> loaded=WorldMapTerrainTile.read(path,pos.x(),pos.z());
+				if(loaded.isPresent()){CACHED_TILES.add(new CachedTile(key,loaded.get(),generation));queued=true;}
+				else{tiles.remove(key);try{Files.deleteIfExists(path);}catch(IOException ignored){}CACHE_MISSES.add(key);}
+			}
+			finally { if(!queued)loadingTiles.remove(key); }
+		}
+
+		static void finishedTileLoad(long position){loadingTiles.remove(position);}
+
+		static void saveTile(WorldMapTerrainTile tile) {
+			Path currentRoot=root;if(!configured||currentRoot==null)return; long key=ChunkPos.pack(tile.chunkX(),tile.chunkZ());tiles.add(key);
+			WRITES.execute(() -> { try{tile.writeAtomically(tilePath(currentRoot,tile.chunkX(),tile.chunkZ()));}catch(IOException exception){WitchercraftMod.LOGGER.warn("Cannot save world map client tile {},{}",tile.chunkX(),tile.chunkZ(),exception);} });
+		}
+
+		static Path regionPath(int x,int z,long settingsKey) {
+			Path currentRoot=root; return currentRoot==null?null:currentRoot.resolve("leaves-v1").resolve("l."+x+"."+z+"."+Long.toUnsignedString(settingsKey,16)+".png");
+		}
+
+		static void writeRegion(Path target,NativeImage image,long[] coverage) {
+			synchronized(regionFileLock(target)) { try { Files.createDirectories(target.getParent()); Path temporary=target.resolveSibling(target.getFileName()+".tmp-"+UUID.randomUUID()); image.writeToFile(temporary);
+				try{Files.move(temporary,target,StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING);}catch(AtomicMoveNotSupportedException ignored){Files.move(temporary,target,StandardCopyOption.REPLACE_EXISTING);}
+				Path coverageTarget=coveragePath(target),coverageTemporary=coverageTarget.resolveSibling(coverageTarget.getFileName()+".tmp-"+UUID.randomUUID());
+				try(DataOutputStream output=new DataOutputStream(new BufferedOutputStream(Files.newOutputStream(coverageTemporary)))){output.writeInt(0x57434D43);output.writeInt(2);for(int i=0;i<4;i++)output.writeLong(i<coverage.length?coverage[i]:0L);}
+				try{Files.move(coverageTemporary,coverageTarget,StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING);}catch(AtomicMoveNotSupportedException ignored){Files.move(coverageTemporary,coverageTarget,StandardCopyOption.REPLACE_EXISTING);} }
+			catch(IOException exception){WitchercraftMod.LOGGER.warn("Cannot save world map client region {}",target,exception);} }
+		}
+
+		private static Object regionFileLock(Path image){return regionFileLocks[Math.floorMod(image.toAbsolutePath().normalize().hashCode(),regionFileLocks.length)];}
+		private static Path coveragePath(Path image){return image.resolveSibling(image.getFileName()+".coverage");}
+		private static long[] readCoverage(Path image)throws IOException{
+			Path path=coveragePath(image);if(!Files.isRegularFile(path))return null;
+			try(DataInputStream input=new DataInputStream(new BufferedInputStream(Files.newInputStream(path)))){
+				if(input.readInt()!=0x57434D43||input.readInt()!=2)return null;long[] result=new long[4];for(int i=0;i<4;i++)result[i]=input.readLong();return result;
+			}
+		}
+		private static long[] coverageFromIndex(int regionX,int regionZ){
+			BitSet result=new BitSet(REGION_CHUNKS*REGION_CHUNKS);int firstX=regionX*REGION_CHUNKS,firstZ=regionZ*REGION_CHUNKS;
+			for(int z=0;z<REGION_CHUNKS;z++)for(int x=0;x<REGION_CHUNKS;x++)if(tiles.contains(ChunkPos.pack(firstX+x,firstZ+z)))result.set(x+z*REGION_CHUNKS);
+			return Arrays.copyOf(result.toLongArray(),4);
+		}
+
+		private static Path tilePath(Path base,int x,int z){return base.resolve("tiles").resolve("r."+(x>>5)+"."+(z>>5)).resolve("c."+x+"."+z+".wct");}
+		static synchronized void clear(){root=null;configured=false;ready=false;tiles.clear();loadingTiles.clear();loadingRegions.clear();serial++;}
+	}
 	private record RegionTexture(Identifier id) {}
 	private static final class ClientRegion {
 		final int x, z; final BitSet presentChunks = new BitSet(REGION_CHUNKS * REGION_CHUNKS);
-		final RegionTexture[] textures = new RegionTexture[LOD_COUNT]; final long[] builtRevisions = new long[LOD_COUNT]; long revision = 1, lastUsedFrame = Long.MIN_VALUE;
+		final RegionTexture[] textures = new RegionTexture[LOD_COUNT]; final long[] builtRevisions = new long[LOD_COUNT], queuedRevisions = new long[LOD_COUNT]; long revision = 1, lastUsedFrame = Long.MIN_VALUE;
 		ClientRegion(int x, int z) { this.x = x; this.z = z; }
 		void setPresent(int chunkX, int chunkZ, boolean present) {
 			presentChunks.set(Math.floorMod(chunkX, REGION_CHUNKS) + Math.floorMod(chunkZ, REGION_CHUNKS) * REGION_CHUNKS, present);
 		}
-		boolean needsBuild(int lod) { return builtRevisions[lod] != revision; }
-		RegionTexture current(int lod) { return builtRevisions[lod] == revision ? textures[lod] : null; }
+		boolean needsBuild(int lod) { return builtRevisions[lod] != revision && queuedRevisions[lod] != revision; }
+		RegionTexture current(int lod) { return textures[lod]; }
+		double distanceSquared(double centerX, double centerZ) { double dx=(x+0.5)*REGION-centerX,dz=(z+0.5)*REGION-centerZ; return dx*dx+dz*dz; }
 		long gpuBytes() { long n = 0; for (int i = 0; i < LOD_COUNT; i++) if (textures[i] != null) { long s = REGION >> i; n += s * s * 4; } return n; }
 		void retireTextures() { for (int i = 0; i < LOD_COUNT; i++) if (textures[i] != null) { retireTexture(textures[i].id); textures[i] = null; } }
 	}

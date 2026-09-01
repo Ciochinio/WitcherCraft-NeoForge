@@ -27,6 +27,7 @@ import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.level.ChunkWatchEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
@@ -67,36 +68,65 @@ public final class WorldMapTerrainCapture {
 	private WorldMapTerrainCapture() {
 	}
 
+	@SubscribeEvent
+	public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
+		if (event.getEntity() instanceof ServerPlayer player && player.level() instanceof ServerLevel level) {
+			ServerState state = SERVERS.computeIfAbsent(level.getServer(), ServerState::new);
+			PacketDistributor.sendToPlayer(player, new WorldMapTileRequestCompleteMessage(0, true, state.worldId));
+		}
+	}
+
 	/** Validate and asynchronously read a bounded batch requested by a client. */
-	public static void requestTiles(ServerPlayer player, int requestId, long[] packedPositions) {
+	public static void requestTiles(ServerPlayer player, int requestId, long[] packedPositions, long[] capturedTimes) {
 		if (requestId <= 0)
 			return;
-		if (!(player.level() instanceof ServerLevel level) || !level.dimension().equals(Level.OVERWORLD) || packedPositions.length == 0 || packedPositions.length > 64) {
-			PacketDistributor.sendToPlayer(player, new WorldMapTileRequestCompleteMessage(requestId));
+		if (!(player.level() instanceof ServerLevel level) || !level.dimension().equals(Level.OVERWORLD) || packedPositions.length == 0 || packedPositions.length > 64 || capturedTimes.length != packedPositions.length) {
+			PacketDistributor.sendToPlayer(player, new WorldMapTileRequestCompleteMessage(requestId, true));
 			return;
 		}
 		ServerState state = SERVERS.computeIfAbsent(level.getServer(), ServerState::new);
 		if (!state.allowRequests(player.getUUID(), packedPositions.length)) {
-			PacketDistributor.sendToPlayer(player, new WorldMapTileRequestCompleteMessage(requestId));
+			PacketDistributor.sendToPlayer(player, new WorldMapTileRequestCompleteMessage(requestId, false, state.worldId));
 			return;
 		}
 		java.util.List<CompletableFuture<Optional<WorldMapTerrainTile>>> reads = new java.util.ArrayList<>();
 		Set<Long> unique = new HashSet<>();
-		for (long packed : packedPositions) {
+		for (int requestIndex = 0; requestIndex < packedPositions.length; requestIndex++) {
+			long packed = packedPositions[requestIndex];
 			if (!unique.add(packed))
 				continue;
 			ChunkPos pos = ChunkPos.unpack(packed);
 			if (!state.isExplored(level, player.getUUID(), packed))
 				continue;
-			reads.add(CompletableFuture.<Optional<WorldMapTerrainTile>>supplyAsync(() -> WorldMapTerrainTile.read(tilePath(level.getServer(), level.dimension(), pos), pos.x(), pos.z()), Util.ioPool()).exceptionally(exception -> Optional.empty()));
+			long knownTime = capturedTimes[requestIndex];
+			reads.add(CompletableFuture.<Optional<WorldMapTerrainTile>>supplyAsync(() -> WorldMapTerrainTile.read(tilePath(level.getServer(), level.dimension(), pos), pos.x(), pos.z())
+				.filter(tile -> tile.capturedGameTime() > knownTime), Util.ioPool()).exceptionally(exception -> Optional.empty()));
 		}
 		CompletableFuture.allOf(reads.toArray(CompletableFuture[]::new)).thenRun(() -> level.getServer().execute(() -> {
 			if (player.hasDisconnected())
 				return;
 			for (CompletableFuture<Optional<WorldMapTerrainTile>> read : reads)
 				read.join().ifPresent(tile -> PacketDistributor.sendToPlayer(player, WorldMapTileDataMessage.from(tile)));
-			PacketDistributor.sendToPlayer(player, new WorldMapTileRequestCompleteMessage(requestId));
+			PacketDistributor.sendToPlayer(player, new WorldMapTileRequestCompleteMessage(requestId, true, state.worldId));
 		}));
+	}
+
+	private static UUID readOrCreateWorldId(Path path) {
+		try {
+			if (Files.isRegularFile(path)) {
+				String value = Files.readString(path).trim();
+				return UUID.fromString(value);
+			}
+			UUID created = UUID.randomUUID();
+			Files.createDirectories(path.getParent());
+			Path temporary = path.resolveSibling(path.getFileName() + ".tmp-" + UUID.randomUUID());
+			Files.writeString(temporary, created.toString());
+			try { Files.move(temporary, path, StandardCopyOption.ATOMIC_MOVE); }
+			catch (AtomicMoveNotSupportedException ignored) { Files.move(temporary, path); }
+			return created;
+		} catch (IOException | IllegalArgumentException exception) {
+			throw new IllegalStateException("Cannot establish WitcherCraft world-map identity", exception);
+		}
 	}
 
 	@SubscribeEvent
@@ -219,6 +249,10 @@ public final class WorldMapTerrainCapture {
 		return dimensionRoot(server, dimension).resolve("exploration").resolve(playerId + ".wce");
 	}
 
+	private static Path identityPath(MinecraftServer server) {
+		return server.getWorldPath(LevelResource.ROOT).resolve("data").resolve("witchercraft_world_map_identity.dat");
+	}
+
 	private record PendingChunk(ResourceKey<Level> dimension, long chunkPos, long distanceSquared, long sequence) {
 	}
 
@@ -227,6 +261,7 @@ public final class WorldMapTerrainCapture {
 
 	private static final class ServerState {
 		private final MinecraftServer server;
+		private final UUID worldId;
 		private final PriorityQueue<PendingChunk> queue = new PriorityQueue<>(Comparator.comparingLong(PendingChunk::distanceSquared).thenComparingLong(PendingChunk::sequence));
 		private final Set<String> queued = new HashSet<>();
 		private final Map<PlayerKey, ExplorationMask> exploration = new HashMap<>();
@@ -241,6 +276,7 @@ public final class WorldMapTerrainCapture {
 
 		private ServerState(MinecraftServer server) {
 			this.server = server;
+			this.worldId = readOrCreateWorldId(identityPath(server));
 		}
 
 		private void enqueue(ServerLevel level, ChunkPos pos, ChunkPos playerPos) {

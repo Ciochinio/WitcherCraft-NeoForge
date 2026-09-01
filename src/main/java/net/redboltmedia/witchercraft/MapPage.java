@@ -40,6 +40,10 @@ public final class MapPage implements GuiPage {
 
 	@Override
 	public void onShown() {
+		zoom = 1.0;
+		targetZoom = 1.0;
+		zoomAnimating = false;
+		dragging = false;
 		centerOnPlayer();
 		WorldMapClientTileCache.markViewDirty();
 	}
