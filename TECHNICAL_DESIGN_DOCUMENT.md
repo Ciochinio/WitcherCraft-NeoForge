@@ -1142,8 +1142,14 @@ client publishes the completed authorized snapshot instead of leaving the leaf b
 combined follow-up. An older GPU texture remains visible until its replacement is ready, and the render
 thread registers at most four completed build textures per frame.
 
-Every zoom level uses the full-resolution image, so zooming cannot replace structures and shorelines
-with box-averaged pixels. A tile arriving on a leaf's east or south dependency edge also dirties the
+At 0.65x zoom and below, the renderer selects a persistent overview tier. Each overview covers 256 by
+256 world blocks in a 256 by 256 texture, retaining one texture pixel per world block. It returns to
+64-block leaves above 0.85x. The gap between thresholds supplies hysteresis
+during animated zoom. At overview scale the viewport needs tens of draw calls instead of hundreds.
+An existing overview renders behind detailed leaves during zoom-in, and existing leaves fill a missing
+overview until its replacement is ready. Overview builds use the same worker, revision, atomic PNG,
+coverage-sidecar, resource-pack key, and publish-then-follow-up rules as leaf builds.
+A tile arriving on a leaf's east or south dependency edge also dirties the
 neighboring leaf that reads its height for west or north shading.
 
 Version 4 terrain tiles add a palette of serialized block states plus palette indices for ground,
@@ -1215,10 +1221,11 @@ preserved user-code block. The locked config class resolves the active mod conta
 a `ModContainer` parameter to the generated constructor because MCreator removes that signature change
 during regeneration while preserving the user-code body.
 
-All leaf screen edges come from one origin, `viewportCenter - mapCenter * zoom`, and the edge's world
-coordinate. Adjacent leaves therefore calculate the same shared pixel edge. The 26.1.2 long `blit`
-overload receives independent destination, source, and texture dimensions, so each selected leaf image
-uses UV coordinates zero through one exactly once at every supported zoom.
+The 26.1.2 long `blit` overload receives matching destination, source, and texture dimensions. Terrain rendering applies one
+floating-point pose transform to every visible page: translate to viewport center, scale by the exact zoom,
+then translate by the exact map-center offset from a nearby 256-block anchor. Pages use integer coordinates
+relative to that anchor, which avoids large-coordinate float precision loss. The shared transform keeps pan
+and zoom subpixel-continuous and prevents adjacent pages from acquiring independently rounded widths.
 
 The decoded cache and the 512-entry GPU leaf cache have separate limits. The visible viewport may
 temporarily exceed the leaf limit because a leaf referenced by the current GUI extraction cannot be
@@ -1249,6 +1256,8 @@ The load area extends by four leaves, or 256 blocks, beyond every viewport edge.
 the build queue first, followed by prefetched leaves ordered by distance from the view center. Loading
 raw cached tiles still revises their leaf. This repairs an image saved while that leaf was only partly
 populated. A valid GPU texture remains visible until the combined replacement build finishes.
+At overview zoom the disk scheduler loads one complete overview beyond each viewport edge. Disk discovery
+is paced to four passes per second instead of walking the visible tile rectangle every render frame.
 
 Each authorized network tile is written atomically using the version-four terrain format and its CRC.
 Each finished leaf image is written through a temporary PNG and atomic replacement. Leaf

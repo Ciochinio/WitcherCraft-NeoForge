@@ -614,7 +614,9 @@ sparse flower sprites remain visible when one world column becomes one map pixel
 unresolved textures retain a 75 percent fallback.
 Ground remains opaque, and biome-colored water keeps its separate seabed composite. Terrain relief compares each visible height with its northern and northwestern
 neighbors and applies stepped light or dark shading. Players can configure the height-difference sensitivity
-separately from the brightness contrast. The terrain image remains at one block per texture pixel at every zoom level.
+separately from the brightness contrast. Every zoom uses one terrain texture pixel per world block. Zoomed-out
+views group those pixels into persistent 256-block overview pages, reducing draw calls without reducing source
+resolution.
 Unexplored chunks and captured tiles that have not arrived yet remain hidden by the black map background.
 Each time the map page opens, it centers on the player at 1.00x zoom. Zoom changes made during that view
 do not carry into the next opening.
@@ -631,6 +633,12 @@ short delay and written as a finished leaf image in the background, without allo
 Deleting or corrupting the client cache loses no permanent exploration data because the server can send
 authorized terrain again. Decoded terrain and uploaded leaf images remain separately bounded in memory,
 so long journeys do not keep every visited area in RAM or GPU memory.
+Below 0.65x zoom the map draws overview pages instead of hundreds of leaves. It returns to leaves above
+0.85x, so animated zoom cannot repeatedly switch detail levels near the boundary. An available overview
+stays behind detailed leaves during zoom and movement, while existing leaves temporarily fill an overview
+that is still being built. Terrain therefore does not disappear while asynchronous cache work catches up.
+Terrain pages share one floating-point transform for pan and zoom. Page positions and sizes are not rounded
+independently, so fractional camera movement stays continuous and adjacent page edges remain aligned.
 
 Opening the map still pauses single-player once every chunk in its current view has been checked. A new
 view resumes the integrated server while its bounded request chain runs. At distant zoom this can take
