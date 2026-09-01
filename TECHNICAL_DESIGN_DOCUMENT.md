@@ -1272,10 +1272,29 @@ populated. A valid GPU texture remains visible until the combined replacement bu
 At overview zoom the disk scheduler loads one complete overview beyond each viewport edge. Disk discovery
 is paced to four passes per second instead of walking the visible tile rectangle every render frame.
 
-Each authorized network tile is compressed on the single cache writer. The writer replaces its entry in the
-4 by 4-chunk terrain container and atomically replaces that small container. Existing compressed entries are
-copied without decompression or recompression. An unreadable container is disposable and the next tile write
-starts a valid replacement; the server can resend its other authorized tiles.
+#### `.wcr` authoring lifecycle
+
+Players and pack authors never create `.wcr` files. They are private client cache files authored by
+`WorldMapClientTileCache` through `WorldMapTerrainTile`. Creation starts only after the client accepts an
+authorized `WorldMapTileDataMessage` from the server. The client makes the tile available to the renderer,
+then submits its disk work to the single cache-writer thread. Map rendering never waits for this write.
+
+The writer creates or updates a container as follows:
+
+1. It calculates the container coordinates with floor division of the chunk coordinates by four. This also
+   assigns negative chunk coordinates correctly. The local floor-modulo coordinates select one of 16 entries.
+2. It reads and validates the existing `r.<region X>.<region Z>.wcr`, if present. The writer retains the other
+   entries in their compressed form. If the existing file is unreadable, it starts a fresh container because
+   the server can resend authorized tiles lost with the damaged cache file.
+3. It serializes the new chunk as a version-four `WorldMapTerrainTile`, including the tile CRC, then deflates
+   that byte sequence. It replaces only the selected entry in the in-memory container table.
+4. It writes the container header, the 16 compressed-entry lengths, every present compressed entry, and the
+   container CRC to a uniquely named temporary file beside the destination.
+5. It atomically replaces the destination with the temporary file. If the filesystem does not support an
+   atomic move, it uses a replacing move after the temporary file has finished writing.
+
+The `.wcr` file stores no finished pixels. Leaf and overview builders read its terrain tiles when a cached PNG
+is absent or stale. They produce the PNG and coverage sidecar through their separate background path.
 Each finished leaf image is written through a temporary PNG and atomic replacement. Leaf
 filenames include the terrain visual-settings key and ordered active resource-pack IDs. A settings or
 resource-pack change selects a different cached image and rebuilds from raw tiles. Every PNG has a
