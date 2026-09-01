@@ -12,12 +12,20 @@ public final class MapPage implements GuiPage {
 	private static final double MIN_ZOOM = 0.25;
 	private static final double MAX_ZOOM = 16.0;
 	private static final double ZOOM_STEP = 1.25;
+	private static final double ZOOM_EASING = 0.22;
+	private static final double ZOOM_SNAP_EPSILON = 0.0005;
 	private static final int MARKER_BASE_SIZE = 16;
 	private static final Identifier PLAYER_MARKER = Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "textures/gui/map/player_arrow.png");
 
 	private double centerX;
 	private double centerZ;
 	private double zoom = 1.0;
+	private double targetZoom = 1.0;
+	private double zoomAnchorX;
+	private double zoomAnchorZ;
+	private double zoomAnchorScreenX;
+	private double zoomAnchorScreenY;
+	private boolean zoomAnimating;
 	private boolean dragging;
 
 	@Override
@@ -47,6 +55,7 @@ public final class MapPage implements GuiPage {
 		int vx = x + MapLayout.VIEW_X, vy = y + MapLayout.VIEW_Y;
 		int vw = Math.min(MapLayout.VIEW_W, w - MapLayout.VIEW_X);
 		int vh = Math.min(MapLayout.VIEW_H, h - MapLayout.VIEW_Y);
+		animateZoom(vx, vy, vw, vh);
 		g.fill(vx, vy, vx + vw, vy + vh, MapLayout.VIEW_BG);
 		g.enableScissor(vx, vy, vx + vw, vy + vh);
 		WorldMapClientTileCache.renderAndRequest(g, vx, vy, vw, vh, centerX, centerZ, zoom);
@@ -87,11 +96,11 @@ public final class MapPage implements GuiPage {
 			return true;
 		}
 		if (inside(mouseX, mouseY, bx + MapLayout.ZOOM_OUT_X, by, MapLayout.ZOOM_W, MapLayout.BUTTON_H)) {
-			setZoom(zoom / ZOOM_STEP, vx + MapLayout.VIEW_W / 2.0, vy + MapLayout.VIEW_H / 2.0, vx, vy);
+			setZoom(targetZoom / ZOOM_STEP, vx + MapLayout.VIEW_W / 2.0, vy + MapLayout.VIEW_H / 2.0, vx, vy);
 			return true;
 		}
 		if (inside(mouseX, mouseY, bx + MapLayout.ZOOM_IN_X, by, MapLayout.ZOOM_W, MapLayout.BUTTON_H)) {
-			setZoom(zoom * ZOOM_STEP, vx + MapLayout.VIEW_W / 2.0, vy + MapLayout.VIEW_H / 2.0, vx, vy);
+			setZoom(targetZoom * ZOOM_STEP, vx + MapLayout.VIEW_W / 2.0, vy + MapLayout.VIEW_H / 2.0, vx, vy);
 			return true;
 		}
 		return false;
@@ -123,7 +132,7 @@ public final class MapPage implements GuiPage {
 		int vx = x + MapLayout.VIEW_X, vy = y + MapLayout.VIEW_Y;
 		if (!inside(mouseX, mouseY, vx, vy, MapLayout.VIEW_W, MapLayout.VIEW_H) || scrollY == 0)
 			return false;
-		setZoom(zoom * Math.pow(ZOOM_STEP, scrollY), mouseX, mouseY, vx, vy);
+		setZoom(targetZoom * Math.pow(ZOOM_STEP, scrollY), mouseX, mouseY, vx, vy);
 		return true;
 	}
 
@@ -133,14 +142,26 @@ public final class MapPage implements GuiPage {
 	}
 
 	private void setZoom(double requested, double mouseX, double mouseY, int vx, int vy) {
-		double next = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, requested));
-		double anchorX = centerX + (mouseX - (vx + MapLayout.VIEW_W / 2.0)) / zoom;
-		double anchorZ = centerZ + (mouseY - (vy + MapLayout.VIEW_H / 2.0)) / zoom;
-		centerX = anchorX - (mouseX - (vx + MapLayout.VIEW_W / 2.0)) / next;
-		centerZ = anchorZ - (mouseY - (vy + MapLayout.VIEW_H / 2.0)) / next;
-		zoom = next;
+		targetZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, requested));
+		zoomAnchorScreenX = mouseX;
+		zoomAnchorScreenY = mouseY;
+		zoomAnchorX = centerX + (mouseX - (vx + MapLayout.VIEW_W / 2.0)) / zoom;
+		zoomAnchorZ = centerZ + (mouseY - (vy + MapLayout.VIEW_H / 2.0)) / zoom;
+		zoomAnimating = targetZoom != zoom;
+	}
+
+	private void animateZoom(int vx, int vy, int vw, int vh) {
+		if (!zoomAnimating)
+			return;
+		if (Math.abs(targetZoom - zoom) < ZOOM_SNAP_EPSILON) {
+			zoom = targetZoom;
+			zoomAnimating = false;
+		} else {
+			zoom += (targetZoom - zoom) * ZOOM_EASING;
+		}
+		centerX = zoomAnchorX - (zoomAnchorScreenX - (vx + vw / 2.0)) / zoom;
+		centerZ = zoomAnchorZ - (zoomAnchorScreenY - (vy + vh / 2.0)) / zoom;
 		clampToWorldBorder();
-		WorldMapClientTileCache.markViewDirty();
 	}
 
 	private void clampToWorldBorder() {
@@ -155,6 +176,8 @@ public final class MapPage implements GuiPage {
 		if (Minecraft.getInstance().player != null) {
 			centerX = Minecraft.getInstance().player.getX();
 			centerZ = Minecraft.getInstance().player.getZ();
+			targetZoom = zoom;
+			zoomAnimating = false;
 			WorldMapClientTileCache.markViewDirty();
 		}
 	}

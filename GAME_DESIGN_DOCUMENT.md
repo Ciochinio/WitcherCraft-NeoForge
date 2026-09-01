@@ -569,8 +569,9 @@ ONE of them is enough - multiple parents are alternative routes into that node, 
 have to clear in full, so a tree can branch and re-converge without gating a node behind everything
 that feeds into it. Hovering a node or a slotted perk shows its name (in its branch's colour) and a
 one-line description; whether it's locked, available, or equipped is left to the art alone. The Map
-tab now has an interactive terrain view. Dragging pans the view, the mouse wheel zooms toward the
-cursor, and the bottom bar provides center and zoom controls. Markers, waypoints, and filters arrive
+tab now has an interactive terrain view. Dragging pans the view, and mouse-wheel or button input sets
+a target zoom that the view smoothly approaches while preserving the world position under the cursor.
+The bottom bar provides center and zoom controls. Markers, waypoints, and filters arrive
 in later world-map milestones. The player appears as a fixed-size gold directional triangle with a dark
 outline. It rotates with the player's facing, does not scale with map zoom, and has a client-side size
 setting. The remaining unfinished tabs use placeholders until those systems
