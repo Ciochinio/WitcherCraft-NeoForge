@@ -8,7 +8,8 @@
       "registry_name": "witcher_gui_screen",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/WitcherGuiScreen.java"
+          "src/main/java/net/redboltmedia/witchercraft/WitcherGuiScreen.java",
+          "src/main/java/net/redboltmedia/witchercraft/WitcherGuiDamageInterrupt.java"
         ]
       },
       "path": "~/NAVBAR"
@@ -424,7 +425,8 @@
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/MapPage.java"
         ]
-      }
+      },
+      "path": "~/World Map"
     },
     {
       "name": "MapLayout",
@@ -436,7 +438,8 @@
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/MapLayout.java"
         ]
-      }
+      },
+      "path": "~/World Map"
     },
     {
       "name": "MeditationRejectMessage",
@@ -461,7 +464,8 @@
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/WorldMapTerrainTile.java"
         ]
-      }
+      },
+      "path": "~/World Map"
     },
     {
       "name": "WorldMapTerrainCapture",
@@ -473,7 +477,8 @@
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/WorldMapTerrainCapture.java"
         ]
-      }
+      },
+      "path": "~/World Map"
     },
     {
       "name": "PauseMenuGuiOpen",
@@ -520,7 +525,8 @@
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/WorldMapTileRequestCompleteMessage.java"
         ]
-      }
+      },
+      "path": "~/World Map"
     },
     {
       "name": "WorldMapClientConfig",
@@ -532,7 +538,8 @@
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/WorldMapClientConfig.java"
         ]
-      }
+      },
+      "path": "~/World Map"
     },
     {
       "name": "WorldMapClientTileCache",
@@ -544,7 +551,8 @@
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/WorldMapClientTileCache.java"
         ]
-      }
+      },
+      "path": "~/World Map"
     },
     {
       "name": "WorldMapTileDataMessage",
@@ -556,7 +564,8 @@
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/WorldMapTileDataMessage.java"
         ]
-      }
+      },
+      "path": "~/World Map"
     },
     {
       "name": "WorldMapTileRequestMessage",
@@ -568,7 +577,8 @@
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/WorldMapTileRequestMessage.java"
         ]
-      }
+      },
+      "path": "~/World Map"
     },
     {
       "name": "AlchemyGui",
@@ -10813,6 +10823,10 @@
       },
       {
         "name": "NAVBAR",
+        "children": []
+      },
+      {
+        "name": "World Map",
         "children": []
       }
     ]

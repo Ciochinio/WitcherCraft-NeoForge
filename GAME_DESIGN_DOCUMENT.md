@@ -644,10 +644,10 @@ that is still being built. Terrain therefore does not disappear while asynchrono
 Terrain pages share one floating-point transform for pan and zoom. Page positions and sizes are not rounded
 independently, so fractional camera movement stays continuous and adjacent page edges remain aligned.
 
-Opening the map still pauses single-player once every chunk in its current view has been checked. A new
-view resumes the integrated server while its bounded request chain runs. At distant zoom this can take
-longer than a close view because the persistent client cache and overview levels belong to later work.
-Multiplayer servers continue running normally.
+Opening the map does not pause the world. The Witcher menu uses full-screen art, so damage from a hostile
+mob or another player closes it and returns control to the player. Environmental damage such as fire,
+lava, falling, drowning, or poison leaves it open. A new map view can take longer to finish at distant
+zoom because it must check more terrain while the integrated server continues running.
 
 The whole hub is a **reskinnable shell**: the navbar and every page's layout live in one data file,
 so tabs and panels can be rearranged, relabelled, or repointed without touching game logic. Each perk now
@@ -802,7 +802,9 @@ while the GUI fades out, rather than a jarring instant jump. It replaces sleepin
 time, and it exists for the hunt: waiting for night to bring out the monsters that only appear then,
 skipping to daylight, or simply passing the time while Toxicity drains back to safe. You cannot
 meditate boxed into a tight space or with monsters nearby, and a campfire is placed for you; because
-meditation is not rest, it does not hold off the phantoms that a lack of sleep brings.
+meditation is not rest, it does not hold off the phantoms that a lack of sleep brings. The menu never
+pauses single-player, so meditation begins as soon as the server accepts it. Taking real health damage
+from a hostile mob or another player closes the menu and cancels an active meditation.
 
 ### Glossary
 

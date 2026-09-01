@@ -309,6 +309,6 @@ public class WitcherGuiScreen extends Screen {
 
 	@Override
 	public boolean isPauseScreen() {
-		return activePage().pausesGame();
+		return false;
 	}
 }

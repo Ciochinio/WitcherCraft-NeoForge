@@ -180,7 +180,6 @@ public final class WorldMapClientTileCache {
 		frames++; renderNanos += System.nanoTime() - started; logDiagnostics();
 	}
 
-	public static boolean canPause() { return !viewDirty && inFlightRequestId == 0; }
 	public static void markViewDirty() { viewDirty = true; viewGeneration++; }
 
 	public static void completeRequest(int requestId, boolean accepted, UUID worldId) {

@@ -612,8 +612,14 @@ small helpers may remain unowned. MCreator does not regenerate either form:
   page content never covers the tabs, then pops the transform and renders the page's tooltip
   (`pollTooltip`) in screen space at the real cursor. Input is transformed screen->design before
   hit-testing. Drag deltas are divided by the same shell scale. A
-  `WitcherGuiScreen(String pageId)` constructor opens straight onto a tab. The screen reports itself
-  as pause-capable, which pauses an integrated single-player server but does not pause multiplayer.
+  `WitcherGuiScreen(String pageId)` constructor opens straight onto a tab. `isPauseScreen()` always
+  returns false. Every page therefore has the same live-world behavior in single-player and multiplayer.
+- **`WitcherGuiDamageInterrupt`** - the server listens to `LivingDamageEvent.Post`, after reductions
+  and health application. Positive health damage closes the shell only when `DamageSource.getEntity()`
+  is an `Enemy` or a player. This includes owned projectiles while excluding fire, lava, falls,
+  drowning, poison ticks, and other environmental sources. A clientbound packet calls the shell's
+  `onClose()` instead of clearing the screen directly, so an active meditation sends its normal cancel
+  request and restores the hidden HUD.
 - **`WitcherGuiLayout`** - the tool-generated data holder for shell **chrome only** (no page content).
   The **design canvas** (`DESIGN_W/H`), a `BG` fallback texture, navbar sizing (`NAV_Y/H`,
   `NAV_TAB_W`, `NAV_GAP`, `NAV_ICON`), a `CONTENT_MARGIN`, a `NAV[]` of tabs (each `pageId` + label key
@@ -1119,10 +1125,9 @@ chain continues until every candidate in the current view has been returned or c
 Each request has a positive ID. After all authorized disk reads finish and all available tile
 messages enter the connection, the server sends `WorldMapTileRequestCompleteMessage` with that ID and
 an accepted flag. The flag is false when rate limiting rejects the request. The client retries those
-positions after its pacing interval instead of recording them as absent. The map page reports itself
-as non-pausing while a view is dirty or a request is in flight. Render frames start later batches, so
-the integrated server keeps running until the visible request chain finishes. Changing the visible
-chunk bounds through pan, zoom, or center reprioritizes the remaining candidates around the new center.
+positions after its pacing interval instead of recording them as absent. The whole Witcher shell is
+non-pausing, so the integrated server keeps running throughout the visible request chain. Changing the
+visible chunk bounds through pan, zoom, or center reprioritizes the remaining candidates around the new center.
 
 ### 5.7 Milestone 2C client renderer
 

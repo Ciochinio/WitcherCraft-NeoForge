@@ -49,11 +49,6 @@ public final class MapPage implements GuiPage {
 	}
 
 	@Override
-	public boolean pausesGame() {
-		return WorldMapClientTileCache.canPause();
-	}
-
-	@Override
 	public void render(GuiGraphicsExtractor g, int x, int y, int w, int h, int mouseX, int mouseY, float partial) {
 		Font font = Minecraft.getInstance().font;
 		int vx = x + MapLayout.VIEW_X, vy = y + MapLayout.VIEW_Y;
