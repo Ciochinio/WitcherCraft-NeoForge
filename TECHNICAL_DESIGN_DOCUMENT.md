@@ -1017,7 +1017,7 @@ an already loaded `LevelChunk` to a specific player. It supplies both facts the 
 may reveal that chunk, and the shared terrain tile may be captured. Do not replace it with a general
 chunk-load event, which would record spawn chunks, tickets, and automation that no player explored.
 
-The queue stores only dimension keys and packed chunk positions. Processing calls
+The queue stores dimension keys, packed chunk positions, priority, and sequence. Processing calls
 `ServerChunkCache.getChunkNow`. A null result increments `skipped_unloaded` and ends that job. Never
 replace this with `getChunk`, a future request, or a ticket because those paths can load or generate
 terrain.
@@ -1082,12 +1082,14 @@ shutdown waits for outstanding writes and retries a failed dirty mask once.
 
 ### 5.5 Work queue and diagnostics
 
-The prototype processes one terrain tile per server tick. This is a measurement starting point, not
-a final configuration default. Watched chunks nearer the observing player sort ahead of distant
-ones. Packed positions are deduplicated, and the hard pending ceiling is 32,768 captures.
+Each server tick processes at least one and at most eight terrain tiles. After the first tile, processing
+stops when the tick has spent 3 milliseconds in capture. Watched chunks nearer the observing player sort
+ahead of distant ones, and newer chunks win equal-distance ties so movement does not leave the latest edge
+behind. Request-triggered repairs sort ahead of ordinary captures. Packed positions are deduplicated, and
+the hard pending ceiling is 32,768 captures.
 
 Every 1,200 ticks the server logs total queued and captured tiles, current pending work, unloaded
-skips, queue-full drops, and storage failures. Profile this in the development client before changing
+skips, repair requests and completions, time-budget stops, queue-full drops, and storage failures. Profile this in the development client before changing
 the per-tick budget or adding a refresh cooldown. Tile and exploration writes run on Minecraft's I/O
 executor. Column sampling remains on the server thread because chunk state is not safe to read from
 the background writer.
@@ -1101,7 +1103,10 @@ position against that player's exploration mask. Client coordinates never grant 
 
 Authorized tile reads run on Minecraft's I/O executor. The server sends each successful read as one
 bounded `WorldMapTileDataMessage` after returning to the server thread. Its size varies with the v4
-block-state palette. Missing, corrupt, or unauthorized files produce no tile response. An accepted
+block-state palette. A missing or corrupt authorized tile queues a high-priority repair only when
+`getChunkNow` confirms that the chunk is already loaded. A successful repair writes the ordinary shared
+tile, updates tracking players, and sends the repaired tile directly to players waiting on that request.
+It never creates a chunk ticket or loads terrain. Unauthorized files produce no tile response. An accepted
 completion causes the client to suppress those requested positions for the rest of the connection. A
 later live tile update removes that suppression, which covers the race between watching a new chunk and
 its first atomic write.

@@ -59,7 +59,9 @@ import net.neoforged.neoforge.network.PacketDistributor;
  */
 @EventBusSubscriber
 public final class WorldMapTerrainCapture {
-	private static final int PROTOTYPE_CAPTURES_PER_TICK = 1;
+	private static final int MIN_CAPTURES_PER_TICK = 1;
+	private static final int MAX_CAPTURES_PER_TICK = 8;
+	private static final long CAPTURE_BUDGET_NANOS = 3_000_000L;
 	private static final int MAX_PENDING_CAPTURES = 32_768;
 	private static final int EXPLORATION_SAVE_INTERVAL_TICKS = 200;
 	private static final int DIAGNOSTIC_INTERVAL_TICKS = 1200;
@@ -89,7 +91,7 @@ public final class WorldMapTerrainCapture {
 			PacketDistributor.sendToPlayer(player, new WorldMapTileRequestCompleteMessage(requestId, false, state.worldId));
 			return;
 		}
-		java.util.List<CompletableFuture<Optional<WorldMapTerrainTile>>> reads = new java.util.ArrayList<>();
+		java.util.List<RequestedRead> reads = new java.util.ArrayList<>();
 		Set<Long> unique = new HashSet<>();
 		for (int requestIndex = 0; requestIndex < packedPositions.length; requestIndex++) {
 			long packed = packedPositions[requestIndex];
@@ -99,14 +101,19 @@ public final class WorldMapTerrainCapture {
 			if (!state.isExplored(level, player.getUUID(), packed))
 				continue;
 			long knownTime = capturedTimes[requestIndex];
-			reads.add(CompletableFuture.<Optional<WorldMapTerrainTile>>supplyAsync(() -> WorldMapTerrainTile.read(tilePath(level.getServer(), level.dimension(), pos), pos.x(), pos.z())
-				.filter(tile -> tile.capturedGameTime() > knownTime), Util.ioPool()).exceptionally(exception -> Optional.empty()));
+			CompletableFuture<Optional<WorldMapTerrainTile>> future = CompletableFuture.<Optional<WorldMapTerrainTile>>supplyAsync(
+				() -> WorldMapTerrainTile.read(tilePath(level.getServer(), level.dimension(), pos), pos.x(), pos.z()), Util.ioPool()).exceptionally(exception -> Optional.empty());
+			reads.add(new RequestedRead(pos, knownTime, future));
 		}
-		CompletableFuture.allOf(reads.toArray(CompletableFuture[]::new)).thenRun(() -> level.getServer().execute(() -> {
+		CompletableFuture.allOf(reads.stream().map(RequestedRead::future).toArray(CompletableFuture[]::new)).thenRun(() -> level.getServer().execute(() -> {
 			if (player.hasDisconnected())
 				return;
-			for (CompletableFuture<Optional<WorldMapTerrainTile>> read : reads)
-				read.join().ifPresent(tile -> PacketDistributor.sendToPlayer(player, WorldMapTileDataMessage.from(tile)));
+			for (RequestedRead read : reads) {
+				Optional<WorldMapTerrainTile> tile = read.future.join();
+				if (tile.isPresent()) {
+					if (tile.get().capturedGameTime() > read.knownTime) PacketDistributor.sendToPlayer(player, WorldMapTileDataMessage.from(tile.get()));
+				} else state.requestRepair(level, read.pos, player.getUUID(), player.chunkPosition());
+			}
 			PacketDistributor.sendToPlayer(player, new WorldMapTileRequestCompleteMessage(requestId, true, state.worldId));
 		}));
 	}
@@ -253,7 +260,10 @@ public final class WorldMapTerrainCapture {
 		return server.getWorldPath(LevelResource.ROOT).resolve("data").resolve("witchercraft_world_map_identity.dat");
 	}
 
-	private record PendingChunk(ResourceKey<Level> dimension, long chunkPos, long distanceSquared, long sequence) {
+	private record RequestedRead(ChunkPos pos, long knownTime, CompletableFuture<Optional<WorldMapTerrainTile>> future) {
+	}
+
+	private record PendingChunk(ResourceKey<Level> dimension, long chunkPos, long distanceSquared, long sequence, boolean repair) {
 	}
 
 	private record PlayerKey(ResourceKey<Level> dimension, UUID playerId) {
@@ -262,17 +272,22 @@ public final class WorldMapTerrainCapture {
 	private static final class ServerState {
 		private final MinecraftServer server;
 		private final UUID worldId;
-		private final PriorityQueue<PendingChunk> queue = new PriorityQueue<>(Comparator.comparingLong(PendingChunk::distanceSquared).thenComparingLong(PendingChunk::sequence));
+		private final PriorityQueue<PendingChunk> queue = new PriorityQueue<>(Comparator.<PendingChunk>comparingInt(pending -> pending.repair() ? 0 : 1)
+			.thenComparingLong(PendingChunk::distanceSquared).thenComparing(Comparator.comparingLong(PendingChunk::sequence).reversed()));
 		private final Set<String> queued = new HashSet<>();
+		private final Map<String, Set<UUID>> repairWaiters = new HashMap<>();
 		private final Map<PlayerKey, ExplorationMask> exploration = new HashMap<>();
 		private final Map<UUID, RequestAllowance> requestAllowances = new HashMap<>();
 		private final Set<CompletableFuture<?>> writes = ConcurrentHashMap.newKeySet();
 		private final AtomicLong captured = new AtomicLong();
+		private final AtomicLong repaired = new AtomicLong();
 		private final AtomicLong failed = new AtomicLong();
 		private long enqueued;
 		private long skippedUnloaded;
 		private long droppedQueueFull;
 		private long sequence;
+		private long repairRequests;
+		private long budgetStops;
 
 		private ServerState(MinecraftServer server) {
 			this.server = server;
@@ -290,7 +305,21 @@ public final class WorldMapTerrainCapture {
 			}
 			long dx = (long) pos.x() - playerPos.x();
 			long dz = (long) pos.z() - playerPos.z();
-			queue.add(new PendingChunk(level.dimension(), pos.pack(), dx * dx + dz * dz, sequence++));
+			queue.add(new PendingChunk(level.dimension(), pos.pack(), dx * dx + dz * dz, sequence++, false));
+			enqueued++;
+		}
+
+		private void requestRepair(ServerLevel level, ChunkPos pos, UUID playerId, ChunkPos playerPos) {
+			if (level.getChunkSource().getChunkNow(pos.x(), pos.z()) == null) return;
+			String key = level.dimension().identifier() + ":" + pos.pack();
+			repairWaiters.computeIfAbsent(key, ignored -> new HashSet<>()).add(playerId);
+			repairRequests++;
+			if (!queued.add(key)) return;
+			if (queue.size() >= MAX_PENDING_CAPTURES) {
+				queued.remove(key); repairWaiters.remove(key); droppedQueueFull++; return;
+			}
+			long dx = (long)pos.x() - playerPos.x(), dz = (long)pos.z() - playerPos.z();
+			queue.add(new PendingChunk(level.dimension(), pos.pack(), dx * dx + dz * dz, sequence++, true));
 			enqueued++;
 		}
 
@@ -313,26 +342,39 @@ public final class WorldMapTerrainCapture {
 		}
 
 		private void tick() {
-			for (int i = 0; i < PROTOTYPE_CAPTURES_PER_TICK && !queue.isEmpty(); i++) {
+			long started = System.nanoTime();
+			int processed = 0;
+			while (processed < MAX_CAPTURES_PER_TICK && !queue.isEmpty()) {
 				PendingChunk pending = queue.poll();
 				ChunkPos pos = ChunkPos.unpack(pending.chunkPos());
-				queued.remove(pending.dimension().identifier() + ":" + pending.chunkPos());
+				String queueKey = pending.dimension().identifier() + ":" + pending.chunkPos();
+				queued.remove(queueKey);
+				processed++;
 				ServerLevel level = server.getLevel(pending.dimension());
 				LevelChunk chunk = level == null ? null : level.getChunkSource().getChunkNow(pos.x(), pos.z());
 				if (chunk == null) {
+					repairWaiters.remove(queueKey);
 					skippedUnloaded++;
-					continue;
+				} else {
+					WorldMapTerrainTile tile = capture(chunk, level.getGameTime());
+					Set<UUID> waiters = repairWaiters.remove(queueKey);
+					submitWrite(() -> tile.writeAtomically(tilePath(server, pending.dimension(), pos)), true, () -> server.execute(() -> {
+						if (waiters == null) PacketDistributor.sendToPlayersTrackingChunk(level, pos, WorldMapTileDataMessage.from(tile));
+						else for (UUID playerId : waiters) {
+							ServerPlayer player = server.getPlayerList().getPlayer(playerId);
+							if (player != null && !player.hasDisconnected()) PacketDistributor.sendToPlayer(player, WorldMapTileDataMessage.from(tile));
+						}
+						if (pending.repair()) repaired.incrementAndGet();
+					}), () -> {});
 				}
-				WorldMapTerrainTile tile = capture(chunk, level.getGameTime());
-				submitWrite(() -> tile.writeAtomically(tilePath(server, pending.dimension(), pos)), true,
-					() -> server.execute(() -> PacketDistributor.sendToPlayersTrackingChunk(level, pos, WorldMapTileDataMessage.from(tile))), () -> {
-					});
+				if (processed >= MIN_CAPTURES_PER_TICK && System.nanoTime() - started >= CAPTURE_BUDGET_NANOS) { if (!queue.isEmpty()) budgetStops++; break; }
 			}
 			int tick = server.getTickCount();
 			if (tick % EXPLORATION_SAVE_INTERVAL_TICKS == 0)
 				flushExploration();
 			if (tick % DIAGNOSTIC_INTERVAL_TICKS == 0)
-				WitchercraftMod.LOGGER.info("World map capture: queued={}, captured={}, pending={}, skipped_unloaded={}, dropped_queue_full={}, failed={}", enqueued, captured.get(), queue.size(), skippedUnloaded, droppedQueueFull, failed.get());
+				WitchercraftMod.LOGGER.info("World map capture: queued={}, captured={}, pending={}, skipped_unloaded={}, repair_requests={}, repaired={}, budget_stops={}, dropped_queue_full={}, failed={}",
+					enqueued, captured.get(), queue.size(), skippedUnloaded, repairRequests, repaired.get(), budgetStops, droppedQueueFull, failed.get());
 		}
 
 		private void flushExploration() {

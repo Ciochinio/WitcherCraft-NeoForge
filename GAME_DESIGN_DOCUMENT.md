@@ -580,7 +580,9 @@ get their own screens.
 World-map exploration begins when the server sends a loaded Overworld chunk to a player. That event
 records the chunk in that player's private exploration history and queues a shared terrain sample.
 The map system never generates or force-loads a chunk. If the chunk unloads before its queued turn,
-the capture is skipped. Each horizontal block column records separate ground, tree-foliage, water, and
+the capture is skipped, but watching it again or requesting it while it is already loaded queues a repair.
+The server processes several captures when tick time permits so ordinary travel does not outrun the queue.
+Each horizontal block column records separate ground, tree-foliage, water, and
 decoration information. Decorative grass and flowers do not replace the ground color, but players can
 show them as a separate map layer. Terrain shading follows the visible layer: open columns use ground
 height, tree-covered columns use foliage height, and water uses its surface height. Raised foliage casts a
