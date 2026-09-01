@@ -1249,12 +1249,17 @@ previously explored terrain after a renderer upgrade without loading or regenera
 
 The server persists a random world-map UUID in the world root. It sends that UUID to each player during
 login through the existing request-completion payload using request ID zero. Ordinary completions also
-carry the UUID. The client cache path includes format version, world UUID, player UUID, and dimension.
+carry the UUID. Client data lives below `witchercraft/world-map/<world UUID>/<player UUID>/dimensions/<namespace>/<path>`.
+File headers own storage-format versions, so the directory name does not change for a format revision.
 This prevents two players, recreated worlds, or reset servers at the same address from sharing terrain.
 
-The client indexes cached tile filenames on two daemon I/O workers before issuing map requests. It loads
-cached leaf PNG files nearest the current view first and then loads up to 256 nearby raw tiles
-at a time. The render thread registers loaded PNGs, while raw tile decoding and file reads stay on the I/O
+The client indexes compressed terrain-container entries on two daemon I/O workers before issuing map requests.
+Each terrain container covers the same 4 by 4 chunks as one rendered leaf and stores up to 16 independently
+deflated version-four tile payloads behind a fixed entry table. The container header records its region coordinates
+and format version, and a container CRC rejects truncated or corrupted files. Tile payloads retain their own CRC.
+The client loads cached leaf PNG files nearest the current view first and then loads nearby raw containers
+selected from at most 256 candidate tiles. One container read supplies every present tile in that leaf. The render
+thread registers loaded PNGs, while raw decompression, tile decoding, and file reads stay on the I/O
 workers. GPU and decoded-memory eviction do not delete these files. Returning to an evicted area can
 therefore restore its finished image without another color and hillshade build.
 The load area extends by four leaves, or 256 blocks, beyond every viewport edge. Visible leaves enter
@@ -1264,7 +1269,10 @@ populated. A valid GPU texture remains visible until the combined replacement bu
 At overview zoom the disk scheduler loads one complete overview beyond each viewport edge. Disk discovery
 is paced to four passes per second instead of walking the visible tile rectangle every render frame.
 
-Each authorized network tile is written atomically using the version-four terrain format and its CRC.
+Each authorized network tile is compressed on the single cache writer. The writer replaces its entry in the
+4 by 4-chunk terrain container and atomically replaces that small container. Existing compressed entries are
+copied without decompression or recompression. An unreadable container is disposable and the next tile write
+starts a valid replacement; the server can resend its other authorized tiles.
 Each finished leaf image is written through a temporary PNG and atomic replacement. Leaf
 filenames include the terrain visual-settings key and ordered active resource-pack IDs. A settings or
 resource-pack change selects a different cached image and rebuilds from raw tiles. Every PNG has a

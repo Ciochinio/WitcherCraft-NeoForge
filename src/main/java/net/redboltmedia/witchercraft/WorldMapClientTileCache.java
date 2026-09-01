@@ -41,6 +41,7 @@ public final class WorldMapClientTileCache {
 	 */
 	private static final int CHUNK = 16, REGION_CHUNKS = 4, REGION = 64, LOD_COUNT = 1, PREFETCH_REGIONS = 4;
 	private static final int OVERVIEW_CHUNKS = 16, OVERVIEW = 256, OVERVIEW_PIXELS = 256, OVERVIEW_PREFETCH = 1;
+	private static final long RENDER_CACHE_VERSION = 1;
 	private static final double OVERVIEW_ENTER_ZOOM = 0.65, OVERVIEW_EXIT_ZOOM = 0.85;
 	private static final int MAX_TILES = 4096, MAX_REGIONS = 512, MAX_PENDING_BUILDS = 8, MAX_UPLOADS_PER_FRAME = 4, MAX_CACHED_UPLOADS_PER_FRAME = 8;
 	private static final long REQUEST_INTERVAL_NANOS = 500_000_000L, DIAGNOSTIC_NANOS = 5_000_000_000L, BACKGROUND_DEBOUNCE_NANOS = 2_000_000_000L;
@@ -186,7 +187,10 @@ public final class WorldMapClientTileCache {
 		ensureConnection(Minecraft.getInstance());
 		if (worldId.getMostSignificantBits() != 0L || worldId.getLeastSignificantBits() != 0L) {
 			var player = Minecraft.getInstance().player;
-			if (player != null) DiskCache.configure(worldId, player.getUUID(), cacheGeneration);
+			if (player != null) {
+				Identifier dimension = player.level().dimension().identifier();
+				DiskCache.configure(worldId, player.getUUID(), dimension.getNamespace(), dimension.getPath(), cacheGeneration);
+			}
 		}
 		if (requestId == 0) return;
 		if (requestId != inFlightRequestId) return;
@@ -717,7 +721,7 @@ public final class WorldMapClientTileCache {
 		return difference < 0 ? -band : band;
 	}
 	private static void refreshVisualSettings() {
-		long key = WorldMapClientConfig.showDecorations() ? 1 : 0;
+		long key = 31 * RENDER_CACHE_VERSION + (WorldMapClientConfig.showDecorations() ? 1 : 0);
 		key = 31 * key + Double.doubleToLongBits(WorldMapClientConfig.terrainBrightness());
 		key = 31 * key + Double.doubleToLongBits(WorldMapClientConfig.biomeColorStrength());
 		key = 31 * key + Double.doubleToLongBits(WorldMapClientConfig.hillshadeStrength());
@@ -931,6 +935,7 @@ public final class WorldMapClientTileCache {
 		});
 		private static final Set<Long> tiles = ConcurrentHashMap.newKeySet();
 		private static final Set<Long> loadingTiles = ConcurrentHashMap.newKeySet();
+		private static final Set<Long> loadingTerrainRegions = ConcurrentHashMap.newKeySet();
 		private static final Set<String> loadingRegions = ConcurrentHashMap.newKeySet();
 		private static final Object[] regionFileLocks = new Object[64];
 		private static volatile Path root;
@@ -938,24 +943,26 @@ public final class WorldMapClientTileCache {
 		private static long serial, nextVisibleScanNanos;
 		static { Arrays.setAll(regionFileLocks, ignored -> new Object()); }
 
-		static synchronized void configure(UUID worldId, UUID playerId, long generation) {
-			Path next = Minecraft.getInstance().gameDirectory.toPath().resolve("witchercraft-map-cache").resolve("v1")
-				.resolve(worldId.toString()).resolve(playerId.toString()).resolve("overworld");
+		static synchronized void configure(UUID worldId, UUID playerId, String dimensionNamespace, String dimensionPath, long generation) {
+			Path next = Minecraft.getInstance().gameDirectory.toPath().resolve("witchercraft").resolve("world-map")
+				.resolve(worldId.toString()).resolve(playerId.toString()).resolve("dimensions").resolve(dimensionNamespace).resolve(dimensionPath);
 			if (configured && next.equals(root)) return;
-			root = next; configured = true; ready = false; tiles.clear(); loadingTiles.clear(); loadingRegions.clear();
+			root = next; configured = true; ready = false; tiles.clear(); loadingTiles.clear(); loadingTerrainRegions.clear(); loadingRegions.clear();
 			long scanSerial = ++serial;
 			IO.execute(() -> scan(next, scanSerial));
 		}
 
 		private static void scan(Path expectedRoot, long expectedSerial) {
 			Set<Long> found = new HashSet<>();
-			Path tileRoot = expectedRoot.resolve("tiles");
+			Path tileRoot = expectedRoot.resolve("terrain");
 			if (Files.isDirectory(tileRoot)) try (var paths = Files.walk(tileRoot)) {
 				paths.filter(Files::isRegularFile).forEach(path -> {
 					String[] parts = path.getFileName().toString().split("\\.");
-					if (parts.length != 4 || !parts[0].equals("c") || !parts[3].equals("wct")) return;
-					try { found.add(ChunkPos.pack(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]))); }
-					catch (NumberFormatException ignored) {}
+					if (parts.length != 4 || !parts[0].equals("r") || !parts[3].equals("wcr")) return;
+					try {
+						int regionX = Integer.parseInt(parts[1]), regionZ = Integer.parseInt(parts[2]); boolean[] present = WorldMapTerrainTile.readContainerIndex(path, regionX, regionZ);
+						for (int slot = 0; slot < present.length; slot++) if (present[slot]) found.add(ChunkPos.pack(regionX * REGION_CHUNKS + slot % REGION_CHUNKS, regionZ * REGION_CHUNKS + slot / REGION_CHUNKS));
+					} catch (IOException | NumberFormatException exception) { WitchercraftMod.LOGGER.warn("Ignoring unreadable world map terrain container {}", path, exception); }
 				});
 			} catch (IOException exception) {
 				WitchercraftMod.LOGGER.warn("Cannot scan world map client cache {}", tileRoot, exception);
@@ -1003,7 +1010,10 @@ public final class WorldMapClientTileCache {
 				long key=ChunkPos.pack(x,z); if(!tiles.contains(key)||TILES.containsKey(key)||loadingTiles.contains(key))continue;
 				double dx=x*CHUNK+8-centerX,dz=z*CHUNK+8-centerZ;nearest.add(new TileDistance(key,dx*dx+dz*dz));if(nearest.size()>256)nearest.poll();
 			}
-			for(TileDistance candidate:nearest)if(loadingTiles.add(candidate.position))IO.execute(() -> loadTile(currentRoot,candidate.position,generation));
+			for(TileDistance candidate:nearest) {
+				ChunkPos position = ChunkPos.unpack(candidate.position); int regionX = Math.floorDiv(position.x(), REGION_CHUNKS), regionZ = Math.floorDiv(position.z(), REGION_CHUNKS); long regionKey = ChunkPos.pack(regionX, regionZ);
+				if (loadingTerrainRegions.add(regionKey)) IO.execute(() -> loadTerrainRegion(currentRoot, regionX, regionZ, regionKey, generation));
+			}
 		}
 
 		private static void loadRegion(Path path,int x,int z,long settingsKey,long generation,String loadingKey) {
@@ -1042,29 +1052,29 @@ public final class WorldMapClientTileCache {
 
 		static void finishedOverviewLoad(String loadingKey){loadingRegions.remove(loadingKey);}
 
-		private static void loadTile(Path expectedRoot,long key,long generation) {
-			ChunkPos pos=ChunkPos.unpack(key);
-			Path path=tilePath(expectedRoot,pos.x(),pos.z());
-			boolean queued=false;
-			try { Optional<WorldMapTerrainTile> loaded=WorldMapTerrainTile.read(path,pos.x(),pos.z());
-				if(loaded.isPresent()){CACHED_TILES.add(new CachedTile(key,loaded.get(),generation));queued=true;}
-				else{tiles.remove(key);try{Files.deleteIfExists(path);}catch(IOException ignored){}CACHE_MISSES.add(key);}
-			}
-			finally { if(!queued)loadingTiles.remove(key); }
+		private static void loadTerrainRegion(Path expectedRoot, int regionX, int regionZ, long regionKey, long generation) {
+			Path path=terrainRegionPath(expectedRoot,regionX,regionZ); boolean queued=false;
+			try {
+				WorldMapTerrainTile[] loaded=WorldMapTerrainTile.readContainer(path,regionX,regionZ);
+				for(WorldMapTerrainTile tile:loaded)if(tile!=null){long key=ChunkPos.pack(tile.chunkX(),tile.chunkZ());if(TILES.containsKey(key))continue;loadingTiles.add(key);CACHED_TILES.add(new CachedTile(key,tile,generation));queued=true;}
+			} catch(IOException exception) {
+				for(int z=0;z<REGION_CHUNKS;z++)for(int x=0;x<REGION_CHUNKS;x++)tiles.remove(ChunkPos.pack(regionX*REGION_CHUNKS+x,regionZ*REGION_CHUNKS+z));
+				try{Files.deleteIfExists(path);}catch(IOException ignored){} CACHE_MISSES.add(regionKey);
+			} finally { loadingTerrainRegions.remove(regionKey); if(!queued) CACHE_MISSES.add(regionKey); }
 		}
 
 		static void finishedTileLoad(long position){loadingTiles.remove(position);}
 
 		static void saveTile(WorldMapTerrainTile tile) {
 			Path currentRoot=root;if(!configured||currentRoot==null)return; long key=ChunkPos.pack(tile.chunkX(),tile.chunkZ());tiles.add(key);
-			WRITES.execute(() -> { try{tile.writeAtomically(tilePath(currentRoot,tile.chunkX(),tile.chunkZ()));}catch(IOException exception){WitchercraftMod.LOGGER.warn("Cannot save world map client tile {},{}",tile.chunkX(),tile.chunkZ(),exception);} });
+			WRITES.execute(() -> { try{WorldMapTerrainTile.writeContainerAtomically(terrainRegionPath(currentRoot,Math.floorDiv(tile.chunkX(),REGION_CHUNKS),Math.floorDiv(tile.chunkZ(),REGION_CHUNKS)),tile);}catch(IOException exception){WitchercraftMod.LOGGER.warn("Cannot save world map client tile {},{}",tile.chunkX(),tile.chunkZ(),exception);} });
 		}
 
 		static Path regionPath(int x,int z,long settingsKey) {
-			Path currentRoot=root; return currentRoot==null?null:currentRoot.resolve("leaves-v1").resolve("l."+x+"."+z+"."+Long.toUnsignedString(settingsKey,16)+".png");
+			Path currentRoot=root; return currentRoot==null?null:currentRoot.resolve("leaves").resolve("l."+x+"."+z+"."+Long.toUnsignedString(settingsKey,16)+".png");
 		}
 		static Path overviewPath(int x,int z,long settingsKey) {
-			Path currentRoot=root; return currentRoot==null?null:currentRoot.resolve("overviews-v2").resolve("o."+x+"."+z+"."+Long.toUnsignedString(settingsKey,16)+".png");
+			Path currentRoot=root; return currentRoot==null?null:currentRoot.resolve("overviews").resolve("o."+x+"."+z+"."+Long.toUnsignedString(settingsKey,16)+".png");
 		}
 
 		static void writeRegion(Path target,NativeImage image,long[] coverage) {
@@ -1093,8 +1103,8 @@ public final class WorldMapClientTileCache {
 			return Arrays.copyOf(result.toLongArray(),4);
 		}
 
-		private static Path tilePath(Path base,int x,int z){return base.resolve("tiles").resolve("r."+(x>>5)+"."+(z>>5)).resolve("c."+x+"."+z+".wct");}
-		static synchronized void clear(){root=null;configured=false;ready=false;tiles.clear();loadingTiles.clear();loadingRegions.clear();nextVisibleScanNanos=0;serial++;}
+		private static Path terrainRegionPath(Path base,int regionX,int regionZ){return base.resolve("terrain").resolve("r."+regionX+"."+regionZ+".wcr");}
+		static synchronized void clear(){root=null;configured=false;ready=false;tiles.clear();loadingTiles.clear();loadingTerrainRegions.clear();loadingRegions.clear();nextVisibleScanNanos=0;serial++;}
 	}
 	private record RegionTexture(Identifier id) {}
 	private static final class OverviewPage {

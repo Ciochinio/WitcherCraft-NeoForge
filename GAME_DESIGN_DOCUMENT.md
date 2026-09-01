@@ -623,10 +623,12 @@ Unexplored chunks and captured tiles that have not arrived yet remain hidden by 
 Each time the map page opens, it centers on the player at 1.00x zoom. Zoom changes made during that view
 do not carry into the next opening.
 After the server authorizes a terrain tile, the client retains its raw samples and completed 64 by 64-block leaf
-image in a private disk cache scoped to the world, player, dimension, format, resource packs, and terrain
+image under the game directory's `witchercraft/world-map` data root, scoped to the world, player, dimension, resource packs, and terrain
 display settings. Panning may release decoded samples or GPU textures, but returning to that area loads
 the retained image instead of downloading and rendering it again. The server remains authoritative and
 checks cached tile capture times in the background, sending replacements only when its copy is newer.
+Raw terrain uses compressed 4 by 4-chunk containers aligned with rendered leaves. This keeps detailed,
+resource-pack-independent terrain samples without creating one allocation-heavy disk file per chunk.
 Each saved leaf records which of its 16 chunks contributed to the image. A coverage mismatch marks the
 PNG for repair, but the client may display that older image until its replacement is complete. The map
 also prepares 256 blocks of leaves beyond each viewport edge so ordinary panning

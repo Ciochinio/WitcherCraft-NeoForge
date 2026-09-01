@@ -5,6 +5,9 @@ import java.nio.file.*;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.zip.CRC32;
+import java.util.zip.Deflater;
+import java.util.zip.DeflaterOutputStream;
+import java.util.zip.InflaterInputStream;
 
 /** Versioned, fixed-resolution layered terrain sample for one 16 by 16 chunk. */
 public record WorldMapTerrainTile(int chunkX, int chunkZ, long capturedGameTime,
@@ -17,6 +20,7 @@ public record WorldMapTerrainTile(int chunkX, int chunkZ, long capturedGameTime,
 	public static final int MAX_STATE_LENGTH = 1024;
 	public static final short NO_HEIGHT = Short.MIN_VALUE;
 	private static final int MAGIC = 0x5743544D, VERSION = 4, OLDEST_READABLE_VERSION = 1, MAX_FILE_BYTES = 1024 * 1024;
+	private static final int CONTAINER_MAGIC = 0x57435452, CONTAINER_VERSION = 1, CONTAINER_SIDE = 4, CONTAINER_ENTRIES = 16, MAX_CONTAINER_BYTES = 16 * 1024 * 1024;
 
 	public WorldMapTerrainTile {
 		check(groundHeights, groundColors, groundTintKinds, groundTints, foliageHeights, foliageColors,
@@ -71,7 +75,51 @@ public record WorldMapTerrainTile(int chunkX, int chunkZ, long capturedGameTime,
 	public static Optional<WorldMapTerrainTile> read(Path source, int expectedX, int expectedZ) {
 		try {
 			long size = Files.size(source); if (size <= 0 || size > MAX_FILE_BYTES) return Optional.empty();
-			byte[] file = Files.readAllBytes(source); if (file.length < 4) return Optional.empty();
+			return decode(Files.readAllBytes(source), expectedX, expectedZ);
+		} catch (IOException | RuntimeException ignored) { return Optional.empty(); }
+	}
+
+	static WorldMapTerrainTile[] readContainer(Path source, int expectedRegionX, int expectedRegionZ) throws IOException {
+		Container container = readContainerData(source, expectedRegionX, expectedRegionZ);
+		WorldMapTerrainTile[] result = new WorldMapTerrainTile[CONTAINER_ENTRIES];
+		for (int slot = 0; slot < CONTAINER_ENTRIES; slot++) {
+			byte[] compressed = container.entries[slot]; if (compressed == null) continue;
+			int x = expectedRegionX * CONTAINER_SIDE + slot % CONTAINER_SIDE, z = expectedRegionZ * CONTAINER_SIDE + slot / CONTAINER_SIDE;
+			byte[] encoded = inflate(compressed); Optional<WorldMapTerrainTile> tile = decode(encoded, x, z);
+			if (tile.isEmpty()) throw new IOException("Invalid world-map terrain tile in container");
+			result[slot] = tile.get();
+		}
+		return result;
+	}
+
+	static boolean[] readContainerIndex(Path source, int expectedRegionX, int expectedRegionZ) throws IOException {
+		Container container = readContainerData(source, expectedRegionX, expectedRegionZ); boolean[] result = new boolean[CONTAINER_ENTRIES];
+		for (int slot = 0; slot < CONTAINER_ENTRIES; slot++) result[slot] = container.entries[slot] != null;
+		return result;
+	}
+
+	static void writeContainerAtomically(Path target, WorldMapTerrainTile tile) throws IOException {
+		int regionX = Math.floorDiv(tile.chunkX, CONTAINER_SIDE), regionZ = Math.floorDiv(tile.chunkZ, CONTAINER_SIDE);
+		byte[][] entries = new byte[CONTAINER_ENTRIES][];
+		if (Files.isRegularFile(target)) try { entries = readContainerData(target, regionX, regionZ).entries; }
+		catch (IOException ignored) { /* A fresh valid container replaces an unreadable disposable cache file. */ }
+		int slot = Math.floorMod(tile.chunkX, CONTAINER_SIDE) + Math.floorMod(tile.chunkZ, CONTAINER_SIDE) * CONTAINER_SIDE;
+		entries[slot] = deflate(tile.encode());
+		ByteArrayOutputStream body = new ByteArrayOutputStream();
+		try (DataOutputStream out = new DataOutputStream(body)) {
+			out.writeInt(CONTAINER_MAGIC); out.writeInt(CONTAINER_VERSION); out.writeInt(regionX); out.writeInt(regionZ); out.writeInt(CONTAINER_ENTRIES);
+			for (byte[] entry : entries) out.writeInt(entry == null ? 0 : entry.length);
+			for (byte[] entry : entries) if (entry != null) out.write(entry);
+		}
+		byte[] bytes = appendCrc(body.toByteArray()); Files.createDirectories(target.getParent());
+		Path temporary = target.resolveSibling(target.getFileName() + ".tmp-" + UUID.randomUUID()); Files.write(temporary, bytes);
+		try { Files.move(temporary, target, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING); }
+		catch (AtomicMoveNotSupportedException ignored) { Files.move(temporary, target, StandardCopyOption.REPLACE_EXISTING); }
+	}
+
+	private static Optional<WorldMapTerrainTile> decode(byte[] file, int expectedX, int expectedZ) {
+		try {
+			if (file.length < 4 || file.length > MAX_FILE_BYTES) return Optional.empty();
 			int bodyLength = file.length - 4; CRC32 crc = new CRC32(); crc.update(file, 0, bodyLength);
 			try (DataInputStream in = new DataInputStream(new ByteArrayInputStream(file))) {
 				if (in.readInt() != MAGIC) return Optional.empty();
@@ -99,6 +147,38 @@ public record WorldMapTerrainTile(int chunkX, int chunkZ, long capturedGameTime,
 		} catch (IOException | RuntimeException ignored) { return Optional.empty(); }
 	}
 
+	private static Container readContainerData(Path source, int expectedRegionX, int expectedRegionZ) throws IOException {
+		long size = Files.size(source); if (size <= 0 || size > MAX_CONTAINER_BYTES) throw new IOException("Invalid world-map terrain container size");
+		byte[] file = Files.readAllBytes(source); if (file.length < 4) throw new IOException("Truncated world-map terrain container");
+		int bodyLength = file.length - 4; CRC32 crc = new CRC32(); crc.update(file, 0, bodyLength);
+		try (DataInputStream in = new DataInputStream(new ByteArrayInputStream(file))) {
+			if (in.readInt() != CONTAINER_MAGIC || in.readInt() != CONTAINER_VERSION || in.readInt() != expectedRegionX || in.readInt() != expectedRegionZ || in.readInt() != CONTAINER_ENTRIES)
+				throw new IOException("Invalid world-map terrain container header");
+			int[] lengths = new int[CONTAINER_ENTRIES]; long payloadBytes = 0;
+			for (int slot = 0; slot < CONTAINER_ENTRIES; slot++) { lengths[slot] = in.readInt(); if (lengths[slot] < 0 || lengths[slot] > MAX_FILE_BYTES) throw new IOException("Invalid terrain entry size"); payloadBytes += lengths[slot]; }
+			if (payloadBytes + 4 != in.available()) throw new IOException("Invalid world-map terrain container length");
+			byte[][] entries = new byte[CONTAINER_ENTRIES][];
+			for (int slot = 0; slot < CONTAINER_ENTRIES; slot++) if (lengths[slot] > 0) { entries[slot] = new byte[lengths[slot]]; in.readFully(entries[slot]); }
+			if (in.readInt() != (int)crc.getValue() || in.available() != 0) throw new IOException("Invalid world-map terrain container CRC");
+			return new Container(entries);
+		}
+	}
+
+	private static byte[] deflate(byte[] source) throws IOException {
+		ByteArrayOutputStream output = new ByteArrayOutputStream(); Deflater compressor = new Deflater(Deflater.DEFAULT_COMPRESSION);
+		try (DeflaterOutputStream stream = new DeflaterOutputStream(output, compressor)) { stream.write(source); }
+		finally { compressor.end(); }
+		return output.toByteArray();
+	}
+
+	private static byte[] inflate(byte[] source) throws IOException {
+		try (InflaterInputStream input = new InflaterInputStream(new ByteArrayInputStream(source)); ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+			byte[] buffer = new byte[8192]; int total = 0, read;
+			while ((read = input.read(buffer)) >= 0) { total += read; if (total > MAX_FILE_BYTES) throw new IOException("Inflated terrain tile is too large"); output.write(buffer, 0, read); }
+			return output.toByteArray();
+		}
+	}
+
 	private byte[] encode() throws IOException {
 		ByteArrayOutputStream body = new ByteArrayOutputStream();
 		try (DataOutputStream out = new DataOutputStream(body)) {
@@ -112,9 +192,10 @@ public record WorldMapTerrainTile(int chunkX, int chunkZ, long capturedGameTime,
 				out.writeShort(groundStateIndices[i]); out.writeShort(foliageStateIndices[i]); out.writeShort(decorationStateIndices[i]);
 			}
 		}
-		byte[] bytes=body.toByteArray(); CRC32 crc=new CRC32(); crc.update(bytes); ByteArrayOutputStream file=new ByteArrayOutputStream(bytes.length+4); file.write(bytes);
-		try(DataOutputStream out=new DataOutputStream(file)){out.writeInt((int)crc.getValue());} return file.toByteArray();
+		return appendCrc(body.toByteArray());
 	}
+	private static byte[] appendCrc(byte[] bytes) throws IOException { CRC32 crc=new CRC32(); crc.update(bytes); ByteArrayOutputStream file=new ByteArrayOutputStream(bytes.length+4); file.write(bytes); try(DataOutputStream out=new DataOutputStream(file)){out.writeInt((int)crc.getValue());} return file.toByteArray(); }
+	private record Container(byte[][] entries) {}
 	private static short[] shorts(){short[] a=new short[SAMPLE_COUNT]; java.util.Arrays.fill(a,NO_HEIGHT); return a;}
 	private static short[] shortsZero(){return new short[SAMPLE_COUNT];}
 	private static byte[] bytes(){return new byte[SAMPLE_COUNT];}
