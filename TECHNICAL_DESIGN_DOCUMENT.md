@@ -1255,7 +1255,10 @@ This prevents two players, recreated worlds, or reset servers at the same addres
 
 The client indexes compressed terrain-container entries on two daemon I/O workers before issuing map requests.
 Each terrain container covers the same 4 by 4 chunks as one rendered leaf and stores up to 16 independently
-deflated version-four tile payloads behind a fixed entry table. The container header records its region coordinates
+deflated version-four tile payloads behind a fixed entry table. These files use the `.wcr` extension, short for
+WitcherCraft Region, and the filename `r.<region X>.<region Z>.wcr`. A `.wcr` file contains raw terrain samples,
+not a rendered image. The client uses those samples to rebuild leaf and overview PNGs when required.
+The container header records its region coordinates
 and format version, and a container CRC rejects truncated or corrupted files. Tile payloads retain their own CRC.
 The client loads cached leaf PNG files nearest the current view first and then loads nearby raw containers
 selected from at most 256 candidate tiles. One container read supplies every present tile in that leaf. The render
