@@ -643,6 +643,8 @@ stays behind detailed leaves during zoom and movement, while existing leaves tem
 that is still being built. Terrain therefore does not disappear while asynchronous cache work catches up.
 Terrain pages share one floating-point transform for pan and zoom. Page positions and sizes are not rounded
 independently, so fractional camera movement stays continuous and adjacent page edges remain aligned.
+Crossing into another set of visible pages starts its disk-cache lookup immediately. Repeated checks of an
+unchanged view remain paced, and visible pages load before the surrounding prefetch ring.
 
 Opening the map does not pause the world. The Witcher menu uses full-screen art, so damage from a hostile
 mob or another player closes it and returns control to the player. Environmental damage such as fire,

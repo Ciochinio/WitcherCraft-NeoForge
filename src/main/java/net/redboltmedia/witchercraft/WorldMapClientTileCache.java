@@ -939,14 +939,16 @@ public final class WorldMapClientTileCache {
 		private static final Object[] regionFileLocks = new Object[64];
 		private static volatile Path root;
 		private static volatile boolean configured, ready;
-		private static long serial, nextVisibleScanNanos;
+		private static long serial, nextVisibleScanNanos, lastScannedSettingsKey;
+		private static int lastScannedMinPageX, lastScannedMaxPageX, lastScannedMinPageZ, lastScannedMaxPageZ;
+		private static boolean haveScannedView, lastScannedOverview;
 		static { Arrays.setAll(regionFileLocks, ignored -> new Object()); }
 
 		static synchronized void configure(UUID worldId, UUID playerId, String dimensionNamespace, String dimensionPath, long generation) {
 			Path next = Minecraft.getInstance().gameDirectory.toPath().resolve("witchercraft").resolve("world-map")
 				.resolve(worldId.toString()).resolve(playerId.toString()).resolve("dimensions").resolve(dimensionNamespace).resolve(dimensionPath);
 			if (configured && next.equals(root)) return;
-			root = next; configured = true; ready = false; tiles.clear(); loadingTiles.clear(); loadingTerrainRegions.clear(); loadingRegions.clear();
+			root = next; configured = true; ready = false; tiles.clear(); loadingTiles.clear(); loadingTerrainRegions.clear(); loadingRegions.clear(); haveScannedView = false;
 			long scanSerial = ++serial;
 			IO.execute(() -> scan(next, scanSerial));
 		}
@@ -988,14 +990,25 @@ public final class WorldMapClientTileCache {
 
 		static void updateVisible(int minX, int maxX, int minZ, int maxZ, double centerX, double centerZ, long settingsKey, long generation, boolean overview) {
 			Path currentRoot = root; if (!configured || !ready || currentRoot == null) return;
-			long now=System.nanoTime();if(now<nextVisibleScanNanos)return;nextVisibleScanNanos=now+250_000_000L;
 			int chunksPerPage=overview?OVERVIEW_CHUNKS:REGION_CHUNKS,prefetch=overview?OVERVIEW_PREFETCH:PREFETCH_REGIONS;
-			int minRX=Math.floorDiv(minX,chunksPerPage)-prefetch,maxRX=Math.floorDiv(maxX,chunksPerPage)+prefetch,minRZ=Math.floorDiv(minZ,chunksPerPage)-prefetch,maxRZ=Math.floorDiv(maxZ,chunksPerPage)+prefetch;
-			List<int[]> regions = new ArrayList<>();
-			for(int z=minRZ;z<=maxRZ;z++)for(int x=minRX;x<=maxRX;x++)regions.add(new int[]{x,z});
+			int visibleMinX=Math.floorDiv(minX,chunksPerPage),visibleMaxX=Math.floorDiv(maxX,chunksPerPage);
+			int visibleMinZ=Math.floorDiv(minZ,chunksPerPage),visibleMaxZ=Math.floorDiv(maxZ,chunksPerPage);
+			boolean changed=!haveScannedView||visibleMinX!=lastScannedMinPageX||visibleMaxX!=lastScannedMaxPageX
+				||visibleMinZ!=lastScannedMinPageZ||visibleMaxZ!=lastScannedMaxPageZ||overview!=lastScannedOverview||settingsKey!=lastScannedSettingsKey;
+			long now=System.nanoTime();if(!changed&&now<nextVisibleScanNanos)return;nextVisibleScanNanos=now+250_000_000L;
+			haveScannedView=true;lastScannedMinPageX=visibleMinX;lastScannedMaxPageX=visibleMaxX;
+			lastScannedMinPageZ=visibleMinZ;lastScannedMaxPageZ=visibleMaxZ;lastScannedOverview=overview;lastScannedSettingsKey=settingsKey;
+			int minRX=visibleMinX-prefetch,maxRX=visibleMaxX+prefetch,minRZ=visibleMinZ-prefetch,maxRZ=visibleMaxZ+prefetch;
+			List<int[]> visiblePages = new ArrayList<>(), prefetchedPages = new ArrayList<>();
+			for(int z=minRZ;z<=maxRZ;z++)for(int x=minRX;x<=maxRX;x++){
+				int[] page={x,z};
+				if(x>=visibleMinX&&x<=visibleMaxX&&z>=visibleMinZ&&z<=visibleMaxZ)visiblePages.add(page);else prefetchedPages.add(page);
+			}
 			int pageBlocks=overview?OVERVIEW:REGION;
-			regions.sort(Comparator.comparingDouble(p -> { double dx=(p[0]+0.5)*pageBlocks-centerX,dz=(p[1]+0.5)*pageBlocks-centerZ; return dx*dx+dz*dz; }));
-			for(int[] region:regions) {
+			Comparator<int[]> nearestPage=Comparator.comparingDouble(p->{double dx=(p[0]+0.5)*pageBlocks-centerX,dz=(p[1]+0.5)*pageBlocks-centerZ;return dx*dx+dz*dz;});
+			visiblePages.sort(nearestPage);prefetchedPages.sort(nearestPage);
+			List<int[]> orderedPages=new ArrayList<>(visiblePages.size()+prefetchedPages.size());orderedPages.addAll(visiblePages);orderedPages.addAll(prefetchedPages);
+			for(int[] region:orderedPages) {
 				Path path=overview?overviewPath(region[0],region[1],settingsKey):regionPath(region[0],region[1],settingsKey); String key=path.toString();
 				if(overview){OverviewPage inMemory=OVERVIEWS.get(ChunkPos.pack(region[0],region[1]));if(inMemory!=null&&inMemory.texture!=null)continue;}
 				else{ClientRegion inMemory=REGIONS.get(ChunkPos.pack(region[0],region[1]));if(inMemory!=null&&inMemory.textures[0]!=null)continue;}
@@ -1103,7 +1116,7 @@ public final class WorldMapClientTileCache {
 		}
 
 		private static Path terrainRegionPath(Path base,int regionX,int regionZ){return base.resolve("terrain").resolve("r."+regionX+"."+regionZ+".wcr");}
-		static synchronized void clear(){root=null;configured=false;ready=false;tiles.clear();loadingTiles.clear();loadingTerrainRegions.clear();loadingRegions.clear();nextVisibleScanNanos=0;serial++;}
+		static synchronized void clear(){root=null;configured=false;ready=false;tiles.clear();loadingTiles.clear();loadingTerrainRegions.clear();loadingRegions.clear();nextVisibleScanNanos=0;haveScannedView=false;serial++;}
 	}
 	private record RegionTexture(Identifier id) {}
 	private static final class OverviewPage {

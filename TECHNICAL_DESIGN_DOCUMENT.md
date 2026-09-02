@@ -1129,6 +1129,11 @@ positions after its pacing interval instead of recording them as absent. The who
 non-pausing, so the integrated server keeps running throughout the visible request chain. Changing the
 visible chunk bounds through pan, zoom, or center reprioritizes the remaining candidates around the new center.
 
+Disk-cache discovery retains a 250-millisecond throttle only while the same page bounds remain visible.
+Crossing a leaf or overview-page boundary bypasses that throttle, so a fast pan cannot spend the rest of
+the old scan interval showing the map background. The I/O submission order is visible pages nearest the
+center, then the prefetched ring nearest the center. Existing in-flight reads are not cancelled.
+
 ### 5.7 Milestone 2C client renderer
 
 `WorldMapClientTileCache` keeps received messages as decoded CPU samples. It does not create a GPU
