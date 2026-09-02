@@ -17,7 +17,7 @@ import java.util.UUID;
 
 /** Bounded client intent for one personal waypoint operation. */
 @EventBusSubscriber
-public record WorldMapWaypointMutationMessage(int requestId, Operation operation, UUID waypointId, String dimension, double x, double z, String name, String icon, String color, boolean value)
+public record WorldMapWaypointMutationMessage(int requestId, Operation operation, UUID waypointId, String dimension, double x, double z, String name, String icon, boolean value)
 	implements CustomPacketPayload {
 	private static final UUID NO_ID = new UUID(0L, 0L);
 	private static final int MAX_DIMENSION_LENGTH = 256;
@@ -34,7 +34,6 @@ public record WorldMapWaypointMutationMessage(int requestId, Operation operation
 		buffer.writeDouble(message.z);
 		buffer.writeUtf(message.name, MAX_NAME_WIRE_CHARACTERS);
 		buffer.writeUtf(message.icon, MAX_ID_LENGTH);
-		buffer.writeUtf(message.color, MAX_ID_LENGTH);
 		buffer.writeBoolean(message.value);
 	}, buffer -> {
 		int requestId = buffer.readVarInt();
@@ -49,12 +48,11 @@ public record WorldMapWaypointMutationMessage(int requestId, Operation operation
 		double z = buffer.readDouble();
 		String name = buffer.readUtf(MAX_NAME_WIRE_CHARACTERS);
 		String icon = buffer.readUtf(MAX_ID_LENGTH);
-		String color = buffer.readUtf(MAX_ID_LENGTH);
-		return new WorldMapWaypointMutationMessage(requestId, Operation.values()[operationId], waypointId, dimension, x, z, name, icon, color, buffer.readBoolean());
+		return new WorldMapWaypointMutationMessage(requestId, Operation.values()[operationId], waypointId, dimension, x, z, name, icon, buffer.readBoolean());
 	});
 
 	public static WorldMapWaypointMutationMessage requestSnapshot(int requestId) {
-		return new WorldMapWaypointMutationMessage(requestId, Operation.REQUEST_SNAPSHOT, NO_ID, "", 0, 0, "", "", "", false);
+		return new WorldMapWaypointMutationMessage(requestId, Operation.REQUEST_SNAPSHOT, NO_ID, "", 0, 0, "", "", false);
 	}
 
 	@Override
@@ -71,11 +69,9 @@ public record WorldMapWaypointMutationMessage(int requestId, Operation operation
 		WorldMapWaypoints data = WorldMapWaypoints.get(player.level().getServer());
 		WorldMapWaypoints.OperationResult result = switch (message.operation) {
 			case REQUEST_SNAPSHOT -> new WorldMapWaypoints.OperationResult(WorldMapWaypoints.Status.SUCCESS, null);
-			case CREATE -> data.create(player, Identifier.tryParse(message.dimension), message.x, message.z, message.name,
-				WorldMapWaypoints.WaypointIcon.byId(message.icon), WorldMapWaypoints.WaypointColor.byId(message.color));
-			case EDIT -> data.edit(player, message.waypointId, message.name, WorldMapWaypoints.WaypointIcon.byId(message.icon), WorldMapWaypoints.WaypointColor.byId(message.color));
+			case CREATE -> data.create(player, Identifier.tryParse(message.dimension), message.x, message.z, message.name, WorldMapWaypoints.WaypointIcon.byId(message.icon));
+			case EDIT -> data.edit(player, message.waypointId, message.name, WorldMapWaypoints.WaypointIcon.byId(message.icon));
 			case SET_VISIBLE -> data.setVisible(player, message.waypointId, message.value);
-			case SET_TRACKED -> data.setTracked(player, message.waypointId, message.value);
 			case DELETE -> data.delete(player, message.waypointId);
 		};
 		PacketDistributor.sendToPlayer(player, new WorldMapWaypointResultMessage(message.requestId, message.operation, result.status()));
@@ -88,6 +84,6 @@ public record WorldMapWaypointMutationMessage(int requestId, Operation operation
 	}
 
 	public enum Operation {
-		REQUEST_SNAPSHOT, CREATE, EDIT, SET_VISIBLE, SET_TRACKED, DELETE
+		REQUEST_SNAPSHOT, CREATE, EDIT, SET_VISIBLE, DELETE
 	}
 }

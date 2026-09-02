@@ -1344,9 +1344,9 @@ regions do not create GPU textures, and no fog state enters terrain capture, per
 messages.
 Milestone 2D.8 replaces the diagnostic cross with the 64 by 64 resource-pack texture
 `textures/gui/map/player_arrow.png`. `MapPage` draws it at a base 16 by 16 screen pixels and rotates it
-around the player position using client player yaw. Map zoom changes its position but never its screen
-size. The client `markerScale` setting ranges from 0.5 to 2.0, producing an 8 to 32-pixel marker at the
-default texture. Marker-style configuration remains postponed.
+around the player position using client player yaw. Batch 3 later changed both player and waypoint markers
+to multiply their base size by the square root of map zoom, clamped from 0.5 to 2.5, and then by the client
+`markerScale` setting from 0.5 to 2.0. Marker-style configuration remains postponed.
 Separate stored lighting remains a possible later refinement. Milestone 2D must pass representative
 in-game visual, restart, and performance checks before waypoint work begins.
 
@@ -1360,25 +1360,24 @@ UUID, so terrain from another world or player cannot appear.
 `WorldMapWaypoints` is a locked code element in the base package. It owns the authoritative personal
 waypoint records, validation, and server-thread mutation methods. The server stores one codec-backed
 `SavedData` file in its shared world data storage. That file groups waypoint lists by player UUID, while
-each waypoint records its dimension identifier. Waypoints therefore survive logout, death, and restart
+each waypoint records its dimension identifier, X/Z, name, and visibility. Waypoints therefore survive logout, death, and restart
 without using generated player variables or client files.
 
 The server generates every waypoint UUID. Public operations accept a `ServerPlayer`, derive ownership from
 that player, and never accept an owner UUID from a caller. Creation validates that the dimension is loaded,
 the coordinates are finite and inside both the hard 30,000,000-block ceiling and the dimension's current
 world border, and the normalized name contains 1 to 64 non-control characters. Editing cannot change the
-dimension or coordinates. The icon and color types are fixed enums, and the server caps each player at 200
-records. Tracking one waypoint clears the previous tracked waypoint in the same dimension.
+dimension or coordinates, and the server caps each player at 200 records.
 
 The version-one save format uses permissive stored strings for UUID, dimension, icon, and color fields, then
 validates each decoded record. This lets the loader discard one invalid logical record instead of accepting
-it into server state. It also removes duplicate waypoint UUIDs, extra records above the player limit, and
-extra tracked waypoints in one dimension. A structurally unreadable saved-data file still follows Minecraft's
+it into server state. It also removes duplicate waypoint UUIDs and extra records above the player limit.
+A structurally unreadable saved-data file still follows Minecraft's
 normal SavedData recovery behavior.
 
-Icon IDs will resolve in the client renderer to editable PNG files below
-`textures/gui/map/waypoints/`. The stored color remains separate so one neutral icon texture can support the
-whole fixed palette. Batch 1 does not add client synchronization, rendering, or placeholder textures.
+Format version 2 removes color and tracking from the runtime record. Icon remains player-selectable. The codec
+still accepts and writes the old color and tracking fields with fixed defaults so existing version-one saves
+load safely. The client tints every saved icon with `MapLayout.WAYPOINT_COLOR`.
 
 Batch 2 uses one bounded `WorldMapWaypointMutationMessage` for snapshot requests and all mutation intents.
 The payload never carries an owner UUID. The network context supplies the `ServerPlayer`, and the server
@@ -1390,7 +1389,7 @@ bounded by the 200-waypoint server limit and avoids client-side merge rules.
 Minecraft's current connection object before every access, request, and response. A connection change clears
 the list, results, synchronization flag, and request counter, so state from one server cannot appear on
 another. Opening `MapPage` requests a fresh snapshot. Later waypoint screens call the cache's create, edit,
-visibility, tracking, and delete request methods rather than changing the cached list themselves.
+visibility and delete request methods rather than changing the cached list themselves.
 
 Batch 3 extends the `GuiPage` input contract with a double-click-aware overload and Unicode character input.
 The old click method remains the default target, so existing pages need no changes. `WitcherGuiScreen`
@@ -1404,8 +1403,7 @@ the matching server result. Rejections leave the panel open with a readable stat
 The client cache holds one temporary pin per dimension. A new pin replaces the old pin in that dimension.
 Pins survive closing the map but clear with the rest of the connection-scoped cache when the connection
 changes. They never enter server packets, SavedData, or the 200-waypoint limit. The future minimap reads this
-record as the active temporary navigation target. The atlas retains a pin in cell zero for this purpose, but
-`WaypointIcon` exposes only home, camp, chest, danger, herb, monster, and quest for saved records.
+record as the active temporary navigation target. The atlas retains a pin in cell zero for this purpose.
 
 The waypoint renderer reads only the latest connection-scoped snapshot. It filters records by the player's
 current dimension and persistent visibility flag, uses the terrain world-to-screen transform, and clips all
@@ -1413,11 +1411,29 @@ markers to the viewport. Marker centers retain floating-point screen coordinates
 which removes the integer-step lag seen while panning at low zoom. Player and waypoint marker sizes multiply
 by the square root of map zoom, clamped from 0.5 to 2.5, and then by the existing client marker-scale setting.
 Waypoint opacity rises linearly from 35 percent at 0.25 screen pixels per block to full opacity at 1.0.
-Tracking adds a four-pixel base-size increase and gold outline. Hover detection chooses the nearest marker
-under the cursor and reports its color-styled name and X/Z through the shell's screen-space tooltip path.
+Each frame chooses the nearest marker beneath the cursor. That hovered marker appears in a centered information
+card near the bottom of the map. Left input remains reserved for panning. The card data accepts a name, detail
+line, and color so future POIs can put their description in the detail line without changing its renderer.
 
-The temporary pin and seven saved icon IDs use `textures/gui/map/waypoint_icons.png`, a transparent 4 by 2
-atlas in this fixed cell order: pin, home, camp, chest, danger, herb, monster, and quest. The checked-in atlas
+The temporary pin and seven saved icons use `textures/gui/map/waypoint_icons.png`, a transparent 4 by 2
+atlas. Its fixed order is pin, home, camp, chest, danger, herb, monster, and quest. The checked-in atlas
 contains deliberately simple pixel placeholders and is 1774 by 887 pixels. Replacements
 must retain those dimensions, cell order, transparent padding, and grid. The renderer multiplies neutral icon
-pixels by the waypoint's saved ARGB palette color, so color variants do not require duplicate textures.
+pixels by `MapLayout.WAYPOINT_COLOR`, so testing another color requires one constant change.
+
+Batch 4 adds `WorldMapWaypointManagerOverlay` as a locked base-package code element. `MapPage` owns one
+instance and supplies only a show-on-map callback, keeping map centering in the page while the overlay owns
+its modal state, search query, scroll offset, edit form, delete confirmation, and one pending mutation. The
+manager reads the connection-scoped cache and sends every change through its existing request methods. It
+never edits cached records or authoritative state directly.
+
+The manager sorts the current dimension before other dimensions, then sorts names case-insensitively and
+uses UUID as a stable tie-breaker. Search is also case-insensitive. Current-dimension rows show planar player
+distance and may center the map; other rows show their dimension identifier and disable that action. Edit
+reuses the compact name-and-icon creation-panel geometry but cannot change coordinates or dimension. Delete requires a
+confirmation. Escape closes the delete confirmation, editor, and manager in that order. Sharing remains
+outside Batch 4.
+
+The bottom bar draws width-limited mouse-control hints between the menu buttons and right-side controls.
+`MapLayout` owns the hint position and width plus the hover-card dimensions and offset.
+`tools/map-layout-creator.html` previews both pieces and exports their constants.

@@ -26,7 +26,7 @@ import java.util.UUID;
 
 /** Server-owned personal waypoint storage and mutation validation. */
 public final class WorldMapWaypoints extends SavedData {
-	public static final int FORMAT_VERSION = 1;
+	public static final int FORMAT_VERSION = 2;
 	public static final int MAX_WAYPOINTS_PER_PLAYER = 200;
 	public static final int MAX_NAME_CHARACTERS = 64;
 	public static final double MAX_ABSOLUTE_COORDINATE = 30_000_000.0;
@@ -60,34 +60,34 @@ public final class WorldMapWaypoints extends SavedData {
 		return List.copyOf(waypointsByPlayer.getOrDefault(player.getUUID(), List.of()));
 	}
 
-	public OperationResult create(ServerPlayer player, Identifier dimension, double x, double z, String name, WaypointIcon icon, WaypointColor color) {
+	public OperationResult create(ServerPlayer player, Identifier dimension, double x, double z, String name, WaypointIcon icon) {
 		requireServerThread(player.level().getServer());
 		List<Waypoint> waypoints = waypointsByPlayer.computeIfAbsent(player.getUUID(), ignored -> new ArrayList<>());
 		if (waypoints.size() >= MAX_WAYPOINTS_PER_PLAYER)
 			return OperationResult.failure(Status.LIMIT_REACHED);
 		String normalizedName = normalizeName(name);
-		Status validation = validateInput(player.level().getServer(), dimension, x, z, normalizedName, icon, color);
+		Status validation = validateInput(player.level().getServer(), dimension, x, z, normalizedName, icon);
 		if (validation != Status.SUCCESS)
 			return OperationResult.failure(validation);
 		UUID id;
 		do id = UUID.randomUUID(); while (find(waypoints, id) != null);
-		Waypoint waypoint = new Waypoint(id, dimension, x, z, normalizedName, icon, color, true, false);
+		Waypoint waypoint = new Waypoint(id, dimension, x, z, normalizedName, icon, true);
 		waypoints.add(waypoint);
 		setDirty();
 		return OperationResult.success(waypoint);
 	}
 
-	public OperationResult edit(ServerPlayer player, UUID id, String name, WaypointIcon icon, WaypointColor color) {
+	public OperationResult edit(ServerPlayer player, UUID id, String name, WaypointIcon icon) {
 		requireServerThread(player.level().getServer());
 		List<Waypoint> waypoints = waypointsByPlayer.get(player.getUUID());
 		Waypoint old = find(waypoints, id);
 		if (old == null)
 			return OperationResult.failure(Status.NOT_FOUND);
 		String normalizedName = normalizeName(name);
-		Status validation = validateInput(player.level().getServer(), old.dimension(), old.x(), old.z(), normalizedName, icon, color);
+		Status validation = validateInput(player.level().getServer(), old.dimension(), old.x(), old.z(), normalizedName, icon);
 		if (validation != Status.SUCCESS)
 			return OperationResult.failure(validation);
-		Waypoint replacement = new Waypoint(old.id(), old.dimension(), old.x(), old.z(), normalizedName, icon, color, old.visible(), old.tracked());
+		Waypoint replacement = new Waypoint(old.id(), old.dimension(), old.x(), old.z(), normalizedName, icon, old.visible());
 		replace(waypoints, replacement);
 		setDirty();
 		return OperationResult.success(replacement);
@@ -99,26 +99,7 @@ public final class WorldMapWaypoints extends SavedData {
 		Waypoint old = find(waypoints, id);
 		if (old == null)
 			return OperationResult.failure(Status.NOT_FOUND);
-		Waypoint replacement = new Waypoint(old.id(), old.dimension(), old.x(), old.z(), old.name(), old.icon(), old.color(), visible, old.tracked());
-		replace(waypoints, replacement);
-		setDirty();
-		return OperationResult.success(replacement);
-	}
-
-	public OperationResult setTracked(ServerPlayer player, UUID id, boolean tracked) {
-		requireServerThread(player.level().getServer());
-		List<Waypoint> waypoints = waypointsByPlayer.get(player.getUUID());
-		Waypoint old = find(waypoints, id);
-		if (old == null)
-			return OperationResult.failure(Status.NOT_FOUND);
-		if (tracked) {
-			for (int i = 0; i < waypoints.size(); i++) {
-				Waypoint candidate = waypoints.get(i);
-				if (candidate.tracked() && candidate.dimension().equals(old.dimension()))
-					waypoints.set(i, candidate.withTracked(false));
-			}
-		}
-		Waypoint replacement = old.withTracked(tracked);
+		Waypoint replacement = new Waypoint(old.id(), old.dimension(), old.x(), old.z(), old.name(), old.icon(), visible);
 		replace(waypoints, replacement);
 		setDirty();
 		return OperationResult.success(replacement);
@@ -147,7 +128,6 @@ public final class WorldMapWaypoints extends SavedData {
 		}
 		List<Waypoint> loaded = new ArrayList<>();
 		Set<UUID> identifiers = new HashSet<>();
-		Set<Identifier> trackedDimensions = new HashSet<>();
 		for (StoredWaypoint stored : storedPlayer.waypoints()) {
 			if (loaded.size() >= MAX_WAYPOINTS_PER_PLAYER)
 				break;
@@ -156,8 +136,6 @@ public final class WorldMapWaypoints extends SavedData {
 				WitchercraftMod.LOGGER.warn("Discarded invalid personal waypoint for player {}", playerId);
 				continue;
 			}
-			if (waypoint.tracked() && !trackedDimensions.add(waypoint.dimension()))
-				waypoint = waypoint.withTracked(false);
 			loaded.add(waypoint);
 		}
 		if (!loaded.isEmpty())
@@ -168,8 +146,8 @@ public final class WorldMapWaypoints extends SavedData {
 		return waypointsByPlayer.entrySet().stream().map(entry -> new PlayerEntry(entry.getKey().toString(), entry.getValue().stream().map(StoredWaypoint::from).toList())).toList();
 	}
 
-	private static Status validateInput(MinecraftServer server, Identifier dimension, double x, double z, String name, WaypointIcon icon, WaypointColor color) {
-		if (dimension == null || icon == null || color == null || !validName(name) || !validCoordinates(x, z))
+	private static Status validateInput(MinecraftServer server, Identifier dimension, double x, double z, String name, WaypointIcon icon) {
+		if (dimension == null || icon == null || !validName(name) || !validCoordinates(x, z))
 			return Status.INVALID_INPUT;
 		ServerLevel level = server.getLevel(ResourceKey.create(Registries.DIMENSION, dimension));
 		if (level == null)
@@ -181,7 +159,7 @@ public final class WorldMapWaypoints extends SavedData {
 	}
 
 	private static boolean validStoredWaypoint(Waypoint waypoint) {
-		return waypoint.dimension() != null && waypoint.icon() != null && waypoint.color() != null && validName(waypoint.name()) && validCoordinates(waypoint.x(), waypoint.z());
+		return waypoint.dimension() != null && waypoint.icon() != null && validName(waypoint.name()) && validCoordinates(waypoint.x(), waypoint.z());
 	}
 
 	private static boolean validCoordinates(double x, double z) {
@@ -241,36 +219,7 @@ public final class WorldMapWaypoints extends SavedData {
 		}
 	}
 
-	public enum WaypointColor {
-		GOLD(0xFFD6AD52), RED(0xFFB9473F), GREEN(0xFF5F8A55), BLUE(0xFF507EAA), WHITE(0xFFE7E2D3), ORANGE(0xFFC8783E), PURPLE(0xFF80649A), GRAY(0xFF777777);
-
-		private final int argb;
-
-		WaypointColor(int argb) {
-			this.argb = argb;
-		}
-
-		public String id() {
-			return name().toLowerCase(Locale.ROOT);
-		}
-
-		public int argb() {
-			return argb;
-		}
-
-		public static @Nullable WaypointColor byId(String id) {
-			try {
-				return valueOf(id.toUpperCase(Locale.ROOT));
-			} catch (IllegalArgumentException | NullPointerException exception) {
-				return null;
-			}
-		}
-	}
-
-	public record Waypoint(UUID id, Identifier dimension, double x, double z, String name, WaypointIcon icon, WaypointColor color, boolean visible, boolean tracked) {
-		private Waypoint withTracked(boolean tracked) {
-			return new Waypoint(id, dimension, x, z, name, icon, color, visible, tracked);
-		}
+	public record Waypoint(UUID id, Identifier dimension, double x, double z, String name, WaypointIcon icon, boolean visible) {
 	}
 
 	public enum Status {
@@ -294,32 +243,31 @@ public final class WorldMapWaypoints extends SavedData {
 		).apply(instance, PlayerEntry::new));
 	}
 
-	private record StoredWaypoint(String id, String dimension, double x, double z, String name, String icon, String color, boolean visible, boolean tracked) {
+	private record StoredWaypoint(String id, String dimension, double x, double z, String name, boolean visible, String legacyIcon, String legacyColor, boolean legacyTracked) {
 		private static final Codec<StoredWaypoint> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Codec.STRING.fieldOf("id").forGetter(StoredWaypoint::id),
 			Codec.STRING.fieldOf("dimension").forGetter(StoredWaypoint::dimension),
 			Codec.DOUBLE.fieldOf("x").forGetter(StoredWaypoint::x),
 			Codec.DOUBLE.fieldOf("z").forGetter(StoredWaypoint::z),
 			Codec.STRING.fieldOf("name").forGetter(StoredWaypoint::name),
-			Codec.STRING.fieldOf("icon").forGetter(StoredWaypoint::icon),
-			Codec.STRING.fieldOf("color").forGetter(StoredWaypoint::color),
 			Codec.BOOL.optionalFieldOf("visible", true).forGetter(StoredWaypoint::visible),
-			Codec.BOOL.optionalFieldOf("tracked", false).forGetter(StoredWaypoint::tracked)
+			Codec.STRING.optionalFieldOf("icon", "home").forGetter(StoredWaypoint::legacyIcon),
+			Codec.STRING.optionalFieldOf("color", "gold").forGetter(StoredWaypoint::legacyColor),
+			Codec.BOOL.optionalFieldOf("tracked", false).forGetter(StoredWaypoint::legacyTracked)
 		).apply(instance, StoredWaypoint::new));
 
 		private static StoredWaypoint from(Waypoint waypoint) {
-			return new StoredWaypoint(waypoint.id().toString(), waypoint.dimension().toString(), waypoint.x(), waypoint.z(), waypoint.name(), waypoint.icon().id(), waypoint.color().id(), waypoint.visible(), waypoint.tracked());
+			return new StoredWaypoint(waypoint.id().toString(), waypoint.dimension().toString(), waypoint.x(), waypoint.z(), waypoint.name(), waypoint.visible(), waypoint.icon().id(), "gold", false);
 		}
 
 		private @Nullable Waypoint decode() {
 			try {
 				UUID parsedId = UUID.fromString(id);
 				Identifier parsedDimension = Identifier.tryParse(dimension);
-				WaypointIcon parsedIcon = WaypointIcon.byId(icon);
-				WaypointColor parsedColor = WaypointColor.byId(color);
-				if (parsedDimension == null || parsedIcon == null || parsedColor == null)
+				WaypointIcon parsedIcon = WaypointIcon.byId(legacyIcon);
+				if (parsedDimension == null || parsedIcon == null)
 					return null;
-				return new Waypoint(parsedId, parsedDimension, x, z, normalizeName(name), parsedIcon, parsedColor, visible, tracked);
+				return new Waypoint(parsedId, parsedDimension, x, z, normalizeName(name), parsedIcon, visible);
 			} catch (IllegalArgumentException exception) {
 				return null;
 			}

@@ -546,6 +546,19 @@
       "path": "~/World Map"
     },
     {
+      "name": "WorldMapWaypointManagerOverlay",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_waypoint_manager_overlay",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapWaypointManagerOverlay.java"
+        ]
+      },
+      "path": "~/World Map"
+    },
+    {
       "name": "PauseMenuGuiOpen",
       "type": "procedure",
       "compiles": true,

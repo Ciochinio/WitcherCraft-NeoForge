@@ -578,12 +578,9 @@ size setting. The remaining unfinished tabs use placeholders until those systems
 get their own screens.
 
 Personal waypoints belong to one player in one saved world. A waypoint records its dimension, X and Z
-coordinates, name, icon, color, visibility, and tracking state. Names contain 1 to 64 non-control characters.
-The initial saved-waypoint icon choices are home, camp, chest, danger, herb, monster, and quest. Each icon
-uses an editable PNG texture when rendered. The initial colors are gold, red, green, blue, white, orange,
-purple, and gray, with a gold home icon as the default. A player may keep up to 200 waypoints and track one waypoint in
-each dimension. Waypoints survive death and world restart. They cannot move after creation, but the player
-may edit their presentation, hide them, change tracking, or delete them.
+coordinates, name, icon, and visibility. Names contain 1 to 64 non-control characters. Players choose from
+home, camp, chest, danger, herb, monster, and quest icons. Every icon uses the same fixed UI color. A player may keep up to 200 waypoints. Waypoints survive death
+and world restart. They cannot move after creation, but the player may rename, hide, or delete them.
 
 Left mouse dragging pans the map. One right-click places or replaces a temporary gold pin in the current
 dimension after a short delay. A second right-click during that delay cancels the pin and opens a compact
@@ -591,12 +588,23 @@ saved-waypoint creation panel at that X and Z position. Temporary pins survive c
 client-side and disappear on disconnect. They do not count toward the saved-waypoint limit. The future
 minimap treats the pin as its active navigation target.
 
-The creation panel accepts a name, one of the seven saved icon choices, and one palette color. It remains
-open with an error message if the server rejects the request. Visible waypoints render only on their recorded
+The compact creation panel accepts a name and icon and remains open with an error message if the server rejects the
+request. Visible waypoints render only on their recorded
 dimension. Player and waypoint markers use subpixel positions and scale with the square root of map zoom,
 clamped between 0.5 and 2.5 times their base size. Waypoints also fade to 35 percent opacity at the farthest
-zoom and reach full opacity at 1 screen pixel per block. A tracked saved waypoint receives a larger gold
-outline. Hovering a marker shows its name in the saved color with its coordinates below.
+zoom and reach full opacity at 1 screen pixel per block. Hovering a marker opens a centered information card
+above the bottom controls. Saved waypoints and temporary targets show their coordinates.
+Future points of interest use the same card with a description instead of coordinates.
+
+The Waypoints button opens a compact manager over the darkened map. It lists all saved waypoints with the
+current dimension first, supports case-insensitive name search and mouse-wheel scrolling, and shows either
+the player's distance or the waypoint's dimension on each row. Row controls toggle visibility, open the same
+compact name editor, request deletion behind a confirmation prompt, or center the map
+on a waypoint in the current dimension. Show-on-map is unavailable for waypoints in other dimensions.
+Escape closes the confirmation prompt, editor, and manager in that order.
+
+The bottom control bar places a permanent, width-limited input guide between its left-side menu buttons and
+right-side map controls. Its position and width belong to the editable map layout.
 
 World-map exploration begins when the server sends a loaded Overworld chunk to a player. That event
 records the chunk in that player's private exploration history and queues a shared terrain sample.

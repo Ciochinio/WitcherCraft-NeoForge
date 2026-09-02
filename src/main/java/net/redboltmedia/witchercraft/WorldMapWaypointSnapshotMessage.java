@@ -32,9 +32,7 @@ public record WorldMapWaypointSnapshotMessage(List<WorldMapWaypoints.Waypoint> w
 			buffer.writeDouble(waypoint.z());
 			buffer.writeUtf(waypoint.name(), MAX_NAME_WIRE_CHARACTERS);
 			buffer.writeUtf(waypoint.icon().id(), MAX_ID_LENGTH);
-			buffer.writeUtf(waypoint.color().id(), MAX_ID_LENGTH);
 			buffer.writeBoolean(waypoint.visible());
-			buffer.writeBoolean(waypoint.tracked());
 		}
 	}, buffer -> {
 		int count = buffer.readVarInt();
@@ -48,10 +46,9 @@ public record WorldMapWaypointSnapshotMessage(List<WorldMapWaypoints.Waypoint> w
 			double z = buffer.readDouble();
 			String name = buffer.readUtf(MAX_NAME_WIRE_CHARACTERS);
 			WorldMapWaypoints.WaypointIcon icon = WorldMapWaypoints.WaypointIcon.byId(buffer.readUtf(MAX_ID_LENGTH));
-			WorldMapWaypoints.WaypointColor color = WorldMapWaypoints.WaypointColor.byId(buffer.readUtf(MAX_ID_LENGTH));
-			if (dimension == null || icon == null || color == null || !Double.isFinite(x) || !Double.isFinite(z))
+			if (dimension == null || icon == null || !Double.isFinite(x) || !Double.isFinite(z))
 				throw new IllegalArgumentException("Invalid personal waypoint snapshot entry");
-			waypoints.add(new WorldMapWaypoints.Waypoint(id, dimension, x, z, name, icon, color, buffer.readBoolean(), buffer.readBoolean()));
+			waypoints.add(new WorldMapWaypoints.Waypoint(id, dimension, x, z, name, icon, buffer.readBoolean()));
 		}
 		return new WorldMapWaypointSnapshotMessage(waypoints);
 	});

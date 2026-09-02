@@ -26,27 +26,23 @@ public final class WorldMapWaypointClientCache {
 	}
 
 	public static int requestSnapshot() {
-		return send(WorldMapWaypointMutationMessage.Operation.REQUEST_SNAPSHOT, NO_ID, "", 0, 0, "", "", "", false);
+		return send(WorldMapWaypointMutationMessage.Operation.REQUEST_SNAPSHOT, NO_ID, "", 0, 0, "", "", false);
 	}
 
-	public static int create(Identifier dimension, double x, double z, String name, WorldMapWaypoints.WaypointIcon icon, WorldMapWaypoints.WaypointColor color) {
-		return send(WorldMapWaypointMutationMessage.Operation.CREATE, NO_ID, dimension.toString(), x, z, name, icon.id(), color.id(), false);
+	public static int create(Identifier dimension, double x, double z, String name, WorldMapWaypoints.WaypointIcon icon) {
+		return send(WorldMapWaypointMutationMessage.Operation.CREATE, NO_ID, dimension.toString(), x, z, name, icon.id(), false);
 	}
 
-	public static int edit(UUID id, String name, WorldMapWaypoints.WaypointIcon icon, WorldMapWaypoints.WaypointColor color) {
-		return send(WorldMapWaypointMutationMessage.Operation.EDIT, id, "", 0, 0, name, icon.id(), color.id(), false);
+	public static int edit(UUID id, String name, WorldMapWaypoints.WaypointIcon icon) {
+		return send(WorldMapWaypointMutationMessage.Operation.EDIT, id, "", 0, 0, name, icon.id(), false);
 	}
 
 	public static int setVisible(UUID id, boolean visible) {
-		return send(WorldMapWaypointMutationMessage.Operation.SET_VISIBLE, id, "", 0, 0, "", "", "", visible);
-	}
-
-	public static int setTracked(UUID id, boolean tracked) {
-		return send(WorldMapWaypointMutationMessage.Operation.SET_TRACKED, id, "", 0, 0, "", "", "", tracked);
+		return send(WorldMapWaypointMutationMessage.Operation.SET_VISIBLE, id, "", 0, 0, "", "", visible);
 	}
 
 	public static int delete(UUID id) {
-		return send(WorldMapWaypointMutationMessage.Operation.DELETE, id, "", 0, 0, "", "", "", false);
+		return send(WorldMapWaypointMutationMessage.Operation.DELETE, id, "", 0, 0, "", "", false);
 	}
 
 	public static List<WorldMapWaypoints.Waypoint> waypoints() {
@@ -112,14 +108,14 @@ public final class WorldMapWaypointClientCache {
 	public record TemporaryPin(Identifier dimension, double x, double z) {
 	}
 
-	private static int send(WorldMapWaypointMutationMessage.Operation operation, UUID id, String dimension, double x, double z, String name, String icon, String color, boolean value) {
+	private static int send(WorldMapWaypointMutationMessage.Operation operation, UUID id, String dimension, double x, double z, String name, String icon, boolean value) {
 		ensureConnection();
 		if (Minecraft.getInstance().getConnection() == null)
 			return 0;
 		int requestId = nextRequestId++;
 		if (nextRequestId <= 0)
 			nextRequestId = 1;
-		ClientPacketDistributor.sendToServer(new WorldMapWaypointMutationMessage(requestId, operation, id, dimension, x, z, name, icon, color, value));
+		ClientPacketDistributor.sendToServer(new WorldMapWaypointMutationMessage(requestId, operation, id, dimension, x, z, name, icon, value));
 		return requestId;
 	}
 

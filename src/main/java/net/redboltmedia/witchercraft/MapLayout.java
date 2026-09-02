@@ -28,19 +28,31 @@ public final class MapLayout {
 	public static final int COORD_Y = 13;
 	public static final int HINT_X = 574;
 	public static final int HINT_Y = 13;
-	public static final int CREATE_W = 270;
-	public static final int CREATE_H = 166;
+	public static final int HELP_X = 146;
+	public static final int HELP_Y = 13;
+	public static final int HELP_W = 282;
+	public static final int CREATE_W = 250;
+	public static final int CREATE_H = 142;
 	public static final int CREATE_PADDING = 14;
 	public static final int CREATE_NAME_Y = 34;
 	public static final int CREATE_NAME_H = 18;
 	public static final int CREATE_ICON_Y = 68;
 	public static final int CREATE_ICON_SIZE = 24;
 	public static final int CREATE_ICON_GAP = 5;
-	public static final int CREATE_COLOR_Y = 105;
-	public static final int CREATE_COLOR_SIZE = 18;
-	public static final int CREATE_COLOR_GAP = 9;
-	public static final int CREATE_ACTION_Y = 137;
+	public static final int CREATE_ACTION_Y = 113;
 	public static final int CREATE_ACTION_W = 68;
+	public static final int MANAGER_W = 390;
+	public static final int MANAGER_H = 190;
+	public static final int MANAGER_PADDING = 12;
+	public static final int MANAGER_SEARCH_Y = 30;
+	public static final int MANAGER_SEARCH_H = 18;
+	public static final int MANAGER_LIST_Y = 56;
+	public static final int MANAGER_ROW_H = 29;
+	public static final int MANAGER_VISIBLE_ROWS = 4;
+	public static final int MANAGER_ACTION_X = 230;
+	public static final int SELECTION_W = 280;
+	public static final int SELECTION_H = 40;
+	public static final int SELECTION_BOTTOM = 6;
 
 	public static final int VIEW_BG = 0xFF11151A;
 	public static final int VIEW_BORDER = 0xFF665E4A;
@@ -59,4 +71,6 @@ public final class MapLayout {
 	public static final int FIELD_BG = 0xFF0D0D11;
 	public static final int SELECTED = 0xFFD6AD52;
 	public static final int ERROR = 0xFFE06A5F;
+	/** Edit this ARGB value to test the saved-waypoint icon, name, and selection-card color. */
+	public static final int WAYPOINT_COLOR = 0xFFD6AD52;
 }
