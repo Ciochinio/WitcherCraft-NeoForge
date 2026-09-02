@@ -54,6 +54,11 @@ public interface GuiPage {
 		return false;
 	}
 
+	/** Handle a click while preserving Minecraft's double-click classification. */
+	default boolean mouseClicked(int x, int y, int w, int h, double mouseX, double mouseY, int button, boolean doubleClick) {
+		return mouseClicked(x, y, w, h, mouseX, mouseY, button);
+	}
+
 	/** Handle a mouse-button release. Region, mouse, and drag deltas use design coords. */
 	default boolean mouseReleased(int x, int y, int w, int h, double mouseX, double mouseY, int button) {
 		return false;
@@ -71,6 +76,11 @@ public interface GuiPage {
 
 	/** Handle a key press. Return true to consume (blocks default Esc-close, etc.). */
 	default boolean keyPressed(int keyCode) {
+		return false;
+	}
+
+	/** Handle one typed Unicode code point. */
+	default boolean charTyped(int codepoint) {
 		return false;
 	}
 

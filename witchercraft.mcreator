@@ -481,6 +481,71 @@
       "path": "~/World Map"
     },
     {
+      "name": "WorldMapWaypoints",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_waypoints",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapWaypoints.java"
+        ]
+      },
+      "path": "~/World Map"
+    },
+    {
+      "name": "WorldMapWaypointClientCache",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_waypoint_client_cache",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapWaypointClientCache.java"
+        ]
+      },
+      "path": "~/World Map"
+    },
+    {
+      "name": "WorldMapWaypointMutationMessage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_waypoint_mutation_message",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapWaypointMutationMessage.java"
+        ]
+      },
+      "path": "~/World Map"
+    },
+    {
+      "name": "WorldMapWaypointSnapshotMessage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_waypoint_snapshot_message",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapWaypointSnapshotMessage.java"
+        ]
+      },
+      "path": "~/World Map"
+    },
+    {
+      "name": "WorldMapWaypointResultMessage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_waypoint_result_message",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapWaypointResultMessage.java"
+        ]
+      },
+      "path": "~/World Map"
+    },
+    {
       "name": "PauseMenuGuiOpen",
       "type": "procedure",
       "compiles": true,

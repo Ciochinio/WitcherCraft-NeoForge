@@ -9,6 +9,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
@@ -250,7 +251,7 @@ public class WitcherGuiScreen extends Screen {
 				}
 			}
 		}
-		if (activePage().mouseClicked(WitcherGuiLayout.contentX(), WitcherGuiLayout.contentY(), WitcherGuiLayout.contentW(), WitcherGuiLayout.contentH(), dmx, dmy, event.button()))
+		if (activePage().mouseClicked(WitcherGuiLayout.contentX(), WitcherGuiLayout.contentY(), WitcherGuiLayout.contentW(), WitcherGuiLayout.contentH(), dmx, dmy, event.button(), doubleClick))
 			return true;
 		return super.mouseClicked(event, doubleClick);
 	}
@@ -291,6 +292,13 @@ public class WitcherGuiScreen extends Screen {
 		if (activePage().keyPressed(key))
 			return true;
 		return super.keyPressed(event); // Esc closes via onClose()
+	}
+
+	@Override
+	public boolean charTyped(CharacterEvent event) {
+		if (activePage().charTyped(event.codepoint()))
+			return true;
+		return super.charTyped(event);
 	}
 
 	@Override
