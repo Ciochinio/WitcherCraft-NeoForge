@@ -80,6 +80,11 @@ public final class WorldMapWaypointClientCache {
 		return TEMPORARY_PINS.get(dimension);
 	}
 
+	public static void removeTemporaryPin(Identifier dimension) {
+		ensureConnection();
+		TEMPORARY_PINS.remove(dimension);
+	}
+
 	static void acceptSnapshot(List<WorldMapWaypoints.Waypoint> snapshot) {
 		ensureConnection();
 		if (Minecraft.getInstance().getConnection() == null)

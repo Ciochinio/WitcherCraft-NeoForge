@@ -1437,3 +1437,12 @@ outside Batch 4.
 The bottom bar draws width-limited mouse-control hints between the menu buttons and right-side controls.
 `MapLayout` owns the hint position and width plus the hover-card dimensions and offset.
 `tools/map-layout-creator.html` previews both pieces and exports their constants.
+
+`MapPage` also owns a client-only marker context menu. Right-click hit testing checks the temporary pin first,
+then the nearest visible saved waypoint, and only then treats the click as empty map space. A temporary-pin hit
+removes that dimension's pin from `WorldMapWaypointClientCache`. A saved-waypoint hit opens Target and Delete
+actions centered below the marker. Target writes the waypoint coordinates into the existing temporary-pin
+slot. Delete sends the existing server mutation immediately and keeps the buttons disabled until its matching
+result arrives. The popup follows the marker if the view changes, clamps to the viewport, and blocks wheel and
+button zoom while open. It closes on success, Escape, or an outside click. It adds no saved state or network
+payload.

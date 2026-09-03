@@ -53,6 +53,10 @@ public final class MapLayout {
 	public static final int SELECTION_W = 280;
 	public static final int SELECTION_H = 40;
 	public static final int SELECTION_BOTTOM = 6;
+	public static final int CONTEXT_W = 136;
+	public static final int CONTEXT_H = 58;
+	public static final int CONTEXT_PADDING = 8;
+	public static final int CONTEXT_MARKER_GAP = 5;
 
 	public static final int VIEW_BG = 0xFF11151A;
 	public static final int VIEW_BORDER = 0xFF665E4A;

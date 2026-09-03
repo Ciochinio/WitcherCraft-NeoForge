@@ -48,6 +48,9 @@ public final class MapPage implements GuiPage {
 	private Identifier pendingPingDimension;
 	private double pendingPingX;
 	private double pendingPingZ;
+	private WorldMapWaypoints.Waypoint contextWaypoint;
+	private int contextPendingRequest;
+	private Component contextError;
 
 	@Override
 	public String id() {
@@ -71,6 +74,8 @@ public final class MapPage implements GuiPage {
 		createError = null;
 		pendingPing = false;
 		hoverSelection = null;
+		closeContextMenu();
+		contextPendingRequest = 0;
 		centerOnPlayer();
 		WorldMapClientTileCache.markViewDirty();
 		WorldMapWaypointClientCache.requestSnapshot();
@@ -79,6 +84,7 @@ public final class MapPage implements GuiPage {
 	@Override
 	public void render(GuiGraphicsExtractor g, int x, int y, int w, int h, int mouseX, int mouseY, float partial) {
 		checkCreateResult();
+		checkContextResult();
 		Font font = Minecraft.getInstance().font;
 		int vx = x + MapLayout.VIEW_X, vy = y + MapLayout.VIEW_Y;
 		int vw = Math.min(MapLayout.VIEW_W, w - MapLayout.VIEW_X);
@@ -89,7 +95,7 @@ public final class MapPage implements GuiPage {
 		g.enableScissor(vx, vy, vx + vw, vy + vh);
 		WorldMapClientTileCache.renderAndRequest(g, vx, vy, vw, vh, centerX, centerZ, zoom);
 		drawWaypoints(g, vx, vy, vw, vh);
-		hoverSelection = !creating && !manager.isOpen() ? markerAt(mouseX, mouseY, vx, vy, vw, vh) : null;
+		hoverSelection = !creating && !manager.isOpen() && contextWaypoint == null ? markerAt(mouseX, mouseY, vx, vy, vw, vh) : null;
 		drawPlayer(g, vx, vy, vw, vh);
 		if (creating)
 			drawCreationOverlay(g, font, vx, vy, vw, vh, mouseX, mouseY);
@@ -102,14 +108,16 @@ public final class MapPage implements GuiPage {
 		drawButton(g, font, bx + MapLayout.WAYPOINTS_X, by + MapLayout.BUTTON_Y, MapLayout.WAYPOINTS_W, Component.translatableWithFallback("gui.witchercraft.map.waypoints", "Waypoints"), mouseX, mouseY, !creating && !manager.isOpen());
 		drawButton(g, font, bx + MapLayout.FILTERS_X, by + MapLayout.BUTTON_Y, MapLayout.FILTERS_W, Component.translatableWithFallback("gui.witchercraft.map.filters", "Filters"), mouseX, mouseY, false);
 		drawButton(g, font, bx + MapLayout.CENTER_X, by + MapLayout.BUTTON_Y, MapLayout.CENTER_W, Component.translatableWithFallback("gui.witchercraft.map.center", "Center"), mouseX, mouseY, true);
-		drawButton(g, font, bx + MapLayout.ZOOM_OUT_X, by + MapLayout.BUTTON_Y, MapLayout.ZOOM_W, Component.literal("-"), mouseX, mouseY, true);
-		drawButton(g, font, bx + MapLayout.ZOOM_IN_X, by + MapLayout.BUTTON_Y, MapLayout.ZOOM_W, Component.literal("+"), mouseX, mouseY, true);
+		drawButton(g, font, bx + MapLayout.ZOOM_OUT_X, by + MapLayout.BUTTON_Y, MapLayout.ZOOM_W, Component.literal("-"), mouseX, mouseY, contextWaypoint == null);
+		drawButton(g, font, bx + MapLayout.ZOOM_IN_X, by + MapLayout.BUTTON_Y, MapLayout.ZOOM_W, Component.literal("+"), mouseX, mouseY, contextWaypoint == null);
 
 		g.text(font, Component.literal(String.format(java.util.Locale.ROOT, "%.2fx", zoom)), bx + MapLayout.HINT_X, by + MapLayout.HINT_Y, MapLayout.TEXT_DIM, false);
-		String help = Component.translatableWithFallback("gui.witchercraft.map.help", "Drag Move | RMB Target | RMB x2 Waypoint | Wheel Zoom").getString();
+		String help = Component.translatableWithFallback("gui.witchercraft.map.help", "Drag Move | RMB Target/Menu | x2 Waypoint | Wheel Zoom").getString();
 		g.text(font, Component.literal(fit(font, help, MapLayout.HELP_W)), bx + MapLayout.HELP_X, by + MapLayout.HELP_Y, MapLayout.TEXT_DIM, false);
 		if (hoverSelection != null)
 			drawSelectionCard(g, font, vx, vy, vw, vh);
+		if (contextWaypoint != null)
+			drawContextMenu(g, font, vx, vy, vw, vh, mouseX, mouseY);
 		if (manager.isOpen())
 			manager.render(g, vx, vy, vw, vh, mouseX, mouseY);
 	}
@@ -123,21 +131,35 @@ public final class MapPage implements GuiPage {
 			return manager.mouseClicked(vx, vy, vw, vh, mouseX, mouseY, button);
 		if (creating)
 			return handleCreationClick(vx, vy, vw, vh, mouseX, mouseY, button);
+		if (contextWaypoint != null)
+			return handleContextClick(vx, vy, vw, vh, mouseX, mouseY, button);
 		if (button == 1 && inside(mouseX, mouseY, vx, vy, vw, vh)) {
+			var player = Minecraft.getInstance().player;
+			if (player == null)
+				return true;
+			Identifier dimension = player.level().dimension().identifier();
+			if (temporaryPinAt(mouseX, mouseY, vx, vy, vw, vh)) {
+				pendingPing = false;
+				WorldMapWaypointClientCache.removeTemporaryPin(dimension);
+				return true;
+			}
+			WorldMapWaypoints.Waypoint waypoint = waypointAt(mouseX, mouseY, vx, vy, vw, vh);
+			if (waypoint != null) {
+				pendingPing = false;
+				openContextMenu(waypoint);
+				return true;
+			}
 			double worldX = centerX + (mouseX - (vx + vw / 2.0)) / zoom;
 			double worldZ = centerZ + (mouseY - (vy + vh / 2.0)) / zoom;
 			if (doubleClick) {
 				pendingPing = false;
 				openCreation(worldX, worldZ);
 			} else {
-				var player = Minecraft.getInstance().player;
-				if (player != null) {
-					pendingPing = true;
-					pendingPingAt = System.nanoTime();
-					pendingPingDimension = player.level().dimension().identifier();
-					pendingPingX = worldX;
-					pendingPingZ = worldZ;
-				}
+				pendingPing = true;
+				pendingPingAt = System.nanoTime();
+				pendingPingDimension = dimension;
+				pendingPingX = worldX;
+				pendingPingZ = worldZ;
 			}
 			return true;
 		}
@@ -202,6 +224,8 @@ public final class MapPage implements GuiPage {
 	public boolean mouseScrolled(int x, int y, int w, int h, double mouseX, double mouseY, double scrollX, double scrollY) {
 		if (manager.isOpen())
 			return manager.mouseScrolled(scrollY);
+		if (contextWaypoint != null)
+			return true;
 		if (creating)
 			return true;
 		int vx = x + MapLayout.VIEW_X, vy = y + MapLayout.VIEW_Y;
@@ -215,6 +239,10 @@ public final class MapPage implements GuiPage {
 	public boolean keyPressed(int keyCode) {
 		if (manager.isOpen())
 			return manager.keyPressed(keyCode);
+		if (contextWaypoint != null && keyCode == GLFW.GLFW_KEY_ESCAPE) {
+			closeContextMenu();
+			return true;
+		}
 		if (!creating)
 			return false;
 		if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
@@ -256,6 +284,7 @@ public final class MapPage implements GuiPage {
 		creating = false;
 		manager.close();
 		pendingPing = false;
+		closeContextMenu();
 	}
 
 	private void showOnMap(WorldMapWaypoints.Waypoint waypoint) {
@@ -269,6 +298,7 @@ public final class MapPage implements GuiPage {
 
 	private void openCreation(double worldX, double worldZ) {
 		dragging = false;
+		closeContextMenu();
 		createX = worldX;
 		createZ = worldZ;
 		createName = "";
@@ -480,6 +510,123 @@ public final class MapPage implements GuiPage {
 		drawBorder(g, x, y, MapLayout.SELECTION_W, MapLayout.SELECTION_H, MapLayout.OVERLAY_BORDER);
 		g.text(font, hoverSelection.name(), x + (MapLayout.SELECTION_W - font.width(hoverSelection.name())) / 2, y + 8, hoverSelection.color(), false);
 		g.text(font, hoverSelection.detail(), x + (MapLayout.SELECTION_W - font.width(hoverSelection.detail())) / 2, y + 23, MapLayout.TEXT_DIM, false);
+	}
+
+	private void openContextMenu(WorldMapWaypoints.Waypoint waypoint) {
+		contextWaypoint = waypoint;
+		contextError = null;
+	}
+
+	private void closeContextMenu() {
+		contextWaypoint = null;
+		contextError = null;
+	}
+
+	private void drawContextMenu(GuiGraphicsExtractor g, Font font, int vx, int vy, int vw, int vh, int mouseX, int mouseY) {
+		int x = contextMenuX(vx, vw);
+		int y = contextMenuY(vy, vh);
+		g.fill(x, y, x + MapLayout.CONTEXT_W, y + MapLayout.CONTEXT_H, MapLayout.OVERLAY_BG);
+		drawBorder(g, x, y, MapLayout.CONTEXT_W, MapLayout.CONTEXT_H, MapLayout.OVERLAY_BORDER);
+		int innerW = MapLayout.CONTEXT_W - MapLayout.CONTEXT_PADDING * 2;
+		Component title = contextError == null ? Component.literal(fit(font, contextWaypoint.name(), innerW)) : Component.literal(fit(font, contextError.getString(), innerW));
+		g.text(font, title, x + (MapLayout.CONTEXT_W - font.width(title)) / 2, y + 8, contextError == null ? MapLayout.WAYPOINT_COLOR : MapLayout.ERROR, false);
+		drawContextButtons(g, font, x, y + 29, mouseX, mouseY,
+			Component.translatableWithFallback("gui.witchercraft.map.waypoint.target_action", "Target"), Component.translatableWithFallback("gui.witchercraft.map.waypoint.delete", "Delete"));
+	}
+
+	private void drawContextButtons(GuiGraphicsExtractor g, Font font, int x, int y, int mouseX, int mouseY, Component left, Component right) {
+		int buttonW = (MapLayout.CONTEXT_W - MapLayout.CONTEXT_PADDING * 2 - 4) / 2;
+		boolean enabled = contextPendingRequest == 0;
+		drawButton(g, font, x + MapLayout.CONTEXT_PADDING, y, buttonW, left, mouseX, mouseY, enabled);
+		drawButton(g, font, x + MapLayout.CONTEXT_PADDING + buttonW + 4, y, buttonW, right, mouseX, mouseY, enabled);
+	}
+
+	private boolean handleContextClick(int vx, int vy, int vw, int vh, double mouseX, double mouseY, int button) {
+		int x = contextMenuX(vx, vw);
+		int y = contextMenuY(vy, vh);
+		if (button != 0 || !inside(mouseX, mouseY, x, y, MapLayout.CONTEXT_W, MapLayout.CONTEXT_H)) {
+			closeContextMenu();
+			return true;
+		}
+		if (contextPendingRequest != 0)
+			return true;
+		int buttonW = (MapLayout.CONTEXT_W - MapLayout.CONTEXT_PADDING * 2 - 4) / 2;
+		int buttonY = y + 29;
+		boolean left = inside(mouseX, mouseY, x + MapLayout.CONTEXT_PADDING, buttonY, buttonW, MapLayout.BUTTON_H);
+		boolean right = inside(mouseX, mouseY, x + MapLayout.CONTEXT_PADDING + buttonW + 4, buttonY, buttonW, MapLayout.BUTTON_H);
+		if (left) {
+			WorldMapWaypointClientCache.placeTemporaryPin(contextWaypoint.dimension(), contextWaypoint.x(), contextWaypoint.z());
+			closeContextMenu();
+		} else if (right) {
+			contextPendingRequest = WorldMapWaypointClientCache.delete(contextWaypoint.id());
+			if (contextPendingRequest == 0)
+				contextError = Component.translatableWithFallback("gui.witchercraft.map.waypoint.not_connected", "Not connected to a server");
+		}
+		return true;
+	}
+
+	private int contextMenuX(int vx, int vw) {
+		double markerX = vx + vw / 2.0 + (contextWaypoint.x() - centerX) * zoom;
+		return Math.max(vx, Math.min(vx + vw - MapLayout.CONTEXT_W, (int) Math.round(markerX - MapLayout.CONTEXT_W / 2.0)));
+	}
+
+	private int contextMenuY(int vy, int vh) {
+		double markerY = vy + vh / 2.0 + (contextWaypoint.z() - centerZ) * zoom;
+		int y = (int) Math.round(markerY + markerHitRadius() + MapLayout.CONTEXT_MARKER_GAP);
+		return Math.max(vy, Math.min(vy + vh - MapLayout.CONTEXT_H, y));
+	}
+
+	private void checkContextResult() {
+		if (contextPendingRequest == 0)
+			return;
+		WorldMapWaypointResultMessage result = WorldMapWaypointClientCache.takeResult(contextPendingRequest);
+		if (result == null)
+			return;
+		contextPendingRequest = 0;
+		if (result.status() == WorldMapWaypoints.Status.SUCCESS) {
+			closeContextMenu();
+		} else {
+			contextError = Component.translatableWithFallback("gui.witchercraft.map.waypoint.error." + result.status().name().toLowerCase(java.util.Locale.ROOT), "The server rejected this change");
+		}
+	}
+
+	private WorldMapWaypoints.Waypoint waypointAt(double mouseX, double mouseY, int x, int y, int w, int h) {
+		var player = Minecraft.getInstance().player;
+		if (player == null)
+			return null;
+		double radius = markerHitRadius();
+		double bestDistance = radius * radius;
+		WorldMapWaypoints.Waypoint found = null;
+		for (WorldMapWaypoints.Waypoint waypoint : WorldMapWaypointClientCache.waypoints(player.level().dimension().identifier())) {
+			if (!waypoint.visible())
+				continue;
+			double px = x + w / 2.0 + (waypoint.x() - centerX) * zoom;
+			double py = y + h / 2.0 + (waypoint.z() - centerZ) * zoom;
+			double distance = (mouseX - px) * (mouseX - px) + (mouseY - py) * (mouseY - py);
+			if (distance <= bestDistance) {
+				bestDistance = distance;
+				found = waypoint;
+			}
+		}
+		return found;
+	}
+
+	private boolean temporaryPinAt(double mouseX, double mouseY, int x, int y, int w, int h) {
+		var player = Minecraft.getInstance().player;
+		if (player == null)
+			return false;
+		WorldMapWaypointClientCache.TemporaryPin pin = WorldMapWaypointClientCache.temporaryPin(player.level().dimension().identifier());
+		if (pin == null)
+			return false;
+		double px = x + w / 2.0 + (pin.x() - centerX) * zoom;
+		double py = y + h / 2.0 + (pin.z() - centerZ) * zoom;
+		double radius = markerHitRadius();
+		return (mouseX - px) * (mouseX - px) + (mouseY - py) * (mouseY - py) <= radius * radius;
+	}
+
+	private double markerHitRadius() {
+		int size = Math.max(8, (int) Math.round(WAYPOINT_MARKER_BASE_SIZE * WorldMapClientConfig.markerScale()));
+		return size * markerVisualScale() / 2.0 + 3;
 	}
 
 	private static String fit(Font font, String value, int width) {

@@ -606,6 +606,12 @@ Escape closes the confirmation prompt, editor, and manager in that order.
 The bottom control bar places a permanent, width-limited input guide between its left-side menu buttons and
 right-side map controls. Its position and width belong to the editable map layout.
 
+Right-clicking a visible saved waypoint opens a small marker menu centered below it. Target places or replaces
+the temporary pin at that waypoint, while Delete removes the saved waypoint immediately.
+Right-clicking the temporary pin removes it immediately. Marker actions take priority over the empty-space
+right-click and double-right-click actions. Escape or clicking elsewhere closes the marker menu. Map zoom is
+disabled while the menu is open.
+
 World-map exploration begins when the server sends a loaded Overworld chunk to a player. That event
 records the chunk in that player's private exploration history and queues a shared terrain sample.
 The map system never generates or force-loads a chunk. If the chunk unloads before its queued turn,
