@@ -1,6 +1,20 @@
 {
   "mod_elements": [
     {
+      "name": "PoiTestStructure",
+      "type": "structure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "poi_test_structure",
+      "metadata": {
+        "files": [
+          "src/main/resources/data/witchercraft/worldgen/structure/poi_test_structure.json",
+          "src/main/resources/data/witchercraft/worldgen/template_pool/poi_test_structure.json",
+          "src/main/resources/data/witchercraft/worldgen/structure_set/poi_test_structure.json"
+        ]
+      }
+    },
+    {
       "name": "WitcherGuiScreen",
       "type": "code",
       "compiles": true,

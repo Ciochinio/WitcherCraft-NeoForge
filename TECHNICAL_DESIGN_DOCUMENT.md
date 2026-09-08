@@ -1446,3 +1446,21 @@ slot. Delete sends the existing server mutation immediately and keeps the button
 result arrives. The popup follows the marker if the view changes, clamps to the viewport, and blocks wheel and
 button zoom while open. It closes on success, Escape, or an outside click. It adds no saved state or network
 payload.
+
+### 5.10 Milestone 4A generated POI test structure
+
+`PoiTestStructure` is an ordinary MCreator structure element under `~/World Map`. Its source of truth is
+`elements/PoiTestStructure.mod.json`. MCreator generates the structure, structure-set, and template-pool
+JSON resources. The referenced `data/witchercraft/structure/poi_test_structure.nbt` template is a hollow
+4 by 4 by 4 stone-brick cube with a two-block doorway and a chiseled stone-brick marker in its roof.
+
+This is a real `minecraft:jigsaw` structure rather than a procedure-built cube or placed feature. Its
+single rigid pool element projects to `WORLD_SURFACE_WG`, generates during `surface_structures`, and is
+limited to the `#minecraft:is_overworld` biome tag. Development placement uses random-spread spacing 24
+chunks and separation 8 chunks. MCreator derives the stable salt from the registry name. These placement
+values make the test structure easy to find and are not production balance.
+
+The element intentionally contains no POI registration logic. Later Milestone 4 batches inspect the real
+structure start from already loaded chunk data and map its stable start chunk to a POI instance. Keeping
+the test structure separate proves that later structures can join the POI system through data and provider
+matching instead of copied Java classes.

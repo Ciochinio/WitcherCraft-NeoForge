@@ -612,6 +612,12 @@ Right-clicking the temporary pin removes it immediately. Marker actions take pri
 right-click and double-right-click actions. Escape or clicking elsewhere closes the marker menu. Map zoom is
 disabled while the menu is open.
 
+Points of interest will first be tested against a small generated development structure named
+`poi_test_structure`. It is a hollow 4 by 4 by 4 stone-brick cube with a doorway and a chiseled
+stone-brick roof marker. It generates on the Overworld surface with deliberately frequent development
+spacing. The structure exists to validate real structure discovery and stable map-marker identity. It is
+not production world content and must be removed or disabled before release.
+
 World-map exploration begins when the server sends a loaded Overworld chunk to a player. That event
 records the chunk in that player's private exploration history and queues a shared terrain sample.
 The map system never generates or force-loads a chunk. If the chunk unloads before its queued turn,
