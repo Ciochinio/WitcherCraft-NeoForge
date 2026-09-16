@@ -39,6 +39,10 @@ public class WitchercraftModEntities {
 			EntityType.Builder.<IgniParticlesEntity>of(IgniParticlesEntity::new, MobCategory.MISC).setShouldReceiveVelocityUpdates(true).setTrackingRange(64).setUpdateInterval(1).sized(0.5f, 0.5f));
 	public static final DeferredHolder<EntityType<?>, EntityType<AardParticlesEntity>> AARD_PARTICLES = register("aard_particles",
 			EntityType.Builder.<AardParticlesEntity>of(AardParticlesEntity::new, MobCategory.MISC).setShouldReceiveVelocityUpdates(true).setTrackingRange(64).setUpdateInterval(1).sized(0.5f, 0.5f));
+	public static final DeferredHolder<EntityType<?>, EntityType<AlghoulEntity>> ALGHOUL = register("alghoul",
+			EntityType.Builder.<AlghoulEntity>of(AlghoulEntity::new, MobCategory.MONSTER).setShouldReceiveVelocityUpdates(true).setTrackingRange(64).setUpdateInterval(3)
+
+					.notInPeaceful().sized(1.25f, 2.4f));
 	public static final DeferredHolder<EntityType<?>, EntityType<CockatriceEntity>> COCKATRICE = register("cockatrice",
 			EntityType.Builder.<CockatriceEntity>of(CockatriceEntity::new, MobCategory.MONSTER).setShouldReceiveVelocityUpdates(true).setTrackingRange(64).setUpdateInterval(3)
 
@@ -52,11 +56,13 @@ public class WitchercraftModEntities {
 
 	@SubscribeEvent
 	public static void init(RegisterSpawnPlacementsEvent event) {
+		AlghoulEntity.init(event);
 		CockatriceEntity.init(event);
 	}
 
 	@SubscribeEvent
 	public static void registerAttributes(EntityAttributeCreationEvent event) {
+		event.put(ALGHOUL.get(), AlghoulEntity.createAttributes().build());
 		event.put(COCKATRICE.get(), CockatriceEntity.createAttributes().build());
 	}
 }

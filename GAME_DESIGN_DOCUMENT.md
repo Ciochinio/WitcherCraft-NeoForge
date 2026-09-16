@@ -776,6 +776,17 @@ and flying each have their own animation. Its combat stats are provisional and r
 MCreator living-entity editor. Natural spawning is disabled until its movement and collision have
 been tested in varied terrain, so it is currently available through its spawn egg only.
 
+The Alghoul is available through its spawn egg while natural spawning remains disabled. It has 50
+health, 5 melee damage, 0 armor, and 0.27 movement speed. It keeps its spikes hidden outside combat.
+After holding a living target for 50 ticks, it deploys the spikes through a 15-tick transition. An
+attacker that damages it while the spikes are active receives 2 thorns damage. Losing its target makes
+it retract the spikes.
+
+Night Vision on the Alghoul temporarily stands in for Axii. The effect prevents spike deployment and
+forces active spikes to retract. When the real Axii effect is available, it will replace this temporary
+effect check without changing the stance rules. The mob has separate walk, idle, and slap animations
+for both stances. Natural spawning stays disabled until those behaviors pass in-game testing.
+
 ---
 
 ## 9. World and Utility Systems

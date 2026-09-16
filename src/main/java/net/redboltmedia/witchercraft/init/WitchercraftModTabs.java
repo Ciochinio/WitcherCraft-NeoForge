@@ -90,6 +90,7 @@ public class WitchercraftModTabs {
 				tabData.accept(WitchercraftModItems.WYVERN_DECOCTION.get());
 				tabData.accept(WitchercraftModItems.SUCCUBUS_DECOCTION.get());
 				tabData.accept(WitchercraftModItems.GRAVE_HAG_DECOCTION.get());
+				tabData.accept(WitchercraftModItems.ALGHOUL_SPAWN_EGG.get());
 				tabData.accept(WitchercraftModItems.COCKATRICE_SPAWN_EGG.get());
 			}).build());
 }

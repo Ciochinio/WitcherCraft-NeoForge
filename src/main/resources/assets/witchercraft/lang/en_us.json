@@ -352,5 +352,7 @@
   "key.witchercraft.open_shell.glossary": "WitcherCraft: Glossary",
   "key.witchercraft.open_shell.meditation": "WitcherCraft: Meditation",
   "entity.witchercraft.cockatrice": "Cockatrice",
-  "item.witchercraft.cockatrice_spawn_egg": "Cockatrice Spawn Egg"
+  "item.witchercraft.cockatrice_spawn_egg": "Cockatrice Spawn Egg",
+  "entity.witchercraft.alghoul": "Alghoul",
+  "item.witchercraft.alghoul_spawn_egg": "Alghoul Spawn Egg"
 }

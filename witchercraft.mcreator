@@ -8819,6 +8819,228 @@
       "path": "~/Admin/Calc"
     },
     {
+      "name": "Alghoul",
+      "type": "livingentity",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "alghoul",
+      "metadata": {
+        "files": [
+          "src/main/resources/assets/witchercraft/models/item/alghoul_spawn_egg.json",
+          "src/main/java/net/redboltmedia/witchercraft/client/renderer/AlghoulRenderer.java",
+          "src/main/resources/assets/witchercraft/items/alghoul_spawn_egg.json",
+          "src/main/java/net/redboltmedia/witchercraft/entity/AlghoulEntity.java"
+        ]
+      },
+      "path": "~/Mobs/Alghoul"
+    },
+    {
+      "name": "AlghoulCombatTick",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "alghoul_combat_tick",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/AlghoulCombatTickProcedure.java"
+        ]
+      },
+      "path": "~/Mobs/Alghoul"
+    },
+    {
+      "name": "AlghoulRetaliate",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "alghoul_retaliate",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "sourceentity",
+            "type": "entity"
+          },
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/AlghoulRetaliateProcedure.java"
+        ]
+      },
+      "path": "~/Mobs/Alghoul"
+    },
+    {
+      "name": "AlghoulSpikesOnAnimationCondition",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "alghoul_spikes_on_animation_condition",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/AlghoulSpikesOnAnimationConditionProcedure.java"
+        ],
+        "return_type": "logic"
+      },
+      "path": "~/Mobs/Alghoul"
+    },
+    {
+      "name": "AlghoulSpikesOffAnimationCondition",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "alghoul_spikes_off_animation_condition",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/AlghoulSpikesOffAnimationConditionProcedure.java"
+        ],
+        "return_type": "logic"
+      },
+      "path": "~/Mobs/Alghoul"
+    },
+    {
+      "name": "AlghoulSlapSpikesAnimationCondition",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "alghoul_slap_spikes_animation_condition",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/AlghoulSlapSpikesAnimationConditionProcedure.java"
+        ],
+        "return_type": "logic"
+      },
+      "path": "~/Mobs/Alghoul"
+    },
+    {
+      "name": "AlghoulSlapNoSpikesAnimationCondition",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "alghoul_slap_no_spikes_animation_condition",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/AlghoulSlapNoSpikesAnimationConditionProcedure.java"
+        ],
+        "return_type": "logic"
+      },
+      "path": "~/Mobs/Alghoul"
+    },
+    {
+      "name": "AlghoulIdleSpikesAnimationCondition",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "alghoul_idle_spikes_animation_condition",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/AlghoulIdleSpikesAnimationConditionProcedure.java"
+        ],
+        "return_type": "logic"
+      },
+      "path": "~/Mobs/Alghoul"
+    },
+    {
+      "name": "AlghoulIdleNoSpikesAnimationCondition",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "alghoul_idle_no_spikes_animation_condition",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/AlghoulIdleNoSpikesAnimationConditionProcedure.java"
+        ],
+        "return_type": "logic"
+      },
+      "path": "~/Mobs/Alghoul"
+    },
+    {
+      "name": "AlghoulWalkSpikesAnimationCondition",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "alghoul_walk_spikes_animation_condition",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/AlghoulWalkSpikesAnimationConditionProcedure.java"
+        ],
+        "return_type": "logic"
+      },
+      "path": "~/Mobs/Alghoul"
+    },
+    {
+      "name": "AlghoulWalkNoSpikesAnimationCondition",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "alghoul_walk_no_spikes_animation_condition",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/AlghoulWalkNoSpikesAnimationConditionProcedure.java"
+        ],
+        "return_type": "logic"
+      },
+      "path": "~/Mobs/Alghoul"
+    },
+    {
       "name": "Cockatrice",
       "type": "livingentity",
       "compiles": true,
@@ -9795,7 +10017,8 @@
   "sound_elements": [],
   "tag_elements": {
     "ENTITIES:mod:necrophage": [
-      "EntityZombie"
+      "EntityZombie",
+      "CUSTOM:Alghoul"
     ],
     "ENTITIES:mod:insectoid": [
       "EntitySpider"
@@ -10225,7 +10448,9 @@
       "key.witchercraft.open_shell.glossary": "WitcherCraft: Glossary",
       "key.witchercraft.open_shell.meditation": "WitcherCraft: Meditation",
       "entity.witchercraft.cockatrice": "Cockatrice",
-      "item.witchercraft.cockatrice_spawn_egg": "Cockatrice Spawn Egg"
+      "item.witchercraft.cockatrice_spawn_egg": "Cockatrice Spawn Egg",
+      "entity.witchercraft.alghoul": "Alghoul",
+      "item.witchercraft.alghoul_spawn_egg": "Alghoul Spawn Egg"
     }
   },
   "metadata": {
@@ -10842,6 +11067,10 @@
         "children": [
           {
             "name": "Cockatrice",
+            "children": []
+          },
+          {
+            "name": "Alghoul",
             "children": []
           }
         ]

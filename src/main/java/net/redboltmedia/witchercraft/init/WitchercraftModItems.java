@@ -89,6 +89,7 @@ public class WitchercraftModItems {
 	public static final DeferredItem<Item> WYVERN_DECOCTION;
 	public static final DeferredItem<Item> SUCCUBUS_DECOCTION;
 	public static final DeferredItem<Item> GRAVE_HAG_DECOCTION;
+	public static final DeferredItem<Item> ALGHOUL_SPAWN_EGG;
 	public static final DeferredItem<Item> COCKATRICE_SPAWN_EGG;
 	static {
 		WHITE_HONEY = register("white_honey", WhiteHoneyItem::new);
@@ -164,6 +165,7 @@ public class WitchercraftModItems {
 		WYVERN_DECOCTION = register("wyvern_decoction", WyvernDecoctionItem::new);
 		SUCCUBUS_DECOCTION = register("succubus_decoction", SuccubusDecoctionItem::new);
 		GRAVE_HAG_DECOCTION = register("grave_hag_decoction", GraveHagDecoctionItem::new);
+		ALGHOUL_SPAWN_EGG = register("alghoul_spawn_egg", properties -> new SpawnEggItem(properties.spawnEgg(WitchercraftModEntities.ALGHOUL.get())));
 		COCKATRICE_SPAWN_EGG = register("cockatrice_spawn_egg", properties -> new SpawnEggItem(properties.spawnEgg(WitchercraftModEntities.COCKATRICE.get())));
 	}
 

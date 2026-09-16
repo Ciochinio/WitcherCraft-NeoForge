@@ -1001,6 +1001,133 @@ Natural spawning is off. Test with the Cockatrice spawn egg until ground movemen
 takeoff, landing on uneven terrain, collision around trees, and aerial attack reach have been checked
 in game. Enabling biome spawning is an editor task after those checks, not a Java change.
 
+### 4.5 Stateful animated mobs
+
+A mob with stance, transition, attack, idle, and locomotion animations needs one server-owned state
+machine. Animation conditions read that state. They must not infer combat or stance independently on
+the client, because separate guesses allow incompatible animations to run together.
+
+#### State ownership and persistence
+
+Store gameplay state in MCreator entity-data fields when procedures and rendering both need it. Add
+each field to all four generated entity locations: accessor declaration, `defineSynchedData`, save, and
+load. The server changes these fields. Entity data then synchronizes the result to clients.
+
+A two-stance mob normally needs:
+
+- A persistent stance flag, such as `SpikesOut`.
+- A transition selector where zero means no transition and other values identify the direction.
+- A transition timer measured in ticks.
+- An attack selector and timer.
+- Any edge-detection state needed to turn a short server event into a complete client animation.
+
+The Alghoul example uses `CombatTicks`, `SpikesOut`, `StanceAnimation`, `StanceTicks`,
+`AttackAnimation`, `AttackTicks`, and `WasSwinging`. These fields live in the `Alghoul` MCreator entity
+definition rather than a separate capability.
+
+#### Server state machine
+
+Use an ordinary Blockly procedure for discrete gameplay effects. Use a locked procedure only when a
+transition requires tick-by-tick state that Blockly cannot express safely. Keep its element definition
+as a minimal `no_ext_trigger` stub and set `locked_code: true` in `witchercraft.mcreator`.
+
+The server tick should follow one ordering rule:
+
+1. Apply forced suppression or control effects.
+2. Start or cancel stance transitions.
+3. Advance transition timers and commit the persistent stance at the transition boundary.
+4. Detect attack edges and advance attack timers.
+
+Forced suppression wins over combat. In the current Alghoul example, Night Vision is a temporary Axii
+substitute. It resets the combat delay, blocks deployment, disables retaliation immediately, and starts
+the retract animation when spikes are active. When the effect expires during combat, the normal combat
+delay starts again.
+
+The Alghoul waits 50 ticks after acquiring a living target, plays its 15-tick deployment animation,
+then sets `SpikesOut`. Losing the target starts the 15-tick retraction and clears `SpikesOut` at once.
+This prevents thorns damage while the spikes are visually retracting. A new melee swing starts a
+20-tick slap animation only when no stance transition is active.
+
+#### Animation arbitration
+
+Animation conditions must be mutually exclusive. Use this priority order:
+
+1. Stance transition.
+2. Attack.
+3. Walk for the active stance.
+4. Idle for the active stance.
+
+Transition conditions read only the transition selector. Attack conditions require no transition and
+select the variant for the persistent stance. Walk and idle conditions require no transition and no
+attack. Movement separates walk from idle. This arrangement lets a generated renderer apply all
+registered animation states without blending contradictory poses.
+
+MCreator walking animations use `applyWalk`, so travel distance drives their clock and movement speed
+drives their weight. Choose an amplitude that reaches full weight at the entity's normal movement
+speed. Non-locomotion animations use `AnimationState` and elapsed ticks.
+
+The Alghoul maps its eight definitions this way:
+
+- `spikes_on` and `spikes_off` handle the two transition directions.
+- `slap_spikes` and `slap_no_spikes` handle attacks.
+- `idle_spikes` and `idle_no_spikes` handle stationary poses.
+- `walk_spikes` and `walk_no_spikes` handle locomotion.
+
+#### Gameplay hooks
+
+Keep damage reactions in Blockly when the blocks can express them. The Alghoul's `AlghoulRetaliate`
+procedure runs from the entity hurt trigger. It checks `SpikesOut` and deals 2 thorns damage to a living
+attacker. The synchronized stance flag is the gameplay authority. Animation progress is never used to
+decide whether retaliation applies.
+
+Effects that stand in for unfinished systems should have one explicit integration point. Night Vision
+currently supplies the Alghoul's spike-suppression signal. Replace that one check with the real Axii
+effect later. Do not duplicate Axii handling in animation conditions or the retaliation procedure.
+
+#### Blockbench coordinate conversion
+
+Model and animation exporters may disagree about coordinate conversion. Minecraft animation channels
+add values to an already converted `ModelPart` pose. Raw animation values can therefore bend a child
+chain in a direction that never appears in Blockbench while still compiling without warnings.
+
+For the affected modded-entity export, convert values as follows:
+
+- Rotation: Blockbench `(x, y, z)` becomes Java `degreeVec(-x, -y, z)`.
+- Position: Blockbench `(x, y, z)` becomes Java `posVec(-x, y, z)`. `posVec` negates Y internally.
+- Scale: copy `(x, y, z)` unchanged.
+- Keep timestamps, interpolation, animation length, and loop state unchanged.
+
+Do not apply this rule to another model without checking it. Some exporter versions and hand-edited
+files already contain converted values. A second conversion breaks them in the opposite direction.
+For example, the Alghoul's six stance, attack, and idle definitions were already correct, while both
+walk definitions retained raw X and Y rotation signs.
+
+Use a fixed-frame test when the cause is unclear. Reset every model part, apply one animation at a known
+millisecond with weight `1.0`, and compare an asymmetric pose from the same camera side in Blockbench.
+If the fixed pose differs, inspect exported transforms and hierarchy. If it matches, inspect animation
+gating, clock choice, and amplitude.
+
+#### MCreator source ownership
+
+Permanent model imports belong under `models/`, while generated copies belong under `src/main/java`.
+For the Alghoul these are:
+
+- `models/mojmap-1.21.x/ModelAlghoul.java`
+- `models/animations/AlghoulAnimation.java`
+- `src/main/java/net/redboltmedia/witchercraft/client/model/ModelAlghoul.java`
+- `src/main/java/net/redboltmedia/witchercraft/client/model/animations/AlghoulAnimation.java`
+
+Permanent import fragments must not contain package declarations, imports, or `super(root)`. MCreator
+adds them during generation. Keep permanent and generated animation definitions synchronized, but fix
+the permanent file first. MCreator may delete or replace generated Java during workspace regeneration.
+
+The state-machine procedure follows the locked-code workflow. Animation conditions and damage logic
+remain Blockly-generated where possible. The Alghoul's idle checks and combat tick stay locked because
+their movement and timed-state tests do not have reliable Blockly equivalents in this workspace.
+
+Natural spawning remains off until collision, attack reach, both stance transitions, suppression, and
+retaliation have passed in-game tests.
+
 ---
 
 ## 5. World map terrain pipeline

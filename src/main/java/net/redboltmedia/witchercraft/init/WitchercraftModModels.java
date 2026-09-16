@@ -4,6 +4,7 @@
 package net.redboltmedia.witchercraft.init;
 
 import net.redboltmedia.witchercraft.client.model.ModelCockatrice;
+import net.redboltmedia.witchercraft.client.model.ModelAlghoul;
 
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -15,5 +16,6 @@ public class WitchercraftModModels {
 	@SubscribeEvent
 	public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
 		event.registerLayerDefinition(ModelCockatrice.LAYER_LOCATION, ModelCockatrice::createBodyLayer);
+		event.registerLayerDefinition(ModelAlghoul.LAYER_LOCATION, ModelAlghoul::createBodyLayer);
 	}
 }
