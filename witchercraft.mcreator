@@ -9041,6 +9041,101 @@
       "path": "~/Mobs/Alghoul"
     },
     {
+      "name": "Ghoul",
+      "type": "livingentity",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "ghoul",
+      "metadata": {
+        "files": [
+          "src/main/resources/assets/witchercraft/models/item/ghoul_spawn_egg.json",
+          "src/main/java/net/redboltmedia/witchercraft/client/renderer/GhoulRenderer.java",
+          "src/main/resources/assets/witchercraft/items/ghoul_spawn_egg.json",
+          "src/main/java/net/redboltmedia/witchercraft/entity/GhoulEntity.java"
+        ]
+      },
+      "path": "~/Mobs"
+    },
+    {
+      "name": "GhoulAttackTick",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "ghoul_attack_tick",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/GhoulAttackTickProcedure.java"
+        ]
+      },
+      "path": "~/Mobs"
+    },
+    {
+      "name": "GhoulSlapAnimationCondition",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "ghoul_slap_animation_condition",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/GhoulSlapAnimationConditionProcedure.java"
+        ],
+        "return_type": "logic"
+      },
+      "path": "~/Mobs"
+    },
+    {
+      "name": "GhoulIdleAnimationCondition",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "ghoul_idle_animation_condition",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/GhoulIdleAnimationConditionProcedure.java"
+        ],
+        "return_type": "logic"
+      },
+      "path": "~/Mobs"
+    },
+    {
+      "name": "GhoulWalkAnimationCondition",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "ghoul_walk_animation_condition",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/GhoulWalkAnimationConditionProcedure.java"
+        ],
+        "return_type": "logic"
+      },
+      "path": "~/Mobs"
+    },
+    {
       "name": "Cockatrice",
       "type": "livingentity",
       "compiles": true,
@@ -10018,7 +10113,8 @@
   "tag_elements": {
     "ENTITIES:mod:necrophage": [
       "EntityZombie",
-      "CUSTOM:Alghoul"
+      "CUSTOM:Alghoul",
+      "CUSTOM:Ghoul"
     ],
     "ENTITIES:mod:insectoid": [
       "EntitySpider"
@@ -10450,7 +10546,9 @@
       "entity.witchercraft.cockatrice": "Cockatrice",
       "item.witchercraft.cockatrice_spawn_egg": "Cockatrice Spawn Egg",
       "entity.witchercraft.alghoul": "Alghoul",
-      "item.witchercraft.alghoul_spawn_egg": "Alghoul Spawn Egg"
+      "item.witchercraft.alghoul_spawn_egg": "Alghoul Spawn Egg",
+      "entity.witchercraft.ghoul": "Ghoul",
+      "item.witchercraft.ghoul_spawn_egg": "Ghoul Spawn Egg"
     }
   },
   "metadata": {

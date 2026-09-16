@@ -787,6 +787,11 @@ forces active spikes to retract. When the real Axii effect is available, it will
 effect check without changing the stance rules. The mob has separate walk, idle, and slap animations
 for both stances. Natural spawning stays disabled until those behaviors pass in-game testing.
 
+The Ghoul is a smaller and faster relative of the Alghoul. It uses the same body plan without any spike
+geometry or stance mechanic. Its initial editable values are 30 health, 4 melee damage, 0 armor, 0.33
+movement speed, 0.8 visual scale, and a 1.0 by 1.9 block hitbox. It has walk, idle, and slap animations.
+Natural spawning remains disabled while its scale, collision, attack reach, and movement are tested.
+
 ---
 
 ## 9. World and Utility Systems

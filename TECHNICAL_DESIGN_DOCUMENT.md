@@ -1128,6 +1128,11 @@ their movement and timed-state tests do not have reliable Blockly equivalents in
 Natural spawning remains off until collision, attack reach, both stance transitions, suppression, and
 retaliation have passed in-game tests.
 
+A simpler derivative can reuse the same pattern without copying the stance machine. The Ghoul derives
+its geometry and corrected no-spike animations from the Alghoul, removes every visible spike cube, and
+keeps only walk, idle, and slap. Its sole locked tick procedure converts the short melee swing edge into
+a 20-tick attack animation. Movement and combat AI remain ordinary MCreator entity settings.
+
 ---
 
 ## 5. World map terrain pipeline

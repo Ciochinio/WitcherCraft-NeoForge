@@ -43,6 +43,10 @@ public class WitchercraftModEntities {
 			EntityType.Builder.<AlghoulEntity>of(AlghoulEntity::new, MobCategory.MONSTER).setShouldReceiveVelocityUpdates(true).setTrackingRange(64).setUpdateInterval(3)
 
 					.notInPeaceful().sized(1.25f, 2.4f));
+	public static final DeferredHolder<EntityType<?>, EntityType<GhoulEntity>> GHOUL = register("ghoul",
+			EntityType.Builder.<GhoulEntity>of(GhoulEntity::new, MobCategory.MONSTER).setShouldReceiveVelocityUpdates(true).setTrackingRange(64).setUpdateInterval(3)
+
+					.notInPeaceful().sized(1f, 1.9f));
 	public static final DeferredHolder<EntityType<?>, EntityType<CockatriceEntity>> COCKATRICE = register("cockatrice",
 			EntityType.Builder.<CockatriceEntity>of(CockatriceEntity::new, MobCategory.MONSTER).setShouldReceiveVelocityUpdates(true).setTrackingRange(64).setUpdateInterval(3)
 
@@ -57,12 +61,14 @@ public class WitchercraftModEntities {
 	@SubscribeEvent
 	public static void init(RegisterSpawnPlacementsEvent event) {
 		AlghoulEntity.init(event);
+		GhoulEntity.init(event);
 		CockatriceEntity.init(event);
 	}
 
 	@SubscribeEvent
 	public static void registerAttributes(EntityAttributeCreationEvent event) {
 		event.put(ALGHOUL.get(), AlghoulEntity.createAttributes().build());
+		event.put(GHOUL.get(), GhoulEntity.createAttributes().build());
 		event.put(COCKATRICE.get(), CockatriceEntity.createAttributes().build());
 	}
 }

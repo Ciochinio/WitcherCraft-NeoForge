@@ -1,0 +1,184 @@
+{
+    "_fv":  89,
+    "_type":  "livingentity",
+    "definition":  {
+                       "mobName":  "Ghoul",
+                       "mobLabel":  "",
+                       "mobModelName":  "ModelGhoul",
+                       "mobModelTexture":  "ghoul.png",
+                       "transparentModelCondition":  {
+                                                         "fixedValue":  false
+                                                     },
+                       "isShakingCondition":  {
+                                                  "fixedValue":  false
+                                              },
+                       "solidBoundingBox":  {
+                                                "fixedValue":  false
+                                            },
+                       "visualScale":  {
+                                           "fixedValue":  0.8
+                                       },
+                       "boundingBoxScale":  {
+                                                "fixedValue":  1
+                                            },
+                       "modelLayers":  [
+
+                                       ],
+                       "animations":  [
+                                          {
+                                              "animation":  "CUSTOM:GhoulAnimation.slap",
+                                              "speed":  1,
+                                              "condition":  "GhoulSlapAnimationCondition",
+                                              "walking":  false,
+                                              "amplitude":  1
+                                          },
+                                          {
+                                              "animation":  "CUSTOM:GhoulAnimation.idle",
+                                              "speed":  1,
+                                              "condition":  "GhoulIdleAnimationCondition",
+                                              "walking":  false,
+                                              "amplitude":  1
+                                          },
+                                          {
+                                              "animation":  "CUSTOM:GhoulAnimation.walk",
+                                              "speed":  1,
+                                              "condition":  "GhoulWalkAnimationCondition",
+                                              "walking":  true,
+                                              "amplitude":  8
+                                          }
+                                      ],
+                       "modelWidth":  1,
+                       "modelHeight":  1.9,
+                       "modelShadowSize":  0.65,
+                       "mountedYOffset":  0,
+                       "hasSpawnEgg":  true,
+                       "spawnEggBaseColor":  {
+                                                 "value":  -1118738,
+                                                 "falpha":  0
+                                             },
+                       "spawnEggDotColor":  {
+                                                "value":  -12895429,
+                                                "falpha":  0
+                                            },
+                       "spawnEggTexture":  "",
+                       "creativeTabs":  [
+                                            "CUSTOM:WitcherCraft"
+                                        ],
+                       "isBoss":  false,
+                       "bossBarColor":  "PINK",
+                       "bossBarType":  "PROGRESS",
+                       "equipmentMainHand":  "",
+                       "equipmentOffHand":  "",
+                       "equipmentHelmet":  "",
+                       "equipmentBody":  "",
+                       "equipmentLeggings":  "",
+                       "equipmentBoots":  "",
+                       "mobBehaviourType":  "Mob",
+                       "mobCreatureType":  "UNDEFINED",
+                       "attackStrength":  4,
+                       "attackKnockback":  0,
+                       "knockbackResistance":  0,
+                       "movementSpeed":  0.33,
+                       "stepHeight":  0.6,
+                       "armorBaseValue":  0,
+                       "trackingRange":  64,
+                       "followRange":  20,
+                       "health":  30,
+                       "xpAmount":  0,
+                       "waterMob":  false,
+                       "breatheUnderwater":  {
+                                                 "fixedValue":  false
+                                             },
+                       "pushedByFluids":  {
+                                              "fixedValue":  true
+                                          },
+                       "flyingMob":  false,
+                       "inventorySize":  9,
+                       "inventoryStackSize":  99,
+                       "disableCollisions":  false,
+                       "ridable":  false,
+                       "canControlForward":  false,
+                       "canControlStrafe":  false,
+                       "immuneToFire":  false,
+                       "immuneToArrows":  false,
+                       "immuneToFallDamage":  false,
+                       "immuneToCactus":  false,
+                       "immuneToDrowning":  false,
+                       "immuneToLightning":  false,
+                       "immuneToPotions":  false,
+                       "immuneToPlayer":  false,
+                       "immuneToExplosion":  false,
+                       "immuneToTrident":  false,
+                       "immuneToAnvil":  false,
+                       "immuneToWither":  false,
+                       "immuneToDragonBreath":  false,
+                       "mobDrop":  "",
+                       "livingSound":  "",
+                       "hurtSound":  "entity.generic.hurt",
+                       "deathSound":  "entity.generic.death",
+                       "stepSound":  "",
+                       "raidCelebrationSound":  "",
+                       "entityDataEntries":  [
+                                                 {
+                                                     "min":  0,
+                                                     "max":  1,
+                                                     "name":  "AttackAnimation",
+                                                     "type":  "integer",
+                                                     "value":  0
+                                                 },
+                                                 {
+                                                     "min":  0,
+                                                     "max":  20,
+                                                     "name":  "AttackTicks",
+                                                     "type":  "integer",
+                                                     "value":  0
+                                                 },
+                                                 {
+                                                     "name":  "WasSwinging",
+                                                     "type":  "logic",
+                                                     "value":  false
+                                                 }
+                                             ],
+                       "onMobTickUpdate":  "GhoulAttackTick",
+                       "hasAI":  true,
+                       "aiBase":  "(none)",
+                       "aixml":  "\u003cxml xmlns=\"https://developers.google.com/blockly/xml\"\u003e\n\u003cblock type=\"aitasks_container\" deletable=\"false\" x=\"40\" y=\"40\"\u003e\u003cnext\u003e\n\u003cblock type=\"attack_on_collide\"\u003e\u003cfield name=\"speed\"\u003e1.2\u003c/field\u003e\u003cfield name=\"longmemory\"\u003eFALSE\u003c/field\u003e\u003cfield name=\"condition\"\u003enull,null\u003c/field\u003e\u003cnext\u003e\n\u003cblock type=\"wander\"\u003e\u003cfield name=\"speed\"\u003e1\u003c/field\u003e\u003cfield name=\"condition\"\u003enull,null\u003c/field\u003e\u003cnext\u003e\n\u003cblock type=\"attack_action\"\u003e\u003cfield name=\"callhelp\"\u003eFALSE\u003c/field\u003e\u003cfield name=\"condition\"\u003enull,null\u003c/field\u003e\u003cnext\u003e\n\u003cblock type=\"look_around\"\u003e\u003cfield name=\"condition\"\u003enull,null\u003c/field\u003e\u003cnext\u003e\n\u003cblock type=\"swim_in_water\"\u003e\u003cfield name=\"condition\"\u003enull,null\u003c/field\u003e\u003c/block\u003e\u003c/next\u003e\n\u003c/block\u003e\u003c/next\u003e\u003c/block\u003e\u003c/next\u003e\u003c/block\u003e\u003c/next\u003e\u003c/block\u003e\u003c/next\u003e\u003c/block\u003e\u003c/xml\u003e",
+                       "breedable":  false,
+                       "tameable":  false,
+                       "breedTriggerItems":  [
+
+                                             ],
+                       "ranged":  false,
+                       "rangedAttackItem":  "",
+                       "rangedItemType":  "Default item",
+                       "rangedAttackInterval":  20,
+                       "rangedAttackRadius":  10,
+                       "spawnThisMob":  false,
+                       "doesDespawnWhenIdle":  true,
+                       "spawningProbability":  20,
+                       "mobSpawningType":  "monster",
+                       "minNumberOfMobsPerGroup":  1,
+                       "maxNumberOfMobsPerGroup":  1,
+                       "restrictionBiomes":  [
+
+                                             ],
+                       "spawnInDungeons":  false,
+                       "raidSpawnsCount":  [
+                                               4,
+                                               3,
+                                               3,
+                                               4,
+                                               4,
+                                               4,
+                                               2
+                                           ],
+                       "sensitiveToVibration":  false,
+                       "vibrationalEvents":  [
+
+                                             ],
+                       "vibrationSensitivityRadius":  {
+                                                          "fixedValue":  7
+                                                      },
+                       "whenMobIsHurt":  ""
+                   }
+}
