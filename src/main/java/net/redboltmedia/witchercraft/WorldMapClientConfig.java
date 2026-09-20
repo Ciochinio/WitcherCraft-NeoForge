@@ -29,6 +29,7 @@ public final class WorldMapClientConfig {
 	private static final ModConfigSpec.BooleanValue MINIMAP_ROTATION;
 	private static final ModConfigSpec.DoubleValue MINIMAP_ZOOM;
 	private static final ModConfigSpec.IntValue MINIMAP_SIZE;
+	private static final ModConfigSpec.IntValue MINIMAP_VIEWPORT_INSET;
 
 	public enum MinimapCorner { TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT }
 
@@ -60,6 +61,7 @@ public final class WorldMapClientConfig {
 		MINIMAP_ROTATION = minimapOption(builder, "rotation", "Rotate the minimap so the player's facing direction remains at the top. When disabled, north remains at the top.").define("rotation", true);
 		MINIMAP_ZOOM = minimapOption(builder, "zoom", "Minimap screen pixels per world block. Larger values show a closer view.").defineInRange("zoom", 1.0, 0.25, 4.0);
 		MINIMAP_SIZE = minimapOption(builder, "size", "Minimap diameter or side length in GUI pixels.").defineInRange("size", 128, 64, 256);
+		MINIMAP_VIEWPORT_INSET = minimapOption(builder, "viewport_inset", "Inset of the terrain viewport from each edge, measured in texels of the 64 by 64 frame texture.").defineInRange("viewportInset", 5, 0, 24);
 		builder.pop();
 		SPEC = builder.build();
 	}
@@ -97,4 +99,5 @@ public final class WorldMapClientConfig {
 	public static boolean minimapRotation() { return MINIMAP_ROTATION.getAsBoolean(); }
 	public static double minimapZoom() { return MINIMAP_ZOOM.getAsDouble(); }
 	public static int minimapSize() { return MINIMAP_SIZE.getAsInt(); }
+	public static int minimapViewportInset() { return MINIMAP_VIEWPORT_INSET.getAsInt(); }
 }

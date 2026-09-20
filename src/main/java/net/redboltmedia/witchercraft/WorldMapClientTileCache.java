@@ -103,6 +103,11 @@ public final class WorldMapClientTileCache {
 	}
 
 	public static void renderAndRequest(GuiGraphicsExtractor g, int vx, int vy, int vw, int vh, double centerX, double centerZ, double zoom) {
+		renderAndRequest(g, vx, vy, vw, vh, centerX, centerZ, zoom, 0.0);
+	}
+
+	/** Renders the authorized terrain around one center, optionally rotating it clockwise around the viewport center. */
+	public static void renderAndRequest(GuiGraphicsExtractor g, int vx, int vy, int vw, int vh, double centerX, double centerZ, double zoom, double rotationDegrees) {
 		long started = System.nanoTime();
 		Minecraft mc = Minecraft.getInstance();
 		if (mc.player == null || mc.level == null || mc.getConnection() == null) return;
@@ -110,7 +115,7 @@ public final class WorldMapClientTileCache {
 		renderFrame++;
 		releaseRetiredTextures(mc);
 		ensureConnection(mc);
-		rememberView(vw, vh, centerX, centerZ, zoom);
+		rememberView(vw, vh, centerX, centerZ, zoom, rotationDegrees);
 		refreshVisualSettings();
 		if (overviewSelected ? zoom >= OVERVIEW_EXIT_ZOOM : zoom <= OVERVIEW_ENTER_ZOOM) overviewSelected = !overviewSelected;
 		DiskCache.updateVisible(lastMinChunkX, lastMaxChunkX, lastMinChunkZ, lastMaxChunkZ, centerX, centerZ, visualSettingsKey, cacheGeneration, overviewSelected);
@@ -124,6 +129,7 @@ public final class WorldMapClientTileCache {
 		int anchorZ = Math.floorDiv((int)Math.floor(centerZ), OVERVIEW) * OVERVIEW;
 		g.pose().pushMatrix();
 		g.pose().translate(vx + vw / 2.0f, vy + vh / 2.0f);
+		g.pose().rotate((float)Math.toRadians(rotationDegrees));
 		g.pose().scale((float)zoom, (float)zoom);
 		g.pose().translate((float)(anchorX - centerX), (float)(anchorZ - centerZ));
 		if (overviewSelected) {
@@ -778,11 +784,16 @@ public final class WorldMapClientTileCache {
 	}
 	private static void dirty(int rx, int rz) { ClientRegion r = REGIONS.get(ChunkPos.pack(rx, rz)); if (r != null) r.revision++; }
 
-	private static void rememberView(int vw, int vh, double centerX, double centerZ, double zoom) {
-		int minX = (int)Math.floor((centerX - vw / (2.0 * zoom)) / CHUNK) - 1;
-		int maxX = (int)Math.floor((centerX + vw / (2.0 * zoom)) / CHUNK) + 1;
-		int minZ = (int)Math.floor((centerZ - vh / (2.0 * zoom)) / CHUNK) - 1;
-		int maxZ = (int)Math.floor((centerZ + vh / (2.0 * zoom)) / CHUNK) + 1;
+	private static void rememberView(int vw, int vh, double centerX, double centerZ, double zoom, double rotationDegrees) {
+		double radians = Math.toRadians(rotationDegrees);
+		double cosine = Math.abs(Math.cos(radians));
+		double sine = Math.abs(Math.sin(radians));
+		double halfWorldX = (cosine * vw + sine * vh) / (2.0 * zoom);
+		double halfWorldZ = (sine * vw + cosine * vh) / (2.0 * zoom);
+		int minX = (int)Math.floor((centerX - halfWorldX) / CHUNK) - 1;
+		int maxX = (int)Math.floor((centerX + halfWorldX) / CHUNK) + 1;
+		int minZ = (int)Math.floor((centerZ - halfWorldZ) / CHUNK) - 1;
+		int maxZ = (int)Math.floor((centerZ + halfWorldZ) / CHUNK) + 1;
 		if (!haveViewBounds || minX != lastMinChunkX || maxX != lastMaxChunkX || minZ != lastMinChunkZ || maxZ != lastMaxChunkZ) {
 			markViewDirty(); lastMinChunkX = minX; lastMaxChunkX = maxX; lastMinChunkZ = minZ; lastMaxChunkZ = maxZ; haveViewBounds = true;
 		}

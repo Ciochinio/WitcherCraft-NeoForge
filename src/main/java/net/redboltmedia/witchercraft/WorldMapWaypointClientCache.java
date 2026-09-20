@@ -15,18 +15,30 @@ import java.util.UUID;
 public final class WorldMapWaypointClientCache {
 	private static final UUID NO_ID = new UUID(0L, 0L);
 	private static final int MAX_REMEMBERED_RESULTS = 32;
+	private static final long SNAPSHOT_RETRY_NANOS = 2_000_000_000L;
 	private static final Map<Integer, WorldMapWaypointResultMessage> RESULTS = new LinkedHashMap<>();
 	private static final Map<Identifier, TemporaryPin> TEMPORARY_PINS = new LinkedHashMap<>();
 	private static List<WorldMapWaypoints.Waypoint> waypoints = List.of();
 	private static Object connectionIdentity;
 	private static int nextRequestId = 1;
 	private static boolean synchronizedWithServer;
+	private static long nextSnapshotRequestNanos;
 
 	private WorldMapWaypointClientCache() {
 	}
 
 	public static int requestSnapshot() {
-		return send(WorldMapWaypointMutationMessage.Operation.REQUEST_SNAPSHOT, NO_ID, "", 0, 0, "", "", false);
+		int requestId = send(WorldMapWaypointMutationMessage.Operation.REQUEST_SNAPSHOT, NO_ID, "", 0, 0, "", "", false);
+		if (requestId != 0)
+			nextSnapshotRequestNanos = System.nanoTime() + SNAPSHOT_RETRY_NANOS;
+		return requestId;
+	}
+
+	/** Ensures HUD-only players receive waypoint state without issuing a request every rendered frame. */
+	public static void requestSnapshotIfNeeded() {
+		ensureConnection();
+		if (!synchronizedWithServer && System.nanoTime() >= nextSnapshotRequestNanos)
+			requestSnapshot();
 	}
 
 	public static int create(Identifier dimension, double x, double z, String name, WorldMapWaypoints.WaypointIcon icon) {
@@ -91,6 +103,7 @@ public final class WorldMapWaypointClientCache {
 			return;
 		waypoints = List.copyOf(snapshot);
 		synchronizedWithServer = true;
+		nextSnapshotRequestNanos = 0L;
 	}
 
 	static void acceptResult(WorldMapWaypointResultMessage result) {
@@ -107,6 +120,7 @@ public final class WorldMapWaypointClientCache {
 		RESULTS.clear();
 		TEMPORARY_PINS.clear();
 		synchronizedWithServer = false;
+		nextSnapshotRequestNanos = 0L;
 		nextRequestId = 1;
 	}
 

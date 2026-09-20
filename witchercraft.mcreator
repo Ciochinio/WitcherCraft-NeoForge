@@ -10865,7 +10865,8 @@
       "witchercraft.configuration.minimap.corner": "Screen Corner",
       "witchercraft.configuration.minimap.rotation": "Rotate With Player",
       "witchercraft.configuration.minimap.zoom": "Zoom",
-      "witchercraft.configuration.minimap.size": "Size"
+      "witchercraft.configuration.minimap.size": "Size",
+      "witchercraft.configuration.minimap.viewport_inset": "Frame Viewport Inset"
     }
   },
   "metadata": {
