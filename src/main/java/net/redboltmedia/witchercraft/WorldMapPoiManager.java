@@ -113,10 +113,17 @@ public final class WorldMapPoiManager {
 		private long matchedObservations;
 		private long uniqueInstances;
 		private long refreshedInstances;
+		private long duplicateObservations;
+		private long observationCollisions;
 		private long reveals;
 		private long discoveries;
 		private long viewRequests;
 		private long rejectedViewRequests;
+		private long timedTicks;
+		private long totalTickNanos;
+		private long maximumTickNanos;
+		private long revealCandidates;
+		private long discoveryCandidates;
 
 		private ServerState(MinecraftServer server) {
 			this.server = server;
@@ -142,13 +149,17 @@ public final class WorldMapPoiManager {
 					refreshedInstances++;
 					spatialIndex.upsert(observed);
 				}
-				case UNCHANGED -> refreshedInstances++;
-				case COLLISION -> WitchercraftMod.LOGGER.error("Stable POI marker collision for {} and identity '{}'", observed.markerId(), observed.providerIdentity());
+				case UNCHANGED -> duplicateObservations++;
+				case COLLISION -> {
+					observationCollisions++;
+					WitchercraftMod.LOGGER.error("Stable POI marker collision for {} and identity '{}'", observed.markerId(), observed.providerIdentity());
+				}
 				case LIMIT_REACHED -> WitchercraftMod.LOGGER.error("Cannot retain POI {}: shared instance limit {} reached", observed.markerId(), WorldMapPoiInstances.MAX_INSTANCES);
 			}
 		}
 
 		private void tick(WorldMapPoiDefinitions.Snapshot definitions) {
+			long started = System.nanoTime();
 			int tick = server.getTickCount();
 			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
 				int playerOffset = player.getUUID().hashCode();
@@ -157,6 +168,10 @@ public final class WorldMapPoiManager {
 				if (Math.floorMod(tick, REVEAL_INTERVAL_TICKS) == Math.floorMod(playerOffset, REVEAL_INTERVAL_TICKS))
 					checkReveal(player, definitions);
 			}
+			long elapsed = System.nanoTime() - started;
+			timedTicks++;
+			totalTickNanos += elapsed;
+			maximumTickNanos = Math.max(maximumTickNanos, elapsed);
 			if (tick % DIAGNOSTIC_INTERVAL_TICKS == 0)
 				logDiagnostics();
 		}
@@ -165,7 +180,9 @@ public final class WorldMapPoiManager {
 			if (maximumRevealRadius <= 0.0)
 				return;
 			Identifier dimension = player.level().dimension().identifier();
-			for (UUID markerId : spatialIndex.query(dimension, player.getX(), player.getZ(), maximumRevealRadius)) {
+			List<UUID> candidates = spatialIndex.query(dimension, player.getX(), player.getZ(), maximumRevealRadius);
+			revealCandidates += candidates.size();
+			for (UUID markerId : candidates) {
 				WorldMapPoiInstance instance = instances.get(markerId);
 				if (instance == null || !instance.active() || knowledge.get(player.getUUID(), markerId) != null)
 					continue;
@@ -188,7 +205,9 @@ public final class WorldMapPoiManager {
 			if (maximumDiscoveryRadius <= 0.0)
 				return;
 			Identifier dimension = player.level().dimension().identifier();
-			for (UUID markerId : spatialIndex.query(dimension, player.getX(), player.getZ(), maximumDiscoveryRadius)) {
+			List<UUID> candidates = spatialIndex.query(dimension, player.getX(), player.getZ(), maximumDiscoveryRadius);
+			discoveryCandidates += candidates.size();
+			for (UUID markerId : candidates) {
 				WorldMapPoiInstance instance = instances.get(markerId);
 				if (instance == null || !instance.active())
 					continue;
@@ -309,8 +328,17 @@ public final class WorldMapPoiManager {
 
 		private void logDiagnostics() {
 			long active = instances.values().stream().filter(WorldMapPoiInstance::active).count();
-			WitchercraftMod.LOGGER.info("World-map POI state: watched_chunks={}, matched_observations={}, unique_instances={}, refreshed_instances={}, retained_instances={}, active_instances={}, reveals={}, discoveries={}, view_requests={}, rejected_view_requests={}",
-				watchedChunks, matchedObservations, uniqueInstances, refreshedInstances, instances.values().size(), active, reveals, discoveries, viewRequests, rejectedViewRequests);
+			double averageMicros = timedTicks == 0 ? 0.0 : totalTickNanos / (timedTicks * 1_000.0);
+			double maximumMicros = maximumTickNanos / 1_000.0;
+			WitchercraftMod.LOGGER.info("World-map POI state: watched_chunks={}, matched_observations={}, unique_instances={}, refreshed_instances={}, duplicate_observations={}, observation_collisions={}, retained_instances={}, active_instances={}, reveals={}, discoveries={}, view_requests={}, rejected_view_requests={}, reveal_candidates={}, discovery_candidates={}, tick_avg_us={}, tick_max_us={}",
+				watchedChunks, matchedObservations, uniqueInstances, refreshedInstances, duplicateObservations, observationCollisions,
+				instances.values().size(), active, reveals, discoveries, viewRequests, rejectedViewRequests, revealCandidates,
+				discoveryCandidates, String.format(java.util.Locale.ROOT, "%.2f", averageMicros), String.format(java.util.Locale.ROOT, "%.2f", maximumMicros));
+			timedTicks = 0;
+			totalTickNanos = 0;
+			maximumTickNanos = 0;
+			revealCandidates = 0;
+			discoveryCandidates = 0;
 		}
 
 		private static boolean inside(ServerPlayer player, BlockPos anchor, double radius) {

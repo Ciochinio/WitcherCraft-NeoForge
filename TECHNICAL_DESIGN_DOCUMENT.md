@@ -633,9 +633,10 @@ small helpers may remain unowned. MCreator does not regenerate either form:
   region. Every navbar page with no bespoke `GuiPage` uses it, until that page gets its own class +
   its own placer tool (the Skills pattern).
 - **`PerkPage`** - the perk tree + equip grid, fit-scaled into the content region (see 3.5).
-- **`MapPage`** - the first world-map milestone. It owns only client view state and renders a clipped
-  diagnostic grid, player marker, cursor coordinates, and bottom-bar controls. Terrain, fog, POIs,
-  and waypoints are absent. Wheel zoom preserves the world position under the cursor.
+- **`MapPage`** - the assembled world-map page. It owns client view and overlay state, renders streamed
+  terrain plus the player, waypoint, temporary-target, and POI marker layers, and exposes the bottom-bar
+  controls, waypoint manager, marker interactions, hover cards, and POI filters. Wheel zoom preserves the
+  world position under the cursor; authoritative waypoint and POI state remains outside the page.
 - **`MapLayout`** - tool-generated map viewport, bottom-bar, control, text, and color constants. Its
   editor is `tools/map-layout-creator.html`, which can import the checked-in Java values.
 - **`WitcherGuiKeybind`** - a hand-written `@EventBusSubscriber(Dist.CLIENT)` that registers the **P**
@@ -1135,17 +1136,17 @@ a 20-tick attack animation. Movement and combat AI remain ordinary MCreator enti
 
 ---
 
-## 5. World map terrain pipeline
+## 5. World map system
 
-### 5.1 Milestone 2A ownership
+### 5.1 System ownership
 
 `WorldMapTerrainCapture` and `WorldMapTerrainTile` are locked code elements in the base package.
 They own server observation, capture scheduling, terrain serialization, and exploration-mask
 serialization. Do not move these collections into generated `PlayerVariables`.
 
 Blockly remains the preferred place for ordinary gameplay triggers and effects. It cannot safely
-express chunk-watch events, bounded queues, atomic files, checksums, or background I/O, so the 2A
-core stays in locked Java. Later Blockly procedures may call narrow locked procedures when a map
+express chunk-watch events, bounded queues, atomic files, checksums, or background I/O, so the map
+infrastructure stays in locked Java. Blockly procedures may call narrow locked procedures when a map
 action needs to connect to generated gameplay.
 
 ### 5.2 Legitimate exploration contract
@@ -1160,8 +1161,8 @@ The queue stores dimension keys, packed chunk positions, priority, and sequence.
 replace this with `getChunk`, a future request, or a ticket because those paths can load or generate
 terrain.
 
-Only the Overworld enters the pipeline in this milestone. Storage paths and records retain a
-dimension key so later dimensions can use separate data without changing the formats.
+Only the Overworld currently enters the terrain-capture pipeline. Storage paths and records retain a
+dimension key, allowing another dimension to use isolated data without changing the formats.
 
 ### 5.3 Terrain tile format
 
@@ -1194,8 +1195,8 @@ The reader accepts versions one through four. It supplies absent arrays and an e
 for fields that did not exist in an older format. Exploration files remain version one and are not reset.
 The format change does not alter storage paths, authorization, or the one-chunk packet and persistence unit.
 After a captured tile reaches durable storage, the server sends that tile to players currently tracking
-the chunk. This replaces an old-format fallback that the client may have requested before recapture
-finished, without generating or force-loading terrain.
+the chunk. This also replaces any compatible older tile the client displayed while recapture was pending,
+without generating or force-loading terrain.
 
 Tint kind `0` means no biome tint, `1` grass, `2` foliage, and `3` water. Capturing the resolved tint
 keeps rendering independent of loaded chunks. The tile constructor rejects any array that is not
@@ -1232,7 +1233,7 @@ the per-tick budget or adding a refresh cooldown. Tile and exploration writes ru
 executor. Column sampling remains on the server thread because chunk state is not safe to read from
 the background writer.
 
-### 5.6 Milestone 2B networking
+### 5.6 Terrain authorization and networking
 
 `WorldMapTileRequestMessage` carries at most 64 packed chunk positions. Its decoder rejects larger
 batches before allocation. `WorldMapTerrainCapture.requestTiles` accepts requests only from a player
@@ -1266,7 +1267,7 @@ Crossing a leaf or overview-page boundary bypasses that throttle, so a fast pan 
 the old scan interval showing the map background. The I/O submission order is visible pages nearest the
 center, then the prefetched ring nearest the center. Existing in-flight reads are not cancelled.
 
-### 5.7 Milestone 2C client renderer
+### 5.7 Client terrain renderer
 
 `WorldMapClientTileCache` keeps received messages as decoded CPU samples. It does not create a GPU
 texture per chunk. The decoded cache targets 4,096 chunks in access order, but it retains all chunks
@@ -1387,7 +1388,7 @@ Terrain tile version 4 is the write format. The reader also accepts versions 1 t
 layers and block-state palettes that did not exist in those formats as absent, and verifies their original CRC. This preserves
 previously explored terrain after a renderer upgrade without loading or regenerating old chunks.
 
-### 5.8 Persistent authorized client cache
+### 5.8 Persistent authorized terrain cache
 
 The server persists a random world-map UUID in the world root. It sends that UUID to each player during
 login through the existing request-completion payload using request ID zero. Ordinary completions also
@@ -1447,7 +1448,7 @@ black leaves while raw tiles are still entering memory. A missing or invalid sid
 stale. Per-path locking prevents the I/O loader from holding a PNG open while the builder atomically
 replaces it on Windows. A corrupt tile acts as
 absent. A corrupt PNG is deleted and rebuilt. Cache scanning logs tile count, file count, and total size.
-No automatic pruning runs in this milestone.
+The cache currently has no automatic disk-pruning policy.
 
 Live tile arrivals mark their owning leaf dirty even when the map is closed. A two-second debounce
 combines nearby arrivals. A single maintenance worker then snapshots one due leaf at a time, builds it
@@ -1462,124 +1463,120 @@ player's exploration mask, reads authorized tiles on its I/O executor, and sends
 capture time is newer. An accepted completion marks every position in that batch as validated for the
 connection. Live capture updates replace cached data and dirty the affected leaf normally.
 
-Milestone 2C is complete. Milestone 2D visual validation is in progress. The full-resolution renderer
-removed the damaging box-averaged LOD levels. Milestone 2D.1 replaces the flat centered gradient with
-discrete north and northwest slope shading without reintroducing spatial color blur. Milestone 2D.2 uses
-the visible ground, foliage, or water height. Raised foliage also casts a height-scaled directional contact
-shadow on adjacent lower ground. A separate canopy-relief multiplier controls contrast between neighboring
-foliage heights. Milestone 2D.3 replaces fixed foliage and decoration blending with texture-derived alpha
-coverage and configurable opacity scales. Milestone 2D.5 derives water color from the active still-water
-texture and biome tint, preserves shallow seabeds, and increases opacity and darkness gradually with depth.
-Milestone 2D.7 leaves missing tiles transparent over the black map background. The postponed cloud and
-edge-fade experiments were removed because rebuilding those masks caused unacceptable map lag. Empty
-regions do not create GPU textures, and no fog state enters terrain capture, persistence, or network
-messages.
-Milestone 2D.8 replaces the diagnostic cross with the 64 by 64 resource-pack texture
-`textures/screens/map_player_arrow.png`. `MapPage` draws it at a base 16 by 16 screen pixels and rotates it
-around the player position using client player yaw. Batch 3 later changed both player and waypoint markers
-to multiply their base size by the square root of map zoom, clamped from 0.5 to 2.5, and then by the client
-`markerScale` setting from 0.5 to 2.0. Marker-style configuration remains postponed.
-Separate stored lighting remains a possible later refinement. Milestone 2D must pass representative
-in-game visual, restart, and performance checks before waypoint work begins.
+`MapPage` fills the viewport with black before drawing cached overview pages or detailed leaves. Missing
+terrain therefore remains opaque to the player, and empty regions do not allocate GPU textures. Terrain is
+followed by POIs, saved waypoints, the temporary navigation target, and the player marker. The player uses
+`textures/screens/map_player_arrow.png`, drawn at a 16 by 16-pixel base size and rotated from client yaw.
+Player and waypoint marker sizes multiply by the square root of map zoom, clamped from 0.5 to 2.5, and by
+the client `markerScale` setting, whose supported range is 0.5 to 2.0. No fog, cloud, edge-fade, or separate
+lighting state enters terrain capture, persistence, or networking.
 
-`MapPage` fills the viewport with its black background first, then the region renderer draws terrain,
-followed by the player marker and existing controls. A missing tile therefore reveals nothing. In-memory
-state is scoped to the current connection. Persistent files use the server-issued world UUID and player
-UUID, so terrain from another world or player cannot appear.
+All decoded and rendered state is connection-scoped. Persistent client paths include both the server-issued
+world UUID and player UUID, preventing terrain from another player, recreated world, or reset server at the
+same address from appearing.
 
-### 5.9 Milestone 3 waypoint ownership
+### 5.9 Waypoint architecture and ownership
 
-`WorldMapWaypoints` is a locked code element in the base package. It owns the authoritative personal
-waypoint records, validation, and server-thread mutation methods. The server stores one codec-backed
-`SavedData` file in its shared world data storage. That file groups waypoint lists by player UUID, while
-each waypoint records its dimension identifier, X/Z, name, and visibility. Waypoints therefore survive logout, death, and restart
-without using generated player variables or client files.
+#### Authoritative state
 
-The server generates every waypoint UUID. Public operations accept a `ServerPlayer`, derive ownership from
-that player, and never accept an owner UUID from a caller. Creation validates that the dimension is loaded,
-the coordinates are finite and inside both the hard 30,000,000-block ceiling and the dimension's current
-world border, and the normalized name contains 1 to 64 non-control characters. Editing cannot change the
-dimension or coordinates, and the server caps each player at 200 records.
+`WorldMapWaypoints` is the server authority for personal waypoints. It is a locked base-package code element
+and may only be accessed on the server thread. One codec-backed `SavedData` object in the server's shared world
+storage groups records by owner UUID. Each record contains a server-generated waypoint UUID, dimension
+identifier, X/Z coordinates, normalized name, icon, and persistent visibility flag. Waypoints therefore survive
+logout, death, respawn, and server restart without using generated player variables or client files.
 
-The version-one save format uses permissive stored strings for UUID, dimension, icon, and color fields, then
-validates each decoded record. This lets the loader discard one invalid logical record instead of accepting
-it into server state. It also removes duplicate waypoint UUIDs and extra records above the player limit.
-A structurally unreadable saved-data file still follows Minecraft's
-normal SavedData recovery behavior.
+Every public read or mutation accepts a `ServerPlayer` and derives the owner UUID from that player. Neither the
+storage API nor the network protocol accepts a caller-supplied owner UUID, so a client cannot inspect or mutate
+another player's list. The supported mutations are create, edit name/icon, set visibility, and delete. Editing
+does not change a waypoint's dimension or coordinates, and waypoint sharing is not part of this system.
 
-Format version 2 removes color and tracking from the runtime record. Icon remains player-selectable. The codec
-still accepts and writes the old color and tracking fields with fixed defaults so existing version-one saves
-load safely. The client tints every saved icon with `MapLayout.WAYPOINT_COLOR`.
+Creation is limited to 200 waypoints per player. The requested dimension must be loaded, coordinates must be
+finite and within both the 30,000,000-block hard ceiling and that dimension's current world border, and the
+trimmed name must contain 1 to 64 Unicode code points with no control characters. Icons are restricted to the
+`WaypointIcon` enum: home, camp, chest, danger, herb, monster, and quest. The same name, coordinate, icon, and
+identifier checks are applied while loading stored records.
 
-Batch 2 uses one bounded `WorldMapWaypointMutationMessage` for snapshot requests and all mutation intents.
-The payload never carries an owner UUID. The network context supplies the `ServerPlayer`, and the server
-runs the operation through `WorldMapWaypoints` on its main thread. It replies with a small result containing
-the request ID, operation, and status, followed by a complete authoritative snapshot. Sending a full list is
-bounded by the 200-waypoint server limit and avoids client-side merge rules.
+#### Persistence and compatibility
 
-`WorldMapWaypointClientCache` stores only the latest server snapshot and up to 32 request results. It compares
-Minecraft's current connection object before every access, request, and response. A connection change clears
-the list, results, synchronization flag, and request counter, so state from one server cannot appear on
-another. Opening `MapPage` requests a fresh snapshot. Later waypoint screens call the cache's create, edit,
-visibility and delete request methods rather than changing the cached list themselves.
+Save format 2 uses permissive stored strings for UUIDs, dimension IDs, and icon IDs, then validates each decoded
+logical record. An invalid record, duplicate waypoint UUID, or record above the per-player limit is discarded
+without invalidating unrelated waypoints. An invalid player UUID discards only that player's collection. A
+structurally unreadable `SavedData` file still follows Minecraft's normal saved-data recovery behavior.
 
-Batch 3 extends the `GuiPage` input contract with a double-click-aware overload and Unicode character input.
-The old click method remains the default target, so existing pages need no changes. `WitcherGuiScreen`
-forwards Minecraft's own double-click classification instead of making `MapPage` maintain a second timing
-system. `MapPage` reserves left dragging for panning. A right-click inside the viewport stores its dimension
-and transformed X/Z for 300 milliseconds. Expiry places a temporary client pin. A double right-click cancels
-the pending pin and opens the modal creation panel at the same position. The panel captures mouse, wheel, key,
-and character input until it closes. It sends creation through `WorldMapWaypointClientCache` and waits for
-the matching server result. Rejections leave the panel open with a readable status.
+Color and tracking are not runtime waypoint properties. Their legacy fields remain in the codec with fixed
+defaults so format-1 worlds continue to load and can be written without a destructive migration. Saved icons
+remain player-selectable, while all icons are tinted on the client with `MapLayout.WAYPOINT_COLOR`.
 
-The client cache holds one temporary pin per dimension. A new pin replaces the old pin in that dimension.
-Pins survive closing the map but clear with the rest of the connection-scoped cache when the connection
-changes. They never enter server packets, SavedData, or the 200-waypoint limit. The future minimap reads this
-record as the active temporary navigation target. The atlas retains a pin in cell zero for this purpose.
+#### Network protocol and client cache
 
-The waypoint renderer reads only the latest connection-scoped snapshot. It filters records by the player's
-current dimension and persistent visibility flag, uses the terrain world-to-screen transform, and clips all
-markers to the viewport. Marker centers retain floating-point screen coordinates until the pose translation,
-which removes the integer-step lag seen while panning at low zoom. Player and waypoint marker sizes multiply
-by the square root of map zoom, clamped from 0.5 to 2.5, and then by the existing client marker-scale setting.
+`WorldMapWaypointMutationMessage` is the single bounded serverbound intent for snapshot, create, edit,
+visibility, and delete operations. Its payload has a positive request ID and bounded strings but no owner UUID.
+The network context supplies the authenticated `ServerPlayer`; handling is enqueued onto the server thread and
+delegated to `WorldMapWaypoints`. The server replies with a `WorldMapWaypointResultMessage` containing the
+request ID, operation, and status, followed by a complete `WorldMapWaypointSnapshotMessage`. Full replacement is
+bounded by the 200-record server limit and avoids client-side merge or conflict rules.
+
+`WorldMapWaypointClientCache` stores only the latest authoritative snapshot and the 32 most recent mutation
+results. Every access, request, and response checks Minecraft's current connection object. Changing or losing
+the connection clears waypoints, results, temporary targets, synchronization state, and the request counter, so
+one server's state cannot appear on another. Opening `MapPage` requests a fresh snapshot. All map and manager
+mutations go through cache request methods; UI code never edits the snapshot directly.
+
+#### Temporary navigation targets and creation
+
+The client cache also owns one temporary navigation target per dimension. Placing another target in the same
+dimension replaces it. Targets survive closing the map but clear on connection change. They are not sent to the
+server, saved to disk, or counted against the personal-waypoint limit.
+
+`WitcherGuiScreen` forwards Minecraft's double-click classification and Unicode character input through the
+`GuiPage` contract. `MapPage` reserves left drag for panning. A right-click on empty map space starts a
+300-millisecond pending action; if no second click arrives, it places a temporary target at the transformed
+world X/Z. A double right-click cancels that action and opens the modal waypoint-creation panel at the same
+coordinates. The panel captures mouse, wheel, key, and character input, submits creation through the client
+cache, and waits for its matching result. A rejection leaves the panel open and displays the server status.
+
+#### Rendering and marker interaction
+
+`MapPage` renders saved waypoints from the latest connection-scoped snapshot. It selects only the current
+dimension, applies both the waypoint's persistent visibility flag and the world's client-side personal-waypoint
+filter, uses the terrain world-to-screen transform, and clips markers to the viewport. Marker centers remain
+floating point until pose translation to avoid integer-step panning. Player, waypoint, and temporary-target
+sizes use the square root of map zoom clamped from 0.5 to 2.5, multiplied by the client marker-scale setting.
 Waypoint opacity rises linearly from 35 percent at 0.25 screen pixels per block to full opacity at 1.0.
-Each frame chooses the nearest marker beneath the cursor. That hovered marker appears in a centered information
-card near the bottom of the map. Left input remains reserved for panning. The card data accepts a name, detail
-line, and color so future POIs can put their description in the detail line without changing its renderer.
 
-The temporary pin and seven saved icons use `textures/screens/map_waypoint_icons.png`, a transparent 4 by 2
-atlas. Its fixed order is pin, home, camp, chest, danger, herb, monster, and quest. The checked-in atlas
-contains deliberately simple pixel placeholders and is 1774 by 887 pixels. Replacements
-must retain those dimensions, cell order, transparent padding, and grid. The renderer multiplies neutral icon
-pixels by `MapLayout.WAYPOINT_COLOR`, so testing another color requires one constant change.
+Hover hit testing chooses the nearest marker inside the scaled hit radius; exact overlap is resolved in the
+order temporary target, saved waypoint, then POI. The shared two-line information card shows a waypoint or
+target name followed by floored X/Z coordinates. Right-click interaction uses the same visual layers: a
+temporary-target hit removes it, a saved-waypoint hit opens its Target/Delete menu, and a POI hit places the
+temporary target at the POI anchor without opening a menu. Only empty space participates in the delayed
+single/double-right-click behavior.
 
-Batch 4 adds `WorldMapWaypointManagerOverlay` as a locked base-package code element. `MapPage` owns one
-instance and supplies only a show-on-map callback, keeping map centering in the page while the overlay owns
-its modal state, search query, scroll offset, edit form, delete confirmation, and one pending mutation. The
-manager reads the connection-scoped cache and sends every change through its existing request methods. It
-never edits cached records or authoritative state directly.
+The saved-waypoint context menu follows its marker and clamps to the viewport. Target copies the waypoint's
+coordinates into the dimension's temporary-target slot. Delete sends the normal server mutation and disables
+both actions until the matching result arrives. The menu closes after success, on Escape, or on an outside
+click, and blocks map zoom while open. It owns no persistent state and adds no separate network payload.
 
-The manager sorts the current dimension before other dimensions, then sorts names case-insensitively and
-uses UUID as a stable tie-breaker. Search is also case-insensitive. Current-dimension rows show planar player
-distance and may center the map; other rows show their dimension identifier and disable that action. Edit
-reuses the compact name-and-icon creation-panel geometry but cannot change coordinates or dimension. Delete requires a
-confirmation. Escape closes the delete confirmation, editor, and manager in that order. Sharing remains
-outside Batch 4.
+The temporary target and seven saved icons use `textures/screens/map_waypoint_icons.png`, a transparent 4 by 2
+atlas ordered pin, home, camp, chest, danger, herb, monster, and quest. The checked-in atlas is 1774 by 887
+pixels. Replacements must preserve its dimensions, cell order, transparent padding, and grid. Neutral icon
+pixels are multiplied by `MapLayout.WAYPOINT_COLOR` at render time.
 
-The bottom bar draws width-limited mouse-control hints between the menu buttons and right-side controls.
-`MapLayout` owns the hint position and width plus the hover-card dimensions and offset.
-`tools/map-layout-creator.html` previews both pieces and exports their constants.
+#### Waypoint manager and layout ownership
 
-`MapPage` also owns a client-only marker context menu. Right-click hit testing checks the temporary pin first,
-then the nearest visible saved waypoint, and only then treats the click as empty map space. A temporary-pin hit
-removes that dimension's pin from `WorldMapWaypointClientCache`. A saved-waypoint hit opens Target and Delete
-actions centered below the marker. Target writes the waypoint coordinates into the existing temporary-pin
-slot. Delete sends the existing server mutation immediately and keeps the buttons disabled until its matching
-result arrives. The popup follows the marker if the view changes, clamps to the viewport, and blocks wheel and
-button zoom while open. It closes on success, Escape, or an outside click. It adds no saved state or network
-payload.
+`WorldMapWaypointManagerOverlay` owns its modal state, case-insensitive search, scroll offset, edit form, delete
+confirmation, and one pending mutation. `MapPage` owns the overlay instance and provides only the callback used
+to center the map on a selected current-dimension waypoint. The manager reads the client cache and sends changes
+through its request methods; it never changes cached or authoritative records directly.
 
-### 5.10 Milestone 4A generated POI test structure
+The manager sorts current-dimension records first, followed by case-insensitive name and UUID as a stable
+tie-breaker. Current-dimension rows show planar distance and can center the map. Other rows show their dimension
+identifier and disable centering. Editing can change only name and icon. Deletion requires confirmation, and
+Escape closes the confirmation, editor, and manager in that order.
+
+`MapLayout` owns creation, manager, context-menu, hover-card, bottom-bar hint, and marker layout constants.
+`tools/map-layout-creator.html` previews the editable map layout and exports the corresponding Java constants.
+
+### 5.10 Generated POI test fixture
 
 `PoiTestStructure` is an ordinary MCreator structure element under `~/World Map`. Its source of truth is
 `elements/PoiTestStructure.mod.json`. MCreator generates the structure, structure-set, and template-pool
@@ -1592,12 +1589,12 @@ limited to the `#minecraft:is_overworld` biome tag. Development placement uses r
 chunks and separation 8 chunks. MCreator derives the stable salt from the registry name. These placement
 values make the test structure easy to find and are not production balance.
 
-The element intentionally contains no POI registration logic. Later Milestone 4 batches inspect the real
-structure start from already loaded chunk data and map its stable start chunk to a POI instance. Keeping
-the test structure separate proves that later structures can join the POI system through data and provider
+The element intentionally contains no POI registration logic. The structure provider inspects its real
+structure start in already loaded chunk data and maps its stable start chunk to a POI instance. Keeping
+the fixture separate from POI code proves that additional structures join through definitions and provider
 matching instead of copied Java classes.
 
-### 5.11 Milestone 4B POI definitions and providers
+### 5.11 POI definitions and providers
 
 POI kinds are datapack resources under `data/<namespace>/witchercraft_pois/<path>.json`; the resource path
 becomes the definition ID. A structure type is registered once, and every generated start of that structure
@@ -1615,11 +1612,11 @@ longer moves an unknown marker away from its world anchor.
 Every resource is decoded and validated independently, so a bad definition is logged with its ID without
 discarding valid neighbors. Validation bounds definition and capability counts, identifiers, radii, zoom,
 provider types, structure references, and duplicate claims on one provider source. Reload reconciliation marks
-retained instances inactive when their definition is absent or no longer matches; the Batch 4C shared store
+retained instances inactive when their definition is absent or no longer matches; the shared instance store
 preserves those suppressed records.
 
 `WorldMapPoiProvider` is the reusable loaded-world-object contract, and `WorldMapPoiProviders` is its internal
-type registry. Only `witchercraft:structure` exists in this batch. Its reload preparation resolves definitions
+type registry. `witchercraft:structure` is the currently registered provider. Its reload preparation resolves definitions
 into a structure-object lookup, while observation reads `StructureStart` values directly from the `LevelChunk`
 provided by `ChunkWatchEvent.Watch`. It never locates, generates, tickets, or requests a chunk. Starts that are
 not present in the watched loaded chunk are simply ignored.
@@ -1630,7 +1627,7 @@ UUID from that identity, so repeat observations by multiple players refresh one 
 the observation lifecycle, logs a newly observed instance immediately, and emits bounded aggregate diagnostics
 every 1,200 server ticks.
 
-### 5.12 Milestone 4C POI persistence and discovery
+### 5.12 POI persistence, identity, and discovery
 
 `WorldMapPoiInstances` is the authoritative shared, codec-backed `SavedData` store. Each version-one record
 persists the stable marker UUID, definition and provider identifiers, canonical provider identity, dimension,
@@ -1663,10 +1660,9 @@ skips the revealed state and may be discovered directly inside its discovery rad
 action-bar message and a direct vanilla level-up sound packet only to that player. POI name, category,
 description, and discovery-message keys are written to both `en_us.json` and `witchercraft.mcreator`'s `language_map.en_us`, as
 required by Section 3.11. The server notification also supplies readable fallbacks for both nested translation
-components, preventing raw dotted keys if a resource pack or generated language file is incomplete. Networking
-and client presentation ownership are added separately in Batch 4D below.
+components, preventing raw dotted keys if a resource pack or generated language file is incomplete.
 
-### 5.13 Milestone 4D POI networking and client cache
+### 5.13 POI authorization, networking, and client cache
 
 The POI view protocol uses the same 256-by-256-block cells as the runtime spatial index. While `MapPage` is
 rendering, `WorldMapPoiClientCache` derives visible cells from the shared world-to-screen view and requests at
@@ -1696,9 +1692,9 @@ send `WorldMapPoiCacheResetMessage`; stale batches are ignored and visible cells
 `WorldMapPoiClientCache` is memory-only and scoped by both the active connection object and the existing
 server-issued world UUID. It groups markers by dimension and presentation cell, bounds validated cells per
 dimension, buffers response pages until completion, and clears on connection, world, or definition-generation
-change. Stage 4D deliberately does not render this cache; `markers(dimension)` is the read-only Stage 4E boundary.
+change. `markers(dimension)` is the read-only boundary consumed by map rendering.
 
-### 5.14 Milestone 4E POI rendering and interaction
+### 5.14 POI rendering, interaction, and filters
 
 `MapPage` consumes only `WorldMapPoiClientCache.markers(currentDimension)`. POIs share the terrain and waypoint
 floating-point world-to-screen transform and render inside the terrain scissor after terrain but before personal
@@ -1727,3 +1723,47 @@ server-issued world UUID exposed read-only by `WorldMapPoiClientCache`; a zero U
 at most 128 worlds, skips malformed sibling records independently, and replaces the file atomically where the
 filesystem supports it. Filter data never enters packets, server `SavedData`, generated player variables, or
 the global NeoForge client config.
+
+### 5.15 Operational diagnostics and verification contracts
+
+The POI observation boundary is the already loaded `LevelChunk` supplied by `ChunkWatchEvent.Watch`.
+`WorldMapStructurePoiProvider` inspects structure starts on that object only. Map requests traverse player
+knowledge, shared POI instances, and the runtime spatial index; panning never calls a level chunk lookup,
+structure locate, generator, forced-chunk, or ticket API. This no-load boundary applies to every provider:
+an observation that cannot be answered from the event's loaded object must be skipped.
+
+Structure identity consists of provider type, structure registry ID, dimension ID, and structure-start chunk.
+It deterministically produces one marker UUID, so repeated watches and observations by different players reach
+the same saved record. An unchanged repeat increments `duplicate_observations`; a changed record with the same
+identity is refreshed; a UUID/identity mismatch is rejected and counted in `observation_collisions`.
+
+Definition reload prepares and validates each resource independently before publishing one immutable snapshot.
+A malformed resource is rejected without discarding valid siblings. Reconciliation suppresses retained
+instances whose definition disappeared or no longer accepts them, rebuilds the spatial index from active
+records, resets every connected client's POI cache, and does not delete knowledge. Restoring a definition makes
+future observations eligible to reactivate the retained stable record.
+
+Every 1,200 server ticks, the POI diagnostic line reports cumulative observation, instance, transition,
+request, and rejection counts. It also reports duplicate/collision counts, reveal/discovery candidate totals,
+and the average/maximum manager tick time in microseconds for that reporting window. Timing and candidate
+counters reset after each report; observation, transition, and request counters remain cumulative. These
+bounded counters make duplicate and multi-player performance checks observable without per-tick logging.
+
+Verification must preserve the following invariants:
+
+1. Panning over unexplored terrain may issue bounded cache requests, but must not change chunk tickets, load
+   chunks, generate terrain, or create terrain files for unauthorized positions.
+2. Structure observation may inspect only the `LevelChunk` supplied by `ChunkWatchEvent.Watch`. Searches for
+   chunk lookup, locate, generator, forced-chunk, and ticket APIs in the POI path must remain empty except for
+   that event-owned `getChunk()` handoff.
+3. Repeated watches of one structure, including watches from different players or covered chunks, must leave
+   `retained_instances` unchanged, may increase `duplicate_observations`, and must keep
+   `observation_collisions` at zero.
+4. A malformed POI definition must be rejected without removing valid sibling definitions. Removing a valid
+   definition and reloading must suppress its markers; restoring it and observing the loaded structure again
+   must reactivate the same stable record without duplicating player knowledge.
+5. Performance tests with many retained structures record at least three diagnostic intervals of
+   `reveal_candidates`, `discovery_candidates`, `tick_avg_us`, `tick_max_us`, and whole-server MSPT. Sustained
+   spikes correlated with POI candidate counts require investigation before increasing radii or scan cadence.
+6. Repository validation parses all JSON resources, resolves every MCreator element and declared metadata file,
+   compiles with Java 25, and starts a dedicated server far enough to load POI definitions successfully.

@@ -571,8 +571,9 @@ that feeds into it. Hovering a node or a slotted perk shows its name (in its bra
 one-line description; whether it's locked, available, or equipped is left to the art alone. The Map
 tab now has an interactive terrain view. Dragging pans the view, and mouse-wheel or button input sets
 a target zoom that the view smoothly approaches while preserving the world position under the cursor.
-The bottom bar provides center and zoom controls. Markers, waypoints, and filters arrive
-in later world-map milestones. The player appears as a gold directional triangle with a dark outline.
+The bottom bar provides center and zoom controls plus access to the waypoint manager and map filters.
+The terrain view includes personal waypoints, temporary navigation targets, and discovered or unknown
+points of interest. The player appears as a gold directional triangle with a dark outline.
 It rotates with the player's facing, scales with map zoom within readable limits, and has a client-side
 size setting. The remaining unfinished tabs use placeholders until those systems
 get their own screens.
