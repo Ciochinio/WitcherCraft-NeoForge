@@ -356,5 +356,8 @@
   "entity.witchercraft.alghoul": "Alghoul",
   "item.witchercraft.alghoul_spawn_egg": "Alghoul Spawn Egg",
   "entity.witchercraft.ghoul": "Ghoul",
-  "item.witchercraft.ghoul_spawn_egg": "Ghoul Spawn Egg"
+  "item.witchercraft.ghoul_spawn_egg": "Ghoul Spawn Egg",
+  "poi.witchercraft.poi_test_structure": "Test Structure",
+  "category.witchercraft.poi.test": "Test",
+  "message.witchercraft.poi.discovered": "Discovered: %s"
 }

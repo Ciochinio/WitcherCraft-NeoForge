@@ -1611,8 +1611,8 @@ optional resource additions.
 Every resource is decoded and validated independently, so a bad definition is logged with its ID without
 discarding valid neighbors. Validation bounds definition and capability counts, identifiers, radii, zoom,
 provider types, structure references, and duplicate claims on one provider source. Reload reconciliation marks
-retained runtime instances inactive when their definition is absent or no longer matches; Batch 4C will make
-those retained records persistent.
+retained instances inactive when their definition is absent or no longer matches; the Batch 4C shared store
+preserves those suppressed records.
 
 `WorldMapPoiProvider` is the reusable loaded-world-object contract, and `WorldMapPoiProviders` is its internal
 type registry. Only `witchercraft:structure` exists in this batch. Its reload preparation resolves definitions
@@ -1623,5 +1623,38 @@ not present in the watched loaded chunk are simply ignored.
 The structure provider anchors a marker at the structure bounding-box center. Its canonical identity is provider
 type, structure registry ID, dimension ID, and structure start chunk. `WorldMapPoiInstance` derives a deterministic
 UUID from that identity, so repeat observations by multiple players refresh one entry. `WorldMapPoiManager` owns
-the Batch 4B in-memory instance map, logs a newly observed instance immediately, and emits bounded aggregate
-diagnostics every 1,200 server ticks. Shared and per-player `SavedData` remain Batch 4C work.
+the observation lifecycle, logs a newly observed instance immediately, and emits bounded aggregate diagnostics
+every 1,200 server ticks.
+
+### 5.12 Milestone 4C POI persistence and discovery
+
+`WorldMapPoiInstances` is the authoritative shared, codec-backed `SavedData` store. Each version-one record
+persists the stable marker UUID, definition and provider identifiers, canonical provider identity, dimension,
+exact three-dimensional anchor, and active flag. Loading recomputes the UUID from the provider identity and
+rejects invalid coordinates, identifiers, duplicate IDs, collisions, overlong identities, and records beyond
+the hard instance limit. Provider observations insert or refresh this store on the server thread. Removing a
+definition marks matching records inactive without deleting them; only a later provider observation can
+reactivate one after its definition returns.
+
+`WorldMapPoiKnowledge` is a separate codec-backed `SavedData` store grouped by player UUID. A knowledge record
+contains a marker UUID, monotonic `revealed` or `discovered` state, and the revealed marker's X/Z uncertainty
+offset. The offset is sampled uniformly by area within the definition's uncertainty circle using a square-root
+radial distribution. It is written once and is never rerolled by login, restart, reload, or radius changes.
+Knowledge is independent of generated player variables and therefore survives logout, death, respawn, and
+client-cache deletion. Logical records and collection sizes are validated independently during loading.
+
+`WorldMapPoiSpatialIndex` is derived runtime state and is never serialized. It groups active markers into
+256-by-256-block cells under their dimension identifier. Startup rebuilds it from the shared store; observations
+update it incrementally; definition reload reconciliation rebuilds it after suppressing invalidated records.
+Queries return marker IDs only and perform no level, chunk, generator, locate, or ticket operation.
+
+`WorldMapPoiManager` distributes checks across stable player-UUID tick slots. Reveal checks run every 200 ticks
+and discovery checks every 20 ticks. Both query the spatial index and use squared horizontal X/Z distance; Y is
+retained in storage but ignored for proximity. Normal POIs progress from absent to revealed to discovered. A
+player already inside both radii during a reveal pass is promoted immediately. A POI with zero reveal radius
+skips the revealed state and may be discovered directly inside its discovery radius. Discovery sends a translated
+action-bar message and a direct vanilla level-up sound packet only to that player. POI name, category, and
+discovery-message keys are written to both `en_us.json` and `witchercraft.mcreator`'s `language_map.en_us`, as
+required by Section 3.11. The server notification also supplies readable fallbacks for both nested translation
+components, preventing raw dotted keys if a resource pack or generated language file is incomplete. No POI
+marker networking or client cache is added until Batch 4D.

@@ -600,6 +600,45 @@
       "path": "~/World Map/POI"
     },
     {
+      "name": "WorldMapPoiInstances",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_poi_instances",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapPoiInstances.java"
+        ]
+      },
+      "path": "~/World Map/POI"
+    },
+    {
+      "name": "WorldMapPoiKnowledge",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_poi_knowledge",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapPoiKnowledge.java"
+        ]
+      },
+      "path": "~/World Map/POI"
+    },
+    {
+      "name": "WorldMapPoiSpatialIndex",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_poi_spatial_index",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapPoiSpatialIndex.java"
+        ]
+      },
+      "path": "~/World Map/POI"
+    },
+    {
       "name": "WorldMapWaypointClientCache",
       "type": "code",
       "compiles": true,
@@ -10640,7 +10679,10 @@
       "entity.witchercraft.alghoul": "Alghoul",
       "item.witchercraft.alghoul_spawn_egg": "Alghoul Spawn Egg",
       "entity.witchercraft.ghoul": "Ghoul",
-      "item.witchercraft.ghoul_spawn_egg": "Ghoul Spawn Egg"
+      "item.witchercraft.ghoul_spawn_egg": "Ghoul Spawn Egg",
+      "poi.witchercraft.poi_test_structure": "Test Structure",
+      "category.witchercraft.poi.test": "Test",
+      "message.witchercraft.poi.discovered": "Discovered: %s"
     }
   },
   "metadata": {

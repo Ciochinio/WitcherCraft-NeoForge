@@ -18,8 +18,12 @@ public record WorldMapPoiInstance(UUID markerId, Identifier definitionId, Identi
 
 	public static WorldMapPoiInstance observed(Identifier definitionId, Identifier providerType, Identifier sourceId,
 		String providerIdentity, Identifier dimension, BlockPos anchor) {
-		UUID markerId = UUID.nameUUIDFromBytes((IDENTITY_PREFIX + providerIdentity).getBytes(StandardCharsets.UTF_8));
+		UUID markerId = markerIdForIdentity(providerIdentity);
 		return new WorldMapPoiInstance(markerId, definitionId, providerType, sourceId, providerIdentity, dimension, anchor.immutable(), true);
+	}
+
+	public static UUID markerIdForIdentity(String providerIdentity) {
+		return UUID.nameUUIDFromBytes((IDENTITY_PREFIX + providerIdentity).getBytes(StandardCharsets.UTF_8));
 	}
 
 	public WorldMapPoiInstance withActive(boolean value) {
