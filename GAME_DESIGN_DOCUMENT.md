@@ -592,9 +592,10 @@ The compact creation panel accepts a name and icon and remains open with an erro
 request. Visible waypoints render only on their recorded
 dimension. Player and waypoint markers use subpixel positions and scale with the square root of map zoom,
 clamped between 0.5 and 2.5 times their base size. Waypoints also fade to 35 percent opacity at the farthest
-zoom and reach full opacity at 1 screen pixel per block. Hovering a marker opens a centered information card
-above the bottom controls. Saved waypoints and temporary targets show their coordinates.
-Future points of interest use the same card with a description instead of coordinates.
+zoom and reach full opacity at 1 screen pixel per block. Hovering a marker opens a compact, centered two-line
+information card above the bottom controls. Saved waypoints and temporary targets show their name and coordinates.
+An unknown point of interest shows a generic name and exploration hint; a discovered point of interest shows its
+name and description.
 
 The Waypoints button opens a compact manager over the darkened map. It lists all saved waypoints with the
 current dimension first, supports case-insensitive name search and mouse-wheel scrolling, and shows either
@@ -611,6 +612,11 @@ the temporary pin at that waypoint, while Delete removes the saved waypoint imme
 Right-clicking the temporary pin removes it immediately. Marker actions take priority over the empty-space
 right-click and double-right-click actions. Escape or clicking elsewhere closes the marker menu. Map zoom is
 disabled while the menu is open.
+
+An unknown point of interest appears directly over its real world anchor rather than at a random offset. It hides
+the location's identity and icon until discovery, but does not obscure where the player should explore.
+Right-clicking either an unknown or discovered point of interest immediately places or replaces the temporary
+navigation target there; POIs do not open a marker menu.
 
 Points of interest will first be tested against a small generated development structure named
 `poi_test_structure`. It is a hollow 4 by 4 by 4 stone-brick cube with a doorway and a chiseled

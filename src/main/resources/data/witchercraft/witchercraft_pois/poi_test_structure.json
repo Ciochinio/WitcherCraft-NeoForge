@@ -5,11 +5,12 @@
     "anchor": "bounding_box_center"
   },
   "translation_key": "poi.witchercraft.poi_test_structure",
+  "description_translation_key": "poi.witchercraft.poi_test_structure.description",
   "category": "witchercraft:test",
   "icon": "witchercraft:textures/screens/map_poi_poi_test_structure.png",
   "reveal_radius": 256,
   "discovery_radius": 32,
-  "uncertainty_radius": 32,
+  "uncertainty_radius": 0,
   "default_visible": true,
   "minimum_zoom": 0.25,
   "capabilities": []

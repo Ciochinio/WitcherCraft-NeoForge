@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ThreadLocalRandom;
 
 /** Persistent POI observation, spatial indexing, reveal, and discovery owner. */
 @EventBusSubscriber
@@ -173,9 +172,7 @@ public final class WorldMapPoiManager {
 				WorldMapPoiDefinition definition = definitions.definitions().get(instance.definitionId());
 				if (definition == null || definition.revealRadius() <= 0.0 || !inside(player, instance.anchor(), definition.revealRadius()))
 					continue;
-				double angle = ThreadLocalRandom.current().nextDouble(Math.PI * 2.0);
-				double radius = Math.sqrt(ThreadLocalRandom.current().nextDouble()) * definition.uncertaintyRadius();
-				if (!knowledge.reveal(player.getUUID(), markerId, Math.cos(angle) * radius, Math.sin(angle) * radius))
+				if (!knowledge.reveal(player.getUUID(), markerId, 0.0, 0.0))
 					continue;
 				reveals++;
 				WitchercraftMod.LOGGER.info("Player {} revealed world-map POI {}", player.getGameProfile().name(), markerId);
@@ -277,9 +274,9 @@ public final class WorldMapPoiManager {
 			double exactX = instance.anchor().getX() + 0.5;
 			double exactZ = instance.anchor().getZ() + 0.5;
 			if (entry.state() == WorldMapPoiKnowledge.State.REVEALED)
-				return new WorldMapPoiMarker.Unknown(entry.presentationId(), exactX + entry.offsetX(), exactZ + entry.offsetZ(),
+				return new WorldMapPoiMarker.Unknown(entry.presentationId(), exactX, exactZ,
 					definition.minimumZoom(), definition.defaultVisible());
-			return new WorldMapPoiMarker.Discovered(entry.presentationId(), exactX, exactZ, definition.translationKey(), definition.category(),
+			return new WorldMapPoiMarker.Discovered(entry.presentationId(), exactX, exactZ, definition.translationKey(), definition.descriptionTranslationKey(), definition.category(),
 				definition.icon(), definition.minimumZoom(), definition.defaultVisible());
 		}
 

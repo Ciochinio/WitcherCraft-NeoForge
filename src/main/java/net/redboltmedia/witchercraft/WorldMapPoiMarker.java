@@ -24,11 +24,12 @@ public sealed interface WorldMapPoiMarker permits WorldMapPoiMarker.Unknown, Wor
 		}
 	}
 
-	record Discovered(UUID markerId, double x, double z, String translationKey, Identifier category, Identifier icon,
+	record Discovered(UUID markerId, double x, double z, String translationKey, String descriptionTranslationKey, Identifier category, Identifier icon,
 		double minimumZoom, boolean defaultVisible) implements WorldMapPoiMarker {
 		public Discovered {
 			validateCommon(markerId, x, z, minimumZoom);
-			if (translationKey == null || translationKey.isBlank() || translationKey.length() > 160 || category == null || icon == null)
+			if (translationKey == null || translationKey.isBlank() || translationKey.length() > 160 || descriptionTranslationKey == null
+				|| descriptionTranslationKey.isBlank() || descriptionTranslationKey.length() > 160 || category == null || icon == null)
 				throw new IllegalArgumentException("Invalid discovered POI presentation");
 		}
 	}

@@ -58,7 +58,6 @@ public final class MapPage implements GuiPage {
 	private double pendingPingX;
 	private double pendingPingZ;
 	private WorldMapWaypoints.Waypoint contextWaypoint;
-	private UUID contextPoiId;
 	private int contextPendingRequest;
 	private Component contextError;
 
@@ -86,7 +85,6 @@ public final class MapPage implements GuiPage {
 		pendingPing = false;
 		hoverSelection = null;
 		closeContextMenu();
-		contextPoiId = null;
 		contextPendingRequest = 0;
 		centerOnPlayer();
 		WorldMapClientTileCache.markViewDirty();
@@ -112,7 +110,7 @@ public final class MapPage implements GuiPage {
 			drawPois(g, dimension, vx, vy, vw, vh);
 		}
 		drawWaypoints(g, vx, vy, vw, vh);
-		hoverSelection = !creating && !manager.isOpen() && !filters.isOpen() && contextWaypoint == null && contextPoiId == null
+		hoverSelection = !creating && !manager.isOpen() && !filters.isOpen() && contextWaypoint == null
 			? markerAt(mouseX, mouseY, vx, vy, vw, vh) : null;
 		drawPlayer(g, vx, vy, vw, vh);
 		if (creating)
@@ -123,7 +121,7 @@ public final class MapPage implements GuiPage {
 		int bx = x + MapLayout.BAR_X, by = y + MapLayout.BAR_Y;
 		int bw = Math.min(MapLayout.BAR_W, w - MapLayout.BAR_X);
 		g.fill(bx, by, bx + bw, by + MapLayout.BAR_H, MapLayout.BAR_BG);
-		boolean noModal = !creating && !manager.isOpen() && !filters.isOpen() && contextWaypoint == null && contextPoiId == null;
+		boolean noModal = !creating && !manager.isOpen() && !filters.isOpen() && contextWaypoint == null;
 		drawButton(g, font, bx + MapLayout.WAYPOINTS_X, by + MapLayout.BUTTON_Y, MapLayout.WAYPOINTS_W, Component.translatableWithFallback("gui.witchercraft.map.waypoints", "Waypoints"), mouseX, mouseY, noModal);
 		drawButton(g, font, bx + MapLayout.FILTERS_X, by + MapLayout.BUTTON_Y, MapLayout.FILTERS_W, Component.translatableWithFallback("gui.witchercraft.map.filters", "Filters"), mouseX, mouseY, noModal);
 		drawButton(g, font, bx + MapLayout.CENTER_X, by + MapLayout.BUTTON_Y, MapLayout.CENTER_W, Component.translatableWithFallback("gui.witchercraft.map.center", "Center"), mouseX, mouseY, noModal);
@@ -137,8 +135,6 @@ public final class MapPage implements GuiPage {
 			drawSelectionCard(g, font, vx, vy, vw, vh);
 		if (contextWaypoint != null)
 			drawContextMenu(g, font, vx, vy, vw, vh, mouseX, mouseY);
-		if (contextPoiId != null)
-			drawPoiDetails(g, font, vx, vy, vw, vh);
 		if (manager.isOpen())
 			manager.render(g, vx, vy, vw, vh, mouseX, mouseY);
 		if (filters.isOpen())
@@ -158,8 +154,6 @@ public final class MapPage implements GuiPage {
 			return handleCreationClick(vx, vy, vw, vh, mouseX, mouseY, button);
 		if (contextWaypoint != null)
 			return handleContextClick(vx, vy, vw, vh, mouseX, mouseY, button);
-		if (contextPoiId != null)
-			return handlePoiDetailsClick(vx, vy, vw, vh, mouseX, mouseY, button);
 		if (button == 1 && inside(mouseX, mouseY, vx, vy, vw, vh)) {
 			var player = Minecraft.getInstance().player;
 			if (player == null)
@@ -179,7 +173,7 @@ public final class MapPage implements GuiPage {
 			WorldMapPoiMarker poi = poiAt(mouseX, mouseY, vx, vy, vw, vh);
 			if (poi != null) {
 				pendingPing = false;
-				contextPoiId = poi.markerId();
+				WorldMapWaypointClientCache.placeTemporaryPin(dimension, poi.x(), poi.z());
 				return true;
 			}
 			double worldX = centerX + (mouseX - (vx + vw / 2.0)) / zoom;
@@ -249,7 +243,7 @@ public final class MapPage implements GuiPage {
 
 	@Override
 	public boolean mouseDragged(int x, int y, int w, int h, double mouseX, double mouseY, int button, double dragX, double dragY) {
-		if (creating || manager.isOpen() || filters.isOpen() || contextWaypoint != null || contextPoiId != null)
+		if (creating || manager.isOpen() || filters.isOpen() || contextWaypoint != null)
 			return true;
 		if (button == 0 && dragging) {
 			centerX -= dragX / zoom;
@@ -265,7 +259,7 @@ public final class MapPage implements GuiPage {
 	public boolean mouseScrolled(int x, int y, int w, int h, double mouseX, double mouseY, double scrollX, double scrollY) {
 		if (manager.isOpen())
 			return manager.mouseScrolled(scrollY);
-		if (filters.isOpen() || contextWaypoint != null || contextPoiId != null)
+		if (filters.isOpen() || contextWaypoint != null)
 			return true;
 		if (creating)
 			return true;
@@ -282,10 +276,6 @@ public final class MapPage implements GuiPage {
 			return manager.keyPressed(keyCode);
 		if (filters.isOpen())
 			return filters.keyPressed(keyCode);
-		if (contextPoiId != null && keyCode == GLFW.GLFW_KEY_ESCAPE) {
-			contextPoiId = null;
-			return true;
-		}
 		if (contextWaypoint != null && keyCode == GLFW.GLFW_KEY_ESCAPE) {
 			closeContextMenu();
 			return true;
@@ -335,7 +325,6 @@ public final class MapPage implements GuiPage {
 		filters.close();
 		pendingPing = false;
 		closeContextMenu();
-		contextPoiId = null;
 	}
 
 	private void showOnMap(WorldMapWaypoints.Waypoint waypoint) {
@@ -351,7 +340,6 @@ public final class MapPage implements GuiPage {
 		dragging = false;
 		closeContextMenu();
 		filters.close();
-		contextPoiId = null;
 		createX = worldX;
 		createZ = worldZ;
 		createName = "";
@@ -558,18 +546,19 @@ public final class MapPage implements GuiPage {
 	}
 
 	private static MapSelection waypointSelection(WorldMapWaypoints.Waypoint waypoint) {
-		return new MapSelection(Component.literal(waypoint.name()), Component.literal("X " + (int) Math.floor(waypoint.x()) + "  Z " + (int) Math.floor(waypoint.z())), Component.empty(), MapLayout.WAYPOINT_COLOR);
+		return new MapSelection(Component.literal(waypoint.name()), Component.literal("X " + (int) Math.floor(waypoint.x()) + "  Z " + (int) Math.floor(waypoint.z())), MapLayout.WAYPOINT_COLOR);
 	}
 
 	private static MapSelection targetSelection(double x, double z) {
-		return new MapSelection(Component.translatableWithFallback("gui.witchercraft.map.waypoint.target", "Target"), Component.literal("X " + (int) Math.floor(x) + "  Z " + (int) Math.floor(z)), Component.empty(), MapLayout.WAYPOINT_COLOR);
+		return new MapSelection(Component.translatableWithFallback("gui.witchercraft.map.waypoint.target", "Target"), Component.literal("X " + (int) Math.floor(x) + "  Z " + (int) Math.floor(z)), MapLayout.WAYPOINT_COLOR);
 	}
 
 	private MapSelection poiSelection(WorldMapPoiMarker marker) {
 		if (marker instanceof WorldMapPoiMarker.Unknown)
-			return new MapSelection(Component.translatableWithFallback("gui.witchercraft.map.poi.undiscovered", "Undiscovered location"), Component.empty(), Component.empty(), MapLayout.POI_UNKNOWN_COLOR);
+			return new MapSelection(Component.translatableWithFallback("gui.witchercraft.map.poi.undiscovered", "Undiscovered location"),
+				Component.translatableWithFallback("gui.witchercraft.map.poi.unknown_hint", "Explore nearby to identify it."), MapLayout.POI_UNKNOWN_COLOR);
 		WorldMapPoiMarker.Discovered discovered = (WorldMapPoiMarker.Discovered) marker;
-		return new MapSelection(poiName(discovered), poiCategory(discovered), poiDistanceAndCoordinates(discovered), MapLayout.POI_DISCOVERED_COLOR);
+		return new MapSelection(poiName(discovered), poiDescription(discovered), MapLayout.POI_DISCOVERED_COLOR);
 	}
 
 	private void drawSelectionCard(GuiGraphicsExtractor g, Font font, int vx, int vy, int vw, int vh) {
@@ -580,8 +569,6 @@ public final class MapPage implements GuiPage {
 		drawCenteredFitted(g, font, hoverSelection.name(), x, y + 7, MapLayout.SELECTION_W, hoverSelection.color());
 		if (!hoverSelection.detail().getString().isEmpty())
 			drawCenteredFitted(g, font, hoverSelection.detail(), x, y + 22, MapLayout.SELECTION_W, MapLayout.TEXT_DIM);
-		if (!hoverSelection.extra().getString().isEmpty())
-			drawCenteredFitted(g, font, hoverSelection.extra(), x, y + 37, MapLayout.SELECTION_W, MapLayout.TEXT_DIM);
 	}
 
 	private void openContextMenu(WorldMapWaypoints.Waypoint waypoint) {
@@ -662,66 +649,6 @@ public final class MapPage implements GuiPage {
 		}
 	}
 
-	private void drawPoiDetails(GuiGraphicsExtractor g, Font font, int vx, int vy, int vw, int vh) {
-		WorldMapPoiMarker marker = contextPoi();
-		if (marker == null) {
-			contextPoiId = null;
-			return;
-		}
-		int x = poiDetailsX(marker, vx, vw);
-		int y = poiDetailsY(marker, vy, vh);
-		g.fill(x, y, x + MapLayout.POI_DETAILS_W, y + MapLayout.POI_DETAILS_H, MapLayout.OVERLAY_BG);
-		drawBorder(g, x, y, MapLayout.POI_DETAILS_W, MapLayout.POI_DETAILS_H, MapLayout.OVERLAY_BORDER);
-		int innerX = x + MapLayout.POI_DETAILS_PADDING;
-		int innerW = MapLayout.POI_DETAILS_W - MapLayout.POI_DETAILS_PADDING * 2;
-		if (marker instanceof WorldMapPoiMarker.Unknown) {
-			Component title = Component.translatableWithFallback("gui.witchercraft.map.poi.undiscovered", "Undiscovered location");
-			g.text(font, Component.literal(fit(font, title.getString(), innerW)), innerX, y + 12, MapLayout.POI_UNKNOWN_COLOR, false);
-			Component hint = Component.translatableWithFallback("gui.witchercraft.map.poi.unknown_hint", "Explore nearby to identify it.");
-			g.text(font, Component.literal(fit(font, hint.getString(), innerW)), innerX, y + 32, MapLayout.TEXT_DIM, false);
-		} else {
-			WorldMapPoiMarker.Discovered discovered = (WorldMapPoiMarker.Discovered) marker;
-			g.text(font, Component.literal(fit(font, poiName(discovered).getString(), innerW)), innerX, y + 8, MapLayout.POI_DISCOVERED_COLOR, false);
-			g.text(font, Component.literal(fit(font, poiCategory(discovered).getString(), innerW)), innerX, y + 24, MapLayout.TEXT_DIM, false);
-			g.text(font, Component.literal(fit(font, poiDistance(discovered).getString(), innerW)), innerX, y + 40, MapLayout.TEXT_DIM, false);
-			g.text(font, Component.literal("X " + (int) Math.floor(discovered.x()) + "  Z " + (int) Math.floor(discovered.z())), innerX, y + 56, MapLayout.TEXT_DIM, false);
-		}
-	}
-
-	private boolean handlePoiDetailsClick(int vx, int vy, int vw, int vh, double mouseX, double mouseY, int button) {
-		WorldMapPoiMarker marker = contextPoi();
-		if (marker == null) {
-			contextPoiId = null;
-			return true;
-		}
-		int x = poiDetailsX(marker, vx, vw);
-		int y = poiDetailsY(marker, vy, vh);
-		if (button != 0 || !inside(mouseX, mouseY, x, y, MapLayout.POI_DETAILS_W, MapLayout.POI_DETAILS_H))
-			contextPoiId = null;
-		return true;
-	}
-
-	private int poiDetailsX(WorldMapPoiMarker marker, int vx, int vw) {
-		double markerX = screenX(marker.x(), vx, vw);
-		return Math.max(vx, Math.min(vx + vw - MapLayout.POI_DETAILS_W, (int) Math.round(markerX - MapLayout.POI_DETAILS_W / 2.0)));
-	}
-
-	private int poiDetailsY(WorldMapPoiMarker marker, int vy, int vh) {
-		double markerY = screenY(marker.z(), vy, vh);
-		int y = (int) Math.round(markerY + markerHitRadius() + MapLayout.POI_DETAILS_MARKER_GAP);
-		return Math.max(vy, Math.min(vy + vh - MapLayout.POI_DETAILS_H, y));
-	}
-
-	private WorldMapPoiMarker contextPoi() {
-		var player = Minecraft.getInstance().player;
-		if (player == null || contextPoiId == null)
-			return null;
-		for (WorldMapPoiMarker marker : visiblePois(player.level().dimension().identifier()))
-			if (marker.markerId().equals(contextPoiId))
-				return marker;
-		return null;
-	}
-
 	private WorldMapPoiMarker poiAt(double mouseX, double mouseY, int x, int y, int w, int h) {
 		var player = Minecraft.getInstance().player;
 		if (player == null || !inside(mouseX, mouseY, x, y, w, h))
@@ -755,22 +682,8 @@ public final class MapPage implements GuiPage {
 		return Component.translatableWithFallback(marker.translationKey(), fallback);
 	}
 
-	private Component poiCategory(WorldMapPoiMarker.Discovered marker) {
-		String key = "category." + marker.category().getNamespace() + ".poi." + marker.category().getPath().replace('/', '.');
-		return Component.translatableWithFallback(key, readableIdentifier(marker.category().getPath()));
-	}
-
-	private Component poiDistance(WorldMapPoiMarker marker) {
-		var player = Minecraft.getInstance().player;
-		if (player == null)
-			return Component.empty();
-		double dx = marker.x() - player.getX();
-		double dz = marker.z() - player.getZ();
-		return Component.translatableWithFallback("gui.witchercraft.map.poi.distance", "%s m away", Math.round(Math.sqrt(dx * dx + dz * dz)));
-	}
-
-	private Component poiDistanceAndCoordinates(WorldMapPoiMarker.Discovered marker) {
-		return Component.literal(poiDistance(marker).getString() + "   X " + (int) Math.floor(marker.x()) + "  Z " + (int) Math.floor(marker.z()));
+	private Component poiDescription(WorldMapPoiMarker.Discovered marker) {
+		return Component.translatableWithFallback(marker.descriptionTranslationKey(), "Point of interest");
 	}
 
 	private static String readableIdentifier(String path) {
@@ -979,7 +892,7 @@ public final class MapPage implements GuiPage {
 		return px >= x && px < x + w && py >= y && py < y + h;
 	}
 
-	private record MapSelection(Component name, Component detail, Component extra, int color) {
+	private record MapSelection(Component name, Component detail, int color) {
 	}
 
 	private record MapHit(MapSelection selection, double distance, int priority, String stableId) {

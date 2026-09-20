@@ -1603,9 +1603,13 @@ POI kinds are datapack resources under `data/<namespace>/witchercraft_pois/<path
 becomes the definition ID. A structure type is registered once, and every generated start of that structure
 becomes an instance automatically. Adding another structure POI does not require Java registration: create
 the MCreator structure element and add one definition JSON. Presentation fields may be omitted to use the
-shared defaults (256-block reveal, 32-block discovery and uncertainty, visible by default, 0.25 minimum zoom,
+shared defaults (256-block reveal, 32-block discovery, zero uncertainty, visible by default, 0.25 minimum zoom,
 the `witchercraft:general` category, and the shared default icon). Unique art and localization remain ordinary
 optional resource additions.
+
+Definitions may provide a `description_translation_key`; otherwise it derives from the name key with a
+`.description` suffix. The older `uncertainty_radius` field remains accepted for datapack compatibility but no
+longer moves an unknown marker away from its world anchor.
 
 `WorldMapPoiDefinitions` owns the server reload listener and publishes immutable, fully prepared snapshots.
 Every resource is decoded and validated independently, so a bad definition is logged with its ID without
@@ -1638,9 +1642,9 @@ reactivate one after its definition returns.
 
 `WorldMapPoiKnowledge` is a separate codec-backed `SavedData` store grouped by player UUID. Its version-two
 knowledge record contains the authoritative marker UUID, a random per-player presentation UUID, monotonic
-`revealed` or `discovered` state, and the revealed marker's X/Z uncertainty
-offset. The offset is sampled uniformly by area within the definition's uncertainty circle using a square-root
-radial distribution. It is written once and is never rerolled by login, restart, reload, or radius changes.
+`revealed` or `discovered` state, and legacy X/Z uncertainty-offset fields. New reveals write zero offsets and
+presentation ignores historical non-zero values, so both new and existing unknown markers sit on the exact POI
+anchor. The retained fields keep older saves codec-compatible and may be removed in a later format migration.
 Knowledge is independent of generated player variables and therefore survives logout, death, respawn, and
 client-cache deletion. Version-one entries receive and persist a presentation UUID when first loaded. This opaque
 wire identifier prevents clients from brute-forcing the deterministic provider identity from a marker UUID.
@@ -1656,8 +1660,8 @@ and discovery checks every 20 ticks. Both query the spatial index and use square
 retained in storage but ignored for proximity. Normal POIs progress from absent to revealed to discovered. A
 player already inside both radii during a reveal pass is promoted immediately. A POI with zero reveal radius
 skips the revealed state and may be discovered directly inside its discovery radius. Discovery sends a translated
-action-bar message and a direct vanilla level-up sound packet only to that player. POI name, category, and
-discovery-message keys are written to both `en_us.json` and `witchercraft.mcreator`'s `language_map.en_us`, as
+action-bar message and a direct vanilla level-up sound packet only to that player. POI name, category,
+description, and discovery-message keys are written to both `en_us.json` and `witchercraft.mcreator`'s `language_map.en_us`, as
 required by Section 3.11. The server notification also supplies readable fallbacks for both nested translation
 components, preventing raw dotted keys if a resource pack or generated language file is incomplete. Networking
 and client presentation ownership are added separately in Batch 4D below.
@@ -1677,15 +1681,15 @@ atomically replaces those cells, including empty results; rejected or stale requ
 later. Server responses are deterministically ordered and reject a request rather than partially authorizing it
 if its bounded 4,096-marker response ceiling would be exceeded.
 
-`WorldMapPoiMarker.Unknown` contains only the per-player presentation UUID, stored approximate X/Z, minimum zoom,
-and default visibility. It cannot hold a definition ID, provider fields, exact anchor, translation key, category,
-or icon. `WorldMapPoiMarker.Discovered` contains exact X/Z plus translation key, category, icon, minimum zoom, and
-default visibility. The authoritative deterministic marker UUID never crosses the network; the version-two
+`WorldMapPoiMarker.Unknown` contains only the per-player presentation UUID, exact anchor X/Z, minimum zoom,
+and default visibility. It cannot hold a definition ID, provider fields, translation key, description, category,
+or icon. `WorldMapPoiMarker.Discovered` contains exact X/Z plus name and description translation keys, category,
+icon, minimum zoom, and default visibility. The authoritative deterministic marker UUID never crosses the network; the version-two
 knowledge store's random presentation UUID is stable for that player across sessions and is not derivable from
 the structure identity.
 
 Reveal and discovery transitions persist first and then push a request-ID-zero marker update to that player.
-Discovery replaces the unknown record by presentation UUID even when its exact coordinate falls in another cell.
+Discovery replaces the unknown record by presentation UUID in the same presentation cell.
 Definition snapshots carry a monotonically increasing generation. Login and every successful definition reload
 send `WorldMapPoiCacheResetMessage`; stale batches are ignored and visible cells are requested again.
 
@@ -1705,12 +1709,11 @@ markers remain visible throughout the supported map zoom range.
 
 Drawing, hover, and right-click hit testing share the same visibility predicate. Marker snapshots are sorted by
 the random presentation UUID, nearest-marker selection uses squared screen distance, and exact ties use the
-explicit priority temporary target, personal waypoint, then POI. Right-click uses the same layer priority. An
-unknown hover card and read-only details popup show only `Undiscovered location` and a generic exploration hint.
-A discovered card and popup may show the authorized translated name, category, horizontal player distance, and
-exact X/Z. The popup retains only the presentation UUID and resolves it from the current cache every frame, so a
-knowledge transition, reload, connection change, world change, filter change, or cache eviction updates or
-closes it without retaining stale presentation.
+explicit priority temporary target, personal waypoint, then POI. Right-click uses the same layer priority.
+Hover cards are always two lines: a personal waypoint or temporary target shows name and coordinates; an unknown
+POI shows `Undiscovered location` and a generic exploration hint; a discovered POI shows its translated name and
+data-driven translated description. Right-clicking either POI state immediately places or replaces the existing
+temporary navigation target at that marker. POIs have no details popup or mutation menu.
 
 `WorldMapPoiFilterOverlay` is a modal owned by `MapPage`. It controls personal waypoints, unknown POIs, and
 discovered POIs; the temporary target and player marker are intentionally not filterable. Escape and outside

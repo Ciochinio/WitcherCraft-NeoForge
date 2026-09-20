@@ -39,6 +39,7 @@ public record WorldMapPoiDataMessage(int requestId, long definitionGeneration, I
 			buffer.writeBoolean(marker.defaultVisible());
 			if (marker instanceof WorldMapPoiMarker.Discovered discovered) {
 				buffer.writeUtf(discovered.translationKey(), MAX_TRANSLATION_KEY_LENGTH);
+				buffer.writeUtf(discovered.descriptionTranslationKey(), MAX_TRANSLATION_KEY_LENGTH);
 				buffer.writeUtf(discovered.category().toString(), MAX_IDENTIFIER_LENGTH);
 				buffer.writeUtf(discovered.icon().toString(), MAX_IDENTIFIER_LENGTH);
 			}
@@ -62,11 +63,12 @@ public record WorldMapPoiDataMessage(int requestId, long definitionGeneration, I
 				markers.add(new WorldMapPoiMarker.Unknown(markerId, x, z, minimumZoom, defaultVisible));
 			} else if (state == 1) {
 				String translationKey = buffer.readUtf(MAX_TRANSLATION_KEY_LENGTH);
+				String descriptionTranslationKey = buffer.readUtf(MAX_TRANSLATION_KEY_LENGTH);
 				Identifier category = Identifier.tryParse(buffer.readUtf(MAX_IDENTIFIER_LENGTH));
 				Identifier icon = Identifier.tryParse(buffer.readUtf(MAX_IDENTIFIER_LENGTH));
 				if (category == null || icon == null)
 					throw new IllegalArgumentException("Invalid discovered POI identifiers");
-				markers.add(new WorldMapPoiMarker.Discovered(markerId, x, z, translationKey, category, icon, minimumZoom, defaultVisible));
+				markers.add(new WorldMapPoiMarker.Discovered(markerId, x, z, translationKey, descriptionTranslationKey, category, icon, minimumZoom, defaultVisible));
 			} else {
 				throw new IllegalArgumentException("Invalid world-map POI knowledge state");
 			}

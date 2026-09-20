@@ -10793,7 +10793,6 @@
       "gui.witchercraft.map.filters.hidden": "Hidden",
       "gui.witchercraft.map.poi.undiscovered": "Undiscovered location",
       "gui.witchercraft.map.poi.unknown_hint": "Explore nearby to identify it.",
-      "gui.witchercraft.map.poi.distance": "%s m away",
       "gui.witchercraft.map.center": "Center",
       "key.witchercraft.open_shell.inventory": "WitcherCraft: Inventory",
       "key.witchercraft.open_shell.skills": "WitcherCraft: Skills",
@@ -10808,6 +10807,7 @@
       "entity.witchercraft.ghoul": "Ghoul",
       "item.witchercraft.ghoul_spawn_egg": "Ghoul Spawn Egg",
       "poi.witchercraft.poi_test_structure": "Test Structure",
+      "poi.witchercraft.poi_test_structure.description": "A small stone-brick landmark.",
       "category.witchercraft.poi.test": "Test",
       "message.witchercraft.poi.discovered": "Discovered: %s"
     }

@@ -14,7 +14,7 @@ import java.util.Set;
 
 /** Immutable, datapack-loaded description of one kind of world-map POI. */
 public record WorldMapPoiDefinition(Identifier id, WorldMapPoiProviders.Binding<?> provider, String translationKey,
-	Identifier category, Identifier icon, double revealRadius, double discoveryRadius, double uncertaintyRadius,
+	String descriptionTranslationKey, Identifier category, Identifier icon, double revealRadius, double discoveryRadius, double uncertaintyRadius,
 	boolean defaultVisible, double minimumZoom, List<Identifier> capabilities) {
 	public static final int MAX_DEFINITIONS = 4096;
 	public static final int MAX_CAPABILITIES = 32;
@@ -32,11 +32,12 @@ public record WorldMapPoiDefinition(Identifier id, WorldMapPoiProviders.Binding<
 	public static final Codec<Template> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 		Codec.PASSTHROUGH.fieldOf("provider").forGetter(Template::provider),
 		Codec.STRING.optionalFieldOf("translation_key", "").forGetter(Template::translationKey),
+		Codec.STRING.optionalFieldOf("description_translation_key", "").forGetter(Template::descriptionTranslationKey),
 		Codec.STRING.optionalFieldOf("category", DEFAULT_CATEGORY.toString()).forGetter(Template::category),
 		Codec.STRING.optionalFieldOf("icon", DEFAULT_ICON.toString()).forGetter(Template::icon),
 		Codec.DOUBLE.optionalFieldOf("reveal_radius", 256.0).forGetter(Template::revealRadius),
 		Codec.DOUBLE.optionalFieldOf("discovery_radius", 32.0).forGetter(Template::discoveryRadius),
-		Codec.DOUBLE.optionalFieldOf("uncertainty_radius", 32.0).forGetter(Template::uncertaintyRadius),
+		Codec.DOUBLE.optionalFieldOf("uncertainty_radius", 0.0).forGetter(Template::uncertaintyRadius),
 		Codec.BOOL.optionalFieldOf("default_visible", true).forGetter(Template::defaultVisible),
 		Codec.DOUBLE.optionalFieldOf("minimum_zoom", MINIMUM_MAP_ZOOM).forGetter(Template::minimumZoom),
 		Codec.STRING.listOf().optionalFieldOf("capabilities", List.of()).forGetter(Template::capabilities)
@@ -51,6 +52,8 @@ public record WorldMapPoiDefinition(Identifier id, WorldMapPoiProviders.Binding<
 			return error("Missing definition ID");
 		if (!validTranslationKey(template.translationKey()) && !template.translationKey().isEmpty())
 			return error("Invalid translation_key");
+		if (!validTranslationKey(template.descriptionTranslationKey()) && !template.descriptionTranslationKey().isEmpty())
+			return error("Invalid description_translation_key");
 		Identifier category = Identifier.tryParse(template.category());
 		if (category == null)
 			return error("Invalid category identifier");
@@ -77,8 +80,9 @@ public record WorldMapPoiDefinition(Identifier id, WorldMapPoiProviders.Binding<
 			capabilities.add(capability);
 		}
 
+		String translationKey = template.translationKey().isEmpty() ? derivedTranslationKey(id) : template.translationKey();
 		return WorldMapPoiProviders.decodeAndValidate(template.provider(), registries).map(provider -> new WorldMapPoiDefinition(
-			id, provider, template.translationKey().isEmpty() ? derivedTranslationKey(id) : template.translationKey(), category, icon,
+			id, provider, translationKey, template.descriptionTranslationKey().isEmpty() ? translationKey + ".description" : template.descriptionTranslationKey(), category, icon,
 			template.revealRadius(), template.discoveryRadius(), template.uncertaintyRadius(), template.defaultVisible(), template.minimumZoom(), capabilities));
 	}
 
@@ -99,7 +103,7 @@ public record WorldMapPoiDefinition(Identifier id, WorldMapPoiProviders.Binding<
 		return DataResult.error(() -> message);
 	}
 
-	public record Template(Dynamic<?> provider, String translationKey, String category, String icon, double revealRadius,
+	public record Template(Dynamic<?> provider, String translationKey, String descriptionTranslationKey, String category, String icon, double revealRadius,
 		double discoveryRadius, double uncertaintyRadius, boolean defaultVisible, double minimumZoom, List<String> capabilities) {
 		public Template {
 			capabilities = List.copyOf(capabilities);
