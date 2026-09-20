@@ -1513,7 +1513,10 @@ pin. An out-of-range target is clamped inside the inner viewport and replaced th
 `map_tracking_marker.png`, a transparent editable 16 by 16 upward-authored arrow rotated toward the target.
 The frame then renders above map contents, followed by the compass label and centered player indicator.
 Target state remains the existing connection-scoped, client-only temporary pin; the minimap adds no persistent
-tracking field or network message.
+tracking field or network message. Before drawing either target form, squared horizontal distance is compared
+with the client `targetArrivalRadius` setting (default 5 blocks, range 0 to 64); a positive reached radius hides
+minimap guidance and removes the connection-scoped temporary target as a completed destination. It therefore does
+not reappear after the player leaves the radius. Zero disables automatic target completion.
 
 ### 5.9 Waypoint architecture and ownership
 
@@ -1815,7 +1818,9 @@ Verification must preserve the following invariants:
 integrated server and a dedicated server, and is synchronized read-only to remote clients. `WitchercraftConfigScreen`
 registers NeoForge's built-in configuration screen, producing `Client Settings > World Map` and
 `World Settings > World Map` sections under Mods > WitcherCraft > Config. Translated section and option labels
-belong to `en_us.json`; future systems such as meditation add sibling sections rather than separate settings UIs.
+belong to both `en_us.json` and `witchercraft.mcreator`'s `language_map.en_us`, preventing MCreator regeneration
+from restoring raw translation keys in the generated screen. Future systems such as meditation add sibling
+sections rather than separate settings UIs.
 
 World settings control the map and POI enable switches, a POI-definition allowlist, omitted JSON radius defaults,
 same-session tile refresh cooldown, capture count and time budgets, and the personal-waypoint limit. An empty POI

@@ -879,7 +879,7 @@
           "src/main/java/net/redboltmedia/witchercraft/WorldMapClientConfig.java"
         ]
       },
-      "path": "~/World Map/GUI"
+      "path": "~/Cfg"
     },
     {
       "name": "WorldMapServerConfig",
@@ -891,7 +891,8 @@
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/WorldMapServerConfig.java"
         ]
-      }
+      },
+      "path": "~/Cfg"
     },
     {
       "name": "WorldMapMinimapHud",
@@ -916,7 +917,8 @@
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/WitchercraftConfigScreen.java"
         ]
-      }
+      },
+      "path": "~/Cfg"
     },
     {
       "name": "WorldMapPoiDiscoveredMessage",
@@ -10860,13 +10862,40 @@
       "poi.witchercraft.poi_test_structure.description": "A small stone-brick landmark.",
       "category.witchercraft.poi.test": "Test",
       "message.witchercraft.poi.discovered": "Discovered: %s",
+      "witchercraft.configuration.world_map": "World Map",
+      "witchercraft.configuration.world_map.show_decorations": "Show Decorations",
+      "witchercraft.configuration.world_map.terrain_brightness": "Terrain Brightness",
+      "witchercraft.configuration.world_map.biome_color_strength": "Biome Color Strength",
+      "witchercraft.configuration.world_map.hillshade_strength": "Hillshade Strength",
+      "witchercraft.configuration.world_map.hillshade_slope_sensitivity": "Hillshade Slope Sensitivity",
+      "witchercraft.configuration.world_map.canopy_relief_strength": "Canopy Relief Strength",
+      "witchercraft.configuration.world_map.canopy_shadow_strength": "Canopy Shadow Strength",
+      "witchercraft.configuration.world_map.foliage_opacity_scale": "Foliage Opacity Scale",
+      "witchercraft.configuration.world_map.decoration_opacity_scale": "Decoration Opacity Scale",
+      "witchercraft.configuration.world_map.marker_scale": "Marker Scale",
+      "witchercraft.configuration.world_map.zoom_sensitivity": "Zoom Sensitivity",
+      "witchercraft.configuration.world_map.restore_previous_view": "Restore Previous View",
+      "witchercraft.configuration.world_map.discovery_action_bar": "POI Discovery Messages",
+      "witchercraft.configuration.world_map.default_personal_waypoints_visible": "Show Personal Waypoints by Default",
+      "witchercraft.configuration.world_map.default_unknown_pois_visible": "Show Unknown POIs by Default",
+      "witchercraft.configuration.world_map.default_discovered_pois_visible": "Show Discovered POIs by Default",
+      "witchercraft.configuration.world_map.map_enabled": "World Map Enabled",
+      "witchercraft.configuration.world_map.pois_enabled": "POIs Enabled",
+      "witchercraft.configuration.world_map.enabled_poi_definitions": "Enabled POI Definitions",
+      "witchercraft.configuration.world_map.default_reveal_radius": "Default POI Reveal Radius",
+      "witchercraft.configuration.world_map.default_discovery_radius": "Default POI Discovery Radius",
+      "witchercraft.configuration.world_map.tile_refresh_cooldown_ticks": "Tile Refresh Cooldown",
+      "witchercraft.configuration.world_map.max_captures_per_tick": "Maximum Captures per Tick",
+      "witchercraft.configuration.world_map.capture_budget_micros": "Capture Budget (Microseconds)",
+      "witchercraft.configuration.world_map.waypoint_limit": "Personal Waypoint Limit",
       "witchercraft.configuration.minimap": "Minimap",
       "witchercraft.configuration.minimap.enabled": "Enabled",
       "witchercraft.configuration.minimap.corner": "Screen Corner",
       "witchercraft.configuration.minimap.rotation": "Rotate With Player",
       "witchercraft.configuration.minimap.zoom": "Zoom",
       "witchercraft.configuration.minimap.size": "Size",
-      "witchercraft.configuration.minimap.viewport_inset": "Frame Viewport Inset"
+      "witchercraft.configuration.minimap.viewport_inset": "Frame Viewport Inset",
+      "witchercraft.configuration.minimap.target_arrival_radius": "Target Arrival Radius"
     }
   },
   "metadata": {
@@ -11589,6 +11618,10 @@
       },
       {
         "name": "Structures",
+        "children": []
+      },
+      {
+        "name": "Cfg",
         "children": []
       }
     ]

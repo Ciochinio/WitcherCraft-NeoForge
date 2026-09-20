@@ -145,12 +145,19 @@ public final class WorldMapMinimapHud {
 		WorldMapWaypointClientCache.TemporaryPin target = WorldMapWaypointClientCache.temporaryPin(dimension);
 		if (target == null)
 			return;
+		double arrivalRadius = WorldMapClientConfig.minimapTargetArrivalRadius();
+		double targetOffsetX = target.x() - centerX;
+		double targetOffsetZ = target.z() - centerZ;
+		if (arrivalRadius > 0.0 && targetOffsetX * targetOffsetX + targetOffsetZ * targetOffsetZ <= arrivalRadius * arrivalRadius) {
+			WorldMapWaypointClientCache.removeTemporaryPin(dimension);
+			return;
+		}
 		int markerSize = Math.max(8, (int)Math.round(TRACKING_BASE_SIZE * WorldMapClientConfig.markerScale()));
 		double radians = Math.toRadians(rotationDegrees);
 		double cosine = Math.cos(radians);
 		double sine = Math.sin(radians);
-		double scaledX = (target.x() - centerX) * WorldMapClientConfig.minimapZoom();
-		double scaledZ = (target.z() - centerZ) * WorldMapClientConfig.minimapZoom();
+		double scaledX = targetOffsetX * WorldMapClientConfig.minimapZoom();
+		double scaledZ = targetOffsetZ * WorldMapClientConfig.minimapZoom();
 		double positionX = cosine * scaledX - sine * scaledZ;
 		double positionY = sine * scaledX + cosine * scaledZ;
 		double limit = size / 2.0 - markerSize / 2.0 - 1.0;

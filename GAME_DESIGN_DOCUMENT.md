@@ -592,7 +592,8 @@ treats the pin as its active navigation target.
 The HUD minimap is a square, player-centered view of the same explored terrain used by the full map. Its
 outer frame is an editable 64 by 64 texture, while a configurable inset defines a smaller inner terrain
 viewport so map imagery never leaks behind or beyond thicker frame artwork. Client settings control whether
-it is shown, its corner, outer size, zoom, inset, and whether north or the player's facing remains at the top.
+it is shown, its corner, outer size, zoom, inset, whether north or the player's facing remains at the top, and
+the arrival radius that completes active navigation. Setting that radius to zero disables automatic completion.
 The world/server may disable the minimap independently without disabling the full-screen map. It is hidden
 outside the Overworld, with F1, and while another screen is open.
 
@@ -601,6 +602,8 @@ visibility rules on both maps. Marker positions move continuously with the inter
 The active navigation target keeps its ordinary gold pin while it is inside the minimap. When it is outside
 the inner viewport, a separate editable 16 by 16 directional-arrow texture clamps to the inner border and
 points toward it. The arrow is guidance to the pin, not a replacement for the destination marker.
+Entering the configured arrival radius removes the temporary target, so the navigation pin and arrow stay gone
+even if the player leaves the area again.
 
 The compact creation panel accepts a name and icon and remains open with an error message if the server rejects the
 request. Visible waypoints render only on their recorded
