@@ -508,6 +508,97 @@
       "path": "~/World Map"
     },
     {
+      "name": "WorldMapPoiDefinition",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_poi_definition",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapPoiDefinition.java"
+        ]
+      },
+      "path": "~/World Map"
+    },
+    {
+      "name": "WorldMapPoiProvider",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_poi_provider",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapPoiProvider.java"
+        ]
+      },
+      "path": "~/World Map"
+    },
+    {
+      "name": "WorldMapPoiInstance",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_poi_instance",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapPoiInstance.java"
+        ]
+      },
+      "path": "~/World Map"
+    },
+    {
+      "name": "WorldMapPoiProviders",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_poi_providers",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapPoiProviders.java"
+        ]
+      },
+      "path": "~/World Map"
+    },
+    {
+      "name": "WorldMapStructurePoiProvider",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_structure_poi_provider",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapStructurePoiProvider.java"
+        ]
+      },
+      "path": "~/World Map"
+    },
+    {
+      "name": "WorldMapPoiDefinitions",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_poi_definitions",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapPoiDefinitions.java"
+        ]
+      },
+      "path": "~/World Map"
+    },
+    {
+      "name": "WorldMapPoiManager",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_poi_manager",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapPoiManager.java"
+        ]
+      },
+      "path": "~/World Map"
+    },
+    {
       "name": "WorldMapWaypointClientCache",
       "type": "code",
       "compiles": true,
@@ -9054,7 +9145,7 @@
           "src/main/java/net/redboltmedia/witchercraft/entity/GhoulEntity.java"
         ]
       },
-      "path": "~/Mobs"
+      "path": "~/Mobs/Ghoul"
     },
     {
       "name": "GhoulAttackTick",
@@ -9073,7 +9164,7 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/GhoulAttackTickProcedure.java"
         ]
       },
-      "path": "~/Mobs"
+      "path": "~/Mobs/Ghoul"
     },
     {
       "name": "GhoulSlapAnimationCondition",
@@ -9093,7 +9184,7 @@
         ],
         "return_type": "logic"
       },
-      "path": "~/Mobs"
+      "path": "~/Mobs/Ghoul"
     },
     {
       "name": "GhoulIdleAnimationCondition",
@@ -9113,7 +9204,7 @@
         ],
         "return_type": "logic"
       },
-      "path": "~/Mobs"
+      "path": "~/Mobs/Ghoul"
     },
     {
       "name": "GhoulWalkAnimationCondition",
@@ -9133,7 +9224,7 @@
         ],
         "return_type": "logic"
       },
-      "path": "~/Mobs"
+      "path": "~/Mobs/Ghoul"
     },
     {
       "name": "Cockatrice",
@@ -10554,8 +10645,8 @@
   "metadata": {
     "files": [
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java",
-      "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModScreens.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModMenus.java",
+      "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModScreens.java",
       "src/main/java/net/redboltmedia/witchercraft/network/MenuStateUpdateMessage.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModKeyMappings.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModParticles.java",
@@ -10565,12 +10656,12 @@
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModEntityRenderers.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModEntities.java",
       "src/main/java/net/redboltmedia/witchercraft/WitchercraftMod.java",
-      "src/main/resources/META-INF/accesstransformer.cfg",
-      "src/main/resources/pack.mcmeta",
-      "src/main/resources/META-INF/neoforge.mods.toml",
       "src/main/java/net/redboltmedia/witchercraft/network/WitchercraftModVariables.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModTabs.java",
-      "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModModels.java"
+      "src/main/resources/META-INF/accesstransformer.cfg",
+      "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModModels.java",
+      "src/main/resources/META-INF/neoforge.mods.toml",
+      "src/main/resources/pack.mcmeta"
     ]
   },
   "foldersRoot": {
@@ -11169,6 +11260,10 @@
           },
           {
             "name": "Alghoul",
+            "children": []
+          },
+          {
+            "name": "Ghoul",
             "children": []
           }
         ]
