@@ -13,7 +13,8 @@ import java.util.UUID;
 
 /** Runtime-only dimension and coarse-cell index for active POI instances. */
 public final class WorldMapPoiSpatialIndex {
-	private static final int CELL_SIZE = 256;
+	public static final int CELL_SIZE = 256;
+	private static final int MAX_ABSOLUTE_CELL = (int) Math.ceil(WorldMapPoiMarker.MAX_ABSOLUTE_COORDINATE / CELL_SIZE);
 
 	private final Map<Identifier, Map<Long, Set<UUID>>> cellsByDimension = new HashMap<>();
 	private final Map<UUID, IndexedLocation> locations = new HashMap<>();
@@ -36,14 +37,14 @@ public final class WorldMapPoiSpatialIndex {
 		Map<Long, Set<UUID>> cells = cellsByDimension.get(dimension);
 		if (cells == null || radius < 0.0 || !Double.isFinite(radius))
 			return List.of();
-		int minCellX = cell(x - radius);
-		int maxCellX = cell(x + radius);
-		int minCellZ = cell(z - radius);
-		int maxCellZ = cell(z + radius);
+		int minCellX = cellFor(x - radius);
+		int maxCellX = cellFor(x + radius);
+		int minCellZ = cellFor(z - radius);
+		int maxCellZ = cellFor(z + radius);
 		List<UUID> result = new ArrayList<>();
 		for (int cellZ = minCellZ; cellZ <= maxCellZ; cellZ++)
 			for (int cellX = minCellX; cellX <= maxCellX; cellX++) {
-				Set<UUID> bucket = cells.get(pack(cellX, cellZ));
+				Set<UUID> bucket = cells.get(packCell(cellX, cellZ));
 				if (bucket != null)
 					result.addAll(bucket);
 			}
@@ -53,7 +54,7 @@ public final class WorldMapPoiSpatialIndex {
 	private void add(WorldMapPoiInstance instance) {
 		int cellX = Math.floorDiv(instance.anchor().getX(), CELL_SIZE);
 		int cellZ = Math.floorDiv(instance.anchor().getZ(), CELL_SIZE);
-		long cell = pack(cellX, cellZ);
+		long cell = packCell(cellX, cellZ);
 		cellsByDimension.computeIfAbsent(instance.dimension(), ignored -> new HashMap<>())
 			.computeIfAbsent(cell, ignored -> new LinkedHashSet<>()).add(instance.markerId());
 		locations.put(instance.markerId(), new IndexedLocation(instance.dimension(), cell));
@@ -76,12 +77,24 @@ public final class WorldMapPoiSpatialIndex {
 			cellsByDimension.remove(location.dimension());
 	}
 
-	private static int cell(double coordinate) {
+	public static int cellFor(double coordinate) {
 		return (int) Math.floor(coordinate / CELL_SIZE);
 	}
 
-	private static long pack(int x, int z) {
+	public static long packCell(int x, int z) {
 		return (x & 0xffffffffL) | ((z & 0xffffffffL) << 32);
+	}
+
+	public static int cellX(long packed) {
+		return (int) packed;
+	}
+
+	public static int cellZ(long packed) {
+		return (int) (packed >> 32);
+	}
+
+	public static boolean validCell(long packed) {
+		return Math.abs((long) cellX(packed)) <= MAX_ABSOLUTE_CELL && Math.abs((long) cellZ(packed)) <= MAX_ABSOLUTE_CELL;
 	}
 
 	private record IndexedLocation(Identifier dimension, long cell) {

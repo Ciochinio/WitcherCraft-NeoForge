@@ -84,20 +84,23 @@ public final class WorldMapPoiDefinitions {
 				WitchercraftMod.LOGGER.error("Keeping the previous POI definition snapshot because provider preparation failed");
 				return;
 			}
-			Snapshot replacement = new Snapshot(Map.copyOf(accepted), prepared.get());
+			long nextGeneration = active.generation() == Long.MAX_VALUE ? 1L : active.generation() + 1L;
+			Snapshot replacement = new Snapshot(Map.copyOf(accepted), prepared.get(), nextGeneration);
 			active = replacement;
 			WorldMapPoiManager.onDefinitionsReloaded(replacement);
 			WitchercraftMod.LOGGER.info("World-map POI definitions loaded: valid={}, rejected={}", accepted.size(), rejected);
 		}
 	}
 
-	public record Snapshot(Map<Identifier, WorldMapPoiDefinition> definitions, WorldMapPoiProviders.PreparedProviders providers) {
+	public record Snapshot(Map<Identifier, WorldMapPoiDefinition> definitions, WorldMapPoiProviders.PreparedProviders providers, long generation) {
 		public Snapshot {
 			definitions = Map.copyOf(definitions);
+			if (generation < 0)
+				throw new IllegalArgumentException("POI definition generation may not be negative");
 		}
 
 		private static Snapshot empty() {
-			return new Snapshot(Map.of(), new WorldMapPoiProviders.PreparedProviders(Map.of()));
+			return new Snapshot(Map.of(), new WorldMapPoiProviders.PreparedProviders(Map.of()), 0L);
 		}
 
 		public boolean accepts(WorldMapPoiInstance instance) {

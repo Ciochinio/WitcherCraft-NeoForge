@@ -94,6 +94,8 @@ public final class MapPage implements GuiPage {
 		g.fill(vx, vy, vx + vw, vy + vh, MapLayout.VIEW_BG);
 		g.enableScissor(vx, vy, vx + vw, vy + vh);
 		WorldMapClientTileCache.renderAndRequest(g, vx, vy, vw, vh, centerX, centerZ, zoom);
+		if (Minecraft.getInstance().player != null)
+			WorldMapPoiClientCache.updateView(Minecraft.getInstance().player.level().dimension().identifier(), vw, vh, centerX, centerZ, zoom);
 		drawWaypoints(g, vx, vy, vw, vh);
 		hoverSelection = !creating && !manager.isOpen() && contextWaypoint == null ? markerAt(mouseX, mouseY, vx, vy, vw, vh) : null;
 		drawPlayer(g, vx, vy, vw, vh);

@@ -11,15 +11,17 @@ import net.minecraft.world.level.saveddata.SavedDataType;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /** Server-owned, per-player POI reveal and discovery knowledge. */
 public final class WorldMapPoiKnowledge extends SavedData {
-	public static final int FORMAT_VERSION = 1;
+	public static final int FORMAT_VERSION = 2;
 	public static final int MAX_PLAYERS = 65_536;
 	public static final int MAX_KNOWLEDGE_PER_PLAYER = 16_384;
 
@@ -57,6 +59,11 @@ public final class WorldMapPoiKnowledge extends SavedData {
 		return playerKnowledge == null ? null : playerKnowledge.get(markerId);
 	}
 
+	public List<Entry> entries(UUID playerId) {
+		Map<UUID, Entry> playerKnowledge = knowledgeByPlayer.get(playerId);
+		return playerKnowledge == null ? List.of() : List.copyOf(playerKnowledge.values());
+	}
+
 	public boolean reveal(UUID playerId, UUID markerId, double offsetX, double offsetZ) {
 		if (!validOffset(offsetX, offsetZ))
 			return false;
@@ -69,7 +76,7 @@ public final class WorldMapPoiKnowledge extends SavedData {
 		}
 		if (playerKnowledge.containsKey(markerId) || playerKnowledge.size() >= MAX_KNOWLEDGE_PER_PLAYER)
 			return false;
-		playerKnowledge.put(markerId, new Entry(markerId, State.REVEALED, offsetX, offsetZ));
+		playerKnowledge.put(markerId, new Entry(markerId, newPresentationId(playerKnowledge), State.REVEALED, offsetX, offsetZ));
 		setDirty();
 		return true;
 	}
@@ -87,8 +94,8 @@ public final class WorldMapPoiKnowledge extends SavedData {
 			return false;
 		if (previous == null && playerKnowledge.size() >= MAX_KNOWLEDGE_PER_PLAYER)
 			return false;
-		playerKnowledge.put(markerId, previous == null ? new Entry(markerId, State.DISCOVERED, 0.0, 0.0)
-			: new Entry(markerId, State.DISCOVERED, previous.offsetX(), previous.offsetZ()));
+		playerKnowledge.put(markerId, previous == null ? new Entry(markerId, newPresentationId(playerKnowledge), State.DISCOVERED, 0.0, 0.0)
+			: new Entry(markerId, previous.presentationId(), State.DISCOVERED, previous.offsetX(), previous.offsetZ()));
 		setDirty();
 		return true;
 	}
@@ -106,15 +113,21 @@ public final class WorldMapPoiKnowledge extends SavedData {
 			return;
 		}
 		Map<UUID, Entry> loaded = new LinkedHashMap<>();
+		Set<UUID> presentationIdentifiers = new HashSet<>();
+		boolean migrated = false;
 		for (StoredEntry stored : storedPlayer.entries()) {
 			if (loaded.size() >= MAX_KNOWLEDGE_PER_PLAYER)
 				break;
 			Entry decoded = stored.decode();
-			if (decoded == null || loaded.putIfAbsent(decoded.markerId(), decoded) != null)
+			if (decoded == null || !presentationIdentifiers.add(decoded.presentationId()) || loaded.putIfAbsent(decoded.markerId(), decoded) != null)
 				WitchercraftMod.LOGGER.warn("Discarded invalid or duplicate POI knowledge for player {}", playerId);
+			else if (stored.presentationId().isBlank())
+				migrated = true;
 		}
 		if (!loaded.isEmpty())
 			knowledgeByPlayer.put(playerId, loaded);
+		if (migrated)
+			setDirty();
 	}
 
 	private List<StoredPlayer> storedPlayers() {
@@ -125,6 +138,21 @@ public final class WorldMapPoiKnowledge extends SavedData {
 
 	private static boolean validOffset(double x, double z) {
 		return Double.isFinite(x) && Double.isFinite(z) && Math.abs(x) <= WorldMapPoiDefinition.MAX_RADIUS && Math.abs(z) <= WorldMapPoiDefinition.MAX_RADIUS;
+	}
+
+	private static UUID newPresentationId(Map<UUID, Entry> playerKnowledge) {
+		UUID candidate;
+		do {
+			candidate = UUID.randomUUID();
+		} while (containsPresentationId(playerKnowledge, candidate));
+		return candidate;
+	}
+
+	private static boolean containsPresentationId(Map<UUID, Entry> playerKnowledge, UUID candidate) {
+		for (Entry entry : playerKnowledge.values())
+			if (entry.presentationId().equals(candidate))
+				return true;
+		return false;
 	}
 
 	private static void requireServerThread(MinecraftServer server) {
@@ -144,7 +172,7 @@ public final class WorldMapPoiKnowledge extends SavedData {
 		}
 	}
 
-	public record Entry(UUID markerId, State state, double offsetX, double offsetZ) {
+	public record Entry(UUID markerId, UUID presentationId, State state, double offsetX, double offsetZ) {
 	}
 
 	private record StoredPlayer(String playerId, List<StoredEntry> entries) {
@@ -154,25 +182,28 @@ public final class WorldMapPoiKnowledge extends SavedData {
 		).apply(instance, StoredPlayer::new));
 	}
 
-	private record StoredEntry(String markerId, String state, double offsetX, double offsetZ) {
+	private record StoredEntry(String markerId, String presentationId, String state, double offsetX, double offsetZ) {
 		private static final Codec<StoredEntry> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Codec.STRING.optionalFieldOf("marker_id", "").forGetter(StoredEntry::markerId),
+			Codec.STRING.optionalFieldOf("presentation_id", "").forGetter(StoredEntry::presentationId),
 			Codec.STRING.optionalFieldOf("state", "").forGetter(StoredEntry::state),
 			Codec.DOUBLE.optionalFieldOf("offset_x", 0.0).forGetter(StoredEntry::offsetX),
 			Codec.DOUBLE.optionalFieldOf("offset_z", 0.0).forGetter(StoredEntry::offsetZ)
 		).apply(instance, StoredEntry::new));
 
 		private static StoredEntry from(Entry value) {
-			return new StoredEntry(value.markerId().toString(), value.state().name().toLowerCase(Locale.ROOT), value.offsetX(), value.offsetZ());
+			return new StoredEntry(value.markerId().toString(), value.presentationId().toString(),
+				value.state().name().toLowerCase(Locale.ROOT), value.offsetX(), value.offsetZ());
 		}
 
 		private @Nullable Entry decode() {
 			try {
 				UUID parsedMarkerId = UUID.fromString(markerId);
+				UUID parsedPresentationId = presentationId.isBlank() ? UUID.randomUUID() : UUID.fromString(presentationId);
 				State parsedState = State.byId(state);
 				if (parsedState == null || !validOffset(offsetX, offsetZ))
 					return null;
-				return new Entry(parsedMarkerId, parsedState, offsetX, offsetZ);
+				return new Entry(parsedMarkerId, parsedPresentationId, parsedState, offsetX, offsetZ);
 			} catch (IllegalArgumentException exception) {
 				return null;
 			}

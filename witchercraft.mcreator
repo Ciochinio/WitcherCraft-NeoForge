@@ -639,6 +639,97 @@
       "path": "~/World Map/POI"
     },
     {
+      "name": "WorldMapWorldIdentity",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_world_identity",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapWorldIdentity.java"
+        ]
+      },
+      "path": "~/World Map/POI"
+    },
+    {
+      "name": "WorldMapPoiMarker",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_poi_marker",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapPoiMarker.java"
+        ]
+      },
+      "path": "~/World Map/POI"
+    },
+    {
+      "name": "WorldMapPoiViewRequestMessage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_poi_view_request_message",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapPoiViewRequestMessage.java"
+        ]
+      },
+      "path": "~/World Map/POI"
+    },
+    {
+      "name": "WorldMapPoiDataMessage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_poi_data_message",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapPoiDataMessage.java"
+        ]
+      },
+      "path": "~/World Map/POI"
+    },
+    {
+      "name": "WorldMapPoiRequestCompleteMessage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_poi_request_complete_message",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapPoiRequestCompleteMessage.java"
+        ]
+      },
+      "path": "~/World Map/POI"
+    },
+    {
+      "name": "WorldMapPoiCacheResetMessage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_poi_cache_reset_message",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapPoiCacheResetMessage.java"
+        ]
+      },
+      "path": "~/World Map/POI"
+    },
+    {
+      "name": "WorldMapPoiClientCache",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_poi_client_cache",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapPoiClientCache.java"
+        ]
+      },
+      "path": "~/World Map/POI"
+    },
+    {
       "name": "WorldMapWaypointClientCache",
       "type": "code",
       "compiles": true,

@@ -2,6 +2,7 @@ package net.redboltmedia.witchercraft;
 
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.ChunkWatchEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
@@ -17,8 +18,16 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 
+import net.neoforged.neoforge.network.PacketDistributor;
+
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
@@ -29,6 +38,7 @@ public final class WorldMapPoiManager {
 	private static final int REVEAL_INTERVAL_TICKS = 200;
 	private static final int DISCOVERY_INTERVAL_TICKS = 20;
 	private static final int DIAGNOSTIC_INTERVAL_TICKS = 1200;
+	private static final int MAX_MARKERS_PER_REQUEST = 4096;
 	private static final Map<MinecraftServer, ServerState> SERVERS = new ConcurrentHashMap<>();
 
 	private WorldMapPoiManager() {
@@ -57,9 +67,34 @@ public final class WorldMapPoiManager {
 		SERVERS.remove(event.getServer());
 	}
 
+	@SubscribeEvent
+	public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
+		if (event.getEntity() instanceof ServerPlayer player) {
+			ServerState state = SERVERS.computeIfAbsent(player.level().getServer(), ServerState::new);
+			state.sendReset(player, WorldMapPoiDefinitions.active());
+		}
+	}
+
+	@SubscribeEvent
+	public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
+		if (event.getEntity() instanceof ServerPlayer player) {
+			ServerState state = SERVERS.get(player.level().getServer());
+			if (state != null)
+				state.requestAllowances.remove(player.getUUID());
+		}
+	}
+
 	public static void onDefinitionsReloaded(WorldMapPoiDefinitions.Snapshot definitions) {
-		for (ServerState state : SERVERS.values())
+		for (ServerState state : SERVERS.values()) {
 			state.reconcile(definitions);
+			for (ServerPlayer player : state.server.getPlayerList().getPlayers())
+				state.sendReset(player, definitions);
+		}
+	}
+
+	public static void requestMarkers(ServerPlayer player, WorldMapPoiViewRequestMessage request) {
+		ServerState state = SERVERS.computeIfAbsent(player.level().getServer(), ServerState::new);
+		state.requestMarkers(player, request, WorldMapPoiDefinitions.active());
 	}
 
 	public static Collection<WorldMapPoiInstance> instances(MinecraftServer server) {
@@ -72,6 +107,7 @@ public final class WorldMapPoiManager {
 		private final WorldMapPoiInstances instances;
 		private final WorldMapPoiKnowledge knowledge;
 		private final WorldMapPoiSpatialIndex spatialIndex = new WorldMapPoiSpatialIndex();
+		private final Map<UUID, RequestAllowance> requestAllowances = new HashMap<>();
 		private double maximumRevealRadius;
 		private double maximumDiscoveryRadius;
 		private long watchedChunks;
@@ -80,6 +116,8 @@ public final class WorldMapPoiManager {
 		private long refreshedInstances;
 		private long reveals;
 		private long discoveries;
+		private long viewRequests;
+		private long rejectedViewRequests;
 
 		private ServerState(MinecraftServer server) {
 			this.server = server;
@@ -141,8 +179,11 @@ public final class WorldMapPoiManager {
 					continue;
 				reveals++;
 				WitchercraftMod.LOGGER.info("Player {} revealed world-map POI {}", player.getGameProfile().name(), markerId);
+				WorldMapPoiKnowledge.Entry revealed = knowledge.get(player.getUUID(), markerId);
+				if (revealed != null)
+					pushMarker(player, instance, definition, revealed, definitions.generation());
 				if (inside(player, instance.anchor(), definition.discoveryRadius()))
-					discover(player, markerId, definition);
+					discover(player, instance, definition, definitions.generation());
 			}
 		}
 
@@ -162,11 +203,12 @@ public final class WorldMapPoiManager {
 					continue;
 				if (entry == null && definition.revealRadius() > 0.0)
 					continue;
-				discover(player, markerId, definition);
+				discover(player, instance, definition, definitions.generation());
 			}
 		}
 
-		private void discover(ServerPlayer player, UUID markerId, WorldMapPoiDefinition definition) {
+		private void discover(ServerPlayer player, WorldMapPoiInstance instance, WorldMapPoiDefinition definition, long generation) {
+			UUID markerId = instance.markerId();
 			if (!knowledge.discover(player.getUUID(), markerId))
 				return;
 			discoveries++;
@@ -174,7 +216,85 @@ public final class WorldMapPoiManager {
 			player.sendSystemMessage(Component.translatableWithFallback("message.witchercraft.poi.discovered", "Discovered: %s", name), true);
 			player.connection.send(new ClientboundSoundPacket(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(SoundEvents.PLAYER_LEVELUP),
 				SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 0.7F, 1.0F, player.getRandom().nextLong()));
+			WorldMapPoiKnowledge.Entry discovered = knowledge.get(player.getUUID(), markerId);
+			if (discovered != null)
+				pushMarker(player, instance, definition, discovered, generation);
 			WitchercraftMod.LOGGER.info("Player {} discovered world-map POI {} ({})", player.getGameProfile().name(), markerId, definition.id());
+		}
+
+		private void requestMarkers(ServerPlayer player, WorldMapPoiViewRequestMessage request, WorldMapPoiDefinitions.Snapshot definitions) {
+			viewRequests++;
+			Identifier currentDimension = player.level().dimension().identifier();
+			if (!request.dimension().equals(currentDimension) || request.definitionGeneration() != definitions.generation()
+				|| !allowRequest(player.getUUID(), request.cells().length)) {
+				rejectedViewRequests++;
+				complete(player, request.requestId(), false, definitions.generation(), new long[0]);
+				return;
+			}
+			Set<Long> requestedCells = new HashSet<>();
+			for (long cell : request.cells()) {
+				if (!WorldMapPoiSpatialIndex.validCell(cell) || !requestedCells.add(cell)) {
+					rejectedViewRequests++;
+					complete(player, request.requestId(), false, definitions.generation(), new long[0]);
+					return;
+				}
+			}
+
+			List<WorldMapPoiMarker> markers = new ArrayList<>();
+			for (WorldMapPoiKnowledge.Entry entry : knowledge.entries(player.getUUID())) {
+				WorldMapPoiInstance instance = instances.get(entry.markerId());
+				if (instance == null || !instance.active() || !instance.dimension().equals(currentDimension) || !definitions.accepts(instance))
+					continue;
+				WorldMapPoiDefinition definition = definitions.definitions().get(instance.definitionId());
+				if (definition == null)
+					continue;
+				WorldMapPoiMarker marker = marker(instance, definition, entry);
+				long cell = WorldMapPoiSpatialIndex.packCell(WorldMapPoiSpatialIndex.cellFor(marker.x()), WorldMapPoiSpatialIndex.cellFor(marker.z()));
+				if (!requestedCells.contains(cell))
+					continue;
+				if (markers.size() >= MAX_MARKERS_PER_REQUEST) {
+					rejectedViewRequests++;
+					complete(player, request.requestId(), false, definitions.generation(), new long[0]);
+					return;
+				}
+				markers.add(marker);
+			}
+			markers.sort(Comparator.comparing(marker -> marker.markerId().toString()));
+			for (int start = 0; start < markers.size(); start += WorldMapPoiDataMessage.MAX_MARKERS) {
+				int end = Math.min(markers.size(), start + WorldMapPoiDataMessage.MAX_MARKERS);
+				PacketDistributor.sendToPlayer(player, new WorldMapPoiDataMessage(request.requestId(), definitions.generation(), currentDimension, markers.subList(start, end)));
+			}
+			complete(player, request.requestId(), true, definitions.generation(), request.cells());
+		}
+
+		private void pushMarker(ServerPlayer player, WorldMapPoiInstance instance, WorldMapPoiDefinition definition,
+			WorldMapPoiKnowledge.Entry entry, long generation) {
+			PacketDistributor.sendToPlayer(player, new WorldMapPoiDataMessage(0, generation, instance.dimension(),
+				List.of(marker(instance, definition, entry))));
+		}
+
+		private static WorldMapPoiMarker marker(WorldMapPoiInstance instance, WorldMapPoiDefinition definition, WorldMapPoiKnowledge.Entry entry) {
+			double exactX = instance.anchor().getX() + 0.5;
+			double exactZ = instance.anchor().getZ() + 0.5;
+			if (entry.state() == WorldMapPoiKnowledge.State.REVEALED)
+				return new WorldMapPoiMarker.Unknown(entry.presentationId(), exactX + entry.offsetX(), exactZ + entry.offsetZ(),
+					definition.minimumZoom(), definition.defaultVisible());
+			return new WorldMapPoiMarker.Discovered(entry.presentationId(), exactX, exactZ, definition.translationKey(), definition.category(),
+				definition.icon(), definition.minimumZoom(), definition.defaultVisible());
+		}
+
+		private void complete(ServerPlayer player, int requestId, boolean accepted, long generation, long[] cells) {
+			PacketDistributor.sendToPlayer(player, new WorldMapPoiRequestCompleteMessage(requestId, accepted,
+				WorldMapWorldIdentity.get(server), generation, cells));
+		}
+
+		private void sendReset(ServerPlayer player, WorldMapPoiDefinitions.Snapshot definitions) {
+			PacketDistributor.sendToPlayer(player, new WorldMapPoiCacheResetMessage(WorldMapWorldIdentity.get(server), definitions.generation()));
+		}
+
+		private boolean allowRequest(UUID playerId, int cells) {
+			int tick = server.getTickCount();
+			return requestAllowances.computeIfAbsent(playerId, ignored -> new RequestAllowance(tick)).consume(tick, cells);
 		}
 
 		private void reconcile(WorldMapPoiDefinitions.Snapshot definitions) {
@@ -192,8 +312,8 @@ public final class WorldMapPoiManager {
 
 		private void logDiagnostics() {
 			long active = instances.values().stream().filter(WorldMapPoiInstance::active).count();
-			WitchercraftMod.LOGGER.info("World-map POI state: watched_chunks={}, matched_observations={}, unique_instances={}, refreshed_instances={}, retained_instances={}, active_instances={}, reveals={}, discoveries={}",
-				watchedChunks, matchedObservations, uniqueInstances, refreshedInstances, instances.values().size(), active, reveals, discoveries);
+			WitchercraftMod.LOGGER.info("World-map POI state: watched_chunks={}, matched_observations={}, unique_instances={}, refreshed_instances={}, retained_instances={}, active_instances={}, reveals={}, discoveries={}, view_requests={}, rejected_view_requests={}",
+				watchedChunks, matchedObservations, uniqueInstances, refreshedInstances, instances.values().size(), active, reveals, discoveries, viewRequests, rejectedViewRequests);
 		}
 
 		private static boolean inside(ServerPlayer player, BlockPos anchor, double radius) {
@@ -218,6 +338,28 @@ public final class WorldMapPoiManager {
 				}
 			}
 			return result.isEmpty() ? "Location" : result.toString();
+		}
+
+		private static final class RequestAllowance {
+			private static final int WINDOW_TICKS = 20;
+			private static final int MAX_CELLS_PER_WINDOW = 128;
+			private int windowStart;
+			private int used;
+
+			private RequestAllowance(int tick) {
+				windowStart = tick;
+			}
+
+			private boolean consume(int tick, int count) {
+				if (tick - windowStart >= WINDOW_TICKS || tick < windowStart) {
+					windowStart = tick;
+					used = 0;
+				}
+				if (count <= 0 || count > MAX_CELLS_PER_WINDOW - used)
+					return false;
+				used += count;
+				return true;
+			}
 		}
 	}
 }

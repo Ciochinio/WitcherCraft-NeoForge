@@ -118,24 +118,6 @@ public final class WorldMapTerrainCapture {
 		}));
 	}
 
-	private static UUID readOrCreateWorldId(Path path) {
-		try {
-			if (Files.isRegularFile(path)) {
-				String value = Files.readString(path).trim();
-				return UUID.fromString(value);
-			}
-			UUID created = UUID.randomUUID();
-			Files.createDirectories(path.getParent());
-			Path temporary = path.resolveSibling(path.getFileName() + ".tmp-" + UUID.randomUUID());
-			Files.writeString(temporary, created.toString());
-			try { Files.move(temporary, path, StandardCopyOption.ATOMIC_MOVE); }
-			catch (AtomicMoveNotSupportedException ignored) { Files.move(temporary, path); }
-			return created;
-		} catch (IOException | IllegalArgumentException exception) {
-			throw new IllegalStateException("Cannot establish WitcherCraft world-map identity", exception);
-		}
-	}
-
 	@SubscribeEvent
 	public static void onChunkWatch(ChunkWatchEvent.Watch event) {
 		ServerLevel level = event.getLevel();
@@ -256,10 +238,6 @@ public final class WorldMapTerrainCapture {
 		return dimensionRoot(server, dimension).resolve("exploration").resolve(playerId + ".wce");
 	}
 
-	private static Path identityPath(MinecraftServer server) {
-		return server.getWorldPath(LevelResource.ROOT).resolve("data").resolve("witchercraft_world_map_identity.dat");
-	}
-
 	private record RequestedRead(ChunkPos pos, long knownTime, CompletableFuture<Optional<WorldMapTerrainTile>> future) {
 	}
 
@@ -291,7 +269,7 @@ public final class WorldMapTerrainCapture {
 
 		private ServerState(MinecraftServer server) {
 			this.server = server;
-			this.worldId = readOrCreateWorldId(identityPath(server));
+			this.worldId = WorldMapWorldIdentity.get(server);
 		}
 
 		private void enqueue(ServerLevel level, ChunkPos pos, ChunkPos playerPos) {

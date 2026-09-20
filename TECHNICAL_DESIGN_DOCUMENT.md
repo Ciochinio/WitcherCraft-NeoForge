@@ -1636,12 +1636,15 @@ the hard instance limit. Provider observations insert or refresh this store on t
 definition marks matching records inactive without deleting them; only a later provider observation can
 reactivate one after its definition returns.
 
-`WorldMapPoiKnowledge` is a separate codec-backed `SavedData` store grouped by player UUID. A knowledge record
-contains a marker UUID, monotonic `revealed` or `discovered` state, and the revealed marker's X/Z uncertainty
+`WorldMapPoiKnowledge` is a separate codec-backed `SavedData` store grouped by player UUID. Its version-two
+knowledge record contains the authoritative marker UUID, a random per-player presentation UUID, monotonic
+`revealed` or `discovered` state, and the revealed marker's X/Z uncertainty
 offset. The offset is sampled uniformly by area within the definition's uncertainty circle using a square-root
 radial distribution. It is written once and is never rerolled by login, restart, reload, or radius changes.
 Knowledge is independent of generated player variables and therefore survives logout, death, respawn, and
-client-cache deletion. Logical records and collection sizes are validated independently during loading.
+client-cache deletion. Version-one entries receive and persist a presentation UUID when first loaded. This opaque
+wire identifier prevents clients from brute-forcing the deterministic provider identity from a marker UUID.
+Logical records and collection sizes are validated independently during loading.
 
 `WorldMapPoiSpatialIndex` is derived runtime state and is never serialized. It groups active markers into
 256-by-256-block cells under their dimension identifier. Startup rebuilds it from the shared store; observations
@@ -1656,5 +1659,37 @@ skips the revealed state and may be discovered directly inside its discovery rad
 action-bar message and a direct vanilla level-up sound packet only to that player. POI name, category, and
 discovery-message keys are written to both `en_us.json` and `witchercraft.mcreator`'s `language_map.en_us`, as
 required by Section 3.11. The server notification also supplies readable fallbacks for both nested translation
-components, preventing raw dotted keys if a resource pack or generated language file is incomplete. No POI
-marker networking or client cache is added until Batch 4D.
+components, preventing raw dotted keys if a resource pack or generated language file is incomplete. Networking
+and client presentation ownership are added separately in Batch 4D below.
+
+### 5.13 Milestone 4D POI networking and client cache
+
+The POI view protocol uses the same 256-by-256-block cells as the runtime spatial index. While `MapPage` is
+rendering, `WorldMapPoiClientCache` derives visible cells from the shared world-to-screen view and requests at
+most 64 unvalidated cells. One request remains in flight at a time. The server requires a positive request ID,
+the player's current dimension, the current definition generation, unique in-range cells, and a per-player
+allowance of at most 128 requested cells per 20-tick window. The request contains no player UUID and cannot
+mutate knowledge. Handling reads only `SavedData` and runtime maps; it never reads or loads chunks.
+
+`WorldMapPoiDataMessage` carries at most 64 markers per batch. `WorldMapPoiRequestCompleteMessage` echoes the
+authoritatively answered cells and carries the canonical `WorldMapWorldIdentity` UUID. A successful completion
+atomically replaces those cells, including empty results; rejected or stale requests validate nothing and retry
+later. Server responses are deterministically ordered and reject a request rather than partially authorizing it
+if its bounded 4,096-marker response ceiling would be exceeded.
+
+`WorldMapPoiMarker.Unknown` contains only the per-player presentation UUID, stored approximate X/Z, minimum zoom,
+and default visibility. It cannot hold a definition ID, provider fields, exact anchor, translation key, category,
+or icon. `WorldMapPoiMarker.Discovered` contains exact X/Z plus translation key, category, icon, minimum zoom, and
+default visibility. The authoritative deterministic marker UUID never crosses the network; the version-two
+knowledge store's random presentation UUID is stable for that player across sessions and is not derivable from
+the structure identity.
+
+Reveal and discovery transitions persist first and then push a request-ID-zero marker update to that player.
+Discovery replaces the unknown record by presentation UUID even when its exact coordinate falls in another cell.
+Definition snapshots carry a monotonically increasing generation. Login and every successful definition reload
+send `WorldMapPoiCacheResetMessage`; stale batches are ignored and visible cells are requested again.
+
+`WorldMapPoiClientCache` is memory-only and scoped by both the active connection object and the existing
+server-issued world UUID. It groups markers by dimension and presentation cell, bounds validated cells per
+dimension, buffers response pages until completion, and clears on connection, world, or definition-generation
+change. Stage 4D deliberately does not render this cache; `markers(dimension)` is the read-only Stage 4E boundary.
