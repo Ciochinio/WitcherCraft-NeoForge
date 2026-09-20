@@ -21,10 +21,12 @@ public final class WorldMapMinimapHud {
 	private static final int BACKGROUND = 0xD0181714;
 	private static final int TEXT = 0xFFE8DDBE;
 	private static final int WAYPOINT_BASE_SIZE = 14;
+	private static final int POI_BASE_SIZE = 14;
 	private static final int TRACKING_BASE_SIZE = 16;
 	private static final Identifier PLAYER_MARKER = Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "textures/screens/map_player_arrow.png");
 	private static final Identifier SQUARE_FRAME = Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "textures/screens/minimap_frame_square.png");
 	private static final Identifier TRACKING_MARKER = Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "textures/screens/map_tracking_marker.png");
+	private static final Identifier UNKNOWN_POI_ICON = Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "textures/screens/map_poi_unknown.png");
 
 	private WorldMapMinimapHud() {}
 
@@ -59,11 +61,15 @@ public final class WorldMapMinimapHud {
 		double rotation = WorldMapClientConfig.minimapRotation() ? 180.0 - yaw : 0.0;
 
 		WorldMapWaypointClientCache.requestSnapshotIfNeeded();
+		Identifier dimension = minecraft.player.level().dimension().identifier();
+		int poiRequestSize = WorldMapClientConfig.minimapRotation() ? (int)Math.ceil(viewportSize * Math.sqrt(2.0)) : viewportSize;
+		WorldMapPoiClientCache.updateView(dimension, poiRequestSize, poiRequestSize, centerX, centerZ, WorldMapClientConfig.minimapZoom());
 		graphics.fill(viewportX, viewportY, viewportX + viewportSize, viewportY + viewportSize, BACKGROUND);
 		graphics.enableScissor(viewportX, viewportY, viewportX + viewportSize, viewportY + viewportSize);
 		WorldMapClientTileCache.renderAndRequest(graphics, viewportX, viewportY, viewportSize, viewportSize, centerX, centerZ, WorldMapClientConfig.minimapZoom(), rotation);
-		drawWaypoints(graphics, minecraft.player.level().dimension().identifier(), viewportX, viewportY, viewportSize, centerX, centerZ, rotation);
-		drawTrackingTarget(graphics, minecraft.player.level().dimension().identifier(), viewportX, viewportY, viewportSize, centerX, centerZ, rotation);
+		drawPois(graphics, dimension, viewportX, viewportY, viewportSize, centerX, centerZ, rotation);
+		drawWaypoints(graphics, dimension, viewportX, viewportY, viewportSize, centerX, centerZ, rotation);
+		drawTrackingTarget(graphics, dimension, viewportX, viewportY, viewportSize, centerX, centerZ, rotation);
 		graphics.disableScissor();
 		drawSquareFrame(graphics, x, y, size);
 		drawNorth(graphics, minecraft.font, viewportX, viewportY, viewportSize, yaw);
@@ -99,9 +105,38 @@ public final class WorldMapMinimapHud {
 			double positionY = sine * scaledX + cosine * scaledZ;
 			if (Math.abs(positionX) > half - markerSize / 2.0 || Math.abs(positionY) > half - markerSize / 2.0)
 				continue;
-			int markerX = (int)Math.round(x + half + positionX - markerSize / 2.0);
-			int markerY = (int)Math.round(y + half + positionY - markerSize / 2.0);
-			MapPage.drawWaypointIcon(graphics, waypoint.icon().atlasIndex(), markerX, markerY, markerSize, MapLayout.WAYPOINT_COLOR);
+			graphics.pose().pushMatrix();
+			graphics.pose().translate((float)(x + half + positionX), (float)(y + half + positionY));
+			MapPage.drawWaypointIcon(graphics, waypoint.icon().atlasIndex(), -markerSize / 2, -markerSize / 2, markerSize, MapLayout.WAYPOINT_COLOR);
+			graphics.pose().popMatrix();
+		}
+	}
+
+	private static void drawPois(GuiGraphicsExtractor graphics, Identifier dimension, int x, int y, int size,
+			double centerX, double centerZ, double rotationDegrees) {
+		int markerSize = Math.max(8, (int)Math.round(POI_BASE_SIZE * WorldMapClientConfig.markerScale()));
+		double half = size / 2.0;
+		double radians = Math.toRadians(rotationDegrees);
+		double cosine = Math.cos(radians);
+		double sine = Math.sin(radians);
+		double zoom = WorldMapClientConfig.minimapZoom();
+		java.util.UUID worldId = WorldMapPoiClientCache.worldId();
+		for (WorldMapPoiMarker marker : WorldMapPoiClientCache.markers(dimension)) {
+			if (!WorldMapPoiFilterPreferences.poiVisible(worldId, marker)
+				|| marker instanceof WorldMapPoiMarker.Unknown && zoom < marker.minimumZoom())
+				continue;
+			double scaledX = (marker.x() - centerX) * zoom;
+			double scaledZ = (marker.z() - centerZ) * zoom;
+			double positionX = cosine * scaledX - sine * scaledZ;
+			double positionY = sine * scaledX + cosine * scaledZ;
+			if (Math.abs(positionX) > half - markerSize / 2.0 || Math.abs(positionY) > half - markerSize / 2.0)
+				continue;
+			Identifier texture = marker instanceof WorldMapPoiMarker.Discovered discovered ? discovered.icon() : UNKNOWN_POI_ICON;
+			graphics.pose().pushMatrix();
+			graphics.pose().translate((float)(x + half + positionX), (float)(y + half + positionY));
+			graphics.blit(RenderPipelines.GUI_TEXTURED, texture, -markerSize / 2, -markerSize / 2, 0.0F, 0.0F,
+				markerSize, markerSize, 64, 64, 64, 64);
+			graphics.pose().popMatrix();
 		}
 	}
 
@@ -130,10 +165,13 @@ public final class WorldMapMinimapHud {
 		float markerY = (float)(y + size / 2.0 + positionY);
 		graphics.pose().pushMatrix();
 		graphics.pose().translate(markerX, markerY);
-		if (outside)
+		if (outside) {
 			graphics.pose().rotate((float)Math.atan2(positionX, -positionY));
-		graphics.blit(RenderPipelines.GUI_TEXTURED, TRACKING_MARKER, -markerSize / 2, -markerSize / 2, 0.0F, 0.0F,
-			markerSize, markerSize, 16, 16, 16, 16);
+			graphics.blit(RenderPipelines.GUI_TEXTURED, TRACKING_MARKER, -markerSize / 2, -markerSize / 2, 0.0F, 0.0F,
+				markerSize, markerSize, 16, 16, 16, 16);
+		} else {
+			MapPage.drawWaypointIcon(graphics, 0, -markerSize / 2, -markerSize / 2, markerSize, MapLayout.WAYPOINT_COLOR);
+		}
 		graphics.pose().popMatrix();
 	}
 

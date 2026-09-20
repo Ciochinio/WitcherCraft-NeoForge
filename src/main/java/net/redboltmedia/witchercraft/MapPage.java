@@ -31,7 +31,6 @@ public final class MapPage implements GuiPage {
 	private static final Identifier PLAYER_MARKER = Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "textures/screens/map_player_arrow.png");
 	private static final Identifier WAYPOINT_ICONS = Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "textures/screens/map_waypoint_icons.png");
 	private static final Identifier UNKNOWN_POI_ICON = Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "textures/screens/map_poi_unknown.png");
-	private static final Identifier TRACKING_MARKER = Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "textures/screens/map_tracking_marker.png");
 	private final WorldMapWaypointManagerOverlay manager = new WorldMapWaypointManagerOverlay(this::showOnMap);
 	private final WorldMapPoiFilterOverlay filters = new WorldMapPoiFilterOverlay();
 
@@ -500,7 +499,7 @@ public final class MapPage implements GuiPage {
 				drawWaypointIcon(g, waypoint.icon().atlasIndex(), -size / 2, -size / 2, size, tint);
 				g.pose().popMatrix();
 			}
-		drawTemporaryPin(g, player.level().dimension().identifier(), x, y, w, h, visualScale);
+		drawTemporaryPin(g, player.level().dimension().identifier(), x, y, w, h, alpha, visualScale);
 	}
 
 	private void drawPois(GuiGraphicsExtractor g, Identifier dimension, int x, int y, int w, int h) {
@@ -521,7 +520,7 @@ public final class MapPage implements GuiPage {
 		}
 	}
 
-	private void drawTemporaryPin(GuiGraphicsExtractor g, Identifier dimension, int x, int y, int w, int h, float visualScale) {
+	private void drawTemporaryPin(GuiGraphicsExtractor g, Identifier dimension, int x, int y, int w, int h, int alpha, float visualScale) {
 		WorldMapWaypointClientCache.TemporaryPin pin = WorldMapWaypointClientCache.temporaryPin(dimension);
 		if (pin == null)
 			return;
@@ -531,7 +530,7 @@ public final class MapPage implements GuiPage {
 		g.pose().pushMatrix();
 		g.pose().translate((float) px, (float) py);
 		g.pose().scale(visualScale, visualScale);
-		g.blit(RenderPipelines.GUI_TEXTURED, TRACKING_MARKER, -size / 2, -size / 2, 0.0F, 0.0F, size, size, 16, 16, 16, 16);
+		drawWaypointIcon(g, 0, -size / 2, -size / 2, size, (alpha << 24) | (MapLayout.WAYPOINT_COLOR & 0x00FFFFFF));
 		g.pose().popMatrix();
 	}
 

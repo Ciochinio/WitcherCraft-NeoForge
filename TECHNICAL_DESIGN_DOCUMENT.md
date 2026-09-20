@@ -1477,6 +1477,44 @@ All decoded and rendered state is connection-scoped. Persistent client paths inc
 world UUID and player UUID, preventing terrain from another player, recreated world, or reset server at the
 same address from appearing.
 
+### 5.8.1 HUD minimap
+
+`WorldMapMinimapHud` is a locked client code element registered under `World Map/GUI`. It renders from
+`RenderGuiEvent.Post` only with a live Overworld player, visible HUD, no active screen, an enabled map system,
+server minimap permission, and the client minimap toggle. Suppressing it while a screen is open prevents its
+player-centered request bounds from competing in the same frame with `MapPage` pan and zoom state.
+
+The configured minimap size is the outer frame rectangle. `minimap_frame_square.png` is a transparent 64 by
+64 texture drawn over all map contents. `viewportInset` is expressed in texels of that source texture and
+scaled with the outer frame; the resulting inner rectangle owns the background fill, terrain scissor, terrain
+request extent, and marker clipping. This separates artwork geometry from map geometry, allowing a thicker or
+decorated frame without rendering terrain behind it. Runtime clamping always leaves at least a 32 by 32 inner
+viewport.
+
+The minimap calls the existing `WorldMapClientTileCache` rather than storing, decoding, or uploading terrain
+again. Its render overload accepts a clockwise rotation around the viewport center. The corresponding request
+bounds use the rotated rectangle's axis-aligned world extents, including the ordinary one-chunk margin, so
+rotated corners neither go blank nor authorize additional terrain. Player X/Z and yaw interpolate with the
+render partial tick. North-up uses zero terrain rotation and rotates the player arrow; player-up rotates terrain
+by `180 - yaw`, fixes the downward-authored player-arrow texture upward, and moves the N label around the inner
+border. Client zoom remains pixels per world block.
+
+After terrain, the minimap draws authorized POIs, personal waypoints, and the temporary navigation target.
+`WorldMapPoiClientCache.updateView` receives a diagonal-sized request rectangle in rotating mode, then POIs
+apply the same discovery state, minimum-zoom rule, definition default, and client filter as `MapPage`.
+`WorldMapWaypointClientCache.requestSnapshotIfNeeded` retries at most once per two seconds until the first
+authoritative snapshot, so HUD-only play does not require opening the full map. Waypoints retain their
+persistent visibility and personal-waypoint filter. POI and waypoint centers use floating-point pose
+translation rather than rounded destination coordinates, keeping their motion aligned with smoothly centered
+terrain.
+
+An in-range temporary target uses atlas index zero from `map_waypoint_icons.png`, matching its full-map gold
+pin. An out-of-range target is clamped inside the inner viewport and replaced there only by
+`map_tracking_marker.png`, a transparent editable 16 by 16 upward-authored arrow rotated toward the target.
+The frame then renders above map contents, followed by the compass label and centered player indicator.
+Target state remains the existing connection-scoped, client-only temporary pin; the minimap adds no persistent
+tracking field or network message.
+
 ### 5.9 Waypoint architecture and ownership
 
 #### Authoritative state
@@ -1521,7 +1559,8 @@ bounded by the 200-record server limit and avoids client-side merge or conflict 
 `WorldMapWaypointClientCache` stores only the latest authoritative snapshot and the 32 most recent mutation
 results. Every access, request, and response checks Minecraft's current connection object. Changing or losing
 the connection clears waypoints, results, temporary targets, synchronization state, and the request counter, so
-one server's state cannot appear on another. Opening `MapPage` requests a fresh snapshot. All map and manager
+one server's state cannot appear on another. Opening `MapPage` requests a fresh snapshot, while the HUD minimap
+requests one on demand with a two-second retry interval until synchronized. All map and manager
 mutations go through cache request methods; UI code never edits the snapshot directly.
 
 #### Temporary navigation targets and creation

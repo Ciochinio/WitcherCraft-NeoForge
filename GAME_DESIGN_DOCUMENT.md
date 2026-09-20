@@ -586,8 +586,21 @@ and world restart. They cannot move after creation, but the player may rename, h
 Left mouse dragging pans the map. One right-click places or replaces a temporary gold pin in the current
 dimension after a short delay. A second right-click during that delay cancels the pin and opens a compact
 saved-waypoint creation panel at that X and Z position. Temporary pins survive closing the map but remain
-client-side and disappear on disconnect. They do not count toward the saved-waypoint limit. The future
-minimap treats the pin as its active navigation target.
+client-side and disappear on disconnect. They do not count toward the saved-waypoint limit. The HUD minimap
+treats the pin as its active navigation target.
+
+The HUD minimap is a square, player-centered view of the same explored terrain used by the full map. Its
+outer frame is an editable 64 by 64 texture, while a configurable inset defines a smaller inner terrain
+viewport so map imagery never leaks behind or beyond thicker frame artwork. Client settings control whether
+it is shown, its corner, outer size, zoom, inset, and whether north or the player's facing remains at the top.
+The world/server may disable the minimap independently without disabling the full-screen map. It is hidden
+outside the Overworld, with F1, and while another screen is open.
+
+Visible personal waypoints and authorized unknown or discovered POIs use the same icons, filters, and
+visibility rules on both maps. Marker positions move continuously with the interpolated player position.
+The active navigation target keeps its ordinary gold pin while it is inside the minimap. When it is outside
+the inner viewport, a separate editable 16 by 16 directional-arrow texture clamps to the inner border and
+points toward it. The arrow is guidance to the pin, not a replacement for the destination marker.
 
 The compact creation panel accepts a name and icon and remains open with an error message if the server rejects the
 request. Visible waypoints render only on their recorded
