@@ -1693,3 +1693,34 @@ send `WorldMapPoiCacheResetMessage`; stale batches are ignored and visible cells
 server-issued world UUID. It groups markers by dimension and presentation cell, bounds validated cells per
 dimension, buffers response pages until completion, and clears on connection, world, or definition-generation
 change. Stage 4D deliberately does not render this cache; `markers(dimension)` is the read-only Stage 4E boundary.
+
+### 5.14 Milestone 4E POI rendering and interaction
+
+`MapPage` consumes only `WorldMapPoiClientCache.markers(currentDimension)`. POIs share the terrain and waypoint
+floating-point world-to-screen transform and render inside the terrain scissor after terrain but before personal
+waypoints, the temporary target, and the player. Unknown markers use `map_poi_unknown.png`; discovered markers
+use the server-approved individual texture identifier. Both marker sizes use the existing client marker-scale
+setting and square-root zoom scaling. Unknown markers honor their definition's minimum zoom, while discovered
+markers remain visible throughout the supported map zoom range.
+
+Drawing, hover, and right-click hit testing share the same visibility predicate. Marker snapshots are sorted by
+the random presentation UUID, nearest-marker selection uses squared screen distance, and exact ties use the
+explicit priority temporary target, personal waypoint, then POI. Right-click uses the same layer priority. An
+unknown hover card and read-only details popup show only `Undiscovered location` and a generic exploration hint.
+A discovered card and popup may show the authorized translated name, category, horizontal player distance, and
+exact X/Z. The popup retains only the presentation UUID and resolves it from the current cache every frame, so a
+knowledge transition, reload, connection change, world change, filter change, or cache eviction updates or
+closes it without retaining stale presentation.
+
+`WorldMapPoiFilterOverlay` is a modal owned by `MapPage`. It controls personal waypoints, unknown POIs, and
+discovered POIs; the temporary target and player marker are intentionally not filterable. Escape and outside
+left click close the overlay, and all map input is consumed while it is open. POI definition `defaultVisible`
+applies while a group has no explicit user override. The first click selects hidden, subsequent clicks toggle
+hidden/shown, and an explicit shown value can reveal definitions that default to hidden.
+
+`WorldMapPoiFilterPreferences` persists these client-only settings in
+`config/witchercraft-world-map-filters.json`. Its versioned, size-bounded JSON records are keyed by the
+server-issued world UUID exposed read-only by `WorldMapPoiClientCache`; a zero UUID is never written. It retains
+at most 128 worlds, skips malformed sibling records independently, and replaces the file atomically where the
+filesystem supports it. Filter data never enters packets, server `SavedData`, generated player variables, or
+the global NeoForge client config.

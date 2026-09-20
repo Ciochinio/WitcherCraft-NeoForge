@@ -79,6 +79,12 @@ public final class WorldMapPoiClientCache {
 		return cache == null ? List.of() : List.copyOf(cache.markers.values());
 	}
 
+	/** Server-issued identity used to isolate client-only presentation preferences. */
+	public static UUID worldId() {
+		ensureConnection();
+		return worldId;
+	}
+
 	static void acceptData(WorldMapPoiDataMessage message) {
 		ensureConnection();
 		if (Minecraft.getInstance().getConnection() == null)

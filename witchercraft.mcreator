@@ -730,6 +730,32 @@
       "path": "~/World Map/POI"
     },
     {
+      "name": "WorldMapPoiFilterPreferences",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_poi_filter_preferences",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapPoiFilterPreferences.java"
+        ]
+      },
+      "path": "~/World Map/POI"
+    },
+    {
+      "name": "WorldMapPoiFilterOverlay",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_poi_filter_overlay",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapPoiFilterOverlay.java"
+        ]
+      },
+      "path": "~/World Map/POI"
+    },
+    {
       "name": "WorldMapWaypointClientCache",
       "type": "code",
       "compiles": true,
@@ -10758,6 +10784,16 @@
       "gui.witchercraft.shell.meditation.blocked_space": "Not enough open space to meditate here.",
       "gui.witchercraft.map.waypoints": "Waypoints",
       "gui.witchercraft.map.filters": "Filters",
+      "gui.witchercraft.map.filters.title": "Map Filters",
+      "gui.witchercraft.map.filters.waypoints": "Personal waypoints",
+      "gui.witchercraft.map.filters.unknown": "Undiscovered POIs",
+      "gui.witchercraft.map.filters.discovered": "Discovered POIs",
+      "gui.witchercraft.map.filters.default": "Default",
+      "gui.witchercraft.map.filters.shown": "Shown",
+      "gui.witchercraft.map.filters.hidden": "Hidden",
+      "gui.witchercraft.map.poi.undiscovered": "Undiscovered location",
+      "gui.witchercraft.map.poi.unknown_hint": "Explore nearby to identify it.",
+      "gui.witchercraft.map.poi.distance": "%s m away",
       "gui.witchercraft.map.center": "Center",
       "key.witchercraft.open_shell.inventory": "WitcherCraft: Inventory",
       "key.witchercraft.open_shell.skills": "WitcherCraft: Skills",

@@ -51,12 +51,22 @@ public final class MapLayout {
 	public static final int MANAGER_VISIBLE_ROWS = 4;
 	public static final int MANAGER_ACTION_X = 230;
 	public static final int SELECTION_W = 280;
-	public static final int SELECTION_H = 40;
+	public static final int SELECTION_H = 54;
 	public static final int SELECTION_BOTTOM = 6;
 	public static final int CONTEXT_W = 136;
 	public static final int CONTEXT_H = 58;
 	public static final int CONTEXT_PADDING = 8;
 	public static final int CONTEXT_MARKER_GAP = 5;
+	public static final int FILTER_W = 238;
+	public static final int FILTER_H = 124;
+	public static final int FILTER_PADDING = 12;
+	public static final int FILTER_ROW_Y = 30;
+	public static final int FILTER_ROW_H = 23;
+	public static final int FILTER_ROW_GAP = 27;
+	public static final int POI_DETAILS_W = 224;
+	public static final int POI_DETAILS_H = 86;
+	public static final int POI_DETAILS_PADDING = 10;
+	public static final int POI_DETAILS_MARKER_GAP = 5;
 
 	public static final int VIEW_BG = 0xFF11151A;
 	public static final int VIEW_BORDER = 0xFF665E4A;
@@ -77,4 +87,6 @@ public final class MapLayout {
 	public static final int ERROR = 0xFFE06A5F;
 	/** Edit this ARGB value to test the saved-waypoint icon, name, and selection-card color. */
 	public static final int WAYPOINT_COLOR = 0xFFD6AD52;
+	public static final int POI_UNKNOWN_COLOR = 0xFFD4C9A9;
+	public static final int POI_DISCOVERED_COLOR = 0xFFD6AD52;
 }
