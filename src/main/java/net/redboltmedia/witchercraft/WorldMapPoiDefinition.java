@@ -10,6 +10,7 @@ import net.minecraft.resources.Identifier;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /** Immutable, datapack-loaded description of one kind of world-map POI. */
@@ -35,8 +36,8 @@ public record WorldMapPoiDefinition(Identifier id, WorldMapPoiProviders.Binding<
 		Codec.STRING.optionalFieldOf("description_translation_key", "").forGetter(Template::descriptionTranslationKey),
 		Codec.STRING.optionalFieldOf("category", DEFAULT_CATEGORY.toString()).forGetter(Template::category),
 		Codec.STRING.optionalFieldOf("icon", DEFAULT_ICON.toString()).forGetter(Template::icon),
-		Codec.DOUBLE.optionalFieldOf("reveal_radius", 256.0).forGetter(Template::revealRadius),
-		Codec.DOUBLE.optionalFieldOf("discovery_radius", 32.0).forGetter(Template::discoveryRadius),
+		Codec.DOUBLE.optionalFieldOf("reveal_radius").forGetter(Template::revealRadius),
+		Codec.DOUBLE.optionalFieldOf("discovery_radius").forGetter(Template::discoveryRadius),
 		Codec.DOUBLE.optionalFieldOf("uncertainty_radius", 0.0).forGetter(Template::uncertaintyRadius),
 		Codec.BOOL.optionalFieldOf("default_visible", true).forGetter(Template::defaultVisible),
 		Codec.DOUBLE.optionalFieldOf("minimum_zoom", MINIMUM_MAP_ZOOM).forGetter(Template::minimumZoom),
@@ -60,9 +61,11 @@ public record WorldMapPoiDefinition(Identifier id, WorldMapPoiProviders.Binding<
 		Identifier icon = Identifier.tryParse(template.icon());
 		if (icon == null)
 			return error("Invalid icon identifier");
-		if (!validRadius(template.revealRadius()) || !validRadius(template.discoveryRadius()) || !validRadius(template.uncertaintyRadius()))
+		double revealRadius = template.revealRadius().orElseGet(WorldMapServerConfig::defaultRevealRadius);
+		double discoveryRadius = template.discoveryRadius().orElseGet(WorldMapServerConfig::defaultDiscoveryRadius);
+		if (!validRadius(revealRadius) || !validRadius(discoveryRadius) || !validRadius(template.uncertaintyRadius()))
 			return error("Radii must be finite values from 0 through " + MAX_RADIUS);
-		if (template.revealRadius() > 0.0 && template.discoveryRadius() > template.revealRadius())
+		if (revealRadius > 0.0 && discoveryRadius > revealRadius)
 			return error("discovery_radius may not exceed reveal_radius");
 		if (!Double.isFinite(template.minimumZoom()) || template.minimumZoom() < MINIMUM_MAP_ZOOM || template.minimumZoom() > MAXIMUM_MAP_ZOOM)
 			return error("minimum_zoom must be between " + MINIMUM_MAP_ZOOM + " and " + MAXIMUM_MAP_ZOOM);
@@ -83,7 +86,7 @@ public record WorldMapPoiDefinition(Identifier id, WorldMapPoiProviders.Binding<
 		String translationKey = template.translationKey().isEmpty() ? derivedTranslationKey(id) : template.translationKey();
 		return WorldMapPoiProviders.decodeAndValidate(template.provider(), registries).map(provider -> new WorldMapPoiDefinition(
 			id, provider, translationKey, template.descriptionTranslationKey().isEmpty() ? translationKey + ".description" : template.descriptionTranslationKey(), category, icon,
-			template.revealRadius(), template.discoveryRadius(), template.uncertaintyRadius(), template.defaultVisible(), template.minimumZoom(), capabilities));
+			revealRadius, discoveryRadius, template.uncertaintyRadius(), template.defaultVisible(), template.minimumZoom(), capabilities));
 	}
 
 	private static String derivedTranslationKey(Identifier id) {
@@ -103,8 +106,8 @@ public record WorldMapPoiDefinition(Identifier id, WorldMapPoiProviders.Binding<
 		return DataResult.error(() -> message);
 	}
 
-	public record Template(Dynamic<?> provider, String translationKey, String descriptionTranslationKey, String category, String icon, double revealRadius,
-		double discoveryRadius, double uncertaintyRadius, boolean defaultVisible, double minimumZoom, List<String> capabilities) {
+	public record Template(Dynamic<?> provider, String translationKey, String descriptionTranslationKey, String category, String icon, Optional<Double> revealRadius,
+		Optional<Double> discoveryRadius, double uncertaintyRadius, boolean defaultVisible, double minimumZoom, List<String> capabilities) {
 		public Template {
 			capabilities = List.copyOf(capabilities);
 		}

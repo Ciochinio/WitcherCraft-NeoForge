@@ -67,9 +67,13 @@ public record WorldMapTerrainTile(int chunkX, int chunkZ, long capturedGameTime,
 
 	public void writeAtomically(Path target) throws IOException {
 		byte[] encoded = encode(); Files.createDirectories(target.getParent());
-		Path temporary = target.resolveSibling(target.getFileName() + ".tmp-" + UUID.randomUUID()); Files.write(temporary, encoded);
-		try { Files.move(temporary, target, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING); }
-		catch (AtomicMoveNotSupportedException ignored) { Files.move(temporary, target, StandardCopyOption.REPLACE_EXISTING); }
+		Path temporary = target.resolveSibling(target.getFileName() + ".tmp-" + UUID.randomUUID());
+		try {
+			Files.write(temporary, encoded);
+			replaceWithRetry(temporary, target);
+		} finally {
+			Files.deleteIfExists(temporary);
+		}
 	}
 
 	public static Optional<WorldMapTerrainTile> read(Path source, int expectedX, int expectedZ) {
@@ -112,9 +116,30 @@ public record WorldMapTerrainTile(int chunkX, int chunkZ, long capturedGameTime,
 			for (byte[] entry : entries) if (entry != null) out.write(entry);
 		}
 		byte[] bytes = appendCrc(body.toByteArray()); Files.createDirectories(target.getParent());
-		Path temporary = target.resolveSibling(target.getFileName() + ".tmp-" + UUID.randomUUID()); Files.write(temporary, bytes);
-		try { Files.move(temporary, target, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING); }
-		catch (AtomicMoveNotSupportedException ignored) { Files.move(temporary, target, StandardCopyOption.REPLACE_EXISTING); }
+		Path temporary = target.resolveSibling(target.getFileName() + ".tmp-" + UUID.randomUUID());
+		try {
+			Files.write(temporary, bytes);
+			replaceWithRetry(temporary, target);
+		} finally {
+			Files.deleteIfExists(temporary);
+		}
+	}
+
+	private static void replaceWithRetry(Path temporary, Path target) throws IOException {
+		IOException failure = null;
+		for (int attempt = 0; attempt < 4; attempt++) {
+			try {
+				try { Files.move(temporary, target, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING); }
+				catch (AtomicMoveNotSupportedException ignored) { Files.move(temporary, target, StandardCopyOption.REPLACE_EXISTING); }
+				return;
+			} catch (IOException exception) {
+				failure = exception;
+				if (attempt == 3) break;
+				try { Thread.sleep(25L * (attempt + 1)); }
+				catch (InterruptedException interrupted) { Thread.currentThread().interrupt(); throw exception; }
+			}
+		}
+		throw failure;
 	}
 
 	private static Optional<WorldMapTerrainTile> decode(byte[] file, int expectedX, int expectedZ) {

@@ -9,7 +9,6 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
@@ -45,7 +44,7 @@ public final class WorldMapPoiManager {
 
 	@SubscribeEvent
 	public static void onChunkWatch(ChunkWatchEvent.Watch event) {
-		if (!event.getLevel().dimension().equals(Level.OVERWORLD))
+		if (!WorldMapServerConfig.poisEnabled() || !event.getLevel().dimension().equals(Level.OVERWORLD))
 			return;
 		WorldMapPoiDefinitions.Snapshot definitions = WorldMapPoiDefinitions.active();
 		if (definitions.definitions().isEmpty())
@@ -58,7 +57,8 @@ public final class WorldMapPoiManager {
 
 	@SubscribeEvent
 	public static void onServerTick(ServerTickEvent.Post event) {
-		SERVERS.computeIfAbsent(event.getServer(), ServerState::new).tick(WorldMapPoiDefinitions.active());
+		if (WorldMapServerConfig.poisEnabled())
+			SERVERS.computeIfAbsent(event.getServer(), ServerState::new).tick(WorldMapPoiDefinitions.active());
 	}
 
 	@SubscribeEvent
@@ -92,6 +92,11 @@ public final class WorldMapPoiManager {
 	}
 
 	public static void requestMarkers(ServerPlayer player, WorldMapPoiViewRequestMessage request) {
+		if (!WorldMapServerConfig.poisEnabled()) {
+			PacketDistributor.sendToPlayer(player, new WorldMapPoiRequestCompleteMessage(request.requestId(), true,
+				WorldMapWorldIdentity.get(player.level().getServer()), WorldMapPoiDefinitions.active().generation(), request.cells()));
+			return;
+		}
 		ServerState state = SERVERS.computeIfAbsent(player.level().getServer(), ServerState::new);
 		state.requestMarkers(player, request, WorldMapPoiDefinitions.active());
 	}
@@ -228,8 +233,7 @@ public final class WorldMapPoiManager {
 			if (!knowledge.discover(player.getUUID(), markerId))
 				return;
 			discoveries++;
-			Component name = Component.translatableWithFallback(definition.translationKey(), fallbackName(definition.id()));
-			player.sendSystemMessage(Component.translatableWithFallback("message.witchercraft.poi.discovered", "Discovered: %s", name), true);
+			PacketDistributor.sendToPlayer(player, new WorldMapPoiDiscoveredMessage(definition.translationKey(), fallbackName(definition.id())));
 			player.connection.send(new ClientboundSoundPacket(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(SoundEvents.PLAYER_LEVELUP),
 				SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 0.7F, 1.0F, player.getRandom().nextLong()));
 			WorldMapPoiKnowledge.Entry discovered = knowledge.get(player.getUUID(), markerId);

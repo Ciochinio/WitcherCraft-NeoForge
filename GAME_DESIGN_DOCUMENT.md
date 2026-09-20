@@ -694,6 +694,15 @@ independently, so fractional camera movement stays continuous and adjacent page 
 Crossing into another set of visible pages starts its disk-cache lookup immediately. Repeated checks of an
 unchanged view remain paced, and visible pages load before the surrounding prefetch ring.
 
+World-map settings are available from **Mods > WitcherCraft > Config**. Personal presentation settings live under
+**Client Settings > World Map** and include terrain appearance, marker size, zoom sensitivity, opening behavior,
+the discovery action-bar message, and initial filter visibility. The discovery sound itself is fixed. Gameplay and
+workload rules live under **World Settings > World Map**. They belong to the saved world in both single-player and
+dedicated-server play; remote players can see the synchronized rules but cannot edit them. World owners can disable
+the map or POIs, select enabled POI definitions, set omitted-definition radius defaults, tune capture workload and
+refresh cadence, and change the waypoint limit. Disabling a system hides and stops it without deleting exploration,
+waypoints, POI instances, or discoveries.
+
 Opening the map does not pause the world. The Witcher menu uses full-screen art, so damage from a hostile
 mob or another player closes it and returns control to the player. Environmental damage such as fire,
 lava, falling, drowning, or poison leaves it open. A new map view can take longer to finish at distant

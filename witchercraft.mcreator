@@ -882,6 +882,43 @@
       "path": "~/World Map/GUI"
     },
     {
+      "name": "WorldMapServerConfig",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_server_config",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapServerConfig.java"
+        ]
+      }
+    },
+    {
+      "name": "WitchercraftConfigScreen",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "witchercraft_config_screen",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WitchercraftConfigScreen.java"
+        ]
+      }
+    },
+    {
+      "name": "WorldMapPoiDiscoveredMessage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_poi_discovered_message",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapPoiDiscoveredMessage.java"
+        ]
+      },
+      "path": "~/World Map/POI"
+    },
+    {
       "name": "WorldMapClientTileCache",
       "type": "code",
       "compiles": true,

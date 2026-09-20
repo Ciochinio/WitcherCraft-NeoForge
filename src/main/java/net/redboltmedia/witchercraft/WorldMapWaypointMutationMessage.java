@@ -5,6 +5,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -13,6 +14,8 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /** Bounded client intent for one personal waypoint operation. */
@@ -23,6 +26,9 @@ public record WorldMapWaypointMutationMessage(int requestId, Operation operation
 	private static final int MAX_DIMENSION_LENGTH = 256;
 	private static final int MAX_ID_LENGTH = 32;
 	private static final int MAX_NAME_WIRE_CHARACTERS = WorldMapWaypoints.MAX_NAME_CHARACTERS * 2;
+	private static final int REQUEST_WINDOW_TICKS = 20;
+	private static final int MAX_REQUESTS_PER_WINDOW = 32;
+	private static final Map<UUID, RequestAllowance> REQUEST_ALLOWANCES = new HashMap<>();
 	public static final Type<WorldMapWaypointMutationMessage> TYPE = new Type<>(Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "world_map_waypoint_mutation"));
 	public static final StreamCodec<RegistryFriendlyByteBuf, WorldMapWaypointMutationMessage> STREAM_CODEC = StreamCodec.of((buffer, message) -> {
 		buffer.writeVarInt(message.requestId);
@@ -66,7 +72,14 @@ public record WorldMapWaypointMutationMessage(int requestId, Operation operation
 	}
 
 	private static void handleOnServer(ServerPlayer player, WorldMapWaypointMutationMessage message) {
+		if (!allowRequest(player))
+			return;
 		WorldMapWaypoints data = WorldMapWaypoints.get(player.level().getServer());
+		if (!WorldMapServerConfig.mapEnabled()) {
+			PacketDistributor.sendToPlayer(player, new WorldMapWaypointResultMessage(message.requestId, message.operation, WorldMapWaypoints.Status.DISABLED));
+			PacketDistributor.sendToPlayer(player, new WorldMapWaypointSnapshotMessage(java.util.List.of()));
+			return;
+		}
 		WorldMapWaypoints.OperationResult result = switch (message.operation) {
 			case REQUEST_SNAPSHOT -> new WorldMapWaypoints.OperationResult(WorldMapWaypoints.Status.SUCCESS, null);
 			case CREATE -> data.create(player, Identifier.tryParse(message.dimension), message.x, message.z, message.name, WorldMapWaypoints.WaypointIcon.byId(message.icon));
@@ -78,6 +91,21 @@ public record WorldMapWaypointMutationMessage(int requestId, Operation operation
 		PacketDistributor.sendToPlayer(player, new WorldMapWaypointSnapshotMessage(data.getWaypoints(player)));
 	}
 
+	private static boolean allowRequest(ServerPlayer player) {
+		int tick = player.level().getServer().getTickCount();
+		RequestAllowance allowance = REQUEST_ALLOWANCES.computeIfAbsent(player.getUUID(), ignored -> new RequestAllowance(tick, 0));
+		if (tick - allowance.windowStart >= REQUEST_WINDOW_TICKS) {
+			allowance.windowStart = tick;
+			allowance.requests = 0;
+		}
+		return ++allowance.requests <= MAX_REQUESTS_PER_WINDOW;
+	}
+
+	@SubscribeEvent
+	public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
+		REQUEST_ALLOWANCES.remove(event.getEntity().getUUID());
+	}
+
 	@SubscribeEvent
 	public static void registerMessage(FMLCommonSetupEvent event) {
 		WitchercraftMod.addNetworkMessage(TYPE, STREAM_CODEC, WorldMapWaypointMutationMessage::handleData);
@@ -85,5 +113,11 @@ public record WorldMapWaypointMutationMessage(int requestId, Operation operation
 
 	public enum Operation {
 		REQUEST_SNAPSHOT, CREATE, EDIT, SET_VISIBLE, DELETE
+	}
+
+	private static final class RequestAllowance {
+		private int windowStart;
+		private int requests;
+		private RequestAllowance(int windowStart, int requests) { this.windowStart = windowStart; this.requests = requests; }
 	}
 }

@@ -1357,14 +1357,16 @@ neighbor, and a southeast-corner change also invalidates the diagonal region tha
 
 `WorldMapClientConfig` registers a NeoForge client configuration with terrain brightness, biome-color
 strength, hillshade strength, hillshade slope sensitivity, canopy relief strength, canopy shadow strength,
-foliage opacity scale, decoration opacity scale, marker scale, and a decoration visibility toggle. A terrain
-setting change revises cached region images, while marker scale applies directly on its next draw. Neither
-path alters server capture or saved terrain. The defaults are 1.0
+foliage opacity scale, decoration opacity scale, marker scale, zoom sensitivity, view restoration, discovery
+action-bar visibility, initial filter visibility, and a decoration visibility toggle. Discovery sound is fixed
+and has no configurable selector or toggle. A terrain setting change revises cached region images, while marker
+and interaction settings apply directly on their next use. Neither path alters server capture or saved terrain. The defaults are 1.0
 brightness, 0.9 biome color strength, 0.75 hillshade strength, 1.0 slope sensitivity, 1.35 canopy relief
 strength, 0.35 canopy shadow strength, 1.0 foliage opacity scale, 1.0 decoration opacity scale, 1.0 marker
 scale, and decorations enabled.
 
-MCreator's generated `WitchercraftMod` constructor calls `WorldMapClientConfig.register()` only from its
+MCreator's generated `WitchercraftMod` constructor calls `WorldMapClientConfig.register()` and
+`WorldMapServerConfig.register()` only from its
 preserved user-code block. The locked config class resolves the active mod container by mod ID. Do not add
 a `ModContainer` parameter to the generated constructor because MCreator removes that signature change
 during regeneration while preserving the user-code body.
@@ -1767,3 +1769,29 @@ Verification must preserve the following invariants:
    spikes correlated with POI candidate counts require investigation before increasing radii or scan cadence.
 6. Repository validation parses all JSON resources, resolves every MCreator element and declared metadata file,
    compiles with Java 25, and starts a dedicated server far enough to load POI definitions successfully.
+
+### 5.16 Configuration and hardening
+
+`WorldMapServerConfig` is a NeoForge `SERVER` configuration. It is stored per world, applies equally to the
+integrated server and a dedicated server, and is synchronized read-only to remote clients. `WitchercraftConfigScreen`
+registers NeoForge's built-in configuration screen, producing `Client Settings > World Map` and
+`World Settings > World Map` sections under Mods > WitcherCraft > Config. Translated section and option labels
+belong to `en_us.json`; future systems such as meditation add sibling sections rather than separate settings UIs.
+
+World settings control the map and POI enable switches, a POI-definition allowlist, omitted JSON radius defaults,
+same-session tile refresh cooldown, capture count and time budgets, and the personal-waypoint limit. An empty POI
+allowlist enables all valid definitions. POI definition selection and default radii require a world restart and are
+re-applied at `ServerAboutToStart`, after the per-world config has loaded. Lowering the waypoint limit never deletes
+stored records. The configurable limit is bounded by a separate immutable 1,000-record wire/storage ceiling.
+
+Configuration never weakens hard validation. Terrain and POI requests remain batch- and rate-limited, waypoint
+mutations allow at most 32 requests per player per 20 ticks, strings and palettes remain bounded, and disabled
+systems reject or complete requests without exposing cached state. The client never draws retained terrain when the
+world disables the map. POI discovery action-bar presentation moved to a bounded clientbound payload so each client
+may hide that message; the authoritative fixed discovery sound remains server-issued.
+
+Client `.wcr` reads and writes now share the same per-path lock. Atomic replacement retries bounded Windows sharing
+violations and removes failed temporary files. Missing or corrupt terrain remains disposable and recoverable from
+the authoritative server without affecting waypoints or POI knowledge. Capture diagnostics additionally report
+average and maximum sampling time; existing renderer, cache-size, POI candidate, tick-time, queue, failure, rebuild,
+upload, draw-call, and disk-footprint diagnostics remain the profiling basis for later default changes.

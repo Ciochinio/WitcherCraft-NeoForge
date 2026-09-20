@@ -27,7 +27,8 @@ import java.util.UUID;
 /** Server-owned personal waypoint storage and mutation validation. */
 public final class WorldMapWaypoints extends SavedData {
 	public static final int FORMAT_VERSION = 2;
-	public static final int MAX_WAYPOINTS_PER_PLAYER = 200;
+	public static final int DEFAULT_WAYPOINT_LIMIT = 200;
+	public static final int HARD_MAX_WAYPOINTS_PER_PLAYER = 1_000;
 	public static final int MAX_NAME_CHARACTERS = 64;
 	public static final double MAX_ABSOLUTE_COORDINATE = 30_000_000.0;
 
@@ -63,7 +64,7 @@ public final class WorldMapWaypoints extends SavedData {
 	public OperationResult create(ServerPlayer player, Identifier dimension, double x, double z, String name, WaypointIcon icon) {
 		requireServerThread(player.level().getServer());
 		List<Waypoint> waypoints = waypointsByPlayer.computeIfAbsent(player.getUUID(), ignored -> new ArrayList<>());
-		if (waypoints.size() >= MAX_WAYPOINTS_PER_PLAYER)
+		if (waypoints.size() >= WorldMapServerConfig.waypointLimit())
 			return OperationResult.failure(Status.LIMIT_REACHED);
 		String normalizedName = normalizeName(name);
 		Status validation = validateInput(player.level().getServer(), dimension, x, z, normalizedName, icon);
@@ -129,7 +130,7 @@ public final class WorldMapWaypoints extends SavedData {
 		List<Waypoint> loaded = new ArrayList<>();
 		Set<UUID> identifiers = new HashSet<>();
 		for (StoredWaypoint stored : storedPlayer.waypoints()) {
-			if (loaded.size() >= MAX_WAYPOINTS_PER_PLAYER)
+			if (loaded.size() >= HARD_MAX_WAYPOINTS_PER_PLAYER)
 				break;
 			Waypoint waypoint = stored.decode();
 			if (waypoint == null || !identifiers.add(waypoint.id()) || !validStoredWaypoint(waypoint)) {
@@ -223,7 +224,7 @@ public final class WorldMapWaypoints extends SavedData {
 	}
 
 	public enum Status {
-		SUCCESS, NOT_FOUND, LIMIT_REACHED, INVALID_INPUT, INVALID_DIMENSION, OUTSIDE_WORLD_BORDER
+		SUCCESS, NOT_FOUND, LIMIT_REACHED, INVALID_INPUT, INVALID_DIMENSION, OUTSIDE_WORLD_BORDER, DISABLED
 	}
 
 	public record OperationResult(Status status, @Nullable Waypoint waypoint) {

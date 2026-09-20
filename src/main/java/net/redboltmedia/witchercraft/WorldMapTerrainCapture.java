@@ -12,6 +12,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.PriorityQueue;
@@ -60,8 +61,6 @@ import net.neoforged.neoforge.network.PacketDistributor;
 @EventBusSubscriber
 public final class WorldMapTerrainCapture {
 	private static final int MIN_CAPTURES_PER_TICK = 1;
-	private static final int MAX_CAPTURES_PER_TICK = 8;
-	private static final long CAPTURE_BUDGET_NANOS = 3_000_000L;
 	private static final int MAX_PENDING_CAPTURES = 32_768;
 	private static final int EXPLORATION_SAVE_INTERVAL_TICKS = 200;
 	private static final int DIAGNOSTIC_INTERVAL_TICKS = 1200;
@@ -82,6 +81,10 @@ public final class WorldMapTerrainCapture {
 	public static void requestTiles(ServerPlayer player, int requestId, long[] packedPositions, long[] capturedTimes) {
 		if (requestId <= 0)
 			return;
+		if (!WorldMapServerConfig.mapEnabled()) {
+			PacketDistributor.sendToPlayer(player, new WorldMapTileRequestCompleteMessage(requestId, true));
+			return;
+		}
 		if (!(player.level() instanceof ServerLevel level) || !level.dimension().equals(Level.OVERWORLD) || packedPositions.length == 0 || packedPositions.length > 64 || capturedTimes.length != packedPositions.length) {
 			PacketDistributor.sendToPlayer(player, new WorldMapTileRequestCompleteMessage(requestId, true));
 			return;
@@ -121,7 +124,7 @@ public final class WorldMapTerrainCapture {
 	@SubscribeEvent
 	public static void onChunkWatch(ChunkWatchEvent.Watch event) {
 		ServerLevel level = event.getLevel();
-		if (!level.dimension().equals(Level.OVERWORLD))
+		if (!WorldMapServerConfig.mapEnabled() || !level.dimension().equals(Level.OVERWORLD))
 			return;
 		ServerState state = SERVERS.computeIfAbsent(level.getServer(), ServerState::new);
 		state.markExplored(level, event.getPlayer().getUUID(), event.getPos());
@@ -131,7 +134,7 @@ public final class WorldMapTerrainCapture {
 	@SubscribeEvent
 	public static void onServerTick(ServerTickEvent.Post event) {
 		ServerState state = SERVERS.get(event.getServer());
-		if (state != null)
+		if (state != null && WorldMapServerConfig.mapEnabled())
 			state.tick();
 	}
 
@@ -256,6 +259,7 @@ public final class WorldMapTerrainCapture {
 		private final Map<String, Set<UUID>> repairWaiters = new HashMap<>();
 		private final Map<PlayerKey, ExplorationMask> exploration = new HashMap<>();
 		private final Map<UUID, RequestAllowance> requestAllowances = new HashMap<>();
+		private final LinkedHashMap<String, Long> lastCaptureTimes = new LinkedHashMap<>();
 		private final Set<CompletableFuture<?>> writes = ConcurrentHashMap.newKeySet();
 		private final AtomicLong captured = new AtomicLong();
 		private final AtomicLong repaired = new AtomicLong();
@@ -266,6 +270,9 @@ public final class WorldMapTerrainCapture {
 		private long sequence;
 		private long repairRequests;
 		private long budgetStops;
+		private long timedCaptures;
+		private long totalCaptureNanos;
+		private long maximumCaptureNanos;
 
 		private ServerState(MinecraftServer server) {
 			this.server = server;
@@ -274,6 +281,9 @@ public final class WorldMapTerrainCapture {
 
 		private void enqueue(ServerLevel level, ChunkPos pos, ChunkPos playerPos) {
 			String key = level.dimension().identifier() + ":" + pos.pack();
+			Long capturedAt = lastCaptureTimes.get(key);
+			if (capturedAt != null && level.getGameTime() - capturedAt < WorldMapServerConfig.tileRefreshCooldownTicks())
+				return;
 			if (!queued.add(key))
 				return;
 			if (queue.size() >= MAX_PENDING_CAPTURES) {
@@ -322,7 +332,7 @@ public final class WorldMapTerrainCapture {
 		private void tick() {
 			long started = System.nanoTime();
 			int processed = 0;
-			while (processed < MAX_CAPTURES_PER_TICK && !queue.isEmpty()) {
+			while (processed < WorldMapServerConfig.maxCapturesPerTick() && !queue.isEmpty()) {
 				PendingChunk pending = queue.poll();
 				ChunkPos pos = ChunkPos.unpack(pending.chunkPos());
 				String queueKey = pending.dimension().identifier() + ":" + pending.chunkPos();
@@ -334,7 +344,15 @@ public final class WorldMapTerrainCapture {
 					repairWaiters.remove(queueKey);
 					skippedUnloaded++;
 				} else {
+					long captureStarted = System.nanoTime();
 					WorldMapTerrainTile tile = capture(chunk, level.getGameTime());
+					long captureElapsed = System.nanoTime() - captureStarted;
+					timedCaptures++;
+					totalCaptureNanos += captureElapsed;
+					maximumCaptureNanos = Math.max(maximumCaptureNanos, captureElapsed);
+					lastCaptureTimes.put(queueKey, level.getGameTime());
+					while (lastCaptureTimes.size() > MAX_PENDING_CAPTURES)
+						lastCaptureTimes.remove(lastCaptureTimes.keySet().iterator().next());
 					Set<UUID> waiters = repairWaiters.remove(queueKey);
 					submitWrite(() -> tile.writeAtomically(tilePath(server, pending.dimension(), pos)), true, () -> server.execute(() -> {
 						if (waiters == null) PacketDistributor.sendToPlayersTrackingChunk(level, pos, WorldMapTileDataMessage.from(tile));
@@ -345,14 +363,18 @@ public final class WorldMapTerrainCapture {
 						if (pending.repair()) repaired.incrementAndGet();
 					}), () -> {});
 				}
-				if (processed >= MIN_CAPTURES_PER_TICK && System.nanoTime() - started >= CAPTURE_BUDGET_NANOS) { if (!queue.isEmpty()) budgetStops++; break; }
+				if (processed >= MIN_CAPTURES_PER_TICK && System.nanoTime() - started >= WorldMapServerConfig.captureBudgetNanos()) { if (!queue.isEmpty()) budgetStops++; break; }
 			}
 			int tick = server.getTickCount();
 			if (tick % EXPLORATION_SAVE_INTERVAL_TICKS == 0)
 				flushExploration();
-			if (tick % DIAGNOSTIC_INTERVAL_TICKS == 0)
-				WitchercraftMod.LOGGER.info("World map capture: queued={}, captured={}, pending={}, skipped_unloaded={}, repair_requests={}, repaired={}, budget_stops={}, dropped_queue_full={}, failed={}",
-					enqueued, captured.get(), queue.size(), skippedUnloaded, repairRequests, repaired.get(), budgetStops, droppedQueueFull, failed.get());
+			if (tick % DIAGNOSTIC_INTERVAL_TICKS == 0) {
+				double averageCaptureMicros = timedCaptures == 0 ? 0.0 : totalCaptureNanos / (timedCaptures * 1_000.0);
+				WitchercraftMod.LOGGER.info("World map capture: queued={}, captured={}, pending={}, skipped_unloaded={}, repair_requests={}, repaired={}, budget_stops={}, dropped_queue_full={}, failed={}, avg_capture_us={}, max_capture_us={}",
+					enqueued, captured.get(), queue.size(), skippedUnloaded, repairRequests, repaired.get(), budgetStops, droppedQueueFull, failed.get(),
+					String.format(java.util.Locale.ROOT, "%.1f", averageCaptureMicros), String.format(java.util.Locale.ROOT, "%.1f", maximumCaptureNanos / 1_000.0));
+				timedCaptures = totalCaptureNanos = maximumCaptureNanos = 0;
+			}
 		}
 
 		private void flushExploration() {

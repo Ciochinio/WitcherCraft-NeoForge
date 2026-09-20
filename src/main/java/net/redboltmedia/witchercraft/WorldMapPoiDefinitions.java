@@ -5,6 +5,7 @@ import com.mojang.serialization.DataResult;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
+import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.FileToIdConverter;
@@ -28,6 +29,8 @@ public final class WorldMapPoiDefinitions {
 	private static final Identifier LISTENER_ID = Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "world_map_poi_definitions");
 	private static final FileToIdConverter FILES = FileToIdConverter.json("witchercraft_pois");
 	private static volatile Snapshot active = Snapshot.empty();
+	private static volatile Map<Identifier, WorldMapPoiDefinition.Template> latestDecoded = Map.of();
+	private static volatile HolderLookup.Provider latestRegistries;
 
 	private WorldMapPoiDefinitions() {
 	}
@@ -41,6 +44,14 @@ public final class WorldMapPoiDefinitions {
 		return active;
 	}
 
+	/** Re-resolve startup resources after NeoForge has loaded this world's SERVER config. */
+	@SubscribeEvent
+	public static void onServerAboutToStart(ServerAboutToStartEvent event) {
+		HolderLookup.Provider registries = latestRegistries;
+		if (registries != null)
+			new ReloadListener(registries).apply(latestDecoded, null, null);
+	}
+
 	private static final class ReloadListener extends SimpleJsonResourceReloadListener<WorldMapPoiDefinition.Template> {
 		private final HolderLookup.Provider registries;
 
@@ -51,12 +62,20 @@ public final class WorldMapPoiDefinitions {
 
 		@Override
 		protected void apply(Map<Identifier, WorldMapPoiDefinition.Template> decoded, ResourceManager manager, ProfilerFiller profiler) {
+			latestDecoded = Map.copyOf(decoded);
+			latestRegistries = registries;
+			if (!WorldMapServerConfig.poisEnabled()) {
+				publish(Map.of(), new WorldMapPoiProviders.PreparedProviders(Map.of()));
+				return;
+			}
 			List<Map.Entry<Identifier, WorldMapPoiDefinition.Template>> ordered = new ArrayList<>(decoded.entrySet());
 			ordered.sort(Map.Entry.comparingByKey(Comparator.comparing(Identifier::toString)));
 			Map<Identifier, WorldMapPoiDefinition> accepted = new LinkedHashMap<>();
 			Set<String> providerKeys = new HashSet<>();
 			int rejected = 0;
 			for (Map.Entry<Identifier, WorldMapPoiDefinition.Template> entry : ordered) {
+				if (!WorldMapServerConfig.poiDefinitionEnabled(entry.getKey()))
+					continue;
 				if (accepted.size() >= WorldMapPoiDefinition.MAX_DEFINITIONS) {
 					WitchercraftMod.LOGGER.error("Rejected POI definition {}: definition limit {} reached", entry.getKey(), WorldMapPoiDefinition.MAX_DEFINITIONS);
 					rejected++;
@@ -84,12 +103,18 @@ public final class WorldMapPoiDefinitions {
 				WitchercraftMod.LOGGER.error("Keeping the previous POI definition snapshot because provider preparation failed");
 				return;
 			}
-			long nextGeneration = active.generation() == Long.MAX_VALUE ? 1L : active.generation() + 1L;
-			Snapshot replacement = new Snapshot(Map.copyOf(accepted), prepared.get(), nextGeneration);
-			active = replacement;
-			WorldMapPoiManager.onDefinitionsReloaded(replacement);
+			publish(accepted, prepared.get());
 			WitchercraftMod.LOGGER.info("World-map POI definitions loaded: valid={}, rejected={}", accepted.size(), rejected);
 		}
+	}
+
+	private static void publish(Map<Identifier, WorldMapPoiDefinition> definitions, WorldMapPoiProviders.PreparedProviders providers) {
+		long nextGeneration = active.generation() == Long.MAX_VALUE ? 1L : active.generation() + 1L;
+		Snapshot replacement = new Snapshot(Map.copyOf(definitions), providers, nextGeneration);
+		active = replacement;
+		WorldMapPoiManager.onDefinitionsReloaded(replacement);
+		if (definitions.isEmpty() && !WorldMapServerConfig.poisEnabled())
+			WitchercraftMod.LOGGER.info("World-map POIs are disabled by world configuration");
 	}
 
 	public record Snapshot(Map<Identifier, WorldMapPoiDefinition> definitions, WorldMapPoiProviders.PreparedProviders providers, long generation) {

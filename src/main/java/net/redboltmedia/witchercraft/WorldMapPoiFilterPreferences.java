@@ -35,20 +35,22 @@ public final class WorldMapPoiFilterPreferences {
 
 	public static boolean personalWaypoints(UUID worldId) {
 		Preferences preferences = get(worldId, false);
-		return preferences == null || preferences.personalWaypoints;
+		return preferences == null ? WorldMapClientConfig.defaultPersonalWaypointsVisible() : preferences.personalWaypoints;
 	}
 
 	public static boolean poiVisible(UUID worldId, WorldMapPoiMarker marker) {
 		Preferences preferences = get(worldId, false);
 		Boolean override = preferences == null ? null : marker instanceof WorldMapPoiMarker.Unknown
 			? preferences.unknownPois : preferences.discoveredPois;
-		return override == null ? marker.defaultVisible() : override;
+		boolean configuredDefault = marker instanceof WorldMapPoiMarker.Unknown
+			? WorldMapClientConfig.defaultUnknownPoisVisible() : WorldMapClientConfig.defaultDiscoveredPoisVisible();
+		return override == null ? configuredDefault && marker.defaultVisible() : override;
 	}
 
 	public static DisplayState state(UUID worldId, Filter filter) {
 		Preferences preferences = get(worldId, false);
 		if (filter == Filter.PERSONAL_WAYPOINTS)
-			return preferences == null || preferences.personalWaypoints ? DisplayState.SHOWN : DisplayState.HIDDEN;
+			return (preferences == null ? WorldMapClientConfig.defaultPersonalWaypointsVisible() : preferences.personalWaypoints) ? DisplayState.SHOWN : DisplayState.HIDDEN;
 		Boolean value = preferences == null ? null : filter == Filter.UNKNOWN_POIS ? preferences.unknownPois : preferences.discoveredPois;
 		return value == null ? DisplayState.DEFAULT : value ? DisplayState.SHOWN : DisplayState.HIDDEN;
 	}
@@ -174,7 +176,7 @@ public final class WorldMapPoiFilterPreferences {
 	}
 
 	private static final class Preferences {
-		private boolean personalWaypoints = true;
+		private boolean personalWaypoints = WorldMapClientConfig.defaultPersonalWaypointsVisible();
 		private Boolean unknownPois;
 		private Boolean discoveredPois;
 	}

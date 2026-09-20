@@ -1067,7 +1067,8 @@ public final class WorldMapClientTileCache {
 		private static void loadTerrainRegion(Path expectedRoot, int regionX, int regionZ, long regionKey, long generation) {
 			Path path=terrainRegionPath(expectedRoot,regionX,regionZ); boolean queued=false;
 			try {
-				WorldMapTerrainTile[] loaded=WorldMapTerrainTile.readContainer(path,regionX,regionZ);
+				WorldMapTerrainTile[] loaded;
+				synchronized(regionFileLock(path)) { loaded=WorldMapTerrainTile.readContainer(path,regionX,regionZ); }
 				for(WorldMapTerrainTile tile:loaded)if(tile!=null){long key=ChunkPos.pack(tile.chunkX(),tile.chunkZ());if(TILES.containsKey(key))continue;loadingTiles.add(key);CACHED_TILES.add(new CachedTile(key,tile,generation));queued=true;}
 			} catch(IOException exception) {
 				for(int z=0;z<REGION_CHUNKS;z++)for(int x=0;x<REGION_CHUNKS;x++)tiles.remove(ChunkPos.pack(regionX*REGION_CHUNKS+x,regionZ*REGION_CHUNKS+z));
@@ -1079,7 +1080,7 @@ public final class WorldMapClientTileCache {
 
 		static void saveTile(WorldMapTerrainTile tile) {
 			Path currentRoot=root;if(!configured||currentRoot==null)return; long key=ChunkPos.pack(tile.chunkX(),tile.chunkZ());tiles.add(key);
-			WRITES.execute(() -> { try{WorldMapTerrainTile.writeContainerAtomically(terrainRegionPath(currentRoot,Math.floorDiv(tile.chunkX(),REGION_CHUNKS),Math.floorDiv(tile.chunkZ(),REGION_CHUNKS)),tile);}catch(IOException exception){WitchercraftMod.LOGGER.warn("Cannot save world map client tile {},{}",tile.chunkX(),tile.chunkZ(),exception);} });
+			WRITES.execute(() -> { Path path=terrainRegionPath(currentRoot,Math.floorDiv(tile.chunkX(),REGION_CHUNKS),Math.floorDiv(tile.chunkZ(),REGION_CHUNKS)); try{synchronized(regionFileLock(path)){WorldMapTerrainTile.writeContainerAtomically(path,tile);}}catch(IOException exception){WitchercraftMod.LOGGER.warn("Cannot save world map client tile {},{}",tile.chunkX(),tile.chunkZ(),exception);} });
 		}
 
 		static Path regionPath(int x,int z,long settingsKey) {

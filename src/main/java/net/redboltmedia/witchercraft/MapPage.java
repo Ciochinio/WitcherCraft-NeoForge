@@ -43,6 +43,7 @@ public final class MapPage implements GuiPage {
 	private double zoomAnchorScreenX;
 	private double zoomAnchorScreenY;
 	private boolean zoomAnimating;
+	private boolean hasPreviousView;
 	private boolean dragging;
 	private boolean creating;
 	private double createX;
@@ -73,8 +74,11 @@ public final class MapPage implements GuiPage {
 
 	@Override
 	public void onShown() {
-		zoom = 1.0;
-		targetZoom = 1.0;
+		boolean restore = WorldMapClientConfig.restorePreviousView() && hasPreviousView;
+		if (!restore) {
+			zoom = 1.0;
+			targetZoom = 1.0;
+		}
 		zoomAnimating = false;
 		dragging = false;
 		creating = false;
@@ -86,9 +90,12 @@ public final class MapPage implements GuiPage {
 		hoverSelection = null;
 		closeContextMenu();
 		contextPendingRequest = 0;
-		centerOnPlayer();
+		if (!restore)
+			centerOnPlayer();
+		hasPreviousView = true;
 		WorldMapClientTileCache.markViewDirty();
-		WorldMapWaypointClientCache.requestSnapshot();
+		if (WorldMapServerConfig.mapEnabled())
+			WorldMapWaypointClientCache.requestSnapshot();
 	}
 
 	@Override
@@ -103,16 +110,24 @@ public final class MapPage implements GuiPage {
 		placePendingPingIfReady();
 		g.fill(vx, vy, vx + vw, vy + vh, MapLayout.VIEW_BG);
 		g.enableScissor(vx, vy, vx + vw, vy + vh);
-		WorldMapClientTileCache.renderAndRequest(g, vx, vy, vw, vh, centerX, centerZ, zoom);
-		if (Minecraft.getInstance().player != null) {
+		boolean enabled = WorldMapServerConfig.mapEnabled();
+		if (enabled)
+			WorldMapClientTileCache.renderAndRequest(g, vx, vy, vw, vh, centerX, centerZ, zoom);
+		if (enabled && Minecraft.getInstance().player != null) {
 			Identifier dimension = Minecraft.getInstance().player.level().dimension().identifier();
 			WorldMapPoiClientCache.updateView(dimension, vw, vh, centerX, centerZ, zoom);
 			drawPois(g, dimension, vx, vy, vw, vh);
 		}
-		drawWaypoints(g, vx, vy, vw, vh);
-		hoverSelection = !creating && !manager.isOpen() && !filters.isOpen() && contextWaypoint == null
+		if (enabled)
+			drawWaypoints(g, vx, vy, vw, vh);
+		hoverSelection = enabled && !creating && !manager.isOpen() && !filters.isOpen() && contextWaypoint == null
 			? markerAt(mouseX, mouseY, vx, vy, vw, vh) : null;
-		drawPlayer(g, vx, vy, vw, vh);
+		if (enabled)
+			drawPlayer(g, vx, vy, vw, vh);
+		else {
+			Component disabled = Component.translatableWithFallback("gui.witchercraft.map.disabled", "The world map is disabled for this world.");
+			g.text(font, disabled, vx + (vw - font.width(disabled)) / 2, vy + vh / 2 - font.lineHeight / 2, MapLayout.TEXT_DIM, false);
+		}
 		if (creating)
 			drawCreationOverlay(g, font, vx, vy, vw, vh, mouseX, mouseY);
 		g.disableScissor();
@@ -121,7 +136,7 @@ public final class MapPage implements GuiPage {
 		int bx = x + MapLayout.BAR_X, by = y + MapLayout.BAR_Y;
 		int bw = Math.min(MapLayout.BAR_W, w - MapLayout.BAR_X);
 		g.fill(bx, by, bx + bw, by + MapLayout.BAR_H, MapLayout.BAR_BG);
-		boolean noModal = !creating && !manager.isOpen() && !filters.isOpen() && contextWaypoint == null;
+		boolean noModal = enabled && !creating && !manager.isOpen() && !filters.isOpen() && contextWaypoint == null;
 		drawButton(g, font, bx + MapLayout.WAYPOINTS_X, by + MapLayout.BUTTON_Y, MapLayout.WAYPOINTS_W, Component.translatableWithFallback("gui.witchercraft.map.waypoints", "Waypoints"), mouseX, mouseY, noModal);
 		drawButton(g, font, bx + MapLayout.FILTERS_X, by + MapLayout.BUTTON_Y, MapLayout.FILTERS_W, Component.translatableWithFallback("gui.witchercraft.map.filters", "Filters"), mouseX, mouseY, noModal);
 		drawButton(g, font, bx + MapLayout.CENTER_X, by + MapLayout.BUTTON_Y, MapLayout.CENTER_W, Component.translatableWithFallback("gui.witchercraft.map.center", "Center"), mouseX, mouseY, noModal);
@@ -143,6 +158,8 @@ public final class MapPage implements GuiPage {
 
 	@Override
 	public boolean mouseClicked(int x, int y, int w, int h, double mouseX, double mouseY, int button, boolean doubleClick) {
+		if (!WorldMapServerConfig.mapEnabled())
+			return true;
 		int vx = x + MapLayout.VIEW_X, vy = y + MapLayout.VIEW_Y;
 		int vw = Math.min(MapLayout.VIEW_W, w - MapLayout.VIEW_X);
 		int vh = Math.min(MapLayout.VIEW_H, h - MapLayout.VIEW_Y);
@@ -220,11 +237,11 @@ public final class MapPage implements GuiPage {
 			return true;
 		}
 		if (inside(mouseX, mouseY, bx + MapLayout.ZOOM_OUT_X, by, MapLayout.ZOOM_W, MapLayout.BUTTON_H)) {
-			setZoom(targetZoom / ZOOM_STEP, vx + MapLayout.VIEW_W / 2.0, vy + MapLayout.VIEW_H / 2.0, vx, vy);
+			setZoom(targetZoom / Math.pow(ZOOM_STEP, WorldMapClientConfig.zoomSensitivity()), vx + MapLayout.VIEW_W / 2.0, vy + MapLayout.VIEW_H / 2.0, vx, vy);
 			return true;
 		}
 		if (inside(mouseX, mouseY, bx + MapLayout.ZOOM_IN_X, by, MapLayout.ZOOM_W, MapLayout.BUTTON_H)) {
-			setZoom(targetZoom * ZOOM_STEP, vx + MapLayout.VIEW_W / 2.0, vy + MapLayout.VIEW_H / 2.0, vx, vy);
+			setZoom(targetZoom * Math.pow(ZOOM_STEP, WorldMapClientConfig.zoomSensitivity()), vx + MapLayout.VIEW_W / 2.0, vy + MapLayout.VIEW_H / 2.0, vx, vy);
 			return true;
 		}
 		return false;
@@ -266,7 +283,7 @@ public final class MapPage implements GuiPage {
 		int vx = x + MapLayout.VIEW_X, vy = y + MapLayout.VIEW_Y;
 		if (!inside(mouseX, mouseY, vx, vy, MapLayout.VIEW_W, MapLayout.VIEW_H) || scrollY == 0)
 			return false;
-		setZoom(targetZoom * Math.pow(ZOOM_STEP, scrollY), mouseX, mouseY, vx, vy);
+		setZoom(targetZoom * Math.pow(ZOOM_STEP, scrollY * WorldMapClientConfig.zoomSensitivity()), mouseX, mouseY, vx, vy);
 		return true;
 	}
 

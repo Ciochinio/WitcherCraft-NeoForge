@@ -36,7 +36,7 @@ public record WorldMapWaypointSnapshotMessage(List<WorldMapWaypoints.Waypoint> w
 		}
 	}, buffer -> {
 		int count = buffer.readVarInt();
-		if (count < 0 || count > WorldMapWaypoints.MAX_WAYPOINTS_PER_PLAYER)
+		if (count < 0 || count > WorldMapWaypoints.HARD_MAX_WAYPOINTS_PER_PLAYER)
 			throw new IllegalArgumentException("Invalid personal waypoint snapshot count");
 		List<WorldMapWaypoints.Waypoint> waypoints = new ArrayList<>(count);
 		for (int i = 0; i < count; i++) {
@@ -55,7 +55,7 @@ public record WorldMapWaypointSnapshotMessage(List<WorldMapWaypoints.Waypoint> w
 
 	public WorldMapWaypointSnapshotMessage {
 		waypoints = List.copyOf(waypoints);
-		if (waypoints.size() > WorldMapWaypoints.MAX_WAYPOINTS_PER_PLAYER)
+		if (waypoints.size() > WorldMapWaypoints.HARD_MAX_WAYPOINTS_PER_PLAYER)
 			throw new IllegalArgumentException("Too many personal waypoints in snapshot");
 	}
 

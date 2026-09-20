@@ -18,25 +18,41 @@ public final class WorldMapClientConfig {
 	private static final ModConfigSpec.DoubleValue FOLIAGE_OPACITY_SCALE;
 	private static final ModConfigSpec.DoubleValue DECORATION_OPACITY_SCALE;
 	private static final ModConfigSpec.DoubleValue MARKER_SCALE;
+	private static final ModConfigSpec.DoubleValue ZOOM_SENSITIVITY;
+	private static final ModConfigSpec.BooleanValue RESTORE_PREVIOUS_VIEW;
+	private static final ModConfigSpec.BooleanValue DISCOVERY_ACTION_BAR;
+	private static final ModConfigSpec.BooleanValue DEFAULT_PERSONAL_WAYPOINTS_VISIBLE;
+	private static final ModConfigSpec.BooleanValue DEFAULT_UNKNOWN_POIS_VISIBLE;
+	private static final ModConfigSpec.BooleanValue DEFAULT_DISCOVERED_POIS_VISIBLE;
 
 	static {
 		ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
-		builder.push("worldMap");
-		SHOW_DECORATIONS = builder.comment("Draw flowers, grass, and other small decorative blocks on the world map.").define("showDecorations", true);
-		TERRAIN_BRIGHTNESS = builder.comment("Overall world-map terrain brightness.").defineInRange("terrainBrightness", 1.0, 0.5, 1.5);
-		BIOME_COLOR_STRENGTH = builder.comment("Strength of biome grass and foliage colors.").defineInRange("biomeColorStrength", 0.9, 0.0, 1.0);
-		HILLSHADE_STRENGTH = builder.comment("Brightness contrast applied by world-map terrain slope shading.").defineInRange("hillshadeStrength", 0.75, 0.0, 1.5);
-		HILLSHADE_SLOPE_SENSITIVITY = builder.comment("Sensitivity of world-map terrain shading to height differences between neighboring blocks.").defineInRange("hillshadeSlopeSensitivity", 1.0, 0.25, 4.0);
-		CANOPY_RELIEF_STRENGTH = builder.comment("Multiplier for slope contrast within and along raised foliage on the world map.").defineInRange("canopyReliefStrength", 1.35, 0.0, 3.0);
-		CANOPY_SHADOW_STRENGTH = builder.comment("Maximum contact-shadow darkness beside raised foliage on the world map.").defineInRange("canopyShadowStrength", 0.35, 0.0, 0.6);
-		FOLIAGE_OPACITY_SCALE = builder.comment("Multiplier for texture-derived foliage coverage on the world map.").defineInRange("foliageOpacityScale", 1.0, 0.0, 2.0);
-		DECORATION_OPACITY_SCALE = builder.comment("Multiplier for texture-derived flower, grass, and decoration coverage on the world map.").defineInRange("decorationOpacityScale", 1.0, 0.0, 2.0);
-		MARKER_SCALE = builder.comment("Screen-size multiplier for the world-map player marker.").defineInRange("markerScale", 1.0, 0.5, 2.0);
+		builder.comment("Personal presentation and interaction settings for the WitcherCraft world map.")
+			.translation("witchercraft.configuration.world_map").push("worldMap");
+		SHOW_DECORATIONS = option(builder, "show_decorations", "Draw flowers, grass, and other small decorative blocks on the world map.").define("showDecorations", true);
+		TERRAIN_BRIGHTNESS = option(builder, "terrain_brightness", "Overall world-map terrain brightness.").defineInRange("terrainBrightness", 1.0, 0.5, 1.5);
+		BIOME_COLOR_STRENGTH = option(builder, "biome_color_strength", "Strength of biome grass and foliage colors.").defineInRange("biomeColorStrength", 0.9, 0.0, 1.0);
+		HILLSHADE_STRENGTH = option(builder, "hillshade_strength", "Brightness contrast applied by world-map terrain slope shading.").defineInRange("hillshadeStrength", 0.75, 0.0, 1.5);
+		HILLSHADE_SLOPE_SENSITIVITY = option(builder, "hillshade_slope_sensitivity", "Sensitivity of world-map terrain shading to height differences between neighboring blocks.").defineInRange("hillshadeSlopeSensitivity", 1.0, 0.25, 4.0);
+		CANOPY_RELIEF_STRENGTH = option(builder, "canopy_relief_strength", "Multiplier for slope contrast within and along raised foliage on the world map.").defineInRange("canopyReliefStrength", 1.35, 0.0, 3.0);
+		CANOPY_SHADOW_STRENGTH = option(builder, "canopy_shadow_strength", "Maximum contact-shadow darkness beside raised foliage on the world map.").defineInRange("canopyShadowStrength", 0.35, 0.0, 0.6);
+		FOLIAGE_OPACITY_SCALE = option(builder, "foliage_opacity_scale", "Multiplier for texture-derived foliage coverage on the world map.").defineInRange("foliageOpacityScale", 1.0, 0.0, 2.0);
+		DECORATION_OPACITY_SCALE = option(builder, "decoration_opacity_scale", "Multiplier for texture-derived flower, grass, and decoration coverage on the world map.").defineInRange("decorationOpacityScale", 1.0, 0.0, 2.0);
+		MARKER_SCALE = option(builder, "marker_scale", "Screen-size multiplier for world-map player, waypoint, and POI markers.").defineInRange("markerScale", 1.0, 0.5, 2.0);
+		ZOOM_SENSITIVITY = option(builder, "zoom_sensitivity", "Multiplier for mouse-wheel and zoom-button sensitivity.").defineInRange("zoomSensitivity", 1.0, 0.25, 4.0);
+		RESTORE_PREVIOUS_VIEW = option(builder, "restore_previous_view", "Restore the previous pan and zoom when reopening the map instead of centering on the player.").define("restorePreviousView", false);
+		DISCOVERY_ACTION_BAR = option(builder, "discovery_action_bar", "Show an action-bar message when a point of interest is discovered.").define("discoveryActionBar", true);
+		DEFAULT_PERSONAL_WAYPOINTS_VISIBLE = option(builder, "default_personal_waypoints_visible", "Show personal waypoints before a world-specific filter preference is saved.").define("defaultPersonalWaypointsVisible", true);
+		DEFAULT_UNKNOWN_POIS_VISIBLE = option(builder, "default_unknown_pois_visible", "Show unknown POIs before a world-specific filter preference is saved.").define("defaultUnknownPoisVisible", true);
+		DEFAULT_DISCOVERED_POIS_VISIBLE = option(builder, "default_discovered_pois_visible", "Show discovered POIs before a world-specific filter preference is saved.").define("defaultDiscoveredPoisVisible", true);
 		builder.pop();
 		SPEC = builder.build();
 	}
 
 	private WorldMapClientConfig() {}
+	private static ModConfigSpec.Builder option(ModConfigSpec.Builder builder, String key, String comment) {
+		return builder.comment(comment).translation("witchercraft.configuration.world_map." + key);
+	}
 	public static void register() {
 		ModContainer container = ModList.get().getModContainerById(WitchercraftMod.MODID)
 			.orElseThrow(() -> new IllegalStateException("WitcherCraft mod container is unavailable during client-config registration"));
@@ -52,4 +68,10 @@ public final class WorldMapClientConfig {
 	public static double foliageOpacityScale() { return FOLIAGE_OPACITY_SCALE.getAsDouble(); }
 	public static double decorationOpacityScale() { return DECORATION_OPACITY_SCALE.getAsDouble(); }
 	public static double markerScale() { return MARKER_SCALE.getAsDouble(); }
+	public static double zoomSensitivity() { return ZOOM_SENSITIVITY.getAsDouble(); }
+	public static boolean restorePreviousView() { return RESTORE_PREVIOUS_VIEW.getAsBoolean(); }
+	public static boolean discoveryActionBar() { return DISCOVERY_ACTION_BAR.getAsBoolean(); }
+	public static boolean defaultPersonalWaypointsVisible() { return DEFAULT_PERSONAL_WAYPOINTS_VISIBLE.getAsBoolean(); }
+	public static boolean defaultUnknownPoisVisible() { return DEFAULT_UNKNOWN_POIS_VISIBLE.getAsBoolean(); }
+	public static boolean defaultDiscoveredPoisVisible() { return DEFAULT_DISCOVERED_POIS_VISIBLE.getAsBoolean(); }
 }
