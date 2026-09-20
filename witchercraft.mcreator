@@ -12,7 +12,8 @@
           "src/main/resources/data/witchercraft/worldgen/template_pool/poi_test_structure.json",
           "src/main/resources/data/witchercraft/worldgen/structure_set/poi_test_structure.json"
         ]
-      }
+      },
+      "path": "~/Structures"
     },
     {
       "name": "WitcherGuiScreen",
@@ -440,7 +441,7 @@
           "src/main/java/net/redboltmedia/witchercraft/MapPage.java"
         ]
       },
-      "path": "~/World Map"
+      "path": "~/World Map/GUI"
     },
     {
       "name": "MapLayout",
@@ -453,7 +454,7 @@
           "src/main/java/net/redboltmedia/witchercraft/MapLayout.java"
         ]
       },
-      "path": "~/World Map"
+      "path": "~/World Map/GUI"
     },
     {
       "name": "MeditationRejectMessage",
@@ -479,7 +480,7 @@
           "src/main/java/net/redboltmedia/witchercraft/WorldMapTerrainTile.java"
         ]
       },
-      "path": "~/World Map"
+      "path": "~/World Map/Terrain"
     },
     {
       "name": "WorldMapTerrainCapture",
@@ -492,7 +493,7 @@
           "src/main/java/net/redboltmedia/witchercraft/WorldMapTerrainCapture.java"
         ]
       },
-      "path": "~/World Map"
+      "path": "~/World Map/Terrain"
     },
     {
       "name": "WorldMapWaypoints",
@@ -505,7 +506,7 @@
           "src/main/java/net/redboltmedia/witchercraft/WorldMapWaypoints.java"
         ]
       },
-      "path": "~/World Map"
+      "path": "~/World Map/Waypoints"
     },
     {
       "name": "WorldMapPoiDefinition",
@@ -518,7 +519,7 @@
           "src/main/java/net/redboltmedia/witchercraft/WorldMapPoiDefinition.java"
         ]
       },
-      "path": "~/World Map"
+      "path": "~/World Map/POI"
     },
     {
       "name": "WorldMapPoiProvider",
@@ -531,7 +532,7 @@
           "src/main/java/net/redboltmedia/witchercraft/WorldMapPoiProvider.java"
         ]
       },
-      "path": "~/World Map"
+      "path": "~/World Map/POI"
     },
     {
       "name": "WorldMapPoiInstance",
@@ -544,7 +545,7 @@
           "src/main/java/net/redboltmedia/witchercraft/WorldMapPoiInstance.java"
         ]
       },
-      "path": "~/World Map"
+      "path": "~/World Map/POI"
     },
     {
       "name": "WorldMapPoiProviders",
@@ -557,7 +558,7 @@
           "src/main/java/net/redboltmedia/witchercraft/WorldMapPoiProviders.java"
         ]
       },
-      "path": "~/World Map"
+      "path": "~/World Map/POI"
     },
     {
       "name": "WorldMapStructurePoiProvider",
@@ -570,7 +571,7 @@
           "src/main/java/net/redboltmedia/witchercraft/WorldMapStructurePoiProvider.java"
         ]
       },
-      "path": "~/World Map"
+      "path": "~/World Map/POI"
     },
     {
       "name": "WorldMapPoiDefinitions",
@@ -583,7 +584,7 @@
           "src/main/java/net/redboltmedia/witchercraft/WorldMapPoiDefinitions.java"
         ]
       },
-      "path": "~/World Map"
+      "path": "~/World Map/POI"
     },
     {
       "name": "WorldMapPoiManager",
@@ -596,7 +597,7 @@
           "src/main/java/net/redboltmedia/witchercraft/WorldMapPoiManager.java"
         ]
       },
-      "path": "~/World Map"
+      "path": "~/World Map/POI"
     },
     {
       "name": "WorldMapWaypointClientCache",
@@ -609,7 +610,7 @@
           "src/main/java/net/redboltmedia/witchercraft/WorldMapWaypointClientCache.java"
         ]
       },
-      "path": "~/World Map"
+      "path": "~/World Map/Waypoints"
     },
     {
       "name": "WorldMapWaypointMutationMessage",
@@ -622,7 +623,7 @@
           "src/main/java/net/redboltmedia/witchercraft/WorldMapWaypointMutationMessage.java"
         ]
       },
-      "path": "~/World Map"
+      "path": "~/World Map/Waypoints"
     },
     {
       "name": "WorldMapWaypointSnapshotMessage",
@@ -635,7 +636,7 @@
           "src/main/java/net/redboltmedia/witchercraft/WorldMapWaypointSnapshotMessage.java"
         ]
       },
-      "path": "~/World Map"
+      "path": "~/World Map/Waypoints"
     },
     {
       "name": "WorldMapWaypointResultMessage",
@@ -648,7 +649,7 @@
           "src/main/java/net/redboltmedia/witchercraft/WorldMapWaypointResultMessage.java"
         ]
       },
-      "path": "~/World Map"
+      "path": "~/World Map/Waypoints"
     },
     {
       "name": "WorldMapWaypointManagerOverlay",
@@ -661,7 +662,7 @@
           "src/main/java/net/redboltmedia/witchercraft/WorldMapWaypointManagerOverlay.java"
         ]
       },
-      "path": "~/World Map"
+      "path": "~/World Map/Waypoints"
     },
     {
       "name": "PauseMenuGuiOpen",
@@ -709,7 +710,7 @@
           "src/main/java/net/redboltmedia/witchercraft/WorldMapTileRequestCompleteMessage.java"
         ]
       },
-      "path": "~/World Map"
+      "path": "~/World Map/Terrain"
     },
     {
       "name": "WorldMapClientConfig",
@@ -722,7 +723,7 @@
           "src/main/java/net/redboltmedia/witchercraft/WorldMapClientConfig.java"
         ]
       },
-      "path": "~/World Map"
+      "path": "~/World Map/GUI"
     },
     {
       "name": "WorldMapClientTileCache",
@@ -735,7 +736,7 @@
           "src/main/java/net/redboltmedia/witchercraft/WorldMapClientTileCache.java"
         ]
       },
-      "path": "~/World Map"
+      "path": "~/World Map/Terrain"
     },
     {
       "name": "WorldMapTileDataMessage",
@@ -748,7 +749,7 @@
           "src/main/java/net/redboltmedia/witchercraft/WorldMapTileDataMessage.java"
         ]
       },
-      "path": "~/World Map"
+      "path": "~/World Map/Terrain"
     },
     {
       "name": "WorldMapTileRequestMessage",
@@ -761,7 +762,7 @@
           "src/main/java/net/redboltmedia/witchercraft/WorldMapTileRequestMessage.java"
         ]
       },
-      "path": "~/World Map"
+      "path": "~/World Map/Terrain"
     },
     {
       "name": "AlchemyGui",
@@ -11341,6 +11342,27 @@
       },
       {
         "name": "World Map",
+        "children": [
+          {
+            "name": "GUI",
+            "children": []
+          },
+          {
+            "name": "Terrain",
+            "children": []
+          },
+          {
+            "name": "Waypoints",
+            "children": []
+          },
+          {
+            "name": "POI",
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "Structures",
         "children": []
       }
     ]

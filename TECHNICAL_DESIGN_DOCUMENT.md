@@ -1596,3 +1596,32 @@ The element intentionally contains no POI registration logic. Later Milestone 4 
 structure start from already loaded chunk data and map its stable start chunk to a POI instance. Keeping
 the test structure separate proves that later structures can join the POI system through data and provider
 matching instead of copied Java classes.
+
+### 5.11 Milestone 4B POI definitions and providers
+
+POI kinds are datapack resources under `data/<namespace>/witchercraft_pois/<path>.json`; the resource path
+becomes the definition ID. A structure type is registered once, and every generated start of that structure
+becomes an instance automatically. Adding another structure POI does not require Java registration: create
+the MCreator structure element and add one definition JSON. Presentation fields may be omitted to use the
+shared defaults (256-block reveal, 32-block discovery and uncertainty, visible by default, 0.25 minimum zoom,
+the `witchercraft:general` category, and the shared default icon). Unique art and localization remain ordinary
+optional resource additions.
+
+`WorldMapPoiDefinitions` owns the server reload listener and publishes immutable, fully prepared snapshots.
+Every resource is decoded and validated independently, so a bad definition is logged with its ID without
+discarding valid neighbors. Validation bounds definition and capability counts, identifiers, radii, zoom,
+provider types, structure references, and duplicate claims on one provider source. Reload reconciliation marks
+retained runtime instances inactive when their definition is absent or no longer matches; Batch 4C will make
+those retained records persistent.
+
+`WorldMapPoiProvider` is the reusable loaded-world-object contract, and `WorldMapPoiProviders` is its internal
+type registry. Only `witchercraft:structure` exists in this batch. Its reload preparation resolves definitions
+into a structure-object lookup, while observation reads `StructureStart` values directly from the `LevelChunk`
+provided by `ChunkWatchEvent.Watch`. It never locates, generates, tickets, or requests a chunk. Starts that are
+not present in the watched loaded chunk are simply ignored.
+
+The structure provider anchors a marker at the structure bounding-box center. Its canonical identity is provider
+type, structure registry ID, dimension ID, and structure start chunk. `WorldMapPoiInstance` derives a deterministic
+UUID from that identity, so repeat observations by multiple players refresh one entry. `WorldMapPoiManager` owns
+the Batch 4B in-memory instance map, logs a newly observed instance immediately, and emits bounded aggregate
+diagnostics every 1,200 server ticks. Shared and per-player `SavedData` remain Batch 4C work.
