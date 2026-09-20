@@ -21,8 +21,8 @@ public final class MapPage implements GuiPage {
 	private static final int WAYPOINT_MARKER_BASE_SIZE = 22;
 	private static final int ATLAS_WIDTH = 1774;
 	private static final int ATLAS_HEIGHT = 887;
-	private static final Identifier PLAYER_MARKER = Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "textures/gui/map/player_arrow.png");
-	private static final Identifier WAYPOINT_ICONS = Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "textures/gui/map/waypoint_icons.png");
+	private static final Identifier PLAYER_MARKER = Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "textures/screens/map_player_arrow.png");
+	private static final Identifier WAYPOINT_ICONS = Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "textures/screens/map_waypoint_icons.png");
 	private final WorldMapWaypointManagerOverlay manager = new WorldMapWaypointManagerOverlay(this::showOnMap);
 
 	private double centerX;

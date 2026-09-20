@@ -6,7 +6,7 @@
   },
   "translation_key": "poi.witchercraft.poi_test_structure",
   "category": "witchercraft:test",
-  "icon": "witchercraft:textures/gui/map/poi/poi_test_structure.png",
+  "icon": "witchercraft:textures/screens/map_poi_poi_test_structure.png",
   "reveal_radius": 256,
   "discovery_radius": 32,
   "uncertainty_radius": 32,

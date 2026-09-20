@@ -55,9 +55,9 @@ public final class PerkRegistry {
 
 	/**
 	 * Lowercase icon slug for an id, or "" if empty/unknown. Matches the cleaned
-	 * icon filenames under textures/screens/perk/ (&lt;slug&gt;.png = unlit,
-	 * &lt;slug&gt;_lit.png = lit), which were copied from the old per-perk GUI
-	 * icons into consistent names. slug == name().toLowerCase() for every perk.
+	 * flat icon filenames under textures/screens/ (&lt;slug&gt;_notlearned.png,
+	 * &lt;slug&gt;_notequipped.png, and &lt;slug&gt;_equipped.png). These names keep
+	 * all three states visible to MCreator. slug == name().toLowerCase() for every perk.
 	 */
 	public static String slug(int id) {
 		int i = indexOf(id);

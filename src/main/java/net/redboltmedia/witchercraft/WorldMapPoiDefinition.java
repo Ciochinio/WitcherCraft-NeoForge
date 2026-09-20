@@ -23,7 +23,7 @@ public record WorldMapPoiDefinition(Identifier id, WorldMapPoiProviders.Binding<
 	public static final double MAXIMUM_MAP_ZOOM = 16.0;
 
 	private static final Identifier DEFAULT_CATEGORY = Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "general");
-	private static final Identifier DEFAULT_ICON = Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "textures/gui/map/poi/default.png");
+	private static final Identifier DEFAULT_ICON = Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "textures/screens/map_poi_default.png");
 
 	/**
 	 * File payload codec. The definition ID is deliberately supplied from the resource path,

@@ -138,7 +138,7 @@
         <p class="muted">Every navbar tab needs three things to become a real, working page: a <b>NAV entry</b> (this tool), a <b>GuiPage class</b> (code), and being <b>registered</b> so the shell can find it. Follow these steps for a new page, e.g. <code>"crafting"</code>:</p>
         <ol>
           <li><span class="step-title">1. Add the nav tab.</span> Click <b>+ Nav tab</b> above, set its <code>pageId</code> (e.g. <code>crafting</code>), a <code>labelKey</code> (a lang key you'll add to <code>en_us.json</code>), and optionally an <code>icon</code> texture path. Reorder with the arrows. It will show as "Coming soon" in-game until step 3.</li>
-          <li><span class="step-title">2. Give it a background (optional but recommended).</span> Set the tab's <code>background</code> field to a texture path, e.g. <code>witchercraft:textures/gui/shell/backgrounds/crafting.png</code> - author that PNG at the design canvas's aspect ratio (16:9 by default) and drop it in <code>src/main/resources/assets/witchercraft/textures/gui/shell/backgrounds/</code>. Leave it blank to use the shared fallback BG.</li>
+          <li><span class="step-title">2. Give it a background (optional but recommended).</span> Set the tab's <code>background</code> field to a texture path, e.g. <code>witchercraft:textures/screens/shell_background_crafting.png</code> - author that PNG at the design canvas's aspect ratio (16:9 by default) and drop it in <code>src/main/resources/assets/witchercraft/textures/screens/</code>. Leave it blank to use the shared fallback BG.</li>
           <li><span class="step-title">3. Write the page class.</span> In the base package <code>net.redboltmedia.witchercraft</code> (so it opens as a <code>code</code> element in MCreator), create e.g. <code>CraftingPage.java</code> implementing <code>GuiPage</code>:
             <pre class="code">public class CraftingPage implements GuiPage {
     public String id() { return "crafting"; }
@@ -173,7 +173,7 @@ CUSTOM.put(crafting.id(), crafting);</pre>
 // ---- seed = current WitcherGuiLayout.java ---------------------------------
 const SEED = {
   DESIGN_W:640, DESIGN_H:360, CONTENT_MARGIN:3,
-  BG:"witchercraft:textures/gui/shell/background.png",
+  BG:"witchercraft:textures/screens/shell_background.png",
   NAV_Y:8, NAV_H:30, NAV_TAB_W:78, NAV_GAP:4, NAV_ICON:20,
   // level + XP readout (drawn left of the centred tab group)
   LEVEL_X:6, LEVEL_Y:10, LEVEL_SCALE:2,
@@ -182,12 +182,12 @@ const SEED = {
   LEVEL_TEXT_COLOR:"0xFFFFDD55", XP_BAR_BG_COLOR:"0xFF201D14",
   XP_BAR_FILL_COLOR:"0xFFFFDD55", XP_TEXT_COLOR:"0xFFC9C9D2",
   NAV: [
-    {pageId:"glossary",  labelKey:"gui.witchercraft.shell.nav.glossary",  icon:"witchercraft:textures/gui/nav/glossary.png",  background:"witchercraft:textures/gui/shell/backgrounds/glossary.png"},
-    {pageId:"alchemy",   labelKey:"gui.witchercraft.shell.nav.alchemy",   icon:"witchercraft:textures/gui/nav/alchemy.png",   background:"witchercraft:textures/gui/shell/backgrounds/alchemy.png"},
-    {pageId:"inventory", labelKey:"gui.witchercraft.shell.nav.inventory", icon:"witchercraft:textures/gui/nav/inventory.png", background:"witchercraft:textures/gui/shell/backgrounds/inventory.png"},
-    {pageId:"map",       labelKey:"gui.witchercraft.shell.nav.map",       icon:"witchercraft:textures/gui/nav/map.png",       background:"witchercraft:textures/gui/shell/backgrounds/map.png"},
-    {pageId:"skills",    labelKey:"gui.witchercraft.shell.nav.skills",    icon:"witchercraft:textures/gui/nav/skills.png",    background:"witchercraft:textures/gui/shell/backgrounds/skills.png"},
-    {pageId:"meditation",labelKey:"gui.witchercraft.shell.nav.meditation",icon:"witchercraft:textures/gui/nav/meditation.png",background:"witchercraft:textures/gui/shell/backgrounds/meditation.png"},
+    {pageId:"glossary",  labelKey:"gui.witchercraft.shell.nav.glossary",  icon:"witchercraft:textures/screens/nav_glossary.png",  background:"witchercraft:textures/screens/shell_background_glossary.png"},
+    {pageId:"alchemy",   labelKey:"gui.witchercraft.shell.nav.alchemy",   icon:"witchercraft:textures/screens/nav_alchemy.png",   background:"witchercraft:textures/screens/shell_background_alchemy.png"},
+    {pageId:"inventory", labelKey:"gui.witchercraft.shell.nav.inventory", icon:"witchercraft:textures/screens/nav_inventory.png", background:"witchercraft:textures/screens/shell_background_inventory.png"},
+    {pageId:"map",       labelKey:"gui.witchercraft.shell.nav.map",       icon:"witchercraft:textures/screens/nav_map.png",       background:"witchercraft:textures/screens/shell_background_map.png"},
+    {pageId:"skills",    labelKey:"gui.witchercraft.shell.nav.skills",    icon:"witchercraft:textures/screens/nav_skills.png",    background:"witchercraft:textures/screens/shell_background_skills.png"},
+    {pageId:"meditation",labelKey:"gui.witchercraft.shell.nav.meditation",icon:"witchercraft:textures/screens/nav_meditation.png",background:"witchercraft:textures/screens/shell_background_meditation.png"},
   ],
 };
 let S = structuredClone(SEED);

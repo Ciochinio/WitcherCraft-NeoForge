@@ -257,7 +257,7 @@ public class PerkPage implements GuiPage {
 
 	// ---- perk icons (32x32 source, scaled to the target cell) ----------------
 
-	// Each perk has its own folder textures/screens/perk/<slug>/ with three state
+	// Each perk has three flat MCreator-visible textures/screens/<slug>_<state>
 	// glyphs. The coloured frame / selection highlight is drawn by the GUI, not
 	// baked into the glyph, so these are bare icons.
 	private static final int ICON_NOTLEARNED = 0, ICON_NOTEQUIPPED = 1, ICON_EQUIPPED = 2;
@@ -272,8 +272,8 @@ public class PerkPage implements GuiPage {
 		String slug = PerkRegistry.slug(perkId);
 		if (slug.isEmpty())
 			return null;
-		String key = slug + "/" + ICON_STATE[state];
-		return ICON_CACHE.computeIfAbsent(key, k -> Identifier.parse("witchercraft:textures/screens/perk/" + k + ".png"));
+		String key = slug + "_" + ICON_STATE[state];
+		return ICON_CACHE.computeIfAbsent(key, k -> Identifier.parse("witchercraft:textures/screens/" + k + ".png"));
 	}
 
 	/** Draw a perk's glyph filling a size x size cell at (x, y). Falls back to

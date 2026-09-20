@@ -26,7 +26,7 @@ public final class WitcherGuiLayout {
 
 	// --- fullscreen background --------------------------------------------------
 	// Fallback used when a page has no entry in BACKGROUNDS below.
-	public static final String BG = "witchercraft:textures/gui/shell/background.png";
+	public static final String BG = "witchercraft:textures/screens/shell_background.png";
 
 	// --- navbar (centred group of fixed-width tabs, drawn over the background) -
 	public static final int NAV_Y = 8;
@@ -74,12 +74,12 @@ public final class WitcherGuiLayout {
 
 	// --- navbar ---------------------------------------------------------------
 	public static final Nav[] NAV = {
-			new Nav("glossary", "gui.witchercraft.shell.nav.glossary", "witchercraft:textures/gui/nav/glossary.png"),
-			new Nav("alchemy", "gui.witchercraft.shell.nav.alchemy", "witchercraft:textures/gui/nav/alchemy.png"),
-			new Nav("inventory", "gui.witchercraft.shell.nav.inventory", "witchercraft:textures/gui/nav/inventory.png"),
-			new Nav("map", "gui.witchercraft.shell.nav.map", "witchercraft:textures/gui/nav/map.png"),
-			new Nav("skills", "gui.witchercraft.shell.nav.skills", "witchercraft:textures/gui/nav/skills.png"),
-			new Nav("meditation", "gui.witchercraft.shell.nav.meditation", "witchercraft:textures/gui/nav/meditation.png"),
+			new Nav("glossary", "gui.witchercraft.shell.nav.glossary", "witchercraft:textures/screens/nav_glossary.png"),
+			new Nav("alchemy", "gui.witchercraft.shell.nav.alchemy", "witchercraft:textures/screens/nav_alchemy.png"),
+			new Nav("inventory", "gui.witchercraft.shell.nav.inventory", "witchercraft:textures/screens/nav_inventory.png"),
+			new Nav("map", "gui.witchercraft.shell.nav.map", "witchercraft:textures/screens/nav_map.png"),
+			new Nav("skills", "gui.witchercraft.shell.nav.skills", "witchercraft:textures/screens/nav_skills.png"),
+			new Nav("meditation", "gui.witchercraft.shell.nav.meditation", "witchercraft:textures/screens/nav_meditation.png"),
 	};
 
 	// ==========================================================================
@@ -96,12 +96,12 @@ public final class WitcherGuiLayout {
 	}
 
 	public static final Background[] BACKGROUNDS = {
-			new Background("glossary", "witchercraft:textures/gui/shell/backgrounds/glossary.png"),
-			new Background("alchemy", "witchercraft:textures/gui/shell/backgrounds/alchemy.png"),
-			new Background("inventory", "witchercraft:textures/gui/shell/backgrounds/inventory.png"),
-			new Background("map", "witchercraft:textures/gui/shell/backgrounds/map.png"),
-			new Background("skills", "witchercraft:textures/gui/shell/backgrounds/skills.png"),
-			new Background("meditation", "witchercraft:textures/gui/shell/backgrounds/meditation.png"),
+			new Background("glossary", "witchercraft:textures/screens/shell_background_glossary.png"),
+			new Background("alchemy", "witchercraft:textures/screens/shell_background_alchemy.png"),
+			new Background("inventory", "witchercraft:textures/screens/shell_background_inventory.png"),
+			new Background("map", "witchercraft:textures/screens/shell_background_map.png"),
+			new Background("skills", "witchercraft:textures/screens/shell_background_skills.png"),
+			new Background("meditation", "witchercraft:textures/screens/shell_background_meditation.png"),
 	};
 
 	// --- lookups (kept trivial so the tool can regenerate the class) ----------

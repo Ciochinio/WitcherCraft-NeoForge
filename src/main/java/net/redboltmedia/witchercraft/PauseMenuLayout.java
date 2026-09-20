@@ -27,7 +27,7 @@ public final class PauseMenuLayout {
 	public static final int DESIGN_H = 360;
 
 	// --- background (fills the 16:9 design canvas; black letterbox elsewhere) --
-	public static final String BG = "witchercraft:textures/gui/shell/background.png";
+	public static final String BG = "witchercraft:textures/screens/shell_background.png";
 
 	// --- navbar (centred group of fixed-width tabs; bigger than the shell's) ---
 	public static final int NAV_Y = 150;
@@ -54,12 +54,12 @@ public final class PauseMenuLayout {
 
 	// --- tabs (same set as the navbar) ----------------------------------------
 	public static final Nav[] NAV = {
-			new Nav("glossary", "gui.witchercraft.shell.nav.glossary", "witchercraft:textures/gui/nav/glossary.png"),
-			new Nav("alchemy", "gui.witchercraft.shell.nav.alchemy", "witchercraft:textures/gui/nav/alchemy.png"),
-			new Nav("inventory", "gui.witchercraft.shell.nav.inventory", "witchercraft:textures/gui/nav/inventory.png"),
-			new Nav("map", "gui.witchercraft.shell.nav.map", "witchercraft:textures/gui/nav/map.png"),
-			new Nav("skills", "gui.witchercraft.shell.nav.skills", "witchercraft:textures/gui/nav/skills.png"),
-			new Nav("meditation", "gui.witchercraft.shell.nav.meditation", "witchercraft:textures/gui/nav/meditation.png"),
+			new Nav("glossary", "gui.witchercraft.shell.nav.glossary", "witchercraft:textures/screens/nav_glossary.png"),
+			new Nav("alchemy", "gui.witchercraft.shell.nav.alchemy", "witchercraft:textures/screens/nav_alchemy.png"),
+			new Nav("inventory", "gui.witchercraft.shell.nav.inventory", "witchercraft:textures/screens/nav_inventory.png"),
+			new Nav("map", "gui.witchercraft.shell.nav.map", "witchercraft:textures/screens/nav_map.png"),
+			new Nav("skills", "gui.witchercraft.shell.nav.skills", "witchercraft:textures/screens/nav_skills.png"),
+			new Nav("meditation", "gui.witchercraft.shell.nav.meditation", "witchercraft:textures/screens/nav_meditation.png"),
 	};
 
 	// --- lookups (kept trivial so the tool can regenerate the class) ----------

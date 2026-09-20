@@ -785,8 +785,8 @@ divergence risk the way the `en_us.json` gotcha (3.11) is.
   the meditation-redesign slice 4, and the ESC pause-menu "Meditation" button now opens the shell tab
   client-side (like the Skills button). Alchemy, Glossary, etc. still remain their own container
   screens - they can be re-homed as pages later, or bridged (a tab that opens the old screen).
-- **Placeholder art.** The navbar icons (`textures/gui/nav/<page>.png`) and every page's background
-  (`textures/gui/shell/backgrounds/<page>.png`, falling back to `textures/gui/shell/background.png`)
+- **Placeholder art.** The navbar icons (`textures/screens/nav_<page>.png`) and every page's background
+  (`textures/screens/shell_background_<page>.png`, falling back to `textures/screens/shell_background.png`)
   are generated placeholders meant to be replaced. Backgrounds are fit to the 16:9 design canvas
   (black letterbox on other screen aspects, no screen-aspect distortion), but a replacement image that
   is not itself 16:9 will be stretched to the canvas - author each at `DESIGN_W:DESIGN_H`.
@@ -846,8 +846,8 @@ A perk touches several files that must stay in sync. In order:
    state) and `PerkEquipGuiButtonMessage.prereqsMet` (server, the actual learn gate). Keep both in sync
    by hand if you ever change this rule; it is intentionally duplicated rather than shared, the same way
    the rest of the equip screen keeps client-render and server-authority logic separate.
-4. **Icon** - a folder `assets/witchercraft/textures/screens/perk/<slug>/` with three 32x32 glyphs:
-   `notlearned.png` (locked or available), `notequipped.png` (learned but not slotted), `equipped.png`
+4. **Icon** - three flat, MCreator-visible 32x32 glyphs under `assets/witchercraft/textures/screens/`:
+   `<slug>_notlearned.png` (locked or available), `<slug>_notequipped.png` (learned but not slotted), `<slug>_equipped.png`
    (slotted). Bare glyph only - no baked-in frame or background; the coloured cell border and selection
    ring are drawn by `PerkPage` around whatever the icon is. Missing files fall back to a 3-letter text
    abbreviation, so a half-finished icon set degrades visibly rather than crashing.
@@ -1475,7 +1475,7 @@ edge-fade experiments were removed because rebuilding those masks caused unaccep
 regions do not create GPU textures, and no fog state enters terrain capture, persistence, or network
 messages.
 Milestone 2D.8 replaces the diagnostic cross with the 64 by 64 resource-pack texture
-`textures/gui/map/player_arrow.png`. `MapPage` draws it at a base 16 by 16 screen pixels and rotates it
+`textures/screens/map_player_arrow.png`. `MapPage` draws it at a base 16 by 16 screen pixels and rotates it
 around the player position using client player yaw. Batch 3 later changed both player and waypoint markers
 to multiply their base size by the square root of map zoom, clamped from 0.5 to 2.5, and then by the client
 `markerScale` setting from 0.5 to 2.0. Marker-style configuration remains postponed.
@@ -1547,7 +1547,7 @@ Each frame chooses the nearest marker beneath the cursor. That hovered marker ap
 card near the bottom of the map. Left input remains reserved for panning. The card data accepts a name, detail
 line, and color so future POIs can put their description in the detail line without changing its renderer.
 
-The temporary pin and seven saved icons use `textures/gui/map/waypoint_icons.png`, a transparent 4 by 2
+The temporary pin and seven saved icons use `textures/screens/map_waypoint_icons.png`, a transparent 4 by 2
 atlas. Its fixed order is pin, home, camp, chest, danger, herb, monster, and quest. The checked-in atlas
 contains deliberately simple pixel placeholders and is 1774 by 887 pixels. Replacements
 must retain those dimensions, cell order, transparent padding, and grid. The renderer multiplies neutral icon
