@@ -24,6 +24,13 @@ public final class WorldMapClientConfig {
 	private static final ModConfigSpec.BooleanValue DEFAULT_PERSONAL_WAYPOINTS_VISIBLE;
 	private static final ModConfigSpec.BooleanValue DEFAULT_UNKNOWN_POIS_VISIBLE;
 	private static final ModConfigSpec.BooleanValue DEFAULT_DISCOVERED_POIS_VISIBLE;
+	private static final ModConfigSpec.BooleanValue MINIMAP_ENABLED;
+	private static final ModConfigSpec.EnumValue<MinimapCorner> MINIMAP_CORNER;
+	private static final ModConfigSpec.BooleanValue MINIMAP_ROTATION;
+	private static final ModConfigSpec.DoubleValue MINIMAP_ZOOM;
+	private static final ModConfigSpec.IntValue MINIMAP_SIZE;
+
+	public enum MinimapCorner { TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT }
 
 	static {
 		ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
@@ -46,12 +53,23 @@ public final class WorldMapClientConfig {
 		DEFAULT_UNKNOWN_POIS_VISIBLE = option(builder, "default_unknown_pois_visible", "Show unknown POIs before a world-specific filter preference is saved.").define("defaultUnknownPoisVisible", true);
 		DEFAULT_DISCOVERED_POIS_VISIBLE = option(builder, "default_discovered_pois_visible", "Show discovered POIs before a world-specific filter preference is saved.").define("defaultDiscoveredPoisVisible", true);
 		builder.pop();
+		builder.comment("Personal presentation settings for the WitcherCraft minimap.")
+			.translation("witchercraft.configuration.minimap").push("minimap");
+		MINIMAP_ENABLED = minimapOption(builder, "enabled", "Show the WitcherCraft minimap when the server permits it.").define("enabled", true);
+		MINIMAP_CORNER = minimapOption(builder, "corner", "Screen corner occupied by the minimap.").defineEnum("corner", MinimapCorner.TOP_RIGHT);
+		MINIMAP_ROTATION = minimapOption(builder, "rotation", "Rotate the minimap so the player's facing direction remains at the top. When disabled, north remains at the top.").define("rotation", true);
+		MINIMAP_ZOOM = minimapOption(builder, "zoom", "Minimap screen pixels per world block. Larger values show a closer view.").defineInRange("zoom", 1.0, 0.25, 4.0);
+		MINIMAP_SIZE = minimapOption(builder, "size", "Minimap diameter or side length in GUI pixels.").defineInRange("size", 128, 64, 256);
+		builder.pop();
 		SPEC = builder.build();
 	}
 
 	private WorldMapClientConfig() {}
 	private static ModConfigSpec.Builder option(ModConfigSpec.Builder builder, String key, String comment) {
 		return builder.comment(comment).translation("witchercraft.configuration.world_map." + key);
+	}
+	private static ModConfigSpec.Builder minimapOption(ModConfigSpec.Builder builder, String key, String comment) {
+		return builder.comment(comment).translation("witchercraft.configuration.minimap." + key);
 	}
 	public static void register() {
 		ModContainer container = ModList.get().getModContainerById(WitchercraftMod.MODID)
@@ -74,4 +92,9 @@ public final class WorldMapClientConfig {
 	public static boolean defaultPersonalWaypointsVisible() { return DEFAULT_PERSONAL_WAYPOINTS_VISIBLE.getAsBoolean(); }
 	public static boolean defaultUnknownPoisVisible() { return DEFAULT_UNKNOWN_POIS_VISIBLE.getAsBoolean(); }
 	public static boolean defaultDiscoveredPoisVisible() { return DEFAULT_DISCOVERED_POIS_VISIBLE.getAsBoolean(); }
+	public static boolean minimapEnabled() { return MINIMAP_ENABLED.getAsBoolean(); }
+	public static MinimapCorner minimapCorner() { return MINIMAP_CORNER.get(); }
+	public static boolean minimapRotation() { return MINIMAP_ROTATION.getAsBoolean(); }
+	public static double minimapZoom() { return MINIMAP_ZOOM.getAsDouble(); }
+	public static int minimapSize() { return MINIMAP_SIZE.getAsInt(); }
 }

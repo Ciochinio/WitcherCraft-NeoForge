@@ -369,5 +369,11 @@
   "poi.witchercraft.poi_test_structure": "Test Structure",
   "poi.witchercraft.poi_test_structure.description": "A small stone-brick landmark.",
   "category.witchercraft.poi.test": "Test",
-  "message.witchercraft.poi.discovered": "Discovered: %s"
+  "message.witchercraft.poi.discovered": "Discovered: %s",
+  "witchercraft.configuration.minimap": "Minimap",
+  "witchercraft.configuration.minimap.enabled": "Enabled",
+  "witchercraft.configuration.minimap.corner": "Screen Corner",
+  "witchercraft.configuration.minimap.rotation": "Rotate With Player",
+  "witchercraft.configuration.minimap.zoom": "Zoom",
+  "witchercraft.configuration.minimap.size": "Size"
 }

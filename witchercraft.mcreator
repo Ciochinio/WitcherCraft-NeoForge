@@ -894,6 +894,19 @@
       }
     },
     {
+      "name": "WorldMapMinimapHud",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_minimap_hud",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapMinimapHud.java"
+        ]
+      },
+      "path": "~/World Map/GUI"
+    },
+    {
       "name": "WitchercraftConfigScreen",
       "type": "code",
       "compiles": true,
@@ -10846,7 +10859,13 @@
       "poi.witchercraft.poi_test_structure": "Test Structure",
       "poi.witchercraft.poi_test_structure.description": "A small stone-brick landmark.",
       "category.witchercraft.poi.test": "Test",
-      "message.witchercraft.poi.discovered": "Discovered: %s"
+      "message.witchercraft.poi.discovered": "Discovered: %s",
+      "witchercraft.configuration.minimap": "Minimap",
+      "witchercraft.configuration.minimap.enabled": "Enabled",
+      "witchercraft.configuration.minimap.corner": "Screen Corner",
+      "witchercraft.configuration.minimap.rotation": "Rotate With Player",
+      "witchercraft.configuration.minimap.zoom": "Zoom",
+      "witchercraft.configuration.minimap.size": "Size"
     }
   },
   "metadata": {

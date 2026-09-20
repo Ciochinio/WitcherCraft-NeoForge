@@ -26,6 +26,7 @@ public final class WorldMapServerConfig {
 	private static final ModConfigSpec SPEC;
 	private static final ModConfigSpec.BooleanValue MAP_ENABLED;
 	private static final ModConfigSpec.BooleanValue POIS_ENABLED;
+	private static final ModConfigSpec.BooleanValue MINIMAP_ENABLED;
 	private static final ModConfigSpec.ConfigValue<List<? extends String>> ENABLED_POI_DEFINITIONS;
 	private static final ModConfigSpec.DoubleValue DEFAULT_REVEAL_RADIUS;
 	private static final ModConfigSpec.DoubleValue DEFAULT_DISCOVERY_RADIUS;
@@ -49,6 +50,10 @@ public final class WorldMapServerConfig {
 		CAPTURE_BUDGET_MICROS = option(builder, "capture_budget_micros", "Approximate per-tick terrain-capture time budget in microseconds after the first capture.").defineInRange("captureBudgetMicros", DEFAULT_CAPTURE_BUDGET_MICROS, 250, HARD_MAX_CAPTURE_BUDGET_MICROS);
 		WAYPOINT_LIMIT = option(builder, "waypoint_limit", "Maximum personal waypoints each player may create. Lowering this never deletes existing waypoints.").defineInRange("waypointLimit", WorldMapWaypoints.DEFAULT_WAYPOINT_LIMIT, 0, WorldMapWaypoints.HARD_MAX_WAYPOINTS_PER_PLAYER);
 		builder.pop();
+		builder.comment("Per-world permissions for the WitcherCraft minimap.")
+			.translation("witchercraft.configuration.minimap").push("minimap");
+		MINIMAP_ENABLED = minimapOption(builder, "enabled", "Allow players to display the WitcherCraft minimap in this world.").define("enabled", true);
+		builder.pop();
 		SPEC = builder.build();
 	}
 
@@ -56,6 +61,10 @@ public final class WorldMapServerConfig {
 
 	private static ModConfigSpec.Builder option(ModConfigSpec.Builder builder, String key, String comment) {
 		return builder.comment(comment).translation("witchercraft.configuration.world_map." + key);
+	}
+
+	private static ModConfigSpec.Builder minimapOption(ModConfigSpec.Builder builder, String key, String comment) {
+		return builder.comment(comment).translation("witchercraft.configuration.minimap." + key);
 	}
 
 	private static boolean validIdentifier(Object value) {
@@ -71,6 +80,7 @@ public final class WorldMapServerConfig {
 	public static boolean loaded() { return SPEC.isLoaded(); }
 	public static boolean mapEnabled() { return !loaded() ? DEFAULT_MAP_ENABLED : MAP_ENABLED.getAsBoolean(); }
 	public static boolean poisEnabled() { return mapEnabled() && (!loaded() ? DEFAULT_POIS_ENABLED : POIS_ENABLED.getAsBoolean()); }
+	public static boolean minimapEnabled() { return mapEnabled() && (!loaded() || MINIMAP_ENABLED.getAsBoolean()); }
 	public static Set<Identifier> enabledPoiDefinitions() {
 		if (!loaded()) return Set.of();
 		return ENABLED_POI_DEFINITIONS.get().stream().limit(WorldMapPoiDefinition.MAX_DEFINITIONS).map(Identifier::tryParse).filter(java.util.Objects::nonNull).collect(Collectors.toUnmodifiableSet());
