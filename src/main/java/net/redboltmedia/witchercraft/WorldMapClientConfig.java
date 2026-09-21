@@ -5,6 +5,10 @@ import net.neoforged.fml.ModList;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
+import net.minecraft.resources.Identifier;
+
+import java.util.List;
+
 /** Client-owned world-map visual settings. */
 public final class WorldMapClientConfig {
 	private static final ModConfigSpec SPEC;
@@ -24,6 +28,7 @@ public final class WorldMapClientConfig {
 	private static final ModConfigSpec.BooleanValue DEFAULT_PERSONAL_WAYPOINTS_VISIBLE;
 	private static final ModConfigSpec.BooleanValue DEFAULT_UNKNOWN_POIS_VISIBLE;
 	private static final ModConfigSpec.BooleanValue DEFAULT_DISCOVERED_POIS_VISIBLE;
+	private static final ModConfigSpec.ConfigValue<List<? extends String>> DEFAULT_HIDDEN_POI_CATEGORIES;
 	private static final ModConfigSpec.BooleanValue MINIMAP_ENABLED;
 	private static final ModConfigSpec.EnumValue<MinimapCorner> MINIMAP_CORNER;
 	private static final ModConfigSpec.BooleanValue MINIMAP_ROTATION;
@@ -54,6 +59,8 @@ public final class WorldMapClientConfig {
 		DEFAULT_PERSONAL_WAYPOINTS_VISIBLE = option(builder, "default_personal_waypoints_visible", "Show personal waypoints before a world-specific filter preference is saved.").define("defaultPersonalWaypointsVisible", true);
 		DEFAULT_UNKNOWN_POIS_VISIBLE = option(builder, "default_unknown_pois_visible", "Show unknown POIs before a world-specific filter preference is saved.").define("defaultUnknownPoisVisible", true);
 		DEFAULT_DISCOVERED_POIS_VISIBLE = option(builder, "default_discovered_pois_visible", "Show discovered POIs before a world-specific filter preference is saved.").define("defaultDiscoveredPoisVisible", true);
+		DEFAULT_HIDDEN_POI_CATEGORIES = option(builder, "default_hidden_poi_categories", "POI categories hidden before a world-specific category filter preference is saved.")
+			.defineListAllowEmpty("defaultHiddenPoiCategories", List.of("witchercraft:services"), () -> "witchercraft:services", WorldMapClientConfig::validIdentifier);
 		builder.pop();
 		builder.comment("Personal presentation settings for the WitcherCraft minimap.")
 			.translation("witchercraft.configuration.minimap").push("minimap");
@@ -97,6 +104,10 @@ public final class WorldMapClientConfig {
 	public static boolean defaultPersonalWaypointsVisible() { return DEFAULT_PERSONAL_WAYPOINTS_VISIBLE.getAsBoolean(); }
 	public static boolean defaultUnknownPoisVisible() { return DEFAULT_UNKNOWN_POIS_VISIBLE.getAsBoolean(); }
 	public static boolean defaultDiscoveredPoisVisible() { return DEFAULT_DISCOVERED_POIS_VISIBLE.getAsBoolean(); }
+	public static boolean defaultPoiCategoryVisible(Identifier category) {
+		String id = category.toString();
+		return DEFAULT_HIDDEN_POI_CATEGORIES.get().stream().noneMatch(id::equals);
+	}
 	public static boolean minimapEnabled() { return MINIMAP_ENABLED.getAsBoolean(); }
 	public static MinimapCorner minimapCorner() { return MINIMAP_CORNER.get(); }
 	public static boolean minimapRotation() { return MINIMAP_ROTATION.getAsBoolean(); }
@@ -104,4 +115,7 @@ public final class WorldMapClientConfig {
 	public static int minimapSize() { return MINIMAP_SIZE.getAsInt(); }
 	public static int minimapViewportInset() { return MINIMAP_VIEWPORT_INSET.getAsInt(); }
 	public static double minimapTargetArrivalRadius() { return MINIMAP_TARGET_ARRIVAL_RADIUS.getAsDouble(); }
+	private static boolean validIdentifier(Object value) {
+		return value instanceof String string && Identifier.tryParse(string) != null;
+	}
 }

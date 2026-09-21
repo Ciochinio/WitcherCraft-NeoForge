@@ -58,7 +58,6 @@ public final class MapLayout {
 	public static final int CONTEXT_PADDING = 8;
 	public static final int CONTEXT_MARKER_GAP = 5;
 	public static final int FILTER_W = 238;
-	public static final int FILTER_H = 124;
 	public static final int FILTER_PADDING = 12;
 	public static final int FILTER_ROW_Y = 30;
 	public static final int FILTER_ROW_H = 23;

@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.resources.Identifier;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -24,6 +25,7 @@ import java.util.UUID;
 public final class WorldMapPoiFilterPreferences {
 	private static final int FORMAT_VERSION = 1;
 	private static final int MAX_WORLDS = 128;
+	private static final int MAX_CATEGORIES = 128;
 	private static final long MAX_FILE_BYTES = 262_144L;
 	private static final UUID NO_WORLD = new UUID(0L, 0L);
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
@@ -44,7 +46,28 @@ public final class WorldMapPoiFilterPreferences {
 			? preferences.unknownPois : preferences.discoveredPois;
 		boolean configuredDefault = marker instanceof WorldMapPoiMarker.Unknown
 			? WorldMapClientConfig.defaultUnknownPoisVisible() : WorldMapClientConfig.defaultDiscoveredPoisVisible();
-		return override == null ? configuredDefault && marker.defaultVisible() : override;
+		boolean stateVisible = override == null ? configuredDefault && marker.defaultVisible() : override;
+		if (!stateVisible || !(marker instanceof WorldMapPoiMarker.Discovered discovered))
+			return stateVisible;
+		Boolean categoryOverride = preferences == null ? null : preferences.categories.get(discovered.category());
+		return categoryOverride == null ? WorldMapClientConfig.defaultPoiCategoryVisible(discovered.category()) : categoryOverride;
+	}
+
+	public static DisplayState categoryState(UUID worldId, Identifier category) {
+		Preferences preferences = get(worldId, false);
+		Boolean value = preferences == null ? null : preferences.categories.get(category);
+		return value == null ? DisplayState.DEFAULT : value ? DisplayState.SHOWN : DisplayState.HIDDEN;
+	}
+
+	public static void toggleCategory(UUID worldId, Identifier category) {
+		Preferences preferences = get(worldId, true);
+		if (preferences == null || category == null)
+			return;
+		Boolean current = preferences.categories.get(category);
+		preferences.categories.put(category, current == null ? !WorldMapClientConfig.defaultPoiCategoryVisible(category) : !current);
+		while (preferences.categories.size() > MAX_CATEGORIES)
+			preferences.categories.remove(preferences.categories.keySet().iterator().next());
+		save();
 	}
 
 	public static DisplayState state(UUID worldId, Filter filter) {
@@ -109,6 +132,16 @@ public final class WorldMapPoiFilterPreferences {
 						preferences.personalWaypoints = value.get("personal_waypoints").getAsBoolean();
 					preferences.unknownPois = optionalBoolean(value, "unknown_pois");
 					preferences.discoveredPois = optionalBoolean(value, "discovered_pois");
+					if (value.has("categories") && value.get("categories").isJsonObject()) {
+						int categoryCount = 0;
+						for (Map.Entry<String, JsonElement> categoryEntry : value.getAsJsonObject("categories").entrySet()) {
+							Identifier category = Identifier.tryParse(categoryEntry.getKey());
+							if (categoryCount >= MAX_CATEGORIES || category == null || !categoryEntry.getValue().isJsonPrimitive())
+								continue;
+							preferences.categories.put(category, categoryEntry.getValue().getAsBoolean());
+							categoryCount++;
+						}
+					}
 					WORLDS.put(id, preferences);
 					accepted++;
 				} catch (RuntimeException exception) {
@@ -135,6 +168,12 @@ public final class WorldMapPoiFilterPreferences {
 				value.addProperty("unknown_pois", entry.getValue().unknownPois);
 			if (entry.getValue().discoveredPois != null)
 				value.addProperty("discovered_pois", entry.getValue().discoveredPois);
+			if (!entry.getValue().categories.isEmpty()) {
+				JsonObject categories = new JsonObject();
+				for (Map.Entry<Identifier, Boolean> category : entry.getValue().categories.entrySet())
+					categories.addProperty(category.getKey().toString(), category.getValue());
+				value.add("categories", categories);
+			}
 			worlds.add(entry.getKey().toString(), value);
 		}
 		root.add("worlds", worlds);
@@ -179,5 +218,6 @@ public final class WorldMapPoiFilterPreferences {
 		private boolean personalWaypoints = WorldMapClientConfig.defaultPersonalWaypointsVisible();
 		private Boolean unknownPois;
 		private Boolean discoveredPois;
+		private final Map<Identifier, Boolean> categories = new LinkedHashMap<>();
 	}
 }

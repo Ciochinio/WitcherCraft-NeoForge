@@ -201,7 +201,7 @@ public final class WorldMapPoiManager {
 				WorldMapPoiKnowledge.Entry revealed = knowledge.get(player.getUUID(), markerId);
 				if (revealed != null)
 					pushMarker(player, instance, definition, revealed, definitions.generation());
-				if (inside(player, instance.anchor(), definition.discoveryRadius()))
+				if (definition.discoveryRequired() && inside(player, instance.anchor(), definition.discoveryRadius()))
 					discover(player, instance, definition, definitions.generation());
 			}
 		}
@@ -217,7 +217,7 @@ public final class WorldMapPoiManager {
 				if (instance == null || !instance.active())
 					continue;
 				WorldMapPoiDefinition definition = definitions.definitions().get(instance.definitionId());
-				if (definition == null || !inside(player, instance.anchor(), definition.discoveryRadius()))
+				if (definition == null || !definition.discoveryRequired() || !inside(player, instance.anchor(), definition.discoveryRadius()))
 					continue;
 				WorldMapPoiKnowledge.Entry entry = knowledge.get(player.getUUID(), markerId);
 				if (entry != null && entry.state() == WorldMapPoiKnowledge.State.DISCOVERED)
@@ -296,7 +296,7 @@ public final class WorldMapPoiManager {
 		private static WorldMapPoiMarker marker(WorldMapPoiInstance instance, WorldMapPoiDefinition definition, WorldMapPoiKnowledge.Entry entry) {
 			double exactX = instance.anchor().getX() + 0.5;
 			double exactZ = instance.anchor().getZ() + 0.5;
-			if (entry.state() == WorldMapPoiKnowledge.State.REVEALED)
+			if (entry.state() == WorldMapPoiKnowledge.State.REVEALED && definition.discoveryRequired())
 				return new WorldMapPoiMarker.Unknown(entry.presentationId(), exactX, exactZ,
 					definition.minimumZoom(), definition.defaultVisible());
 			return new WorldMapPoiMarker.Discovered(entry.presentationId(), exactX, exactZ, definition.translationKey(), definition.descriptionTranslationKey(), definition.category(),
@@ -322,7 +322,8 @@ public final class WorldMapPoiManager {
 			maximumDiscoveryRadius = 0.0;
 			for (WorldMapPoiDefinition definition : definitions.definitions().values()) {
 				maximumRevealRadius = Math.max(maximumRevealRadius, definition.revealRadius());
-				maximumDiscoveryRadius = Math.max(maximumDiscoveryRadius, definition.discoveryRadius());
+				if (definition.discoveryRequired())
+					maximumDiscoveryRadius = Math.max(maximumDiscoveryRadius, definition.discoveryRadius());
 			}
 			for (WorldMapPoiInstance instance : instances.values())
 				if (instance.active() && !definitions.accepts(instance))

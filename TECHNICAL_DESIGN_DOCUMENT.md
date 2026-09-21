@@ -1708,6 +1708,8 @@ action-bar message and a direct vanilla level-up sound packet only to that playe
 description, and discovery-message keys are written to both `en_us.json` and `witchercraft.mcreator`'s `language_map.en_us`, as
 required by Section 3.11. The server notification also supplies readable fallbacks for both nested translation
 components, preventing raw dotted keys if a resource pack or generated language file is incomplete.
+Definitions with `discovery_required: false` stop at the revealed knowledge state but use their identified marker
+presentation immediately; they never show the unknown icon or produce a discovery message or sound.
 
 ### 5.13 POI authorization, networking, and client cache
 
@@ -1747,8 +1749,9 @@ change. `markers(dimension)` is the read-only boundary consumed by map rendering
 floating-point world-to-screen transform and render inside the terrain scissor after terrain but before personal
 waypoints, the temporary target, and the player. Unknown markers use `map_poi_unknown.png`; discovered markers
 use the server-approved individual texture identifier. Both marker sizes use the existing client marker-scale
-setting and square-root zoom scaling. Unknown markers honor their definition's minimum zoom, while discovered
-markers remain visible throughout the supported map zoom range.
+setting and square-root zoom scaling. Unknown and identified markers both honor their definition's minimum-zoom
+rule. Definitions that use the minimum supported value remain visible and
+continue shrinking at every zoom level. Personal waypoints and temporary pins retain full opacity while zooming.
 
 Drawing, hover, and right-click hit testing share the same visibility predicate. Marker snapshots are sorted by
 the random presentation UUID, nearest-marker selection uses squared screen distance, and exact ties use the
@@ -1758,15 +1761,19 @@ POI shows `Undiscovered location` and a generic exploration hint; a discovered P
 data-driven translated description. Right-clicking either POI state immediately places or replaces the existing
 temporary navigation target at that marker. POIs have no details popup or mutation menu.
 
-`WorldMapPoiFilterOverlay` is a modal owned by `MapPage`. It controls personal waypoints, unknown POIs, and
-discovered POIs; the temporary target and player marker are intentionally not filterable. Escape and outside
+`WorldMapPoiFilterOverlay` is a modal owned by `MapPage`. It controls personal waypoints, unknown POIs,
+discovered POIs, and the categories present among identified markers in the current client cache; the temporary
+target and player marker are intentionally not filterable. Unknown markers do not expose their category. Escape and outside
 left click close the overlay, and all map input is consumed while it is open. POI definition `defaultVisible`
 applies while a group has no explicit user override. The first click selects hidden, subsequent clicks toggle
 hidden/shown, and an explicit shown value can reveal definitions that default to hidden.
 
 `WorldMapPoiFilterPreferences` persists these client-only settings in
 `config/witchercraft-world-map-filters.json`. Its versioned, size-bounded JSON records are keyed by the
-server-issued world UUID exposed read-only by `WorldMapPoiClientCache`; a zero UUID is never written. It retains
+server-issued world UUID exposed read-only by `WorldMapPoiClientCache`; a zero UUID is never written. Per-category
+overrides are stored by category identifier alongside the three general filters. Categories without a world-specific
+override consult the client config's `defaultHiddenPoiCategories` identifier list; Services is hidden there by
+default. It retains
 at most 128 worlds, skips malformed sibling records independently, and replaces the file atomically where the
 filesystem supports it. Filter data never enters packets, server `SavedData`, generated player variables, or
 the global NeoForge client config.

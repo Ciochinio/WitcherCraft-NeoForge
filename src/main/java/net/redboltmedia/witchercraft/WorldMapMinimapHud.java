@@ -122,8 +122,7 @@ public final class WorldMapMinimapHud {
 		double zoom = WorldMapClientConfig.minimapZoom();
 		java.util.UUID worldId = WorldMapPoiClientCache.worldId();
 		for (WorldMapPoiMarker marker : WorldMapPoiClientCache.markers(dimension)) {
-			if (!WorldMapPoiFilterPreferences.poiVisible(worldId, marker)
-				|| marker instanceof WorldMapPoiMarker.Unknown && zoom < marker.minimumZoom())
+			if (!WorldMapPoiFilterPreferences.poiVisible(worldId, marker) || zoom < marker.minimumZoom())
 				continue;
 			double scaledX = (marker.x() - centerX) * zoom;
 			double scaledZ = (marker.z() - centerZ) * zoom;

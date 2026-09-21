@@ -480,7 +480,7 @@ public final class MapPage implements GuiPage {
 		var player = Minecraft.getInstance().player;
 		if (player == null)
 			return;
-		int alpha = waypointAlpha();
+		int alpha = 255;
 		float visualScale = markerVisualScale();
 		int size = Math.max(8, (int) Math.round(WAYPOINT_MARKER_BASE_SIZE * WorldMapClientConfig.markerScale()));
 		if (WorldMapPoiFilterPreferences.personalWaypoints(WorldMapPoiClientCache.worldId()))
@@ -532,13 +532,6 @@ public final class MapPage implements GuiPage {
 		g.pose().scale(visualScale, visualScale);
 		drawWaypointIcon(g, 0, -size / 2, -size / 2, size, (alpha << 24) | (MapLayout.WAYPOINT_COLOR & 0x00FFFFFF));
 		g.pose().popMatrix();
-	}
-
-	private int waypointAlpha() {
-		if (zoom >= 1.0)
-			return 255;
-		double progress = (zoom - MIN_ZOOM) / (1.0 - MIN_ZOOM);
-		return (int) Math.round(89 + Math.max(0, Math.min(1, progress)) * 166);
 	}
 
 	private MapSelection markerAt(double mouseX, double mouseY, int x, int y, int w, int h) {
@@ -686,8 +679,7 @@ public final class MapPage implements GuiPage {
 		List<WorldMapPoiMarker> result = new ArrayList<>();
 		UUID worldId = WorldMapPoiClientCache.worldId();
 		for (WorldMapPoiMarker marker : WorldMapPoiClientCache.markers(dimension))
-			if (WorldMapPoiFilterPreferences.poiVisible(worldId, marker)
-				&& (!(marker instanceof WorldMapPoiMarker.Unknown) || zoom >= marker.minimumZoom()))
+			if (WorldMapPoiFilterPreferences.poiVisible(worldId, marker) && zoom >= marker.minimumZoom())
 				result.add(marker);
 		result.sort(Comparator.comparing(WorldMapPoiMarker::markerId));
 		return result;

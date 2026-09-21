@@ -608,8 +608,8 @@ even if the player leaves the area again.
 The compact creation panel accepts a name and icon and remains open with an error message if the server rejects the
 request. Visible waypoints render only on their recorded
 dimension. Player and waypoint markers use subpixel positions and scale with the square root of map zoom,
-clamped between 0.5 and 2.5 times their base size. Waypoints also fade to 35 percent opacity at the farthest
-zoom and reach full opacity at 1 screen pixel per block. Hovering a marker opens a compact, centered two-line
+clamped between 0.5 and 2.5 times their base size. Waypoint opacity remains constant at every zoom level.
+Hovering a marker opens a compact, centered two-line
 information card above the bottom controls. Saved waypoints and temporary targets show their name and coordinates.
 An unknown point of interest shows a generic name and exploration hint; a discovered point of interest shows its
 name and description.
@@ -645,7 +645,9 @@ Production structure POIs include vanilla pillager outposts, presented with the 
 vanilla structure in `#minecraft:village`, presented with the innkeeper icon. They use the same reveal,
 discovery, filtering, persistence, and temporary-target behavior as other structure-backed POIs.
 Vanilla `minecraft:meeting` point-of-interest records also use the innkeeper icon, placing a marker at each
-village bell meeting point observed in a watched chunk.
+village bell meeting point observed in a watched chunk. Service POIs are identified as soon as they are revealed,
+can be hidden together through the Services map filter, and disappear below their configured minimum zoom. Services
+begin hidden through the client configuration's default-hidden category list unless a player saves a per-world override.
 
 World-map exploration begins when the server sends a loaded Overworld chunk to a player. That event
 records the chunk in that player's private exploration history and queues a shared terrain sample.
