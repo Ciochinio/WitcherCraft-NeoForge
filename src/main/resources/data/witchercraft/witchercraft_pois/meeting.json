@@ -1,0 +1,16 @@
+{
+  "provider": {
+    "type": "witchercraft:poi_type",
+    "poi_type": "minecraft:meeting"
+  },
+  "translation_key": "poi.witchercraft.meeting",
+  "description_translation_key": "poi.witchercraft.meeting.description",
+  "category": "witchercraft:settlement",
+  "icon": "witchercraft:textures/screens/map_poi_innkeeper.png",
+  "reveal_radius": 256,
+  "discovery_radius": 32,
+  "uncertainty_radius": 0,
+  "default_visible": true,
+  "minimum_zoom": 0.25,
+  "capabilities": []
+}

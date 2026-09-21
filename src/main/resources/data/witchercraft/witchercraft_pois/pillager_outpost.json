@@ -1,0 +1,17 @@
+{
+  "provider": {
+    "type": "witchercraft:structure",
+    "structure": "minecraft:pillager_outpost",
+    "anchor": "bounding_box_center"
+  },
+  "translation_key": "poi.witchercraft.pillager_outpost",
+  "description_translation_key": "poi.witchercraft.pillager_outpost.description",
+  "category": "witchercraft:bandit_camp",
+  "icon": "witchercraft:textures/screens/map_poi_bandit_camp.png",
+  "reveal_radius": 256,
+  "discovery_radius": 32,
+  "uncertainty_radius": 0,
+  "default_visible": true,
+  "minimum_zoom": 0.25,
+  "capabilities": []
+}

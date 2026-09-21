@@ -19,6 +19,7 @@ public final class WorldMapPoiProviders {
 
 	static {
 		register(WorldMapStructurePoiProvider.INSTANCE);
+		register(WorldMapPoiTypeProvider.INSTANCE);
 	}
 
 	private WorldMapPoiProviders() {

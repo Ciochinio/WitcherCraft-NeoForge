@@ -1641,9 +1641,10 @@ matching instead of copied Java classes.
 ### 5.11 POI definitions and providers
 
 POI kinds are datapack resources under `data/<namespace>/witchercraft_pois/<path>.json`; the resource path
-becomes the definition ID. A structure type is registered once, and every generated start of that structure
-becomes an instance automatically. Adding another structure POI does not require Java registration: create
-the MCreator structure element and add one definition JSON. Presentation fields may be omitted to use the
+becomes the definition ID. A definition selects either one exact `structure` or one `structure_tag`, and every
+generated start of a selected structure becomes an instance automatically. The two selector fields are mutually
+exclusive. Adding another structure POI does not require Java registration: add one definition JSON referring
+to a vanilla, modded, or MCreator structure or structure tag. Presentation fields may be omitted to use the
 shared defaults (256-block reveal, 32-block discovery, zero uncertainty, visible by default, 0.25 minimum zoom,
 the `witchercraft:general` category, and the shared default icon). Unique art and localization remain ordinary
 optional resource additions.
@@ -1655,15 +1656,17 @@ longer moves an unknown marker away from its world anchor.
 `WorldMapPoiDefinitions` owns the server reload listener and publishes immutable, fully prepared snapshots.
 Every resource is decoded and validated independently, so a bad definition is logged with its ID without
 discarding valid neighbors. Validation bounds definition and capability counts, identifiers, radii, zoom,
-provider types, structure references, and duplicate claims on one provider source. Reload reconciliation marks
+provider types, structure and structure-tag references, empty tags, and overlapping claims on one provider source. Reload reconciliation marks
 retained instances inactive when their definition is absent or no longer matches; the shared instance store
 preserves those suppressed records.
 
 `WorldMapPoiProvider` is the reusable loaded-world-object contract, and `WorldMapPoiProviders` is its internal
-type registry. `witchercraft:structure` is the currently registered provider. Its reload preparation resolves definitions
-into a structure-object lookup, while observation reads `StructureStart` values directly from the `LevelChunk`
-provided by `ChunkWatchEvent.Watch`. It never locates, generates, tickets, or requests a chunk. Starts that are
-not present in the watched loaded chunk are simply ignored.
+type registry. The `witchercraft:structure` provider expands exact IDs and tags into a structure-object lookup,
+while observation reads `StructureStart` values directly from the `LevelChunk` provided by
+`ChunkWatchEvent.Watch`. The `witchercraft:poi_type` provider resolves an exact point-of-interest registry ID and
+reads matching records from the watched chunk through the server's `PoiManager`; one stable map instance is
+created per matching block position. Neither provider locates, generates, tickets, or requests a chunk. Sources
+that are not present in the watched loaded chunk are simply ignored.
 
 The structure provider anchors a marker at the structure bounding-box center. Its canonical identity is provider
 type, structure registry ID, dimension ID, and structure start chunk. `WorldMapPoiInstance` derives a deterministic

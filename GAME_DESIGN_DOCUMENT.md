@@ -641,6 +641,12 @@ stone-brick roof marker. It generates on the Overworld surface with deliberately
 spacing. The structure exists to validate real structure discovery and stable map-marker identity. It is
 not production world content and must be removed or disabled before release.
 
+Production structure POIs include vanilla pillager outposts, presented with the bandit-camp icon, and every
+vanilla structure in `#minecraft:village`, presented with the innkeeper icon. They use the same reveal,
+discovery, filtering, persistence, and temporary-target behavior as other structure-backed POIs.
+Vanilla `minecraft:meeting` point-of-interest records also use the innkeeper icon, placing a marker at each
+village bell meeting point observed in a watched chunk.
+
 World-map exploration begins when the server sends a loaded Overworld chunk to a player. That event
 records the chunk in that player's private exploration history and queues a shared terrain sample.
 The map system never generates or force-loads a chunk. If the chunk unloads before its queued turn,
