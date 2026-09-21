@@ -1,6 +1,7 @@
 package net.redboltmedia.witchercraft.procedures;
 
 import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
+import net.redboltmedia.witchercraft.MeditationCosts;
 
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.entity.Entity;
@@ -63,11 +64,25 @@ public class MeditationTickProcedure {
 			// time_since_rest by the ticks we skipped - phantoms still come.
 			UUID id = MeditationStartProcedure.initiator;
 			if (id != null) {
-				if (level.getServer().getPlayerList().getPlayer(id) instanceof ServerPlayer sp)
+				if (level.getServer().getPlayerList().getPlayer(id) instanceof ServerPlayer sp) {
+					chargeElapsedCost(sp, delta);
 					sp.awardStat(Stats.CUSTOM.get(Stats.TIME_SINCE_REST), (int) delta);
+				}
 				MeditationStartProcedure.initiator = null;
 			}
 		}
+	}
+
+	static long elapsedClockTicks(ServerLevel level) {
+		long delta = (long) WitchercraftModVariables.meditationDeltaTicks;
+		long elapsed = Math.max(0L, level.getGameTime() - (long) WitchercraftModVariables.meditationAnchorGametime);
+		double fraction = Math.min(1.0, elapsed / (double) spinDurationTicks(delta));
+		return Math.max(0L, Math.min(delta, (long) (delta * fraction)));
+	}
+
+	static void chargeElapsedCost(ServerPlayer player, long elapsedClockTicks) {
+		int cost = MeditationCosts.timeCost(elapsedClockTicks);
+		player.getFoodData().setFoodLevel(Math.max(0, player.getFoodData().getFoodLevel() - cost));
 	}
 
 	private static void setClock(ServerLevel level, long ticks) {

@@ -3,6 +3,8 @@ package net.redboltmedia.witchercraft.procedures;
 import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
 
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 
 /**
  * HAND-MAINTAINED (locked_code procedure, ~/Meditation2). Cancels the active
@@ -15,6 +17,11 @@ import net.minecraft.world.level.LevelAccessor;
  */
 public class MeditationStopProcedure {
 	public static void execute(LevelAccessor world) {
+		if (!(world instanceof ServerLevel level) || WitchercraftModVariables.meditationState != 2)
+			return;
+		if (MeditationStartProcedure.initiator != null
+				&& level.getServer().getPlayerList().getPlayer(MeditationStartProcedure.initiator) instanceof ServerPlayer player)
+			MeditationTickProcedure.chargeElapsedCost(player, MeditationTickProcedure.elapsedClockTicks(level));
 		WitchercraftModVariables.meditationState = 0;
 		// cancelled before finishing -> no insomnia is awarded (see MeditationTick)
 		MeditationStartProcedure.initiator = null;

@@ -1832,6 +1832,20 @@ belong to both `en_us.json` and `witchercraft.mcreator`'s `language_map.en_us`, 
 from restoring raw translation keys in the generated screen. Future systems such as meditation add sibling
 sections rather than separate settings UIs.
 
+The sibling `Meditation` server-config section owns the authoritative stamina economy. Its defaults
+are free meditation off, setup cost 2, four hours per step, 2 stamina per step, and a maximum elapsed
+time cost of 10. The server checks the selected session's full price before committing, charges setup
+immediately, and charges elapsed time on completion or cancellation. Cancellation derives elapsed
+clock ticks from the same session anchors used by the accelerated clock, so it never bills the
+unreached part of the selected duration. `MeditationCosts` is the shared calculation used by the
+server and the synchronized client-side price indicator.
+The indicator is selection-only and disappears once the time-lapse begins. Its anchor, icon size,
+and icon texture belong to `MeditationLayout` and are editable in `tools/meditation-dial-creator.html`.
+`MeditationPlaceCampfireProcedure.hasNearbyCampfire` is the shared client/server scan for normal and
+soul campfires within the placement procedure's four-block horizontal and one-block vertical range.
+The client uses it to omit setup from the displayed price. The server repeats it before affordability
+validation, campfire placement, and setup charging, so the server remains authoritative.
+
 World settings control the map and POI enable switches, a POI-definition allowlist, omitted JSON radius defaults,
 same-session tile refresh cooldown, capture count and time budgets, and the personal-waypoint limit. An empty POI
 allowlist enables all valid definitions. POI definition selection and default radii require a world restart and are

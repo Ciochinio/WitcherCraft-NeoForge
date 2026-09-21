@@ -72,6 +72,10 @@ public final class MeditationLayout {
 	// Readout text baselines (centred on CX): current time then target time.
 	public static final int NOW_Y = 232;
 	public static final int TARGET_Y = 244;
+	public static final int COST_X = 112;
+	public static final int COST_Y = 214;
+	public static final int COST_ICON_SIZE = 9;
+	public static final String COST_ICON_TEX = "witchercraft:textures/screens/hunger_icon.png";
 
 	// "Meditate" button rect (panel coords).
 	public static final int BTN_X = 52;

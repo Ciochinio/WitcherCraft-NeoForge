@@ -35,10 +35,8 @@ public class MeditationPlaceCampfireProcedure {
 		BlockPos base = BlockPos.containing(x, y, z);
 
 		// already a campfire nearby? then don't place another.
-		for (BlockPos p : BlockPos.betweenClosed(base.offset(-SCAN, -1, -SCAN), base.offset(SCAN, 1, SCAN))) {
-			if (level.getBlockState(p).is(Blocks.CAMPFIRE) || level.getBlockState(p).is(Blocks.SOUL_CAMPFIRE))
-				return;
-		}
+		if (hasNearbyCampfire(world, x, y, z))
+			return;
 
 		// candidate COLUMNS, all >= MIN_DIST blocks away horizontally, ordered by
 		// facing: straight ahead (2 then 3), the two front diagonals, the sides, then
@@ -65,6 +63,15 @@ public class MeditationPlaceCampfireProcedure {
 				return;
 			}
 		}
+	}
+
+	/** Shared price and placement check for normal or soul campfires. */
+	public static boolean hasNearbyCampfire(LevelAccessor world, double x, double y, double z) {
+		BlockPos base = BlockPos.containing(x, y, z);
+		for (BlockPos p : BlockPos.betweenClosed(base.offset(-SCAN, -1, -SCAN), base.offset(SCAN, 1, SCAN)))
+			if (world.getBlockState(p).is(Blocks.CAMPFIRE) || world.getBlockState(p).is(Blocks.SOUL_CAMPFIRE))
+				return true;
+		return false;
 	}
 
 	/**

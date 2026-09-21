@@ -43,8 +43,8 @@
 <body>
 <header>
   <h1>Meditation Dial Creator</h1>
-  <span class="hint">Drag the <b>centre</b>, the <b>radius</b> handle (on the ring), or the <b>button</b>; tune the rest with the inputs. The dial reads day-up (noon top, 00:00 bottom). Output regenerates
-  <code>src/main/java/net/redboltmedia/witchercraft/client/gui/MeditationLayout.java</code> &rarr; Copy &rarr; paste over the file. The two preview-hour inputs only move the sample hands + arc; they are not saved.</span>
+  <span class="hint">Drag the <b>centre</b>, the <b>radius</b> handle (on the ring), the <b>cost</b>, or the <b>button</b>; tune the rest with the inputs. The dial reads day-up (noon top, 00:00 bottom). Output regenerates
+  <code>src/main/java/net/redboltmedia/witchercraft/MeditationLayout.java</code> &rarr; Copy &rarr; paste over the file. The two preview-hour inputs only move the sample hands + arc; they are not saved.</span>
 </header>
 
 <div class="wrap">
@@ -59,7 +59,7 @@
     <fieldset><legend>Time-of-day orbs</legend><div id="grpOrbs"></div><div id="grpOrbTex"></div></fieldset>
     <fieldset><legend>Hands &amp; hub (arrows)</legend><div id="grpHands"></div></fieldset>
     <fieldset><legend>Progress arc</legend><div id="grpArc"></div></fieldset>
-    <fieldset><legend>Readout &amp; button</legend><div id="grpBtn"></div></fieldset>
+    <fieldset><legend>Readout, cost &amp; button</legend><div id="grpBtn"></div><div id="grpCostTex"></div></fieldset>
     <fieldset><legend>Preview only (not saved)</legend><div id="grpPrev"></div></fieldset>
     <fieldset><legend>Colours (0xAARRGGBB)</legend><div id="grpColors"></div></fieldset>
     <div class="row">
@@ -91,14 +91,16 @@ const DEFAULTS = {
   ORB_RADIUS:88, ORB_SIZE:30, ORB_DAWN_HOUR:6, ORB_NOON_HOUR:12, ORB_DUSK_HOUR:18, ORB_NIGHT_HOUR:0,
   HAND_CURRENT_LEN:58, HAND_CURRENT_HALF:1, HAND_TARGET_LEN:72, HAND_TARGET_HALF:2,
   HAND_HEAD_LEN:12, HAND_HEAD_HALF:4, HUB_HALF:3,
-  ARC_RADIUS:68, ARC_HALF:1,
-  NOW_Y:232, TARGET_Y:244, BTN_X:52, BTN_Y:262, BTN_W:120, BTN_H:20
+  ARC_RADIUS:68, ARC_HALF:0,
+  NOW_Y:232, TARGET_Y:244, COST_X:112, COST_Y:214, COST_ICON_SIZE:9,
+  BTN_X:52, BTN_Y:262, BTN_W:120, BTN_H:20
 };
 const STRINGS = {
   ORB_DAWN_TEX:"witchercraft:textures/screens/meditationguitimedawn.png",
   ORB_NOON_TEX:"witchercraft:textures/screens/meditationguitimenoon.png",
   ORB_DUSK_TEX:"witchercraft:textures/screens/meditationguitimedusk.png",
-  ORB_NIGHT_TEX:"witchercraft:textures/screens/meditationguitimenight.png"
+  ORB_NIGHT_TEX:"witchercraft:textures/screens/meditationguitimenight.png",
+  COST_ICON_TEX:"witchercraft:textures/screens/hunger_icon.png"
 };
 const COLORS = {
   COL_TICK_MINOR:"0xFF55555F", COL_TICK_MAJOR:"0xFFCFC7B0", COL_HAND_CURRENT:"0xFF8899AA",
@@ -120,7 +122,7 @@ const GROUPS = {
   grpOrbs:  ["ORB_RADIUS","ORB_SIZE","ORB_DAWN_HOUR","ORB_NOON_HOUR","ORB_DUSK_HOUR","ORB_NIGHT_HOUR"],
   grpHands: ["HAND_CURRENT_LEN","HAND_CURRENT_HALF","HAND_TARGET_LEN","HAND_TARGET_HALF","HAND_HEAD_LEN","HAND_HEAD_HALF","HUB_HALF"],
   grpArc:   ["ARC_RADIUS","ARC_HALF"],
-  grpBtn:   ["NOW_Y","TARGET_Y","BTN_X","BTN_Y","BTN_W","BTN_H"]
+  grpBtn:   ["NOW_Y","TARGET_Y","COST_X","COST_Y","COST_ICON_SIZE","BTN_X","BTN_Y","BTN_W","BTN_H"]
 };
 
 // --- colour helpers ---------------------------------------------------------
@@ -154,7 +156,7 @@ for (const key of Object.keys(T)){
   const k=document.createElement("span"); k.className="k"; k.textContent=key.replace(/_TEX$/,"").replace(/^ORB_/,"").toLowerCase();
   const t=document.createElement("input"); t.type="text"; t.value=T[key]; t.dataset.tk=key;
   t.addEventListener("input",()=>{ T[key]=t.value.trim(); redraw(); });
-  row.append(k,t); document.getElementById("grpOrbTex").appendChild(row);
+  row.append(k,t); document.getElementById(key==="COST_ICON_TEX"?"grpCostTex":"grpOrbTex").appendChild(row);
 }
 // preview inputs
 {
@@ -250,6 +252,11 @@ function redraw(){
   // readouts
   const now=el("text",{x:S.CX,y:S.NOW_Y+6,fill:argbToCss(C.COL_TEXT_SUB),"text-anchor":"middle"}); now.textContent="Now: "+fmt(P.previewNow); svg.appendChild(now);
   const tgt=el("text",{x:S.CX,y:S.TARGET_Y+6,fill:argbToCss(C.COL_TEXT_TITLE),"text-anchor":"middle"}); tgt.textContent="Meditate to "+fmtHour(P.previewTarget); svg.appendChild(tgt);
+  // selected cost preview; the game hides this once meditation starts
+  const costHref=orbHref(T.COST_ICON_TEX), costGap=3, costTextWidth=5;
+  const costLeft=S.COST_X-(S.COST_ICON_SIZE+costGap+costTextWidth)/2;
+  if(costHref){ const im=el("image",{x:costLeft,y:S.COST_Y,width:S.COST_ICON_SIZE,height:S.COST_ICON_SIZE}); im.setAttribute("href",costHref); svg.appendChild(im); }
+  const cost=el("text",{x:costLeft+S.COST_ICON_SIZE+costGap,y:S.COST_Y+7,fill:argbToCss(C.COL_TEXT_TITLE)}); cost.textContent="8"; svg.appendChild(cost);
   // button
   svg.appendChild(el("rect",{x:S.BTN_X,y:S.BTN_Y,width:S.BTN_W,height:S.BTN_H,fill:argbToCss(C.COL_BTN_BG),stroke:argbToCss(C.COL_BTN_BORDER),"stroke-width":1}));
   const bt=el("text",{x:S.BTN_X+S.BTN_W/2,y:S.BTN_Y+S.BTN_H/2+3,fill:argbToCss(C.COL_BTN_TEXT),"text-anchor":"middle"}); bt.textContent="Meditate"; svg.appendChild(bt);
@@ -258,6 +265,7 @@ function redraw(){
   addHandle("center", S.CX, S.CY, "#ffdd55");
   const [rhx,rhy]=pt(6,S.RADIUS); addHandle("radius", rhx, rhy, "#55ff99");
   addHandle("button", S.BTN_X, S.BTN_Y, "#5599ff");
+  addHandle("cost", S.COST_X, S.COST_Y, "#ff9955");
 
   regen();
 }
@@ -282,6 +290,7 @@ svg.addEventListener("pointermove",ev=>{
   if(drag==="center"){ S.CX=Math.round(mx); S.CY=Math.round(my); }
   else if(drag==="radius"){ const dx=mx-S.CX, dy=my-S.CY; S.RADIUS=Math.max(10,Math.round(Math.hypot(dx,dy))); }
   else if(drag==="button"){ S.BTN_X=Math.round(mx); S.BTN_Y=Math.round(my); }
+  else if(drag==="cost"){ S.COST_X=Math.round(mx); S.COST_Y=Math.round(my); }
   redraw();
 });
 svg.addEventListener("pointerup",()=>{ drag=null; });
@@ -364,6 +373,12 @@ public final class MeditationLayout {
 \t// Readout text baselines (centred on CX): current time then target time.
 \tpublic static final int NOW_Y = ${n("NOW_Y")};
 \tpublic static final int TARGET_Y = ${n("TARGET_Y")};
+
+\t// Meditation-cost indicator anchor and hunger-icon asset.
+\tpublic static final int COST_X = ${n("COST_X")};
+\tpublic static final int COST_Y = ${n("COST_Y")};
+\tpublic static final int COST_ICON_SIZE = ${n("COST_ICON_SIZE")};
+\tpublic static final String COST_ICON_TEX = "${T.COST_ICON_TEX}";
 
 \t// "Meditate" button rect (panel coords).
 \tpublic static final int BTN_X = ${n("BTN_X")};

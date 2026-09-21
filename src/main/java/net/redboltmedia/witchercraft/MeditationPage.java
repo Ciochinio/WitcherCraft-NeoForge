@@ -1,6 +1,8 @@
 package net.redboltmedia.witchercraft;
 
 
+import net.redboltmedia.witchercraft.procedures.MeditationPlaceCampfireProcedure;
+
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 import net.minecraft.client.Minecraft;
@@ -47,6 +49,7 @@ public class MeditationPage implements GuiPage {
 	private static final Identifier ORB_NOON = Identifier.parse(MeditationLayout.ORB_NOON_TEX);
 	private static final Identifier ORB_DUSK = Identifier.parse(MeditationLayout.ORB_DUSK_TEX);
 	private static final Identifier ORB_NIGHT = Identifier.parse(MeditationLayout.ORB_NIGHT_TEX);
+	private static final Identifier COST_ICON = Identifier.parse(MeditationLayout.COST_ICON_TEX);
 
 	private final String pageId;
 
@@ -92,9 +95,11 @@ public class MeditationPage implements GuiPage {
 	 */
 	public static void rejectAndClose(int reason) {
 		Minecraft mc = Minecraft.getInstance();
-		String key = reason == net.redboltmedia.witchercraft.procedures.MeditationCanStartProcedure.BLOCKED_MONSTER
-				? "gui.witchercraft.shell.meditation.blocked_monster"
-				: "gui.witchercraft.shell.meditation.blocked_space";
+		String key = switch (reason) {
+			case net.redboltmedia.witchercraft.procedures.MeditationCanStartProcedure.BLOCKED_MONSTER -> "gui.witchercraft.shell.meditation.blocked_monster";
+			case net.redboltmedia.witchercraft.procedures.MeditationCanStartProcedure.BLOCKED_STAMINA -> "gui.witchercraft.shell.meditation.blocked_stamina";
+			default -> "gui.witchercraft.shell.meditation.blocked_space";
+		};
 		if (mc.player != null)
 			mc.gui.setOverlayMessage(Component.translatable(key), false); // action bar
 		if (mc.screen instanceof WitcherGuiScreen)
@@ -255,6 +260,8 @@ public class MeditationPage implements GuiPage {
 		Component tgt = Component.translatable("gui.witchercraft.shell.meditation.target", clockHour(targetHour));
 		centeredText(g, now, MeditationLayout.CX, MeditationLayout.NOW_Y, MeditationLayout.COL_TEXT_SUB);
 		centeredText(g, tgt, MeditationLayout.CX, MeditationLayout.TARGET_Y, MeditationLayout.COL_TEXT_TITLE);
+		if (!spinning())
+			drawCost(g, nowHour);
 
 		// Meditate button
 		int bx = MeditationLayout.BTN_X, by = MeditationLayout.BTN_Y, bw = MeditationLayout.BTN_W, bh = MeditationLayout.BTN_H;
@@ -267,6 +274,24 @@ public class MeditationPage implements GuiPage {
 		centeredText(g, btnLabel, bx + bw / 2, by + bh / 2 - 4, MeditationLayout.COL_BTN_TEXT);
 
 		g.pose().popMatrix();
+	}
+
+	private void drawCost(GuiGraphicsExtractor g, double nowHour) {
+		double hours = ((targetHour - nowHour) % 24.0 + 24.0) % 24.0;
+		if (hours < 1e-3)
+			hours = 24.0;
+		long ticks = (long) Math.ceil(hours * MeditationCosts.TICKS_PER_HOUR);
+		Player currentPlayer = player();
+		boolean campfireNearby = currentPlayer != null && MeditationPlaceCampfireProcedure.hasNearbyCampfire(currentPlayer.level(), currentPlayer.getX(), currentPlayer.getY(), currentPlayer.getZ());
+		int cost = MeditationCosts.totalCost(ticks, campfireNearby);
+		String value = Integer.toString(cost);
+		int icon = MeditationLayout.COST_ICON_SIZE;
+		int gap = 3;
+		int width = icon + gap + font.width(value);
+		int left = MeditationLayout.COST_X - width / 2;
+		int tint = withAlpha(0xFFFFFFFF, contentAlpha);
+		g.blit(RenderPipelines.GUI_TEXTURED, COST_ICON, left, MeditationLayout.COST_Y, 0, 0, icon, icon, icon, icon, tint);
+		textA(g, Component.literal(value), left + icon + gap, MeditationLayout.COST_Y, MeditationLayout.COL_TEXT_TITLE);
 	}
 
 	/** 24 tick marks; every MAJOR_EVERY-th is longer + brighter and labelled. */

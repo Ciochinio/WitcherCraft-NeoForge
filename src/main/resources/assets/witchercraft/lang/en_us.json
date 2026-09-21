@@ -342,6 +342,7 @@
   "gui.witchercraft.shell.meditation.cancel": "Cancel",
   "gui.witchercraft.shell.meditation.blocked_monster": "Monsters are nearby - you cannot meditate.",
   "gui.witchercraft.shell.meditation.blocked_space": "Not enough open space to meditate here.",
+  "gui.witchercraft.shell.meditation.blocked_stamina": "Not enough stamina for this meditation.",
   "gui.witchercraft.map.waypoints": "Waypoints",
   "gui.witchercraft.map.filters": "Filters",
   "gui.witchercraft.map.filters.title": "Map Filters",
@@ -413,5 +414,11 @@
   "witchercraft.configuration.minimap.zoom": "Zoom",
   "witchercraft.configuration.minimap.size": "Size",
   "witchercraft.configuration.minimap.viewport_inset": "Frame Viewport Inset",
-  "witchercraft.configuration.minimap.target_arrival_radius": "Target Arrival Radius"
+  "witchercraft.configuration.minimap.target_arrival_radius": "Target Arrival Radius",
+  "witchercraft.configuration.meditation": "Meditation",
+  "witchercraft.configuration.meditation.free": "Free Meditation",
+  "witchercraft.configuration.meditation.setup_cost": "Setup Cost",
+  "witchercraft.configuration.meditation.hours_per_cost_step": "Hours Per Cost Step",
+  "witchercraft.configuration.meditation.cost_per_step": "Cost Per Step",
+  "witchercraft.configuration.meditation.maximum_time_cost": "Maximum Time Cost"
 }

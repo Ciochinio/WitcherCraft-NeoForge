@@ -19,6 +19,11 @@ public final class WorldMapServerConfig {
 	private static final int DEFAULT_REFRESH_COOLDOWN_TICKS = 1200;
 	private static final int DEFAULT_MAX_CAPTURES_PER_TICK = 8;
 	private static final int DEFAULT_CAPTURE_BUDGET_MICROS = 3000;
+	private static final boolean DEFAULT_FREE_MEDITATION = false;
+	private static final int DEFAULT_MEDITATION_SETUP_COST = 2;
+	private static final int DEFAULT_MEDITATION_HOURS_PER_COST_STEP = 4;
+	private static final int DEFAULT_MEDITATION_COST_PER_STEP = 2;
+	private static final int DEFAULT_MEDITATION_MAXIMUM_TIME_COST = 10;
 	public static final int HARD_MAX_CAPTURES_PER_TICK = 32;
 	public static final int HARD_MAX_CAPTURE_BUDGET_MICROS = 20_000;
 	public static final int HARD_MAX_REFRESH_COOLDOWN_TICKS = 1_728_000;
@@ -34,6 +39,11 @@ public final class WorldMapServerConfig {
 	private static final ModConfigSpec.IntValue MAX_CAPTURES_PER_TICK;
 	private static final ModConfigSpec.IntValue CAPTURE_BUDGET_MICROS;
 	private static final ModConfigSpec.IntValue WAYPOINT_LIMIT;
+	private static final ModConfigSpec.BooleanValue FREE_MEDITATION;
+	private static final ModConfigSpec.IntValue MEDITATION_SETUP_COST;
+	private static final ModConfigSpec.IntValue MEDITATION_HOURS_PER_COST_STEP;
+	private static final ModConfigSpec.IntValue MEDITATION_COST_PER_STEP;
+	private static final ModConfigSpec.IntValue MEDITATION_MAXIMUM_TIME_COST;
 
 	static {
 		ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
@@ -54,6 +64,14 @@ public final class WorldMapServerConfig {
 			.translation("witchercraft.configuration.minimap").push("minimap");
 		MINIMAP_ENABLED = minimapOption(builder, "enabled", "Allow players to display the WitcherCraft minimap in this world.").define("enabled", true);
 		builder.pop();
+		builder.comment("Per-world gameplay costs for meditation.")
+			.translation("witchercraft.configuration.meditation").push("meditation");
+		FREE_MEDITATION = meditationOption(builder, "free", "Disable all meditation stamina costs.").define("freeMeditation", DEFAULT_FREE_MEDITATION);
+		MEDITATION_SETUP_COST = meditationOption(builder, "setup_cost", "Stamina charged when an accepted meditation begins.").defineInRange("setupCost", DEFAULT_MEDITATION_SETUP_COST, 0, 20);
+		MEDITATION_HOURS_PER_COST_STEP = meditationOption(builder, "hours_per_cost_step", "Meditated hours represented by one time-cost step.").defineInRange("hoursPerCostStep", DEFAULT_MEDITATION_HOURS_PER_COST_STEP, 1, 24);
+		MEDITATION_COST_PER_STEP = meditationOption(builder, "cost_per_step", "Stamina charged for each started time-cost step.").defineInRange("costPerStep", DEFAULT_MEDITATION_COST_PER_STEP, 0, 20);
+		MEDITATION_MAXIMUM_TIME_COST = meditationOption(builder, "maximum_time_cost", "Maximum stamina charged for elapsed meditation time, excluding setup.").defineInRange("maximumTimeCost", DEFAULT_MEDITATION_MAXIMUM_TIME_COST, 0, 20);
+		builder.pop();
 		SPEC = builder.build();
 	}
 
@@ -65,6 +83,10 @@ public final class WorldMapServerConfig {
 
 	private static ModConfigSpec.Builder minimapOption(ModConfigSpec.Builder builder, String key, String comment) {
 		return builder.comment(comment).translation("witchercraft.configuration.minimap." + key);
+	}
+
+	private static ModConfigSpec.Builder meditationOption(ModConfigSpec.Builder builder, String key, String comment) {
+		return builder.comment(comment).translation("witchercraft.configuration.meditation." + key);
 	}
 
 	private static boolean validIdentifier(Object value) {
@@ -95,4 +117,9 @@ public final class WorldMapServerConfig {
 	public static int maxCapturesPerTick() { return !loaded() ? DEFAULT_MAX_CAPTURES_PER_TICK : MAX_CAPTURES_PER_TICK.getAsInt(); }
 	public static long captureBudgetNanos() { return (!loaded() ? DEFAULT_CAPTURE_BUDGET_MICROS : CAPTURE_BUDGET_MICROS.getAsInt()) * 1_000L; }
 	public static int waypointLimit() { return !loaded() ? WorldMapWaypoints.DEFAULT_WAYPOINT_LIMIT : WAYPOINT_LIMIT.getAsInt(); }
+	public static boolean freeMeditation() { return loaded() ? FREE_MEDITATION.getAsBoolean() : DEFAULT_FREE_MEDITATION; }
+	public static int meditationSetupCost() { return loaded() ? MEDITATION_SETUP_COST.getAsInt() : DEFAULT_MEDITATION_SETUP_COST; }
+	public static int meditationHoursPerCostStep() { return loaded() ? MEDITATION_HOURS_PER_COST_STEP.getAsInt() : DEFAULT_MEDITATION_HOURS_PER_COST_STEP; }
+	public static int meditationCostPerStep() { return loaded() ? MEDITATION_COST_PER_STEP.getAsInt() : DEFAULT_MEDITATION_COST_PER_STEP; }
+	public static int meditationMaximumTimeCost() { return loaded() ? MEDITATION_MAXIMUM_TIME_COST.getAsInt() : DEFAULT_MEDITATION_MAXIMUM_TIME_COST; }
 }

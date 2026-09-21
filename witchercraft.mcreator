@@ -10847,6 +10847,7 @@
       "gui.witchercraft.shell.meditation.cancel": "Cancel",
       "gui.witchercraft.shell.meditation.blocked_monster": "Monsters are nearby - you cannot meditate.",
       "gui.witchercraft.shell.meditation.blocked_space": "Not enough open space to meditate here.",
+      "gui.witchercraft.shell.meditation.blocked_stamina": "Not enough stamina for this meditation.",
       "gui.witchercraft.map.waypoints": "Waypoints",
       "gui.witchercraft.map.filters": "Filters",
       "gui.witchercraft.map.filters.title": "Map Filters",
@@ -10918,14 +10919,20 @@
       "witchercraft.configuration.minimap.zoom": "Zoom",
       "witchercraft.configuration.minimap.size": "Size",
       "witchercraft.configuration.minimap.viewport_inset": "Frame Viewport Inset",
-      "witchercraft.configuration.minimap.target_arrival_radius": "Target Arrival Radius"
+      "witchercraft.configuration.minimap.target_arrival_radius": "Target Arrival Radius",
+      "witchercraft.configuration.meditation": "Meditation",
+      "witchercraft.configuration.meditation.free": "Free Meditation",
+      "witchercraft.configuration.meditation.setup_cost": "Setup Cost",
+      "witchercraft.configuration.meditation.hours_per_cost_step": "Hours Per Cost Step",
+      "witchercraft.configuration.meditation.cost_per_step": "Cost Per Step",
+      "witchercraft.configuration.meditation.maximum_time_cost": "Maximum Time Cost"
     }
   },
   "metadata": {
     "files": [
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java",
-      "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModMenus.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModScreens.java",
+      "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModMenus.java",
       "src/main/java/net/redboltmedia/witchercraft/network/MenuStateUpdateMessage.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModKeyMappings.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModParticles.java",
@@ -10935,12 +10942,12 @@
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModEntityRenderers.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModEntities.java",
       "src/main/java/net/redboltmedia/witchercraft/WitchercraftMod.java",
+      "src/main/resources/META-INF/accesstransformer.cfg",
+      "src/main/resources/pack.mcmeta",
+      "src/main/resources/META-INF/neoforge.mods.toml",
       "src/main/java/net/redboltmedia/witchercraft/network/WitchercraftModVariables.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModTabs.java",
-      "src/main/resources/META-INF/accesstransformer.cfg",
-      "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModModels.java",
-      "src/main/resources/META-INF/neoforge.mods.toml",
-      "src/main/resources/pack.mcmeta"
+      "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModModels.java"
     ]
   },
   "foldersRoot": {

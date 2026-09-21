@@ -24,6 +24,7 @@ public class MeditationCanStartProcedure {
 	public static final int OK = 0;
 	public static final int BLOCKED_SPACE = 1;
 	public static final int BLOCKED_MONSTER = 2;
+	public static final int BLOCKED_STAMINA = 3;
 
 	/** Open-air cells required around the head (of the 6 checked) - "not boxed in". */
 	private static final int MIN_AIR = 5;

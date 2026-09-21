@@ -3,6 +3,8 @@ package net.redboltmedia.witchercraft.procedures;
 import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
 import net.redboltmedia.witchercraft.MeditationSpinMessage;
 import net.redboltmedia.witchercraft.MeditationRejectMessage;
+import net.redboltmedia.witchercraft.MeditationCosts;
+import net.redboltmedia.witchercraft.WorldMapServerConfig;
 
 import net.neoforged.neoforge.network.PacketDistributor;
 
@@ -58,6 +60,12 @@ public class MeditationStartProcedure {
 		if (delta == 0)
 			delta = 24000; // picking the current hour = advance a full day
 
+		boolean campfireNearby = MeditationPlaceCampfireProcedure.hasNearbyCampfire(world, x, y, z);
+		if (entity instanceof ServerPlayer sp && sp.getFoodData().getFoodLevel() < MeditationCosts.totalCost(delta, campfireNearby)) {
+			PacketDistributor.sendToPlayer(sp, new MeditationRejectMessage(MeditationCanStartProcedure.BLOCKED_STAMINA));
+			return;
+		}
+
 		WitchercraftModVariables.meditationAnchorTicks = anchor;
 		WitchercraftModVariables.meditationDeltaTicks = delta;
 		WitchercraftModVariables.meditationAnchorGametime = level.getGameTime();
@@ -68,6 +76,8 @@ public class MeditationStartProcedure {
 		MeditationPlaceCampfireProcedure.execute(world, x, y, z, entity);
 		if (entity instanceof ServerPlayer sp) {
 			initiator = sp.getUUID();
+			if (!WorldMapServerConfig.freeMeditation() && !campfireNearby)
+				sp.getFoodData().setFoodLevel(Math.max(0, sp.getFoodData().getFoodLevel() - WorldMapServerConfig.meditationSetupCost()));
 			PacketDistributor.sendToPlayer(sp, new MeditationSpinMessage(hour, MeditationTickProcedure.spinDurationTicks(delta)));
 		}
 	}

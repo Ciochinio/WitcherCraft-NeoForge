@@ -905,6 +905,13 @@ meditation is not rest, it does not hold off the phantoms that a lack of sleep b
 pauses single-player, so meditation begins as soon as the server accepts it. Taking real health damage
 from a hostile mob or another player closes the menu and cancels an active meditation.
 
+Meditation spends stamina. Setting up camp costs **2 stamina**, then every started **4 hours** costs
+another **2**, up to **10** stamina for elapsed time and **12** total. While choosing a target, the
+menu shows its price beside the hunger icon and refuses a session the player cannot fully afford.
+Cancelling pays only for the world time that actually passed, plus the setup cost. World owners can
+disable or tune these costs. A normal or soul campfire within four horizontal blocks and one vertical
+block waives the setup cost, rewarding prepared and revisited campsites.
+
 ### Glossary
 
 The Glossary is a reference for the Witcher universe's terminology - the in-world vocabulary a
