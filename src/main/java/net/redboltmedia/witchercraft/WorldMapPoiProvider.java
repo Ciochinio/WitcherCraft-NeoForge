@@ -32,6 +32,23 @@ public interface WorldMapPoiProvider<C, P> {
 	/** Whether a retained runtime instance still matches this configuration. */
 	boolean matchesSource(C configuration, Identifier sourceId);
 
+	/**
+	 * Lifecycle-managed providers create and delete instances from world events (such as a block being
+	 * placed or broken) instead of observing loaded chunks. Their retained records are reactivated when
+	 * their definition becomes available again, and are checked by {@link #retainsLoadedInstance}.
+	 */
+	default boolean lifecycleManaged() {
+		return false;
+	}
+
+	/**
+	 * Called for a retained instance whose anchor lies in the watched chunk. Returning false deletes the
+	 * stale record. Implementations may only read the chunk supplied by the context.
+	 */
+	default boolean retainsLoadedInstance(ObservationContext context, WorldMapPoiInstance instance) {
+		return true;
+	}
+
 	record ConfiguredDefinition<C>(WorldMapPoiDefinition definition, C configuration) {
 	}
 

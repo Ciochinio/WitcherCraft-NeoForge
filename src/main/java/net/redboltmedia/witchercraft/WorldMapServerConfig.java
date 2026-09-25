@@ -24,6 +24,10 @@ public final class WorldMapServerConfig {
 	private static final int DEFAULT_MEDITATION_HOURS_PER_COST_STEP = 4;
 	private static final int DEFAULT_MEDITATION_COST_PER_STEP = 2;
 	private static final int DEFAULT_MEDITATION_MAXIMUM_TIME_COST = 10;
+	private static final boolean DEFAULT_FAST_TRAVEL_ENABLED = true;
+	private static final boolean DEFAULT_SIGN_DROPS_ITEM = true;
+	private static final int DEFAULT_PLAYER_SIGN_LIMIT = 256;
+	public static final int HARD_MAX_PLAYER_SIGN_LIMIT = 100_000;
 	public static final int HARD_MAX_CAPTURES_PER_TICK = 32;
 	public static final int HARD_MAX_CAPTURE_BUDGET_MICROS = 20_000;
 	public static final int HARD_MAX_REFRESH_COOLDOWN_TICKS = 1_728_000;
@@ -44,6 +48,9 @@ public final class WorldMapServerConfig {
 	private static final ModConfigSpec.IntValue MEDITATION_HOURS_PER_COST_STEP;
 	private static final ModConfigSpec.IntValue MEDITATION_COST_PER_STEP;
 	private static final ModConfigSpec.IntValue MEDITATION_MAXIMUM_TIME_COST;
+	private static final ModConfigSpec.BooleanValue FAST_TRAVEL_ENABLED;
+	private static final ModConfigSpec.BooleanValue SIGN_DROPS_ITEM;
+	private static final ModConfigSpec.IntValue PLAYER_SIGN_LIMIT;
 
 	static {
 		ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
@@ -72,6 +79,12 @@ public final class WorldMapServerConfig {
 		MEDITATION_COST_PER_STEP = meditationOption(builder, "cost_per_step", "Stamina charged for each started time-cost step.").defineInRange("costPerStep", DEFAULT_MEDITATION_COST_PER_STEP, 0, 20);
 		MEDITATION_MAXIMUM_TIME_COST = meditationOption(builder, "maximum_time_cost", "Maximum stamina charged for elapsed meditation time, excluding setup.").defineInRange("maximumTimeCost", DEFAULT_MEDITATION_MAXIMUM_TIME_COST, 0, 20);
 		builder.pop();
+		builder.comment("Per-world rules for fast-travel signposts.")
+			.translation("witchercraft.configuration.fast_travel").push("fastTravel");
+		FAST_TRAVEL_ENABLED = fastTravelOption(builder, "enabled", "Enable fast-travel signpost markers and travel. Disabling keeps signs, names, and discoveries.").worldRestart().define("enabled", DEFAULT_FAST_TRAVEL_ENABLED);
+		SIGN_DROPS_ITEM = fastTravelOption(builder, "sign_drops_item", "Destroyed signposts drop a placeable signpost item outside creative mode.").define("signDropsItem", DEFAULT_SIGN_DROPS_ITEM);
+		PLAYER_SIGN_LIMIT = fastTravelOption(builder, "player_sign_limit", "Maximum player-placed signposts in this world. Zero means no limit. Village signposts do not count. Lowering this never removes signs.").defineInRange("playerSignLimit", DEFAULT_PLAYER_SIGN_LIMIT, 0, HARD_MAX_PLAYER_SIGN_LIMIT);
+		builder.pop();
 		SPEC = builder.build();
 	}
 
@@ -87,6 +100,10 @@ public final class WorldMapServerConfig {
 
 	private static ModConfigSpec.Builder meditationOption(ModConfigSpec.Builder builder, String key, String comment) {
 		return builder.comment(comment).translation("witchercraft.configuration.meditation." + key);
+	}
+
+	private static ModConfigSpec.Builder fastTravelOption(ModConfigSpec.Builder builder, String key, String comment) {
+		return builder.comment(comment).translation("witchercraft.configuration.fast_travel." + key);
 	}
 
 	private static boolean validIdentifier(Object value) {
@@ -122,4 +139,8 @@ public final class WorldMapServerConfig {
 	public static int meditationHoursPerCostStep() { return loaded() ? MEDITATION_HOURS_PER_COST_STEP.getAsInt() : DEFAULT_MEDITATION_HOURS_PER_COST_STEP; }
 	public static int meditationCostPerStep() { return loaded() ? MEDITATION_COST_PER_STEP.getAsInt() : DEFAULT_MEDITATION_COST_PER_STEP; }
 	public static int meditationMaximumTimeCost() { return loaded() ? MEDITATION_MAXIMUM_TIME_COST.getAsInt() : DEFAULT_MEDITATION_MAXIMUM_TIME_COST; }
+	/** Requires the map and POIs too: sign markers are POIs, and travel is chosen on the map. */
+	public static boolean fastTravelEnabled() { return poisEnabled() && (!loaded() ? DEFAULT_FAST_TRAVEL_ENABLED : FAST_TRAVEL_ENABLED.getAsBoolean()); }
+	public static boolean signDropsItem() { return loaded() ? SIGN_DROPS_ITEM.getAsBoolean() : DEFAULT_SIGN_DROPS_ITEM; }
+	public static int playerSignLimit() { return loaded() ? PLAYER_SIGN_LIMIT.getAsInt() : DEFAULT_PLAYER_SIGN_LIMIT; }
 }

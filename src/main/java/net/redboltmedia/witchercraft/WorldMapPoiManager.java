@@ -12,10 +12,14 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.chunk.LevelChunk;
+
+import org.jspecify.annotations.Nullable;
 
 import net.neoforged.neoforge.network.PacketDistributor;
 
@@ -46,10 +50,11 @@ public final class WorldMapPoiManager {
 	public static void onChunkWatch(ChunkWatchEvent.Watch event) {
 		if (!WorldMapServerConfig.poisEnabled() || !event.getLevel().dimension().equals(Level.OVERWORLD))
 			return;
+		ServerState state = SERVERS.computeIfAbsent(event.getLevel().getServer(), ServerState::new);
+		state.reconcileLoadedChunk(event.getLevel(), event.getChunk());
 		WorldMapPoiDefinitions.Snapshot definitions = WorldMapPoiDefinitions.active();
 		if (definitions.definitions().isEmpty())
 			return;
-		ServerState state = SERVERS.computeIfAbsent(event.getLevel().getServer(), ServerState::new);
 		state.watchedChunks++;
 		definitions.providers().observeLoadedChunk(new WorldMapPoiProvider.ObservationContext(event.getLevel(), event.getChunk()),
 			instance -> state.accept(instance, definitions));
@@ -101,6 +106,62 @@ public final class WorldMapPoiManager {
 		state.requestMarkers(player, request, WorldMapPoiDefinitions.active());
 	}
 
+	/**
+	 * Stores or replaces a lifecycle-managed instance created by a world event, such as a placed
+	 * fast-travel sign. The record stays inactive while its definition is unavailable. A record stored
+	 * with {@code discoverable} false is kept out of the spatial index, so nobody can reveal or discover
+	 * it, until {@link #makeDiscoverable} is called. That hold is runtime-only and ends on restart.
+	 * Server thread only.
+	 */
+	public static boolean putLifecycleInstance(MinecraftServer server, WorldMapPoiInstance instance, boolean discoverable) {
+		return SERVERS.computeIfAbsent(server, ServerState::new).putLifecycle(instance, discoverable);
+	}
+
+	public static void makeDiscoverable(MinecraftServer server, UUID markerId) {
+		SERVERS.computeIfAbsent(server, ServerState::new).makeDiscoverable(markerId);
+	}
+
+	/**
+	 * Discovers a POI for one player immediately, skipping the reveal pass and discovery radius, with the
+	 * normal message and sound. Used when a player places a fast-travel sign. No-op for an inactive,
+	 * held, unknown, or already discovered POI.
+	 */
+	public static void discoverFor(ServerPlayer player, UUID markerId) {
+		ServerState state = SERVERS.computeIfAbsent(player.level().getServer(), ServerState::new);
+		WorldMapPoiInstance instance = state.instances.get(markerId);
+		WorldMapPoiDefinitions.Snapshot definitions = WorldMapPoiDefinitions.active();
+		if (instance == null || !instance.active() || state.undiscoverable.contains(markerId) || !definitions.accepts(instance))
+			return;
+		WorldMapPoiDefinition definition = definitions.definitions().get(instance.definitionId());
+		if (definition != null && definition.discoveryRequired())
+			state.discover(player, instance, definition, definitions.generation());
+	}
+
+	/** The lifecycle-managed instance anchored at an exact block, if any. */
+	public static @Nullable WorldMapPoiInstance lifecycleInstanceAt(MinecraftServer server, Identifier dimension, BlockPos anchor) {
+		ServerState state = SERVERS.computeIfAbsent(server, ServerState::new);
+		UUID markerId = state.lifecycleAnchors.get(new ServerState.AnchorKey(dimension, anchor.asLong()));
+		return markerId == null ? null : state.instances.get(markerId);
+	}
+
+	/** Deletes an instance and every player's knowledge of it, and drops it from connected clients. */
+	public static boolean removeInstance(MinecraftServer server, UUID markerId) {
+		return SERVERS.computeIfAbsent(server, ServerState::new).remove(markerId);
+	}
+
+	/** Changes a custom name and refreshes the marker for connected players who know it. */
+	public static boolean renameInstance(MinecraftServer server, UUID markerId, String customName) {
+		return SERVERS.computeIfAbsent(server, ServerState::new).rename(markerId, customName);
+	}
+
+	public static int countInstances(MinecraftServer server, Identifier providerType, Identifier sourceId) {
+		int count = 0;
+		for (WorldMapPoiInstance instance : SERVERS.computeIfAbsent(server, ServerState::new).instances.values())
+			if (instance.providerType().equals(providerType) && instance.sourceId().equals(sourceId))
+				count++;
+		return count;
+	}
+
 	public static Collection<WorldMapPoiInstance> instances(MinecraftServer server) {
 		ServerState state = SERVERS.get(server);
 		return state == null ? java.util.List.of() : state.instances.values();
@@ -112,6 +173,9 @@ public final class WorldMapPoiManager {
 		private final WorldMapPoiKnowledge knowledge;
 		private final WorldMapPoiSpatialIndex spatialIndex = new WorldMapPoiSpatialIndex();
 		private final Map<UUID, RequestAllowance> requestAllowances = new HashMap<>();
+		private final Map<AnchorKey, UUID> lifecycleAnchors = new HashMap<>();
+		private final Map<ChunkKey, Set<UUID>> lifecycleByChunk = new HashMap<>();
+		private final Set<UUID> undiscoverable = new HashSet<>();
 		private double maximumRevealRadius;
 		private double maximumDiscoveryRadius;
 		private long watchedChunks;
@@ -129,12 +193,120 @@ public final class WorldMapPoiManager {
 		private long maximumTickNanos;
 		private long revealCandidates;
 		private long discoveryCandidates;
+		private long lifecycleRemovals;
+		private long staleRemovals;
 
 		private ServerState(MinecraftServer server) {
 			this.server = server;
 			instances = WorldMapPoiInstances.get(server);
 			knowledge = WorldMapPoiKnowledge.get(server);
+			for (WorldMapPoiInstance instance : instances.values())
+				if (lifecycleManaged(instance))
+					indexLifecycle(instance);
 			reconcile(WorldMapPoiDefinitions.active());
+		}
+
+		private boolean putLifecycle(WorldMapPoiInstance instance, boolean discoverable) {
+			WorldMapPoiInstance stored = instance.withActive(WorldMapPoiDefinitions.active().accepts(instance));
+			WorldMapPoiInstances.ObservationResult result = instances.observe(stored);
+			switch (result) {
+				case CREATED, UPDATED, UNCHANGED -> {
+					indexLifecycle(stored);
+					if (discoverable) {
+						undiscoverable.remove(stored.markerId());
+						spatialIndex.upsert(stored);
+					} else {
+						undiscoverable.add(stored.markerId());
+						spatialIndex.remove(stored.markerId());
+					}
+					if (result == WorldMapPoiInstances.ObservationResult.CREATED)
+						WitchercraftMod.LOGGER.info("Registered world-map POI: marker={}, definition={}, source={}, dimension={}, anchor=[{}, {}, {}], active={}",
+							stored.markerId(), stored.definitionId(), stored.sourceId(), stored.dimension(), stored.anchor().getX(),
+							stored.anchor().getY(), stored.anchor().getZ(), stored.active());
+					return true;
+				}
+				case COLLISION -> WitchercraftMod.LOGGER.error("Stable POI marker collision for {} and identity '{}'", stored.markerId(), stored.providerIdentity());
+				case LIMIT_REACHED -> WitchercraftMod.LOGGER.error("Cannot retain POI {}: shared instance limit {} reached", stored.markerId(), WorldMapPoiInstances.MAX_INSTANCES);
+			}
+			return false;
+		}
+
+		private void makeDiscoverable(UUID markerId) {
+			if (!undiscoverable.remove(markerId))
+				return;
+			WorldMapPoiInstance instance = instances.get(markerId);
+			if (instance != null)
+				spatialIndex.upsert(instance);
+		}
+
+		private boolean remove(UUID markerId) {
+			WorldMapPoiInstance removed = instances.remove(markerId);
+			if (removed == null)
+				return false;
+			spatialIndex.remove(markerId);
+			undiscoverable.remove(markerId);
+			unindexLifecycle(removed);
+			lifecycleRemovals++;
+			for (Map.Entry<UUID, UUID> forgotten : knowledge.forget(markerId).entrySet()) {
+				ServerPlayer player = server.getPlayerList().getPlayer(forgotten.getKey());
+				if (player != null)
+					PacketDistributor.sendToPlayer(player, new WorldMapPoiRemovedMessage(removed.dimension(), forgotten.getValue()));
+			}
+			WitchercraftMod.LOGGER.info("Removed world-map POI: marker={}, definition={}, dimension={}, anchor=[{}, {}, {}]", markerId,
+				removed.definitionId(), removed.dimension(), removed.anchor().getX(), removed.anchor().getY(), removed.anchor().getZ());
+			return true;
+		}
+
+		private boolean rename(UUID markerId, String customName) {
+			if (!instances.setCustomName(markerId, customName))
+				return false;
+			WorldMapPoiInstance instance = instances.get(markerId);
+			WorldMapPoiDefinitions.Snapshot definitions = WorldMapPoiDefinitions.active();
+			WorldMapPoiDefinition definition = instance == null ? null : definitions.definitions().get(instance.definitionId());
+			if (definition == null || !instance.active() || !definitions.accepts(instance))
+				return true;
+			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+				WorldMapPoiKnowledge.Entry entry = knowledge.get(player.getUUID(), markerId);
+				if (entry != null)
+					pushMarker(player, instance, definition, entry, definitions.generation());
+			}
+			return true;
+		}
+
+		/** Deletes lifecycle-managed records anchored in this watched chunk whose world object is gone. */
+		private void reconcileLoadedChunk(ServerLevel level, LevelChunk chunk) {
+			Set<UUID> anchored = lifecycleByChunk.get(new ChunkKey(level.dimension().identifier(), chunk.getPos().x(), chunk.getPos().z()));
+			if (anchored == null)
+				return;
+			WorldMapPoiProvider.ObservationContext context = new WorldMapPoiProvider.ObservationContext(level, chunk);
+			for (UUID markerId : List.copyOf(anchored)) {
+				WorldMapPoiInstance instance = instances.get(markerId);
+				if (instance == null)
+					continue;
+				WorldMapPoiProvider<?, ?> provider = WorldMapPoiProviders.provider(instance.providerType()).orElse(null);
+				if (provider != null && !provider.retainsLoadedInstance(context, instance) && remove(markerId))
+					staleRemovals++;
+			}
+		}
+
+		private void indexLifecycle(WorldMapPoiInstance instance) {
+			lifecycleAnchors.put(new AnchorKey(instance.dimension(), instance.anchor().asLong()), instance.markerId());
+			lifecycleByChunk.computeIfAbsent(ChunkKey.of(instance), ignored -> new java.util.LinkedHashSet<>()).add(instance.markerId());
+		}
+
+		private void unindexLifecycle(WorldMapPoiInstance instance) {
+			lifecycleAnchors.remove(new AnchorKey(instance.dimension(), instance.anchor().asLong()), instance.markerId());
+			ChunkKey chunk = ChunkKey.of(instance);
+			Set<UUID> anchored = lifecycleByChunk.get(chunk);
+			if (anchored != null) {
+				anchored.remove(instance.markerId());
+				if (anchored.isEmpty())
+					lifecycleByChunk.remove(chunk);
+			}
+		}
+
+		private static boolean lifecycleManaged(WorldMapPoiInstance instance) {
+			return WorldMapPoiProviders.provider(instance.providerType()).map(WorldMapPoiProvider::lifecycleManaged).orElse(false);
 		}
 
 		private void accept(WorldMapPoiInstance observed, WorldMapPoiDefinitions.Snapshot definitions) {
@@ -233,7 +405,7 @@ public final class WorldMapPoiManager {
 			if (!knowledge.discover(player.getUUID(), markerId))
 				return;
 			discoveries++;
-			PacketDistributor.sendToPlayer(player, new WorldMapPoiDiscoveredMessage(definition.translationKey(), fallbackName(definition.id())));
+			PacketDistributor.sendToPlayer(player, new WorldMapPoiDiscoveredMessage(definition.translationKey(), fallbackName(definition.id()), instance.customName()));
 			player.connection.send(new ClientboundSoundPacket(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(SoundEvents.PLAYER_LEVELUP),
 				SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 0.7F, 1.0F, player.getRandom().nextLong()));
 			WorldMapPoiKnowledge.Entry discovered = knowledge.get(player.getUUID(), markerId);
@@ -300,7 +472,7 @@ public final class WorldMapPoiManager {
 				return new WorldMapPoiMarker.Unknown(entry.presentationId(), exactX, exactZ,
 					definition.minimumZoom(), definition.defaultVisible());
 			return new WorldMapPoiMarker.Discovered(entry.presentationId(), exactX, exactZ, definition.translationKey(), definition.descriptionTranslationKey(), definition.category(),
-				definition.icon(), definition.minimumZoom(), definition.defaultVisible());
+				definition.icon(), definition.minimumZoom(), definition.defaultVisible(), instance.customName());
 		}
 
 		private void complete(ServerPlayer player, int requestId, boolean accepted, long generation, long[] cells) {
@@ -325,19 +497,25 @@ public final class WorldMapPoiManager {
 				if (definition.discoveryRequired())
 					maximumDiscoveryRadius = Math.max(maximumDiscoveryRadius, definition.discoveryRadius());
 			}
-			for (WorldMapPoiInstance instance : instances.values())
-				if (instance.active() && !definitions.accepts(instance))
+			for (WorldMapPoiInstance instance : instances.values()) {
+				boolean accepted = definitions.accepts(instance);
+				if (instance.active() && !accepted)
 					instances.setActive(instance.markerId(), false);
+				else if (!instance.active() && accepted && lifecycleManaged(instance))
+					instances.setActive(instance.markerId(), true);
+			}
 			spatialIndex.rebuild(instances.values());
+			for (UUID markerId : undiscoverable)
+				spatialIndex.remove(markerId);
 		}
 
 		private void logDiagnostics() {
 			long active = instances.values().stream().filter(WorldMapPoiInstance::active).count();
 			double averageMicros = timedTicks == 0 ? 0.0 : totalTickNanos / (timedTicks * 1_000.0);
 			double maximumMicros = maximumTickNanos / 1_000.0;
-			WitchercraftMod.LOGGER.info("World-map POI state: watched_chunks={}, matched_observations={}, unique_instances={}, refreshed_instances={}, duplicate_observations={}, observation_collisions={}, retained_instances={}, active_instances={}, reveals={}, discoveries={}, view_requests={}, rejected_view_requests={}, reveal_candidates={}, discovery_candidates={}, tick_avg_us={}, tick_max_us={}",
+			WitchercraftMod.LOGGER.info("World-map POI state: watched_chunks={}, matched_observations={}, unique_instances={}, refreshed_instances={}, duplicate_observations={}, observation_collisions={}, retained_instances={}, active_instances={}, lifecycle_removals={}, stale_removals={}, reveals={}, discoveries={}, view_requests={}, rejected_view_requests={}, reveal_candidates={}, discovery_candidates={}, tick_avg_us={}, tick_max_us={}",
 				watchedChunks, matchedObservations, uniqueInstances, refreshedInstances, duplicateObservations, observationCollisions,
-				instances.values().size(), active, reveals, discoveries, viewRequests, rejectedViewRequests, revealCandidates,
+				instances.values().size(), active, lifecycleRemovals, staleRemovals, reveals, discoveries, viewRequests, rejectedViewRequests, revealCandidates,
 				discoveryCandidates, String.format(java.util.Locale.ROOT, "%.2f", averageMicros), String.format(java.util.Locale.ROOT, "%.2f", maximumMicros));
 			timedTicks = 0;
 			totalTickNanos = 0;
@@ -368,6 +546,15 @@ public final class WorldMapPoiManager {
 				}
 			}
 			return result.isEmpty() ? "Location" : result.toString();
+		}
+
+		private record AnchorKey(Identifier dimension, long position) {
+		}
+
+		private record ChunkKey(Identifier dimension, int x, int z) {
+			private static ChunkKey of(WorldMapPoiInstance instance) {
+				return new ChunkKey(instance.dimension(), instance.anchor().getX() >> 4, instance.anchor().getZ() >> 4);
+			}
 		}
 
 		private static final class RequestAllowance {

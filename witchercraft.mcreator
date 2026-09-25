@@ -9602,6 +9602,349 @@
         ]
       },
       "path": "~/Mobs/Cockatrice"
+    },
+    {
+      "name": "FastTravelSign",
+      "type": "block",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "fast_travel_sign",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/block/FastTravelSignBlock.java",
+          "src/main/resources/assets/witchercraft/blockstates/fast_travel_sign.json",
+          "src/main/resources/assets/witchercraft/models/block/fast_travel_sign.json",
+          "src/main/resources/assets/witchercraft/models/block/fast_travel_sign_0.json",
+          "src/main/resources/assets/witchercraft/models/item/fast_travel_sign.json",
+          "src/main/resources/assets/witchercraft/items/fast_travel_sign.json",
+          "src/main/resources/data/witchercraft/loot_table/blocks/fast_travel_sign.json"
+        ]
+      },
+      "path": "~/World Map/Fast Travel"
+    },
+    {
+      "name": "FastTravelSignCanSurvive",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "fast_travel_sign_can_survive",
+      "metadata": {
+        "return_type": "logic",
+        "dependencies": [
+          {
+            "name": "world",
+            "type": "world"
+          },
+          {
+            "name": "x",
+            "type": "number"
+          },
+          {
+            "name": "y",
+            "type": "number"
+          },
+          {
+            "name": "z",
+            "type": "number"
+          },
+          {
+            "name": "blockstate",
+            "type": "blockstate"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/FastTravelSignCanSurviveProcedure.java"
+        ]
+      },
+      "path": "~/World Map/Fast Travel"
+    },
+    {
+      "name": "FastTravelSignPlaced",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "fast_travel_sign_placed",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "world",
+            "type": "world"
+          },
+          {
+            "name": "x",
+            "type": "number"
+          },
+          {
+            "name": "y",
+            "type": "number"
+          },
+          {
+            "name": "z",
+            "type": "number"
+          },
+          {
+            "name": "blockstate",
+            "type": "blockstate"
+          },
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/FastTravelSignPlacedProcedure.java"
+        ]
+      },
+      "path": "~/World Map/Fast Travel"
+    },
+    {
+      "name": "FastTravelSignDestroyedByPlayer",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "fast_travel_sign_destroyed_by_player",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "world",
+            "type": "world"
+          },
+          {
+            "name": "x",
+            "type": "number"
+          },
+          {
+            "name": "y",
+            "type": "number"
+          },
+          {
+            "name": "z",
+            "type": "number"
+          },
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/FastTravelSignDestroyedByPlayerProcedure.java"
+        ]
+      },
+      "path": "~/World Map/Fast Travel"
+    },
+    {
+      "name": "FastTravelSignExploded",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "fast_travel_sign_exploded",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "world",
+            "type": "world"
+          },
+          {
+            "name": "x",
+            "type": "number"
+          },
+          {
+            "name": "y",
+            "type": "number"
+          },
+          {
+            "name": "z",
+            "type": "number"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/FastTravelSignExplodedProcedure.java"
+        ]
+      },
+      "path": "~/World Map/Fast Travel"
+    },
+    {
+      "name": "FastTravelSignNeighbourChanged",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "fast_travel_sign_neighbour_changed",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "world",
+            "type": "world"
+          },
+          {
+            "name": "x",
+            "type": "number"
+          },
+          {
+            "name": "y",
+            "type": "number"
+          },
+          {
+            "name": "z",
+            "type": "number"
+          },
+          {
+            "name": "blockstate",
+            "type": "blockstate"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/FastTravelSignNeighbourChangedProcedure.java"
+        ]
+      },
+      "path": "~/World Map/Fast Travel"
+    },
+    {
+      "name": "FastTravelSignRegister",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "fast_travel_sign_register",
+      "metadata": {
+        "return_type": "logic",
+        "dependencies": [
+          {
+            "name": "world",
+            "type": "world"
+          },
+          {
+            "name": "x",
+            "type": "number"
+          },
+          {
+            "name": "y",
+            "type": "number"
+          },
+          {
+            "name": "z",
+            "type": "number"
+          },
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/FastTravelSignRegisterProcedure.java"
+        ]
+      },
+      "path": "~/World Map/Fast Travel"
+    },
+    {
+      "name": "FastTravelSignRemove",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "fast_travel_sign_remove",
+      "metadata": {
+        "return_type": "logic",
+        "dependencies": [
+          {
+            "name": "world",
+            "type": "world"
+          },
+          {
+            "name": "x",
+            "type": "number"
+          },
+          {
+            "name": "y",
+            "type": "number"
+          },
+          {
+            "name": "z",
+            "type": "number"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/FastTravelSignRemoveProcedure.java"
+        ]
+      },
+      "path": "~/World Map/Fast Travel"
+    },
+    {
+      "name": "FastTravelSignDropsItem",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "fast_travel_sign_drops_item",
+      "metadata": {
+        "return_type": "logic",
+        "dependencies": [],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/FastTravelSignDropsItemProcedure.java"
+        ]
+      },
+      "path": "~/World Map/Fast Travel"
+    },
+    {
+      "name": "FastTravelSigns",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "fast_travel_signs",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/FastTravelSigns.java"
+        ]
+      },
+      "path": "~/World Map/Fast Travel"
+    },
+    {
+      "name": "FastTravelSignPoiProvider",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "fast_travel_sign_poi_provider",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/FastTravelSignPoiProvider.java"
+        ]
+      },
+      "path": "~/World Map/Fast Travel"
+    },
+    {
+      "name": "FastTravelSignNameScreen",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "fast_travel_sign_name_screen",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/FastTravelSignNameScreen.java"
+        ]
+      },
+      "path": "~/World Map/Fast Travel"
+    },
+    {
+      "name": "FastTravelSignNameMessage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "fast_travel_sign_name_message",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/FastTravelSignNameMessage.java"
+        ]
+      },
+      "path": "~/World Map/Fast Travel"
+    },
+    {
+      "name": "WorldMapPoiRemovedMessage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "world_map_poi_removed_message",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WorldMapPoiRemovedMessage.java"
+        ]
+      },
+      "path": "~/World Map/POI"
     }
   ],
   "variable_elements": [
@@ -10925,7 +11268,25 @@
       "witchercraft.configuration.meditation.setup_cost": "Setup Cost",
       "witchercraft.configuration.meditation.hours_per_cost_step": "Hours Per Cost Step",
       "witchercraft.configuration.meditation.cost_per_step": "Cost Per Step",
-      "witchercraft.configuration.meditation.maximum_time_cost": "Maximum Time Cost"
+      "witchercraft.configuration.meditation.maximum_time_cost": "Maximum Time Cost",
+      "block.witchercraft.fast_travel_sign": "Signpost",
+      "item.witchercraft.fast_travel_sign": "Signpost",
+      "poi.witchercraft.fast_travel_sign": "Signpost",
+      "poi.witchercraft.fast_travel_sign.description": "A shared fast-travel destination.",
+      "category.witchercraft.poi.fast_travel": "Fast Travel",
+      "gui.witchercraft.fast_travel.sign_name.title": "Name this signpost",
+      "gui.witchercraft.fast_travel.sign_name.name": "Name",
+      "gui.witchercraft.fast_travel.sign_name.hint": "Leave empty to keep the default name.",
+      "gui.witchercraft.fast_travel.sign_name.save": "Save",
+      "message.witchercraft.fast_travel.sign.overworld_only": "Signposts can only be placed in the Overworld.",
+      "message.witchercraft.fast_travel.sign.no_room": "There is no room for a signpost here.",
+      "message.witchercraft.fast_travel.sign.limit_reached": "This world has reached its signpost limit.",
+      "message.witchercraft.fast_travel.sign.failed": "This signpost could not be registered.",
+      "witchercraft.configuration.fast_travel": "Fast Travel",
+      "witchercraft.configuration.fast_travel.enabled": "Fast Travel Enabled",
+      "witchercraft.configuration.fast_travel.sign_drops_item": "Signposts Drop as Items",
+      "witchercraft.configuration.fast_travel.player_sign_limit": "Player-Placed Signpost Limit",
+      "gui.witchercraft.map.poi.named": "%s: %s"
     }
   },
   "metadata": {
@@ -10938,6 +11299,7 @@
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModParticles.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModParticleTypes.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModMobEffects.java",
+      "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModBlocks.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModItems.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModEntityRenderers.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModEntities.java",
@@ -11642,6 +12004,10 @@
           },
           {
             "name": "POI",
+            "children": []
+          },
+          {
+            "name": "Fast Travel",
             "children": []
           }
         ]

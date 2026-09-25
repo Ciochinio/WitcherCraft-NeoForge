@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "upper=false": {
+      "model": "witchercraft:block/fast_travel_sign"
+    },
+    "upper=true": {
+      "model": "witchercraft:block/fast_travel_sign_0"
+    }
+  }
+}

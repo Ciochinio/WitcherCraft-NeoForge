@@ -1,0 +1,14 @@
+{
+  "provider": {
+    "type": "witchercraft:fast_travel_sign"
+  },
+  "translation_key": "poi.witchercraft.fast_travel_sign",
+  "description_translation_key": "poi.witchercraft.fast_travel_sign.description",
+  "category": "witchercraft:fast_travel",
+  "icon": "witchercraft:textures/screens/map_poi_fast_travel.png",
+  "reveal_radius": 128,
+  "discovery_radius": 16,
+  "default_visible": true,
+  "minimum_zoom": 0.25,
+  "capabilities": []
+}

@@ -1676,13 +1676,16 @@ every 1,200 server ticks.
 
 ### 5.12 POI persistence, identity, and discovery
 
-`WorldMapPoiInstances` is the authoritative shared, codec-backed `SavedData` store. Each version-one record
+`WorldMapPoiInstances` is the authoritative shared, codec-backed `SavedData` store. Each record
 persists the stable marker UUID, definition and provider identifiers, canonical provider identity, dimension,
-exact three-dimensional anchor, and active flag. Loading recomputes the UUID from the provider identity and
-rejects invalid coordinates, identifiers, duplicate IDs, collisions, overlong identities, and records beyond
-the hard instance limit. Provider observations insert or refresh this store on the server thread. Removing a
-definition marks matching records inactive without deleting them; only a later provider observation can
-reactivate one after its definition returns.
+exact three-dimensional anchor, and active flag. Version two adds an optional `custom_name` (empty by default,
+at most 64 code points of plain text) used by lifecycle-managed POIs; version-one files load unchanged. Loading
+recomputes the UUID from the provider identity and rejects invalid coordinates, identifiers, names, duplicate IDs,
+collisions, overlong identities, and records beyond the hard instance limit. Provider observations insert or
+refresh this store on the server thread. Removing a definition marks matching records inactive without deleting
+them; only a later provider observation can reactivate one after its definition returns. Lifecycle-managed
+records (Section 5.17) are the exception: definition reconciliation reactivates them, and only they are ever
+deleted from the store.
 
 `WorldMapPoiKnowledge` is a separate codec-backed `SavedData` store grouped by player UUID. Its version-two
 knowledge record contains the authoritative marker UUID, a random per-player presentation UUID, monotonic
@@ -1729,7 +1732,8 @@ if its bounded 4,096-marker response ceiling would be exceeded.
 `WorldMapPoiMarker.Unknown` contains only the per-player presentation UUID, exact anchor X/Z, minimum zoom,
 and default visibility. It cannot hold a definition ID, provider fields, translation key, description, category,
 or icon. `WorldMapPoiMarker.Discovered` contains exact X/Z plus name and description translation keys, category,
-icon, minimum zoom, and default visibility. The authoritative deterministic marker UUID never crosses the network; the version-two
+icon, minimum zoom, default visibility, and the server-approved custom name, which replaces the translated name
+when it is not empty. The authoritative deterministic marker UUID never crosses the network; the version-two
 knowledge store's random presentation UUID is stable for that player across sessions and is not derivable from
 the structure identity.
 
@@ -1846,6 +1850,9 @@ soul campfires within the placement procedure's four-block horizontal and one-bl
 The client uses it to omit setup from the displayed price. The server repeats it before affordability
 validation, campfire placement, and setup charging, so the server remains authoritative.
 
+The sibling `Fast Travel` section holds the fast-travel enable switch, the sign-drop switch, and the
+player-placed sign limit (Section 5.17). Fast travel additionally requires the map and POIs to be enabled.
+
 World settings control the map and POI enable switches, a POI-definition allowlist, omitted JSON radius defaults,
 same-session tile refresh cooldown, capture count and time budgets, and the personal-waypoint limit. An empty POI
 allowlist enables all valid definitions. POI definition selection and default radii require a world restart and are
@@ -1863,3 +1870,93 @@ violations and removes failed temporary files. Missing or corrupt terrain remain
 the authoritative server without affecting waypoints or POI knowledge. Capture diagnostics additionally report
 average and maximum sampling time; existing renderer, cache-size, POI candidate, tick-time, queue, failure, rebuild,
 upload, draw-call, and disk-footprint diagnostics remain the profiling basis for later default changes.
+
+### 5.17 Fast-travel signposts
+
+Stage 1 of the fast-travel milestone adds the signpost block and its lifecycle as a shared POI. Travel sessions,
+XP pricing, and the map travel mode are later stages and must build on the contracts below.
+
+#### Ownership boundary
+
+The block is an ordinary MCreator element, `FastTravelSign` (browser folder `~/World Map/Fast Travel`). Its two
+halves are one block with a custom logic property `upper`; the upper state has its own model, like a vanilla
+door. Both halves share one plain 10 by 16 by 10 bounding box (collision and selection). The models are `models/fast_travel_sign_lower.json` and `models/fast_travel_sign_upper.json`
+(MCreator workspace models with `.textures` mapping files), split at y=16 from
+`models/blockbench/FastTravelSign.bbmodel`. A replacement model must also split cleanly at y=16. The block has no
+drops of its own (drop amount zero, empty loot table), no block entity, piston reaction `BLOCK`, and zero
+flammability, so every normal removal path goes through a procedure.
+
+These Blockly procedures own placement and destruction and are the source of truth for that behavior:
+
+| Procedure | Trigger | Behavior |
+| --- | --- | --- |
+| `FastTravelSignCanSurvive` | Placing condition (`canSurvive`) | Upper half survives only on a lower half. Lower half requires the Overworld and air or its own upper half above. MCreator's generated `updateShape` turns a half that fails this into air, which is how the upper half disappears with its base. |
+| `FastTravelSignPlaced` | Block placed by entity | For the lower half, calls `FastTravelSignRegister`; on success places the upper half, otherwise removes the lower half and refunds the item outside creative mode. |
+| `FastTravelSignDestroyedByPlayer` | Destroyed by player | Removes a lower half directly below (the player broke the upper half), then drops one item if `FastTravelSignRemove` and `FastTravelSignDropsItem` both return true and the player is not in creative mode. |
+| `FastTravelSignExploded` | Destroyed by explosion | Same as above without the creative check. The explosion hook receives no block state, so the procedure never relies on knowing which half exploded. |
+| `FastTravelSignNeighbourChanged` | Neighbour changed | A lower half without its upper half (removed by a command) removes itself and its record, without a drop. |
+
+The locked procedures `FastTravelSignRegister`, `FastTravelSignRemove`, and `FastTravelSignDropsItem` are thin
+entry points into the locked code element `FastTravelSigns`.
+
+#### Identity and authoritative state
+
+The shared POI store is the authoritative sign state. `FastTravelSigns.register` creates a record under the
+`witchercraft:fast_travel_sign` definition and provider with identity
+`witchercraft:fast_travel_sign|<dimension>|<random UUID>`, so every placement, including a replacement at the same
+position, gets a fresh marker UUID and fresh per-player knowledge. The anchor is the lower half. Any older record
+at the same anchor is deleted first. The record's `custom_name` holds the bare sign name, defaulting to the
+anchor's `x, z` coordinates. Presentation adds the kind: `WorldMapPoiMarker.displayName` formats any
+custom-named POI as `<translated kind>: <name>` through the `gui.witchercraft.map.poi.named` key, used by the
+map hover card and the discovery message. The `sourceId` distinguishes `witchercraft:player_placed` from the reserved
+`witchercraft:village`; only player-placed records count toward the per-world limit.
+
+`FastTravelSigns.removeIfGone` checks the records anchored at the broken block and the block below it, and deletes
+any whose complete two-block sign no longer stands. It returns true only for an actual deletion, so a destroyed
+sign produces at most one item no matter how many of its halves trigger a procedure. Client-side calls of
+Register return true (the client predicts the upper half) and client-side calls of Remove return false; the
+server is authoritative.
+
+#### Lifecycle-managed POIs
+
+`WorldMapPoiProvider` has two default methods for providers whose instances come from world events rather than
+chunk observation. `lifecycleManaged()` makes definition reconciliation reactivate retained records when their
+definition returns. `retainsLoadedInstance` is asked about every retained lifecycle record anchored in a chunk
+delivered by `ChunkWatchEvent.Watch`; returning false deletes the record. `FastTravelSignPoiProvider` observes
+nothing and answers the retention check from the watched `LevelChunk` only, which catches signs removed by
+`/setblock`, `/fill`, and other paths that run no procedure. This keeps the no-load contract of Section 5.15.
+
+`WorldMapPoiManager` keeps two derived, unsaved indexes of lifecycle records: exact anchor to marker and chunk to
+markers. Its lifecycle API is `putLifecycleInstance`, `makeDiscoverable`, `discoverFor`, `lifecycleInstanceAt`,
+`removeInstance`, `renameInstance`, and `countInstances`, all server-thread only. A record whose definition is
+unavailable (fast travel or POIs disabled) is stored inactive and stays out of the spatial index, so it is neither
+revealed nor sent. A record stored with `discoverable` false is also kept out of the spatial index until
+`makeDiscoverable`; this runtime-only hold ends at restart and survives definition reconciliation.
+
+Deleting a record also deletes every player's knowledge entry for it (`WorldMapPoiKnowledge.forget`) and sends
+`WorldMapPoiRemovedMessage` with that player's presentation UUID to each affected connected player, whose
+client cache drops the marker. Offline players receive a full cache reset at login as before. Renaming pushes
+the updated marker to connected players who know it. `WorldMapPoiDiscoveredMessage` carries the custom name
+alongside the translation key. The diagnostic line adds
+`lifecycle_removals` and `stale_removals`.
+
+#### Configuration
+
+The `fast_travel_sign` definition ignores the POI allowlist and is published only while
+`WorldMapServerConfig.fastTravelEnabled()` is true, which also requires the map and POIs. The definition sets a
+128-block reveal radius, a 16-block discovery radius, the `witchercraft:fast_travel` category, and the
+`map_poi_fast_travel.png` icon. Sign drops and the player-placed limit (default 256, zero for no limit, hard
+ceiling 100,000) apply immediately; the enable switch requires a world restart like other definition selection.
+
+#### Placement naming
+
+A player placement registers the sign undiscoverable, stores a naming session for that player (marker UUID and
+a five-minute expiry), and sends `FastTravelSignNameMessage` with the default name. The client opens
+`FastTravelSignNameScreen`, a plain `Screen` styled like the waypoint creation panel. However the screen
+closes, `removed()` sends the same message type back exactly once with only the name, empty for cancel. The
+server consumes the sender's session, so a request can only name the sender's latest sign, once, and the packet
+never carries a sign identity. A non-empty name that passes `WorldMapPoiInstance.validCustomName` replaces the
+default; the sign is then made discoverable in every case, and `WorldMapPoiManager.discoverFor` discovers it for
+the placer at once (normal message and sound), bypassing the reveal pass and discovery radius. Sessions also end, releasing the sign, on logout, on
+expiry (checked once per second), and when the same player places another sign. Server stop clears them; the
+hold itself is runtime-only.

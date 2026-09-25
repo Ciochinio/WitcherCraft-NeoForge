@@ -74,8 +74,13 @@ public final class WorldMapPoiDefinitions {
 			Set<String> providerKeys = new HashSet<>();
 			int rejected = 0;
 			for (Map.Entry<Identifier, WorldMapPoiDefinition.Template> entry : ordered) {
-				if (!WorldMapServerConfig.poiDefinitionEnabled(entry.getKey()))
+				// Fast-travel signs ignore the allowlist and follow their own world setting instead.
+				if (FastTravelSigns.DEFINITION_ID.equals(entry.getKey())) {
+					if (!WorldMapServerConfig.fastTravelEnabled())
+						continue;
+				} else if (!WorldMapServerConfig.poiDefinitionEnabled(entry.getKey())) {
 					continue;
+				}
 				if (accepted.size() >= WorldMapPoiDefinition.MAX_DEFINITIONS) {
 					WitchercraftMod.LOGGER.error("Rejected POI definition {}: definition limit {} reached", entry.getKey(), WorldMapPoiDefinition.MAX_DEFINITIONS);
 					rejected++;

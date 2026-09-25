@@ -51,6 +51,7 @@ public class WitchercraftMod {
 		// End of user code block mod constructor
 		NeoForge.EVENT_BUS.register(this);
 		modEventBus.addListener(this::registerNetworking);
+		WitchercraftModBlocks.REGISTRY.register(modEventBus);
 		WitchercraftModItems.REGISTRY.register(modEventBus);
 		WitchercraftModEntities.REGISTRY.register(modEventBus);
 		WitchercraftModTabs.REGISTRY.register(modEventBus);

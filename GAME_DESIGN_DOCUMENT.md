@@ -912,6 +912,46 @@ Cancelling pays only for the world time that actually passed, plus the setup cos
 disable or tune these costs. A normal or soul campfire within four horizontal blocks and one vertical
 block waives the setup cost, rewarding prepared and revisited campsites.
 
+### Fast Travel
+
+Fast travel runs through **signposts**: two-block-tall wooden posts with weathered directional boards. A
+signpost is a shared destination on the world map. Every player discovers each signpost separately, the same way
+as any other point of interest: it appears as an unknown marker within **128** blocks and is discovered within
+**16** blocks, with the usual discovery message. Discovered signposts show as `Signpost: <name>` on the map and
+in the discovery message. A freshly placed signpost cannot be discovered by anyone until its naming popup closes,
+so it is never discovered under a name that is about to change. The moment the popup closes, the placer discovers
+it automatically, wherever they are standing. Everyone else discovers it the normal way.
+
+Players place signposts in the Overworld only. The post needs a free block above its base, and either half can be
+broken to remove the whole signpost. Its hitbox is a single plain upright box per block. Placing one opens a small
+naming popup. Leaving the name empty, cancelling, or pressing Escape keeps the default name, the post's `x, z`
+coordinates (shown as `Signpost: 120, -45`). Only the player who placed
+the signpost can name it, once, right after placing it. Names are plain text up to **64** characters. Other players
+see the same name and can discover and use the signpost; it is not part of anyone's personal waypoint collection.
+
+Destroying a signpost, by hand or by an explosion, removes its destination and its map marker for everyone.
+Outside creative mode it drops one signpost item, unless the world disables signpost drops. A placed item is
+always a brand-new destination: it keeps no name and no discoveries from the post it came from.
+
+Each world limits player-placed signposts to **256** (zero removes the limit); placing one at the limit is refused
+with a message and the item is kept. Lowering the limit never removes existing signposts. Village signposts will
+not count toward it.
+
+World settings under Mods > WitcherCraft > Config > World Settings > Fast Travel:
+
+| Setting | Default | Effect |
+|---------|---------|--------|
+| Fast Travel Enabled | **on** | Shows signpost markers and allows travel. Turning it off hides them without deleting signposts, names, or discoveries. Requires a world restart. It also requires the world map and POIs to be enabled. Signposts ignore the POI definition allowlist. |
+| Signposts Drop as Items | **on** | Destroyed signposts drop an item outside creative mode. |
+| Player-Placed Signpost Limit | **256** | Zero means no limit. |
+
+Travel itself is not built yet. Right-clicking either half of a signpost will open the world map in travel mode, where
+the player picks another discovered signpost and confirms the exact price in raw XP points:
+**5** + one point per started **100** blocks of horizontal distance. Travel spends vanilla XP only and never reduces
+WitcherCraft level progress. Departure is refused in combat, near hostile mobs, or while dead, sleeping, or riding;
+monsters at the destination never block arrival. Each newly generated village will also receive one signpost near
+its bell, and signposts will get a crafting recipe. Until then, signposts come from the WitcherCraft creative tab.
+
 ### Glossary
 
 The Glossary is a reference for the Witcher universe's terminology - the in-world vocabulary a

@@ -1,0 +1,171 @@
+{
+  "_fv": 89,
+  "_type": "block",
+  "definition": {
+    "texture": "fast_travel_sign",
+    "textureTop": "",
+    "textureLeft": "",
+    "textureFront": "",
+    "textureRight": "",
+    "textureBack": "",
+    "renderType": 2,
+    "customModelName": "fast_travel_sign_lower:default",
+    "rotationMode": 0,
+    "enablePitch": false,
+    "emissiveRendering": false,
+    "displayFluidOverlay": false,
+    "states": [
+      {
+        "texture": "fast_travel_sign",
+        "textureTop": "",
+        "textureLeft": "",
+        "textureFront": "",
+        "textureRight": "",
+        "textureBack": "",
+        "renderType": 2,
+        "customModelName": "fast_travel_sign_upper:default",
+        "particleTexture": "fast_travel_sign",
+        "hasCustomBoundingBox": false,
+        "boundingBoxes": [],
+        "stateMap": [
+          {
+            "property": {
+              "name": "CUSTOM:upper",
+              "type": "logic"
+            },
+            "value": true
+          }
+        ]
+      }
+    ],
+    "animations": [],
+    "itemTexture": "fast_travel_sign",
+    "particleTexture": "fast_travel_sign",
+    "blockSetType": "OAK",
+    "pottedPlant": "",
+    "leavesParticleChance": 0.01,
+    "signEntityTexture": "",
+    "signGUITexture": "",
+    "tintType": "No tint",
+    "isItemTinted": false,
+    "hasTransparency": true,
+    "connectedSides": false,
+    "transparencyType": "CUTOUT",
+    "disableOffset": false,
+    "boundingBoxes": [
+      {
+        "mx": 3,
+        "my": 0,
+        "mz": 3,
+        "Mx": 13,
+        "My": 16,
+        "Mz": 13,
+        "subtract": false
+      }
+    ],
+    "customProperties": [
+      {
+        "name": "CUSTOM:upper",
+        "type": "logic",
+        "value": false
+      }
+    ],
+    "name": "Signpost",
+    "specialInformation": {
+      "fixedValue": []
+    },
+    "hardness": 2,
+    "resistance": 3,
+    "hasGravity": false,
+    "isWaterloggable": false,
+    "hasBlockItem": true,
+    "maxStackSize": 16,
+    "rarity": "COMMON",
+    "immuneToFire": false,
+    "creativeTabs": [
+      "CUSTOM:WitcherCraft"
+    ],
+    "destroyTool": "axe",
+    "customDrop": "",
+    "dropAmount": 0,
+    "xpAmountMin": 0,
+    "xpAmountMax": 0,
+    "useLootTableForDrops": false,
+    "requiresCorrectTool": false,
+    "enchantPowerBonus": 0,
+    "plantsGrowOn": false,
+    "canRedstoneConnect": false,
+    "hasCustomOpacity": false,
+    "lightOpacity": 0,
+    "tickRate": 0,
+    "tickRandomly": false,
+    "isReplaceable": false,
+    "canProvidePower": false,
+    "emittedRedstonePower": {
+      "fixedValue": 15
+    },
+    "colorOnMap": "WOOD",
+    "noteBlockInstrument": "harp",
+    "creativePickItem": "",
+    "offsetType": "NONE",
+    "aiPathNodeType": "DEFAULT",
+    "strippingResult": "",
+    "ignitedByLava": false,
+    "flammability": 0,
+    "fireSpreadSpeed": 0,
+    "isLadder": false,
+    "slipperiness": 0.6,
+    "speedFactor": 1,
+    "jumpFactor": 1,
+    "reactionToPushing": "BLOCK",
+    "isNotColidable": false,
+    "soundOnStep": "WOOD",
+    "isCustomSoundType": false,
+    "breakSound": "",
+    "fallSound": "",
+    "hitSound": "",
+    "placeSound": "",
+    "stepSound": "",
+    "luminance": {
+      "fixedValue": 0
+    },
+    "unbreakable": false,
+    "vanillaToolTier": "NONE",
+    "placingCondition": "FastTravelSignCanSurvive",
+    "isBonemealable": false,
+    "sensitiveToVibration": false,
+    "vibrationalEvents": [],
+    "vibrationSensitivityRadius": {
+      "fixedValue": 8
+    },
+    "hasInventory": false,
+    "guiBoundTo": "<NONE>",
+    "openGUIOnRightClick": false,
+    "inventorySize": 9,
+    "inventoryStackSize": 99,
+    "inventoryDropWhenDestroyed": true,
+    "inventoryComparatorPower": true,
+    "inventoryOutSlotIDs": [],
+    "inventoryInSlotIDs": [],
+    "hasEnergyStorage": false,
+    "energyInitial": 0,
+    "energyCapacity": 400000,
+    "energyMaxReceive": 200,
+    "energyMaxExtract": 200,
+    "isFluidTank": false,
+    "fluidCapacity": 8000,
+    "fluidRestrictions": [],
+    "onNeighbourBlockChanges": "FastTravelSignNeighbourChanged",
+    "onDestroyedByPlayer": "FastTravelSignDestroyedByPlayer",
+    "onDestroyedByExplosion": "FastTravelSignExploded",
+    "onBlockPlayedBy": "FastTravelSignPlaced",
+    "generateFeature": false,
+    "restrictionBiomes": [],
+    "blocksToReplace": [],
+    "generationShape": "UNIFORM",
+    "frequencyPerChunks": 10,
+    "frequencyOnChunk": 16,
+    "minGenerateHeight": 0,
+    "maxGenerateHeight": 64
+  }
+}

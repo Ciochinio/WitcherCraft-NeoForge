@@ -20,6 +20,7 @@ public final class WorldMapPoiProviders {
 	static {
 		register(WorldMapStructurePoiProvider.INSTANCE);
 		register(WorldMapPoiTypeProvider.INSTANCE);
+		register(FastTravelSignPoiProvider.INSTANCE);
 	}
 
 	private WorldMapPoiProviders() {
@@ -28,6 +29,10 @@ public final class WorldMapPoiProviders {
 	private static void register(WorldMapPoiProvider<?, ?> provider) {
 		if (PROVIDERS.putIfAbsent(provider.id(), provider) != null)
 			throw new IllegalStateException("Duplicate world-map POI provider: " + provider.id());
+	}
+
+	public static Optional<WorldMapPoiProvider<?, ?>> provider(Identifier id) {
+		return Optional.ofNullable(PROVIDERS.get(id));
 	}
 
 	public static DataResult<Binding<?>> decodeAndValidate(Dynamic<?> encoded, HolderLookup.Provider registries) {

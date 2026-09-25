@@ -100,6 +100,22 @@ public final class WorldMapPoiKnowledge extends SavedData {
 		return true;
 	}
 
+	/**
+	 * Removes every player's knowledge of a deleted POI and returns each affected player's
+	 * presentation UUID, so connected clients can drop the marker from their caches.
+	 */
+	public Map<UUID, UUID> forget(UUID markerId) {
+		Map<UUID, UUID> removed = new LinkedHashMap<>();
+		for (Map.Entry<UUID, Map<UUID, Entry>> player : knowledgeByPlayer.entrySet()) {
+			Entry entry = player.getValue().remove(markerId);
+			if (entry != null)
+				removed.put(player.getKey(), entry.presentationId());
+		}
+		if (!removed.isEmpty())
+			setDirty();
+		return removed;
+	}
+
 	private void loadPlayer(StoredPlayer storedPlayer) {
 		UUID playerId;
 		try {

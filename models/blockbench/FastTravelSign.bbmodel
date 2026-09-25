@@ -1,0 +1,2137 @@
+{
+  "meta": {
+    "format_version": "4.10",
+    "model_format": "java_block",
+    "box_uv": false
+  },
+  "name": "FastTravelSign",
+  "model_identifier": "fast_travel_sign",
+  "visible_box": [
+    1,
+    2,
+    1
+  ],
+  "resolution": {
+    "width": 128,
+    "height": 128
+  },
+  "elements": [
+    {
+      "name": "Post - lower",
+      "from": [
+        6.5,
+        0,
+        7
+      ],
+      "to": [
+        9.5,
+        16,
+        10
+      ],
+      "autouv": 0,
+      "box_uv": false,
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "origin": [
+        8,
+        16,
+        8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            80,
+            64,
+            92,
+            128
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            96,
+            64,
+            108,
+            128
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            80,
+            64,
+            92,
+            128
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            96,
+            64,
+            108,
+            128
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            0,
+            88,
+            12,
+            100
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            0,
+            88,
+            12,
+            100
+          ],
+          "texture": 0
+        }
+      },
+      "type": "cube",
+      "uuid": "4f81e25a-a33e-429d-aa87-147e5c5cd6d9"
+    },
+    {
+      "name": "Post - upper",
+      "from": [
+        6.5,
+        16,
+        7
+      ],
+      "to": [
+        9.5,
+        30.5,
+        10
+      ],
+      "autouv": 0,
+      "box_uv": false,
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "origin": [
+        8,
+        16,
+        8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            80,
+            6,
+            92,
+            64
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            96,
+            6,
+            108,
+            64
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            80,
+            6,
+            92,
+            64
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            96,
+            6,
+            108,
+            64
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            0,
+            88,
+            12,
+            100
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            0,
+            88,
+            12,
+            100
+          ],
+          "texture": 0
+        }
+      },
+      "type": "cube",
+      "uuid": "b306c50c-0b68-46ed-b5ac-85a9362e4d37"
+    },
+    {
+      "name": "Weathered cap",
+      "from": [
+        6,
+        30.5,
+        6.5
+      ],
+      "to": [
+        10,
+        31.5,
+        10.5
+      ],
+      "autouv": 0,
+      "box_uv": false,
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "origin": [
+        8,
+        16,
+        8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            88,
+            16,
+            92
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            88,
+            16,
+            92
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            0,
+            88,
+            16,
+            92
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            0,
+            88,
+            16,
+            92
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            0,
+            88,
+            16,
+            104
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            0,
+            88,
+            16,
+            104
+          ],
+          "texture": 0
+        }
+      },
+      "type": "cube",
+      "uuid": "7e9f1a4a-1b03-4dfa-aa71-f8d754dd74c3"
+    },
+    {
+      "name": "Cap crown",
+      "from": [
+        6.5,
+        31.5,
+        7
+      ],
+      "to": [
+        9.5,
+        32,
+        10
+      ],
+      "autouv": 0,
+      "box_uv": false,
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "origin": [
+        8,
+        16,
+        8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            88,
+            12,
+            90
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            88,
+            12,
+            90
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            0,
+            88,
+            12,
+            90
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            0,
+            88,
+            12,
+            90
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            0,
+            88,
+            12,
+            100
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            0,
+            88,
+            12,
+            100
+          ],
+          "texture": 0
+        }
+      },
+      "type": "cube",
+      "uuid": "5104f867-a56b-4a43-8444-4e1a2eb29bae"
+    },
+    {
+      "name": "Board 1 - plank",
+      "from": [
+        3.5,
+        12.75,
+        5.8
+      ],
+      "to": [
+        14,
+        15.75,
+        6.8
+      ],
+      "autouv": 0,
+      "box_uv": false,
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "origin": [
+        8,
+        16,
+        8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            14,
+            1,
+            56,
+            13
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            12
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            14,
+            1,
+            56,
+            13
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            12
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            14,
+            0,
+            56,
+            4
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            14,
+            12,
+            56,
+            16
+          ],
+          "texture": 0
+        }
+      },
+      "type": "cube",
+      "uuid": "1514edb5-3fe8-4f31-a611-e82fa5d18180"
+    },
+    {
+      "name": "Board 1 - worn upper edge",
+      "from": [
+        4,
+        15.75,
+        5.8
+      ],
+      "to": [
+        13.75,
+        16,
+        6.8
+      ],
+      "autouv": 0,
+      "box_uv": false,
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "origin": [
+        8,
+        16,
+        8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            16,
+            0,
+            55,
+            1
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            1
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            16,
+            0,
+            55,
+            1
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            1
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            16,
+            0,
+            55,
+            4
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            16,
+            12,
+            55,
+            16
+          ],
+          "texture": 0
+        }
+      },
+      "type": "cube",
+      "uuid": "62e3e889-7310-4b59-bd9e-5e61f120aa7c"
+    },
+    {
+      "name": "Board 1 - worn lower edge",
+      "from": [
+        4.5,
+        12.5,
+        5.8
+      ],
+      "to": [
+        13.25,
+        12.75,
+        6.8
+      ],
+      "autouv": 0,
+      "box_uv": false,
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "origin": [
+        8,
+        16,
+        8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            18,
+            13,
+            53,
+            14
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            1
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            18,
+            13,
+            53,
+            14
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            1
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            18,
+            0,
+            53,
+            4
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            18,
+            12,
+            53,
+            16
+          ],
+          "texture": 0
+        }
+      },
+      "type": "cube",
+      "uuid": "241b757c-84e1-4cc6-be46-0569a4bc07c3"
+    },
+    {
+      "name": "Board 1 - arrow shoulder",
+      "from": [
+        2.5,
+        13.25,
+        5.8
+      ],
+      "to": [
+        3.5,
+        15.25,
+        6.8
+      ],
+      "autouv": 0,
+      "box_uv": false,
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "origin": [
+        8,
+        16,
+        8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            10,
+            3,
+            14,
+            11
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            8
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            10,
+            3,
+            14,
+            11
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            8
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            10,
+            0,
+            14,
+            4
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            10,
+            12,
+            14,
+            16
+          ],
+          "texture": 0
+        }
+      },
+      "type": "cube",
+      "uuid": "062ee405-4d70-4118-9147-65043e124126"
+    },
+    {
+      "name": "Board 1 - arrow tip",
+      "from": [
+        1.5,
+        13.75,
+        5.8
+      ],
+      "to": [
+        2.5,
+        14.75,
+        6.8
+      ],
+      "autouv": 0,
+      "box_uv": false,
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "origin": [
+        8,
+        16,
+        8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6,
+            5,
+            10,
+            9
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            4
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            6,
+            5,
+            10,
+            9
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            4
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            6,
+            0,
+            10,
+            4
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            6,
+            12,
+            10,
+            16
+          ],
+          "texture": 0
+        }
+      },
+      "type": "cube",
+      "uuid": "158c303c-4dcc-489c-9176-eb31c904e603"
+    },
+    {
+      "name": "Board 2 - plank",
+      "from": [
+        2,
+        17.25,
+        5.6
+      ],
+      "to": [
+        13.5,
+        20.25,
+        6.6
+      ],
+      "autouv": 0,
+      "box_uv": false,
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "origin": [
+        8,
+        16,
+        8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            8,
+            21,
+            54,
+            33
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            20,
+            4,
+            32
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            8,
+            21,
+            54,
+            33
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            0,
+            20,
+            4,
+            32
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            8,
+            20,
+            54,
+            24
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            8,
+            32,
+            54,
+            36
+          ],
+          "texture": 0
+        }
+      },
+      "type": "cube",
+      "uuid": "c4bad8dd-14d8-4e82-a921-23602e869747"
+    },
+    {
+      "name": "Board 2 - worn upper edge",
+      "from": [
+        2.75,
+        20.25,
+        5.6
+      ],
+      "to": [
+        13,
+        20.5,
+        6.6
+      ],
+      "autouv": 0,
+      "box_uv": false,
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "origin": [
+        8,
+        16,
+        8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            11,
+            20,
+            52,
+            21
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            20,
+            4,
+            21
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            11,
+            20,
+            52,
+            21
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            0,
+            20,
+            4,
+            21
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            11,
+            20,
+            52,
+            24
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            11,
+            32,
+            52,
+            36
+          ],
+          "texture": 0
+        }
+      },
+      "type": "cube",
+      "uuid": "20017662-ca32-4166-8887-47ed580f8181"
+    },
+    {
+      "name": "Board 2 - worn lower edge",
+      "from": [
+        2.25,
+        17,
+        5.6
+      ],
+      "to": [
+        12.5,
+        17.25,
+        6.6
+      ],
+      "autouv": 0,
+      "box_uv": false,
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "origin": [
+        8,
+        16,
+        8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            9,
+            33,
+            50,
+            34
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            20,
+            4,
+            21
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            9,
+            33,
+            50,
+            34
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            0,
+            20,
+            4,
+            21
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            9,
+            20,
+            50,
+            24
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            9,
+            32,
+            50,
+            36
+          ],
+          "texture": 0
+        }
+      },
+      "type": "cube",
+      "uuid": "6105dec5-51ed-4835-8cba-c7c75dd298c5"
+    },
+    {
+      "name": "Board 2 - arrow shoulder",
+      "from": [
+        13.5,
+        17.75,
+        5.6
+      ],
+      "to": [
+        14.5,
+        19.75,
+        6.6
+      ],
+      "autouv": 0,
+      "box_uv": false,
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "origin": [
+        8,
+        16,
+        8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            54,
+            23,
+            58,
+            31
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            20,
+            4,
+            28
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            54,
+            23,
+            58,
+            31
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            0,
+            20,
+            4,
+            28
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            54,
+            20,
+            58,
+            24
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            54,
+            32,
+            58,
+            36
+          ],
+          "texture": 0
+        }
+      },
+      "type": "cube",
+      "uuid": "f14e34b9-4c97-4bc9-bc66-adbb24338b5c"
+    },
+    {
+      "name": "Board 2 - arrow tip",
+      "from": [
+        14.5,
+        18.25,
+        5.6
+      ],
+      "to": [
+        15.5,
+        19.25,
+        6.6
+      ],
+      "autouv": 0,
+      "box_uv": false,
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "origin": [
+        8,
+        16,
+        8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            58,
+            25,
+            62,
+            29
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            20,
+            4,
+            24
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            58,
+            25,
+            62,
+            29
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            0,
+            20,
+            4,
+            24
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            58,
+            20,
+            62,
+            24
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            58,
+            32,
+            62,
+            36
+          ],
+          "texture": 0
+        }
+      },
+      "type": "cube",
+      "uuid": "6c4c01d6-d52c-49e8-bf76-32e49e315439"
+    },
+    {
+      "name": "Board 3 - plank",
+      "from": [
+        2.5,
+        21.75,
+        5.9
+      ],
+      "to": [
+        14,
+        24.75,
+        6.9
+      ],
+      "autouv": 0,
+      "box_uv": false,
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "origin": [
+        8,
+        16,
+        8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            10,
+            41,
+            56,
+            53
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            40,
+            4,
+            52
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            10,
+            41,
+            56,
+            53
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            0,
+            40,
+            4,
+            52
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            10,
+            40,
+            56,
+            44
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            10,
+            52,
+            56,
+            56
+          ],
+          "texture": 0
+        }
+      },
+      "type": "cube",
+      "uuid": "a4f630b5-f607-4a6b-985f-2e32b06d3469"
+    },
+    {
+      "name": "Board 3 - worn upper edge",
+      "from": [
+        3,
+        24.75,
+        5.9
+      ],
+      "to": [
+        13.75,
+        25,
+        6.9
+      ],
+      "autouv": 0,
+      "box_uv": false,
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "origin": [
+        8,
+        16,
+        8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12,
+            40,
+            55,
+            41
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            40,
+            4,
+            41
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            12,
+            40,
+            55,
+            41
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            0,
+            40,
+            4,
+            41
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            12,
+            40,
+            55,
+            44
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            12,
+            52,
+            55,
+            56
+          ],
+          "texture": 0
+        }
+      },
+      "type": "cube",
+      "uuid": "26bd8f6c-3d2f-4c68-9bc7-6e7d79b8e487"
+    },
+    {
+      "name": "Board 3 - worn lower edge",
+      "from": [
+        3.5,
+        21.5,
+        5.9
+      ],
+      "to": [
+        13.25,
+        21.75,
+        6.9
+      ],
+      "autouv": 0,
+      "box_uv": false,
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "origin": [
+        8,
+        16,
+        8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            14,
+            53,
+            53,
+            54
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            40,
+            4,
+            41
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            14,
+            53,
+            53,
+            54
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            0,
+            40,
+            4,
+            41
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            14,
+            40,
+            53,
+            44
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            14,
+            52,
+            53,
+            56
+          ],
+          "texture": 0
+        }
+      },
+      "type": "cube",
+      "uuid": "bbcc3b32-3349-458f-916d-740750b76b11"
+    },
+    {
+      "name": "Board 3 - arrow shoulder",
+      "from": [
+        1.5,
+        22.25,
+        5.9
+      ],
+      "to": [
+        2.5,
+        24.25,
+        6.9
+      ],
+      "autouv": 0,
+      "box_uv": false,
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "origin": [
+        8,
+        16,
+        8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6,
+            43,
+            10,
+            51
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            40,
+            4,
+            48
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            6,
+            43,
+            10,
+            51
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            0,
+            40,
+            4,
+            48
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            6,
+            40,
+            10,
+            44
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            6,
+            52,
+            10,
+            56
+          ],
+          "texture": 0
+        }
+      },
+      "type": "cube",
+      "uuid": "42fabbe7-5d5e-4d75-935b-9f940b26b815"
+    },
+    {
+      "name": "Board 3 - arrow tip",
+      "from": [
+        0.5,
+        22.75,
+        5.9
+      ],
+      "to": [
+        1.5,
+        23.75,
+        6.9
+      ],
+      "autouv": 0,
+      "box_uv": false,
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "origin": [
+        8,
+        16,
+        8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            2,
+            45,
+            6,
+            49
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            40,
+            4,
+            44
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            2,
+            45,
+            6,
+            49
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            0,
+            40,
+            4,
+            44
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            2,
+            40,
+            6,
+            44
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            2,
+            52,
+            6,
+            56
+          ],
+          "texture": 0
+        }
+      },
+      "type": "cube",
+      "uuid": "98fd07a1-617e-45eb-a94e-576e317d5d76"
+    },
+    {
+      "name": "Board 4 - plank",
+      "from": [
+        1,
+        26.25,
+        5.5
+      ],
+      "to": [
+        13,
+        29.25,
+        6.5
+      ],
+      "autouv": 0,
+      "box_uv": false,
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "origin": [
+        8,
+        16,
+        8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            61,
+            52,
+            73
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            60,
+            4,
+            72
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            4,
+            61,
+            52,
+            73
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            0,
+            60,
+            4,
+            72
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            4,
+            60,
+            52,
+            64
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            4,
+            72,
+            52,
+            76
+          ],
+          "texture": 0
+        }
+      },
+      "type": "cube",
+      "uuid": "04818fc8-ca6a-449d-a87d-7acf945cd11c"
+    },
+    {
+      "name": "Board 4 - worn upper edge",
+      "from": [
+        1.75,
+        29.25,
+        5.5
+      ],
+      "to": [
+        12.5,
+        29.5,
+        6.5
+      ],
+      "autouv": 0,
+      "box_uv": false,
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "origin": [
+        8,
+        16,
+        8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            7,
+            60,
+            50,
+            61
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            60,
+            4,
+            61
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            7,
+            60,
+            50,
+            61
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            0,
+            60,
+            4,
+            61
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            7,
+            60,
+            50,
+            64
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            7,
+            72,
+            50,
+            76
+          ],
+          "texture": 0
+        }
+      },
+      "type": "cube",
+      "uuid": "c76986ab-0725-4592-83ac-7029e9d9ffca"
+    },
+    {
+      "name": "Board 4 - worn lower edge",
+      "from": [
+        1.25,
+        26,
+        5.5
+      ],
+      "to": [
+        12,
+        26.25,
+        6.5
+      ],
+      "autouv": 0,
+      "box_uv": false,
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "origin": [
+        8,
+        16,
+        8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            5,
+            73,
+            48,
+            74
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            60,
+            4,
+            61
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            5,
+            73,
+            48,
+            74
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            0,
+            60,
+            4,
+            61
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            5,
+            60,
+            48,
+            64
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            5,
+            72,
+            48,
+            76
+          ],
+          "texture": 0
+        }
+      },
+      "type": "cube",
+      "uuid": "ea92c2fc-ef5c-40a3-8f64-5f2c269ef2fc"
+    },
+    {
+      "name": "Board 4 - arrow shoulder",
+      "from": [
+        13,
+        26.75,
+        5.5
+      ],
+      "to": [
+        14,
+        28.75,
+        6.5
+      ],
+      "autouv": 0,
+      "box_uv": false,
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "origin": [
+        8,
+        16,
+        8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            52,
+            63,
+            56,
+            71
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            60,
+            4,
+            68
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            52,
+            63,
+            56,
+            71
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            0,
+            60,
+            4,
+            68
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            52,
+            60,
+            56,
+            64
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            52,
+            72,
+            56,
+            76
+          ],
+          "texture": 0
+        }
+      },
+      "type": "cube",
+      "uuid": "3e8c3100-35dd-424f-bc9e-422b816739ad"
+    },
+    {
+      "name": "Board 4 - arrow tip",
+      "from": [
+        14,
+        27.25,
+        5.5
+      ],
+      "to": [
+        15,
+        28.25,
+        6.5
+      ],
+      "autouv": 0,
+      "box_uv": false,
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "origin": [
+        8,
+        16,
+        8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            56,
+            65,
+            60,
+            69
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            60,
+            4,
+            64
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            56,
+            65,
+            60,
+            69
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            0,
+            60,
+            4,
+            64
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            56,
+            60,
+            60,
+            64
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            56,
+            72,
+            60,
+            76
+          ],
+          "texture": 0
+        }
+      },
+      "type": "cube",
+      "uuid": "8996dec8-7420-4dca-b30c-48c145110c1b"
+    }
+  ],
+  "outliner": [
+    {
+      "name": "Lower half - y 0 to 16",
+      "origin": [
+        8,
+        0,
+        8
+      ],
+      "uuid": "4bd14d14-f66b-4ab7-96e4-fb80253da25d",
+      "children": [
+        "4f81e25a-a33e-429d-aa87-147e5c5cd6d9",
+        "1514edb5-3fe8-4f31-a611-e82fa5d18180",
+        "62e3e889-7310-4b59-bd9e-5e61f120aa7c",
+        "241b757c-84e1-4cc6-be46-0569a4bc07c3",
+        "062ee405-4d70-4118-9147-65043e124126",
+        "158c303c-4dcc-489c-9176-eb31c904e603"
+      ]
+    },
+    {
+      "name": "Upper half - y 16 to 32",
+      "origin": [
+        8,
+        16,
+        8
+      ],
+      "uuid": "3e7eda1d-722b-49eb-a2f7-48d4a1d67d89",
+      "children": [
+        "b306c50c-0b68-46ed-b5ac-85a9362e4d37",
+        "7e9f1a4a-1b03-4dfa-aa71-f8d754dd74c3",
+        "5104f867-a56b-4a43-8444-4e1a2eb29bae",
+        "c4bad8dd-14d8-4e82-a921-23602e869747",
+        "20017662-ca32-4166-8887-47ed580f8181",
+        "6105dec5-51ed-4835-8cba-c7c75dd298c5",
+        "f14e34b9-4c97-4bc9-bc66-adbb24338b5c",
+        "6c4c01d6-d52c-49e8-bf76-32e49e315439",
+        "a4f630b5-f607-4a6b-985f-2e32b06d3469",
+        "26bd8f6c-3d2f-4c68-9bc7-6e7d79b8e487",
+        "bbcc3b32-3349-458f-916d-740750b76b11",
+        "42fabbe7-5d5e-4d75-935b-9f940b26b815",
+        "98fd07a1-617e-45eb-a94e-576e317d5d76",
+        "04818fc8-ca6a-449d-a87d-7acf945cd11c",
+        "c76986ab-0725-4592-83ac-7029e9d9ffca",
+        "ea92c2fc-ef5c-40a3-8f64-5f2c269ef2fc",
+        "3e8c3100-35dd-424f-bc9e-422b816739ad",
+        "8996dec8-7420-4dca-b30c-48c145110c1b"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "path": "",
+      "name": "FastTravelSign.png",
+      "folder": "block",
+      "namespace": "witchercraft",
+      "id": "0",
+      "uuid": "bbb0d9a7-ba80-4616-9860-30d80c980f8d",
+      "source": "data:image/png;base64,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",
+      "mode": "bitmap",
+      "width": 128,
+      "height": 128,
+      "uv_width": 128,
+      "uv_height": 128,
+      "particle": true
+    }
+  ],
+  "display": {
+    "gui": {
+      "rotation": [
+        15,
+        135,
+        0
+      ],
+      "translation": [
+        0,
+        -6,
+        0
+      ],
+      "scale": [
+        0.55,
+        0.55,
+        0.55
+      ]
+    },
+    "ground": {
+      "translation": [
+        0,
+        2,
+        0
+      ],
+      "scale": [
+        0.25,
+        0.25,
+        0.25
+      ]
+    },
+    "fixed": {
+      "translation": [
+        0,
+        -6,
+        0
+      ],
+      "scale": [
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        75,
+        45,
+        0
+      ],
+      "translation": [
+        0,
+        2.5,
+        0
+      ],
+      "scale": [
+        0.375,
+        0.375,
+        0.375
+      ]
+    }
+  }
+}

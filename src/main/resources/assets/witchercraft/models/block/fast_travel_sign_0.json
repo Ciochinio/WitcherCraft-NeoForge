@@ -1,0 +1,8 @@
+{
+  "parent": "witchercraft:custom/fast_travel_sign_upper",
+  "textures": {
+    "0": "witchercraft:block/fast_travel_sign",
+    "all": "witchercraft:block/fast_travel_sign",
+    "particle": "witchercraft:block/fast_travel_sign"
+  }
+}

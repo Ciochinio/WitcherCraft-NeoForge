@@ -60,7 +60,7 @@ public final class WorldMapPoiSpatialIndex {
 		locations.put(instance.markerId(), new IndexedLocation(instance.dimension(), cell));
 	}
 
-	private void remove(UUID markerId) {
+	public void remove(UUID markerId) {
 		IndexedLocation location = locations.remove(markerId);
 		if (location == null)
 			return;

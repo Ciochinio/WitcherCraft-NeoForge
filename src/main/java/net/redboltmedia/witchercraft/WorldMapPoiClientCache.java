@@ -138,6 +138,14 @@ public final class WorldMapPoiClientCache {
 		nextRequestNanos = System.nanoTime() + REQUEST_RETRY_NANOS;
 	}
 
+	/** Drops one marker that the server deleted, such as a destroyed fast-travel sign. */
+	static void acceptRemoval(Identifier dimension, UUID presentationId) {
+		ensureConnection();
+		DimensionCache cache = DIMENSIONS.get(dimension);
+		if (cache != null)
+			cache.removeMarker(presentationId);
+	}
+
 	public static void reset(UUID nextWorldId, long nextDefinitionGeneration) {
 		ensureConnection();
 		clearPresentation();
