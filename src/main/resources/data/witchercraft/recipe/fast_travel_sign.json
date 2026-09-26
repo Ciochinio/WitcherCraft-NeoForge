@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "aba",
+    " c ",
+    " c "
+  ],
+  "key": {
+    "a": "minecraft:oak_sign",
+    "b": "minecraft:compass",
+    "c": "#minecraft:logs"
+  },
+  "result": {
+    "id": "witchercraft:fast_travel_sign",
+    "count": 1
+  }
+}

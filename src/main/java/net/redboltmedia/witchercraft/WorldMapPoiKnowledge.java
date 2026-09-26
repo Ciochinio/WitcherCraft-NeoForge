@@ -19,25 +19,46 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-/** Server-owned, per-player POI reveal and discovery knowledge. */
+/**
+ * Server-owned, per-player POI reveal and discovery knowledge.
+ *
+ * Version 3 adds shared discovery. {@code shared_discoveries} lists POIs (fast-travel signposts) that at
+ * least one player has discovered. When the shared discovery setting is on, each player's entry for such
+ * a POI carries {@code shared}, which makes it count as discovered on top of the player's own
+ * {@code state}. {@link State#UNKNOWN} marks an entry that exists only because of sharing. With the
+ * setting off, only {@code state} counts, so switching it off returns every player to their own
+ * discoveries. Use {@link #effective} to read the state the rest of the system should see.
+ */
 public final class WorldMapPoiKnowledge extends SavedData {
-	public static final int FORMAT_VERSION = 2;
+	public static final int FORMAT_VERSION = 3;
+	public static final int MAX_SHARED_DISCOVERIES = 262_144;
 	public static final int MAX_PLAYERS = 65_536;
 	public static final int MAX_KNOWLEDGE_PER_PLAYER = 16_384;
 
 	private static final Identifier DATA_ID = Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "world_map/poi_knowledge");
 	private static final Codec<WorldMapPoiKnowledge> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 		Codec.INT.optionalFieldOf("format_version", FORMAT_VERSION).forGetter(ignored -> FORMAT_VERSION),
-		StoredPlayer.CODEC.listOf().optionalFieldOf("players", List.of()).forGetter(WorldMapPoiKnowledge::storedPlayers)
+		StoredPlayer.CODEC.listOf().optionalFieldOf("players", List.of()).forGetter(WorldMapPoiKnowledge::storedPlayers),
+		Codec.STRING.listOf().optionalFieldOf("shared_discoveries", List.of()).forGetter(WorldMapPoiKnowledge::storedShared)
 	).apply(instance, WorldMapPoiKnowledge::new));
 	public static final SavedDataType<WorldMapPoiKnowledge> TYPE = new SavedDataType<>(DATA_ID, WorldMapPoiKnowledge::new, CODEC);
 
 	private final Map<UUID, Map<UUID, Entry>> knowledgeByPlayer = new LinkedHashMap<>();
+	private final Set<UUID> sharedDiscoveries = new java.util.LinkedHashSet<>();
 
 	public WorldMapPoiKnowledge() {
 	}
 
-	private WorldMapPoiKnowledge(int formatVersion, List<StoredPlayer> players) {
+	private WorldMapPoiKnowledge(int formatVersion, List<StoredPlayer> players, List<String> shared) {
+		for (String markerId : shared) {
+			if (sharedDiscoveries.size() >= MAX_SHARED_DISCOVERIES)
+				break;
+			try {
+				sharedDiscoveries.add(UUID.fromString(markerId));
+			} catch (IllegalArgumentException exception) {
+				WitchercraftMod.LOGGER.warn("Discarded shared POI discovery with invalid marker UUID");
+			}
+		}
 		if (formatVersion != FORMAT_VERSION)
 			WitchercraftMod.LOGGER.warn("Loading POI knowledge data version {} with reader version {}", formatVersion, FORMAT_VERSION);
 		for (StoredPlayer player : players) {
@@ -64,6 +85,46 @@ public final class WorldMapPoiKnowledge extends SavedData {
 		return playerKnowledge == null ? List.of() : List.copyOf(playerKnowledge.values());
 	}
 
+	/**
+	 * The entry as the rest of the system should see it: a shared entry counts as discovered while
+	 * sharing is on, and an entry known only through sharing is absent while it is off.
+	 */
+	public static @Nullable Entry effective(@Nullable Entry entry, boolean sharing) {
+		if (entry == null)
+			return null;
+		if (sharing && entry.shared())
+			return entry.state() == State.DISCOVERED ? entry : entry.withState(State.DISCOVERED);
+		return entry.state() == State.UNKNOWN ? null : entry;
+	}
+
+	/** Records that someone discovered a shareable POI. Returns true the first time. */
+	public boolean markShared(UUID markerId) {
+		if (sharedDiscoveries.size() >= MAX_SHARED_DISCOVERIES || !sharedDiscoveries.add(markerId))
+			return false;
+		setDirty();
+		return true;
+	}
+
+	public Set<UUID> sharedDiscoveries() {
+		return Set.copyOf(sharedDiscoveries);
+	}
+
+	/** Gives a player shared discovery of a POI. Returns true when the player's entry changed. */
+	public boolean grantShared(UUID playerId, UUID markerId) {
+		Map<UUID, Entry> playerKnowledge = playerKnowledge(playerId);
+		if (playerKnowledge == null)
+			return false;
+		Entry previous = playerKnowledge.get(markerId);
+		if (previous != null && previous.shared())
+			return false;
+		if (previous == null && playerKnowledge.size() >= MAX_KNOWLEDGE_PER_PLAYER)
+			return false;
+		playerKnowledge.put(markerId, previous == null ? new Entry(markerId, newPresentationId(playerKnowledge), State.UNKNOWN, 0.0, 0.0, true)
+			: previous.withShared(true));
+		setDirty();
+		return true;
+	}
+
 	public boolean reveal(UUID playerId, UUID markerId, double offsetX, double offsetZ) {
 		if (!validOffset(offsetX, offsetZ))
 			return false;
@@ -74,9 +135,18 @@ public final class WorldMapPoiKnowledge extends SavedData {
 			playerKnowledge = new LinkedHashMap<>();
 			knowledgeByPlayer.put(playerId, playerKnowledge);
 		}
-		if (playerKnowledge.containsKey(markerId) || playerKnowledge.size() >= MAX_KNOWLEDGE_PER_PLAYER)
+		Entry previous = playerKnowledge.get(markerId);
+		if (previous != null) {
+			// An entry known only through sharing keeps its presentation UUID when the player finds it.
+			if (previous.state() != State.UNKNOWN)
+				return false;
+			playerKnowledge.put(markerId, new Entry(markerId, previous.presentationId(), State.REVEALED, offsetX, offsetZ, previous.shared()));
+			setDirty();
+			return true;
+		}
+		if (playerKnowledge.size() >= MAX_KNOWLEDGE_PER_PLAYER)
 			return false;
-		playerKnowledge.put(markerId, new Entry(markerId, newPresentationId(playerKnowledge), State.REVEALED, offsetX, offsetZ));
+		playerKnowledge.put(markerId, new Entry(markerId, newPresentationId(playerKnowledge), State.REVEALED, offsetX, offsetZ, false));
 		setDirty();
 		return true;
 	}
@@ -94,10 +164,21 @@ public final class WorldMapPoiKnowledge extends SavedData {
 			return false;
 		if (previous == null && playerKnowledge.size() >= MAX_KNOWLEDGE_PER_PLAYER)
 			return false;
-		playerKnowledge.put(markerId, previous == null ? new Entry(markerId, newPresentationId(playerKnowledge), State.DISCOVERED, 0.0, 0.0)
-			: new Entry(markerId, previous.presentationId(), State.DISCOVERED, previous.offsetX(), previous.offsetZ()));
+		playerKnowledge.put(markerId, previous == null ? new Entry(markerId, newPresentationId(playerKnowledge), State.DISCOVERED, 0.0, 0.0, false)
+			: previous.withState(State.DISCOVERED));
 		setDirty();
 		return true;
+	}
+
+	private @Nullable Map<UUID, Entry> playerKnowledge(UUID playerId) {
+		Map<UUID, Entry> playerKnowledge = knowledgeByPlayer.get(playerId);
+		if (playerKnowledge == null) {
+			if (knowledgeByPlayer.size() >= MAX_PLAYERS)
+				return null;
+			playerKnowledge = new LinkedHashMap<>();
+			knowledgeByPlayer.put(playerId, playerKnowledge);
+		}
+		return playerKnowledge;
 	}
 
 	/**
@@ -111,7 +192,7 @@ public final class WorldMapPoiKnowledge extends SavedData {
 			if (entry != null)
 				removed.put(player.getKey(), entry.presentationId());
 		}
-		if (!removed.isEmpty())
+		if (sharedDiscoveries.remove(markerId) || !removed.isEmpty())
 			setDirty();
 		return removed;
 	}
@@ -152,6 +233,10 @@ public final class WorldMapPoiKnowledge extends SavedData {
 				.sorted(Comparator.comparing(value -> value.markerId().toString())).map(StoredEntry::from).toList())).toList();
 	}
 
+	private List<String> storedShared() {
+		return sharedDiscoveries.stream().map(UUID::toString).sorted().toList();
+	}
+
 	private static boolean validOffset(double x, double z) {
 		return Double.isFinite(x) && Double.isFinite(z) && Math.abs(x) <= WorldMapPoiDefinition.MAX_RADIUS && Math.abs(z) <= WorldMapPoiDefinition.MAX_RADIUS;
 	}
@@ -177,7 +262,8 @@ public final class WorldMapPoiKnowledge extends SavedData {
 	}
 
 	public enum State {
-		REVEALED, DISCOVERED;
+		/** No personal knowledge; the entry exists only because of shared discovery. */
+		UNKNOWN, REVEALED, DISCOVERED;
 
 		private static @Nullable State byId(String id) {
 			try {
@@ -188,7 +274,15 @@ public final class WorldMapPoiKnowledge extends SavedData {
 		}
 	}
 
-	public record Entry(UUID markerId, UUID presentationId, State state, double offsetX, double offsetZ) {
+	/** {@code state} is the player's own knowledge; {@code shared} marks a discovery granted by sharing. */
+	public record Entry(UUID markerId, UUID presentationId, State state, double offsetX, double offsetZ, boolean shared) {
+		public Entry withState(State value) {
+			return new Entry(markerId, presentationId, value, offsetX, offsetZ, shared);
+		}
+
+		public Entry withShared(boolean value) {
+			return new Entry(markerId, presentationId, state, offsetX, offsetZ, value);
+		}
 	}
 
 	private record StoredPlayer(String playerId, List<StoredEntry> entries) {
@@ -198,18 +292,19 @@ public final class WorldMapPoiKnowledge extends SavedData {
 		).apply(instance, StoredPlayer::new));
 	}
 
-	private record StoredEntry(String markerId, String presentationId, String state, double offsetX, double offsetZ) {
+	private record StoredEntry(String markerId, String presentationId, String state, double offsetX, double offsetZ, boolean shared) {
 		private static final Codec<StoredEntry> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Codec.STRING.optionalFieldOf("marker_id", "").forGetter(StoredEntry::markerId),
 			Codec.STRING.optionalFieldOf("presentation_id", "").forGetter(StoredEntry::presentationId),
 			Codec.STRING.optionalFieldOf("state", "").forGetter(StoredEntry::state),
 			Codec.DOUBLE.optionalFieldOf("offset_x", 0.0).forGetter(StoredEntry::offsetX),
-			Codec.DOUBLE.optionalFieldOf("offset_z", 0.0).forGetter(StoredEntry::offsetZ)
+			Codec.DOUBLE.optionalFieldOf("offset_z", 0.0).forGetter(StoredEntry::offsetZ),
+			Codec.BOOL.optionalFieldOf("shared", false).forGetter(StoredEntry::shared)
 		).apply(instance, StoredEntry::new));
 
 		private static StoredEntry from(Entry value) {
 			return new StoredEntry(value.markerId().toString(), value.presentationId().toString(),
-				value.state().name().toLowerCase(Locale.ROOT), value.offsetX(), value.offsetZ());
+				value.state().name().toLowerCase(Locale.ROOT), value.offsetX(), value.offsetZ(), value.shared());
 		}
 
 		private @Nullable Entry decode() {
@@ -217,9 +312,9 @@ public final class WorldMapPoiKnowledge extends SavedData {
 				UUID parsedMarkerId = UUID.fromString(markerId);
 				UUID parsedPresentationId = presentationId.isBlank() ? UUID.randomUUID() : UUID.fromString(presentationId);
 				State parsedState = State.byId(state);
-				if (parsedState == null || !validOffset(offsetX, offsetZ))
+				if (parsedState == null || parsedState == State.UNKNOWN && !shared || !validOffset(offsetX, offsetZ))
 					return null;
-				return new Entry(parsedMarkerId, parsedPresentationId, parsedState, offsetX, offsetZ);
+				return new Entry(parsedMarkerId, parsedPresentationId, parsedState, offsetX, offsetZ, shared);
 			} catch (IllegalArgumentException exception) {
 				return null;
 			}

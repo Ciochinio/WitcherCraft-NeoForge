@@ -149,6 +149,7 @@ public final class WorldMapPoiClientCache {
 	public static void reset(UUID nextWorldId, long nextDefinitionGeneration) {
 		ensureConnection();
 		clearPresentation();
+		WorldMapPlaceNames.clear();
 		worldId = nextWorldId;
 		definitionGeneration = nextDefinitionGeneration;
 		WitchercraftMod.LOGGER.info("World-map POI cache reset: world={}, generation={}", worldId, definitionGeneration);

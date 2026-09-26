@@ -44,7 +44,7 @@ public final class FastTravelSigns {
 	public static final Identifier PROVIDER_ID = Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "fast_travel_sign");
 	/** POI source for signs placed by players. These count toward the player-placed sign limit. */
 	public static final Identifier SOURCE_PLAYER = Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "player_placed");
-	/** POI source reserved for village-generated signs (stage 2). */
+	/** POI source for signs placed by village generation ({@link FastTravelVillageSigns}). */
 	public static final Identifier SOURCE_VILLAGE = Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "village");
 	public static final int MAX_NAME_CHARACTERS = WorldMapPoiInstance.MAX_CUSTOM_NAME_CHARACTERS;
 	/** How long after placement the placer may still submit a name. */
@@ -97,7 +97,7 @@ public final class FastTravelSigns {
 			return false;
 		}
 		boolean naming = placer instanceof ServerPlayer;
-		WorldMapPoiInstance instance = register(level, anchor, SOURCE_PLAYER, !naming);
+		WorldMapPoiInstance instance = register(level, anchor, SOURCE_PLAYER, !naming, "");
 		if (instance == null) {
 			reject(placer, "failed", "This signpost could not be registered.");
 			return false;
@@ -114,9 +114,10 @@ public final class FastTravelSigns {
 
 	/**
 	 * Creates a destination record for a sign at {@code anchor} with a fresh identity and the default
-	 * name, replacing any older record at the same anchor.
+	 * name, replacing any older record at the same anchor. A non-empty {@code nameKey} gives it a
+	 * generated, translated name; the coordinates remain the fallback.
 	 */
-	public static @Nullable WorldMapPoiInstance register(ServerLevel level, BlockPos anchor, Identifier source, boolean discoverable) {
+	public static @Nullable WorldMapPoiInstance register(ServerLevel level, BlockPos anchor, Identifier source, boolean discoverable, String nameKey) {
 		MinecraftServer server = level.getServer();
 		Identifier dimension = level.dimension().identifier();
 		WorldMapPoiInstance previous = WorldMapPoiManager.lifecycleInstanceAt(server, dimension, anchor);
@@ -124,8 +125,25 @@ public final class FastTravelSigns {
 			WorldMapPoiManager.removeInstance(server, previous.markerId());
 		String identity = PROVIDER_ID + "|" + dimension + "|" + UUID.randomUUID();
 		WorldMapPoiInstance instance = WorldMapPoiInstance.observed(DEFINITION_ID, PROVIDER_ID, source, identity, dimension, anchor)
-			.withCustomName(defaultName(anchor));
+			.withCustomName(defaultName(anchor)).withNameKey(nameKey);
 		return WorldMapPoiManager.putLifecycleInstance(server, instance, discoverable) ? instance : null;
+	}
+
+	/**
+	 * Builds a complete sign with its lower half at {@code anchor} and registers it as a discoverable
+	 * destination, without a naming screen. Used by village generation. The caller has checked that both
+	 * blocks are free and that every neighbouring chunk is loaded. Returns false and leaves nothing
+	 * behind if registration fails.
+	 */
+	public static boolean placeGenerated(ServerLevel level, BlockPos anchor, Identifier source, String nameKey) {
+		BlockState lower = WitchercraftModBlocks.FAST_TRAVEL_SIGN.get().defaultBlockState().setValue(FastTravelSignBlock.UPPER, false);
+		level.setBlock(anchor, lower, 3);
+		level.setBlock(anchor.above(), lower.setValue(FastTravelSignBlock.UPPER, true), 3);
+		if (isCompleteSign(level, anchor) && register(level, anchor, source, true, nameKey) != null)
+			return true;
+		level.removeBlock(anchor.above(), false);
+		level.removeBlock(anchor, false);
+		return false;
 	}
 
 	/**

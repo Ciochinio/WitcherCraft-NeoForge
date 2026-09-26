@@ -69,6 +69,11 @@ public final class FastTravelSignPoiProvider implements WorldMapPoiProvider<Fast
 		return FastTravelSigns.isCompleteSign(context.chunk(), instance.anchor());
 	}
 
+	@Override
+	public boolean sharesDiscovery() {
+		return true;
+	}
+
 	public record Configuration() {
 	}
 

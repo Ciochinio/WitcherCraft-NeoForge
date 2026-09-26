@@ -44,6 +44,7 @@ public record WorldMapPoiDataMessage(int requestId, long definitionGeneration, I
 				buffer.writeUtf(discovered.category().toString(), MAX_IDENTIFIER_LENGTH);
 				buffer.writeUtf(discovered.icon().toString(), MAX_IDENTIFIER_LENGTH);
 				buffer.writeUtf(discovered.customName(), MAX_CUSTOM_NAME_LENGTH);
+				buffer.writeUtf(discovered.nameKey(), WorldMapPoiInstance.MAX_NAME_KEY_LENGTH);
 			}
 		}
 	}, buffer -> {
@@ -69,9 +70,11 @@ public record WorldMapPoiDataMessage(int requestId, long definitionGeneration, I
 				Identifier category = Identifier.tryParse(buffer.readUtf(MAX_IDENTIFIER_LENGTH));
 				Identifier icon = Identifier.tryParse(buffer.readUtf(MAX_IDENTIFIER_LENGTH));
 				String customName = buffer.readUtf(MAX_CUSTOM_NAME_LENGTH);
+				String nameKey = buffer.readUtf(WorldMapPoiInstance.MAX_NAME_KEY_LENGTH);
 				if (category == null || icon == null)
 					throw new IllegalArgumentException("Invalid discovered POI identifiers");
-				markers.add(new WorldMapPoiMarker.Discovered(markerId, x, z, translationKey, descriptionTranslationKey, category, icon, minimumZoom, defaultVisible, customName));
+				markers.add(new WorldMapPoiMarker.Discovered(markerId, x, z, translationKey, descriptionTranslationKey, category, icon, minimumZoom, defaultVisible,
+					customName, nameKey));
 			} else {
 				throw new IllegalArgumentException("Invalid world-map POI knowledge state");
 			}

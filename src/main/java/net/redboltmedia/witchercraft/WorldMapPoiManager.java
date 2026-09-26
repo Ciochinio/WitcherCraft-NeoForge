@@ -75,7 +75,10 @@ public final class WorldMapPoiManager {
 	public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
 		if (event.getEntity() instanceof ServerPlayer player) {
 			ServerState state = SERVERS.computeIfAbsent(player.level().getServer(), ServerState::new);
-			state.sendReset(player, WorldMapPoiDefinitions.active());
+			WorldMapPoiDefinitions.Snapshot definitions = WorldMapPoiDefinitions.active();
+			if (state.sharing)
+				state.syncShared(player, definitions);
+			state.sendReset(player, definitions);
 		}
 	}
 
@@ -176,6 +179,8 @@ public final class WorldMapPoiManager {
 		private final Map<AnchorKey, UUID> lifecycleAnchors = new HashMap<>();
 		private final Map<ChunkKey, Set<UUID>> lifecycleByChunk = new HashMap<>();
 		private final Set<UUID> undiscoverable = new HashSet<>();
+		/** Last seen value of the shared signpost discovery setting, to react when it changes. */
+		private boolean sharing;
 		private double maximumRevealRadius;
 		private double maximumDiscoveryRadius;
 		private long watchedChunks;
@@ -200,6 +205,7 @@ public final class WorldMapPoiManager {
 			this.server = server;
 			instances = WorldMapPoiInstances.get(server);
 			knowledge = WorldMapPoiKnowledge.get(server);
+			sharing = WorldMapServerConfig.sharedSignDiscovery();
 			for (WorldMapPoiInstance instance : instances.values())
 				if (lifecycleManaged(instance))
 					indexLifecycle(instance);
@@ -266,11 +272,67 @@ public final class WorldMapPoiManager {
 			if (definition == null || !instance.active() || !definitions.accepts(instance))
 				return true;
 			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-				WorldMapPoiKnowledge.Entry entry = knowledge.get(player.getUUID(), markerId);
+				WorldMapPoiKnowledge.Entry entry = known(player.getUUID(), markerId);
 				if (entry != null)
 					pushMarker(player, instance, definition, entry, definitions.generation());
 			}
 			return true;
+		}
+
+		/** A player's knowledge of a POI as seen through the current shared discovery setting. */
+		private WorldMapPoiKnowledge.@Nullable Entry known(UUID playerId, UUID markerId) {
+			return WorldMapPoiKnowledge.effective(knowledge.get(playerId, markerId), sharing);
+		}
+
+		private static boolean sharesDiscovery(WorldMapPoiInstance instance) {
+			return WorldMapPoiProviders.provider(instance.providerType()).map(WorldMapPoiProvider::sharesDiscovery).orElse(false);
+		}
+
+		/**
+		 * Records a discovery of a shareable POI for the world. The first time, while sharing is on, every
+		 * other online player receives it too, with the discovery message but no sound.
+		 */
+		private void shareDiscovery(ServerPlayer discoverer, WorldMapPoiInstance instance, WorldMapPoiDefinition definition, long generation) {
+			if (!sharesDiscovery(instance) || !knowledge.markShared(instance.markerId()) || !sharing)
+				return;
+			for (ServerPlayer player : server.getPlayerList().getPlayers())
+				if (player != discoverer && grantShared(player, instance) && definition.discoveryRequired()) {
+					PacketDistributor.sendToPlayer(player, new WorldMapPoiDiscoveredMessage(definition.translationKey(), fallbackName(definition.id()),
+						instance.customName(), instance.nameKey()));
+					WorldMapPoiKnowledge.Entry entry = known(player.getUUID(), instance.markerId());
+					if (entry != null)
+						pushMarker(player, instance, definition, entry, generation);
+				}
+		}
+
+		/** Returns true when the grant newly made the POI discovered for this player. */
+		private boolean grantShared(ServerPlayer player, WorldMapPoiInstance instance) {
+			WorldMapPoiKnowledge.Entry before = known(player.getUUID(), instance.markerId());
+			return knowledge.grantShared(player.getUUID(), instance.markerId())
+				&& (before == null || before.state() != WorldMapPoiKnowledge.State.DISCOVERED);
+		}
+
+		/** Grants every shared discovery to a player, silently. Callers send a cache reset afterwards. */
+		private void syncShared(ServerPlayer player, WorldMapPoiDefinitions.Snapshot definitions) {
+			for (UUID markerId : knowledge.sharedDiscoveries()) {
+				WorldMapPoiInstance instance = instances.get(markerId);
+				if (instance != null && instance.active() && definitions.accepts(instance) && sharesDiscovery(instance))
+					grantShared(player, instance);
+			}
+		}
+
+		/** Applies a change of the shared discovery setting and makes every client re-request its markers. */
+		private void checkSharingSetting(WorldMapPoiDefinitions.Snapshot definitions) {
+			boolean current = WorldMapServerConfig.sharedSignDiscovery();
+			if (current == sharing)
+				return;
+			sharing = current;
+			WitchercraftMod.LOGGER.info("Shared signpost discovery is now {}", current ? "on" : "off");
+			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+				if (current)
+					syncShared(player, definitions);
+				sendReset(player, definitions);
+			}
 		}
 
 		/** Deletes lifecycle-managed records anchored in this watched chunk whose world object is gone. */
@@ -338,6 +400,8 @@ public final class WorldMapPoiManager {
 		private void tick(WorldMapPoiDefinitions.Snapshot definitions) {
 			long started = System.nanoTime();
 			int tick = server.getTickCount();
+			if (tick % DISCOVERY_INTERVAL_TICKS == 0)
+				checkSharingSetting(definitions);
 			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
 				int playerOffset = player.getUUID().hashCode();
 				if (Math.floorMod(tick, DISCOVERY_INTERVAL_TICKS) == Math.floorMod(playerOffset, DISCOVERY_INTERVAL_TICKS))
@@ -361,7 +425,7 @@ public final class WorldMapPoiManager {
 			revealCandidates += candidates.size();
 			for (UUID markerId : candidates) {
 				WorldMapPoiInstance instance = instances.get(markerId);
-				if (instance == null || !instance.active() || knowledge.get(player.getUUID(), markerId) != null)
+				if (instance == null || !instance.active() || known(player.getUUID(), markerId) != null)
 					continue;
 				WorldMapPoiDefinition definition = definitions.definitions().get(instance.definitionId());
 				if (definition == null || definition.revealRadius() <= 0.0 || !inside(player, instance.anchor(), definition.revealRadius()))
@@ -370,7 +434,7 @@ public final class WorldMapPoiManager {
 					continue;
 				reveals++;
 				WitchercraftMod.LOGGER.info("Player {} revealed world-map POI {}", player.getGameProfile().name(), markerId);
-				WorldMapPoiKnowledge.Entry revealed = knowledge.get(player.getUUID(), markerId);
+				WorldMapPoiKnowledge.Entry revealed = known(player.getUUID(), markerId);
 				if (revealed != null)
 					pushMarker(player, instance, definition, revealed, definitions.generation());
 				if (definition.discoveryRequired() && inside(player, instance.anchor(), definition.discoveryRadius()))
@@ -391,9 +455,15 @@ public final class WorldMapPoiManager {
 				WorldMapPoiDefinition definition = definitions.definitions().get(instance.definitionId());
 				if (definition == null || !definition.discoveryRequired() || !inside(player, instance.anchor(), definition.discoveryRadius()))
 					continue;
-				WorldMapPoiKnowledge.Entry entry = knowledge.get(player.getUUID(), markerId);
-				if (entry != null && entry.state() == WorldMapPoiKnowledge.State.DISCOVERED)
+				WorldMapPoiKnowledge.Entry entry = known(player.getUUID(), markerId);
+				if (entry != null && entry.state() == WorldMapPoiKnowledge.State.DISCOVERED) {
+					// Visiting a POI known only through sharing makes it the player's own, silently, so it
+					// stays discovered if sharing is switched off later.
+					WorldMapPoiKnowledge.Entry own = knowledge.get(player.getUUID(), markerId);
+					if (own != null && own.state() != WorldMapPoiKnowledge.State.DISCOVERED)
+						knowledge.discover(player.getUUID(), markerId);
 					continue;
+				}
 				if (entry == null && definition.revealRadius() > 0.0)
 					continue;
 				discover(player, instance, definition, definitions.generation());
@@ -405,13 +475,15 @@ public final class WorldMapPoiManager {
 			if (!knowledge.discover(player.getUUID(), markerId))
 				return;
 			discoveries++;
-			PacketDistributor.sendToPlayer(player, new WorldMapPoiDiscoveredMessage(definition.translationKey(), fallbackName(definition.id()), instance.customName()));
+			PacketDistributor.sendToPlayer(player, new WorldMapPoiDiscoveredMessage(definition.translationKey(), fallbackName(definition.id()),
+				instance.customName(), instance.nameKey()));
 			player.connection.send(new ClientboundSoundPacket(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(SoundEvents.PLAYER_LEVELUP),
 				SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 0.7F, 1.0F, player.getRandom().nextLong()));
-			WorldMapPoiKnowledge.Entry discovered = knowledge.get(player.getUUID(), markerId);
+			WorldMapPoiKnowledge.Entry discovered = known(player.getUUID(), markerId);
 			if (discovered != null)
 				pushMarker(player, instance, definition, discovered, generation);
 			WitchercraftMod.LOGGER.info("Player {} discovered world-map POI {} ({})", player.getGameProfile().name(), markerId, definition.id());
+			shareDiscovery(player, instance, definition, generation);
 		}
 
 		private void requestMarkers(ServerPlayer player, WorldMapPoiViewRequestMessage request, WorldMapPoiDefinitions.Snapshot definitions) {
@@ -433,7 +505,10 @@ public final class WorldMapPoiManager {
 			}
 
 			List<WorldMapPoiMarker> markers = new ArrayList<>();
-			for (WorldMapPoiKnowledge.Entry entry : knowledge.entries(player.getUUID())) {
+			for (WorldMapPoiKnowledge.Entry stored : knowledge.entries(player.getUUID())) {
+				WorldMapPoiKnowledge.Entry entry = WorldMapPoiKnowledge.effective(stored, sharing);
+				if (entry == null)
+					continue;
 				WorldMapPoiInstance instance = instances.get(entry.markerId());
 				if (instance == null || !instance.active() || !instance.dimension().equals(currentDimension) || !definitions.accepts(instance))
 					continue;
@@ -472,7 +547,7 @@ public final class WorldMapPoiManager {
 				return new WorldMapPoiMarker.Unknown(entry.presentationId(), exactX, exactZ,
 					definition.minimumZoom(), definition.defaultVisible());
 			return new WorldMapPoiMarker.Discovered(entry.presentationId(), exactX, exactZ, definition.translationKey(), definition.descriptionTranslationKey(), definition.category(),
-				definition.icon(), definition.minimumZoom(), definition.defaultVisible(), instance.customName());
+				definition.icon(), definition.minimumZoom(), definition.defaultVisible(), instance.customName(), instance.nameKey());
 		}
 
 		private void complete(ServerPlayer player, int requestId, boolean accepted, long generation, long[] cells) {

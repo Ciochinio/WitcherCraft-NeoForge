@@ -20,10 +20,11 @@ import java.util.UUID;
 
 /**
  * Server-owned persistent registry of provider-observed POI instances.
- * Version 2 adds the optional {@code custom_name} used by lifecycle-managed POIs; version 1 data loads unchanged.
+ * Version 2 adds the optional {@code custom_name} used by lifecycle-managed POIs; version 3 adds the optional
+ * {@code name_key} of generated place names. Older data loads unchanged.
  */
 public final class WorldMapPoiInstances extends SavedData {
-	public static final int FORMAT_VERSION = 2;
+	public static final int FORMAT_VERSION = 3;
 	private static final int OLDEST_READABLE_VERSION = 1;
 	public static final int MAX_INSTANCES = 262_144;
 	private static final int MAX_IDENTITY_LENGTH = 512;
@@ -127,7 +128,7 @@ public final class WorldMapPoiInstances extends SavedData {
 	}
 
 	private record StoredInstance(String markerId, String definitionId, String providerType, String sourceId,
-		String providerIdentity, String dimension, int anchorX, int anchorY, int anchorZ, boolean active, String customName) {
+		String providerIdentity, String dimension, int anchorX, int anchorY, int anchorZ, boolean active, String customName, String nameKey) {
 		private static final Codec<StoredInstance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Codec.STRING.optionalFieldOf("marker_id", "").forGetter(StoredInstance::markerId),
 			Codec.STRING.optionalFieldOf("definition_id", "").forGetter(StoredInstance::definitionId),
@@ -139,13 +140,14 @@ public final class WorldMapPoiInstances extends SavedData {
 			Codec.INT.optionalFieldOf("anchor_y", 0).forGetter(StoredInstance::anchorY),
 			Codec.INT.optionalFieldOf("anchor_z", 0).forGetter(StoredInstance::anchorZ),
 			Codec.BOOL.optionalFieldOf("active", false).forGetter(StoredInstance::active),
-			Codec.STRING.optionalFieldOf("custom_name", "").forGetter(StoredInstance::customName)
+			Codec.STRING.optionalFieldOf("custom_name", "").forGetter(StoredInstance::customName),
+			Codec.STRING.optionalFieldOf("name_key", "").forGetter(StoredInstance::nameKey)
 		).apply(instance, StoredInstance::new));
 
 		private static StoredInstance from(WorldMapPoiInstance value) {
 			return new StoredInstance(value.markerId().toString(), value.definitionId().toString(), value.providerType().toString(),
 				value.sourceId().toString(), value.providerIdentity(), value.dimension().toString(), value.anchor().getX(),
-				value.anchor().getY(), value.anchor().getZ(), value.active(), value.customName());
+				value.anchor().getY(), value.anchor().getZ(), value.active(), value.customName(), value.nameKey());
 		}
 
 		private @Nullable WorldMapPoiInstance decode() {
@@ -159,10 +161,10 @@ public final class WorldMapPoiInstances extends SavedData {
 					|| providerIdentity.isBlank() || providerIdentity.length() > MAX_IDENTITY_LENGTH
 					|| Math.abs((long) anchorX) > MAX_ABSOLUTE_COORDINATE || Math.abs((long) anchorY) > MAX_ABSOLUTE_COORDINATE
 					|| Math.abs((long) anchorZ) > MAX_ABSOLUTE_COORDINATE || !WorldMapPoiInstance.validCustomName(customName)
-					|| !parsedMarkerId.equals(WorldMapPoiInstance.markerIdForIdentity(providerIdentity)))
+					|| !WorldMapPoiInstance.validNameKey(nameKey) || !parsedMarkerId.equals(WorldMapPoiInstance.markerIdForIdentity(providerIdentity)))
 					return null;
 				return new WorldMapPoiInstance(parsedMarkerId, parsedDefinitionId, parsedProviderType, parsedSourceId,
-					providerIdentity, parsedDimension, new BlockPos(anchorX, anchorY, anchorZ), active, customName);
+					providerIdentity, parsedDimension, new BlockPos(anchorX, anchorY, anchorZ), active, customName, nameKey);
 			} catch (IllegalArgumentException exception) {
 				return null;
 			}

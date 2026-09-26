@@ -49,6 +49,14 @@ public interface WorldMapPoiProvider<C, P> {
 		return true;
 	}
 
+	/**
+	 * True when this provider's POIs take part in shared discovery: once anyone discovers one, it counts
+	 * as discovered for everyone while the shared discovery setting is on.
+	 */
+	default boolean sharesDiscovery() {
+		return false;
+	}
+
 	record ConfiguredDefinition<C>(WorldMapPoiDefinition definition, C configuration) {
 	}
 

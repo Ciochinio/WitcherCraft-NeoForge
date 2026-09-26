@@ -1,0 +1,31 @@
+{
+  "_fv": 89,
+  "_type": "recipe",
+  "definition": {
+    "recipeType": "Crafting",
+    "recipeRetstackSize": 1,
+    "group": "",
+    "unlockingItems": [
+      "Items.COMPASS"
+    ],
+    "cookingBookCategory": "MISC",
+    "xpReward": 0.0,
+    "cookingTime": 200,
+    "craftingBookCategory": "MISC",
+    "recipeShapeless": false,
+    "recipeSlots": [
+      "Blocks.STANDING_SIGN",
+      "Items.COMPASS",
+      "Blocks.STANDING_SIGN",
+      "",
+      "Blocks.LOG",
+      "",
+      "",
+      "Blocks.LOG",
+      ""
+    ],
+    "recipeReturnStack": "CUSTOM:FastTravelSign",
+    "name": "fast_travel_sign",
+    "namespace": "mod"
+  }
+}

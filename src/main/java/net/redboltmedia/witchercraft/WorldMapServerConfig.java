@@ -27,6 +27,8 @@ public final class WorldMapServerConfig {
 	private static final boolean DEFAULT_FAST_TRAVEL_ENABLED = true;
 	private static final boolean DEFAULT_SIGN_DROPS_ITEM = true;
 	private static final int DEFAULT_PLAYER_SIGN_LIMIT = 256;
+	private static final boolean DEFAULT_SHARED_SIGN_DISCOVERY = false;
+	private static final String DEFAULT_MAP_NAME_LANGUAGE = "";
 	public static final int HARD_MAX_PLAYER_SIGN_LIMIT = 100_000;
 	public static final int HARD_MAX_CAPTURES_PER_TICK = 32;
 	public static final int HARD_MAX_CAPTURE_BUDGET_MICROS = 20_000;
@@ -51,6 +53,8 @@ public final class WorldMapServerConfig {
 	private static final ModConfigSpec.BooleanValue FAST_TRAVEL_ENABLED;
 	private static final ModConfigSpec.BooleanValue SIGN_DROPS_ITEM;
 	private static final ModConfigSpec.IntValue PLAYER_SIGN_LIMIT;
+	private static final ModConfigSpec.BooleanValue SHARED_SIGN_DISCOVERY;
+	private static final ModConfigSpec.ConfigValue<String> MAP_NAME_LANGUAGE;
 
 	static {
 		ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
@@ -66,6 +70,8 @@ public final class WorldMapServerConfig {
 		MAX_CAPTURES_PER_TICK = option(builder, "max_captures_per_tick", "Maximum loaded chunks sampled during one server tick.").defineInRange("maxCapturesPerTick", DEFAULT_MAX_CAPTURES_PER_TICK, 1, HARD_MAX_CAPTURES_PER_TICK);
 		CAPTURE_BUDGET_MICROS = option(builder, "capture_budget_micros", "Approximate per-tick terrain-capture time budget in microseconds after the first capture.").defineInRange("captureBudgetMicros", DEFAULT_CAPTURE_BUDGET_MICROS, 250, HARD_MAX_CAPTURE_BUDGET_MICROS);
 		WAYPOINT_LIMIT = option(builder, "waypoint_limit", "Maximum personal waypoints each player may create. Lowering this never deletes existing waypoints.").defineInRange("waypointLimit", WorldMapWaypoints.DEFAULT_WAYPOINT_LIMIT, 0, WorldMapWaypoints.HARD_MAX_WAYPOINTS_PER_PLAYER);
+		MAP_NAME_LANGUAGE = option(builder, "map_name_language", "Language code, such as pl_pl, used for generated place names on the map for every player. Empty uses each player's own game language. Interface text always follows the player's language.")
+			.define("mapNameLanguage", DEFAULT_MAP_NAME_LANGUAGE, WorldMapServerConfig::validLanguageCode);
 		builder.pop();
 		builder.comment("Per-world permissions for the WitcherCraft minimap.")
 			.translation("witchercraft.configuration.minimap").push("minimap");
@@ -84,6 +90,7 @@ public final class WorldMapServerConfig {
 		FAST_TRAVEL_ENABLED = fastTravelOption(builder, "enabled", "Enable fast-travel signpost markers and travel. Disabling keeps signs, names, and discoveries.").worldRestart().define("enabled", DEFAULT_FAST_TRAVEL_ENABLED);
 		SIGN_DROPS_ITEM = fastTravelOption(builder, "sign_drops_item", "Destroyed signposts drop a placeable signpost item outside creative mode.").define("signDropsItem", DEFAULT_SIGN_DROPS_ITEM);
 		PLAYER_SIGN_LIMIT = fastTravelOption(builder, "player_sign_limit", "Maximum player-placed signposts in this world. Zero means no limit. Village signposts do not count. Lowering this never removes signs.").defineInRange("playerSignLimit", DEFAULT_PLAYER_SIGN_LIMIT, 0, HARD_MAX_PLAYER_SIGN_LIMIT);
+		SHARED_SIGN_DISCOVERY = fastTravelOption(builder, "shared_discovery", "A signpost discovered by any player counts as discovered for every player. Switching this off returns everyone to their own discoveries.").define("sharedDiscovery", DEFAULT_SHARED_SIGN_DISCOVERY);
 		builder.pop();
 		SPEC = builder.build();
 	}
@@ -104,6 +111,11 @@ public final class WorldMapServerConfig {
 
 	private static ModConfigSpec.Builder fastTravelOption(ModConfigSpec.Builder builder, String key, String comment) {
 		return builder.comment(comment).translation("witchercraft.configuration.fast_travel." + key);
+	}
+
+	/** Empty, or a Minecraft language code such as {@code en_us} or {@code pl_pl}. */
+	private static boolean validLanguageCode(Object value) {
+		return value instanceof String code && (code.isEmpty() || code.length() <= 16 && code.matches("[a-z]{2,3}_[a-z0-9]{2,8}"));
 	}
 
 	private static boolean validIdentifier(Object value) {
@@ -143,4 +155,10 @@ public final class WorldMapServerConfig {
 	public static boolean fastTravelEnabled() { return poisEnabled() && (!loaded() ? DEFAULT_FAST_TRAVEL_ENABLED : FAST_TRAVEL_ENABLED.getAsBoolean()); }
 	public static boolean signDropsItem() { return loaded() ? SIGN_DROPS_ITEM.getAsBoolean() : DEFAULT_SIGN_DROPS_ITEM; }
 	public static int playerSignLimit() { return loaded() ? PLAYER_SIGN_LIMIT.getAsInt() : DEFAULT_PLAYER_SIGN_LIMIT; }
+	public static boolean sharedSignDiscovery() { return loaded() ? SHARED_SIGN_DISCOVERY.getAsBoolean() : DEFAULT_SHARED_SIGN_DISCOVERY; }
+	/** Empty means each player's own game language. Synced to clients with the rest of the server config. */
+	public static String mapNameLanguage() {
+		String code = loaded() ? MAP_NAME_LANGUAGE.get() : DEFAULT_MAP_NAME_LANGUAGE;
+		return validLanguageCode(code) ? code : DEFAULT_MAP_NAME_LANGUAGE;
+	}
 }

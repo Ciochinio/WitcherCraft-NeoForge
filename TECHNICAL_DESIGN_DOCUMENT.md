@@ -1679,7 +1679,9 @@ every 1,200 server ticks.
 `WorldMapPoiInstances` is the authoritative shared, codec-backed `SavedData` store. Each record
 persists the stable marker UUID, definition and provider identifiers, canonical provider identity, dimension,
 exact three-dimensional anchor, and active flag. Version two adds an optional `custom_name` (empty by default,
-at most 64 code points of plain text) used by lifecycle-managed POIs; version-one files load unchanged. Loading
+at most 64 code points of plain text) used by lifecycle-managed POIs; version three adds an optional `name_key`
+(empty, or a lowercase translation key of at most 128 characters) for generated place names. Older files load
+unchanged. Loading
 recomputes the UUID from the provider identity and rejects invalid coordinates, identifiers, names, duplicate IDs,
 collisions, overlong identities, and records beyond the hard instance limit. Provider observations insert or
 refresh this store on the server thread. Removing a definition marks matching records inactive without deleting
@@ -1695,7 +1697,10 @@ anchor. The retained fields keep older saves codec-compatible and may be removed
 Knowledge is independent of generated player variables and therefore survives logout, death, respawn, and
 client-cache deletion. Version-one entries receive and persist a presentation UUID when first loaded. This opaque
 wire identifier prevents clients from brute-forcing the deterministic provider identity from a marker UUID.
-Logical records and collection sizes are validated independently during loading.
+Logical records and collection sizes are validated independently during loading. Version three adds shared
+discovery (Section 5.17): a world-level `shared_discoveries` list of marker UUIDs, a per-entry `shared` flag, and
+an `unknown` state for entries that exist only because of sharing. Every consumer reads knowledge through
+`WorldMapPoiKnowledge.effective(entry, sharing)` rather than the raw state.
 
 `WorldMapPoiSpatialIndex` is derived runtime state and is never serialized. It groups active markers into
 256-by-256-block cells under their dimension identifier. Startup rebuilds it from the shared store; observations
@@ -1850,8 +1855,10 @@ soul campfires within the placement procedure's four-block horizontal and one-bl
 The client uses it to omit setup from the displayed price. The server repeats it before affordability
 validation, campfire placement, and setup charging, so the server remains authoritative.
 
-The sibling `Fast Travel` section holds the fast-travel enable switch, the sign-drop switch, and the
-player-placed sign limit (Section 5.17). Fast travel additionally requires the map and POIs to be enabled.
+The sibling `Fast Travel` section holds the fast-travel enable switch, the sign-drop switch, the player-placed
+sign limit, and shared signpost discovery (Section 5.17). Fast travel additionally requires the map and POIs to be
+enabled. The `World Map` section's `mapNameLanguage` (empty, or a language code such as `pl_pl`) is read by
+clients through the synchronized config; see "Generated place names" in Section 5.17.
 
 World settings control the map and POI enable switches, a POI-definition allowlist, omitted JSON radius defaults,
 same-session tile refresh cooldown, capture count and time budgets, and the personal-waypoint limit. An empty POI
@@ -1873,8 +1880,10 @@ upload, draw-call, and disk-footprint diagnostics remain the profiling basis for
 
 ### 5.17 Fast-travel signposts
 
-Stage 1 of the fast-travel milestone adds the signpost block and its lifecycle as a shared POI. Travel sessions,
-XP pricing, and the map travel mode are later stages and must build on the contracts below.
+Stages 1 and 2 of the fast-travel milestone add the signpost block, its lifecycle as a shared POI, village
+signposts, generated place names, shared discovery, and the recipe. Travel sessions, XP pricing, and the map travel
+mode are later stages and must build on the contracts below. Stage 3 travel authorization must read discovery
+through `WorldMapPoiKnowledge.effective`, so shared discoveries count.
 
 #### Ownership boundary
 
@@ -1908,7 +1917,8 @@ position, gets a fresh marker UUID and fresh per-player knowledge. The anchor is
 at the same anchor is deleted first. The record's `custom_name` holds the bare sign name, defaulting to the
 anchor's `x, z` coordinates. Presentation adds the kind: `WorldMapPoiMarker.displayName` formats any
 custom-named POI as `<translated kind>: <name>` through the `gui.witchercraft.map.poi.named` key, used by the
-map hover card and the discovery message. The `sourceId` distinguishes `witchercraft:player_placed` from the reserved
+map hover card and the discovery message. A non-empty `name_key` takes precedence over `custom_name` (see
+"Generated place names"). The `sourceId` distinguishes `witchercraft:player_placed` from
 `witchercraft:village`; only player-placed records count toward the per-world limit.
 
 `FastTravelSigns.removeIfGone` checks the records anchored at the broken block and the block below it, and deletes
@@ -1936,8 +1946,8 @@ revealed nor sent. A record stored with `discoverable` false is also kept out of
 Deleting a record also deletes every player's knowledge entry for it (`WorldMapPoiKnowledge.forget`) and sends
 `WorldMapPoiRemovedMessage` with that player's presentation UUID to each affected connected player, whose
 client cache drops the marker. Offline players receive a full cache reset at login as before. Renaming pushes
-the updated marker to connected players who know it. `WorldMapPoiDiscoveredMessage` carries the custom name
-alongside the translation key. The diagnostic line adds
+the updated marker to connected players who know it. `WorldMapPoiDiscoveredMessage` and `WorldMapPoiDataMessage`
+carry the custom name and name key alongside the translation key. The diagnostic line adds
 `lifecycle_removals` and `stale_removals`.
 
 #### Configuration
@@ -1960,3 +1970,69 @@ default; the sign is then made discoverable in every case, and `WorldMapPoiManag
 the placer at once (normal message and sound), bypassing the reveal pass and discovery radius. Sessions also end, releasing the sign, on logout, on
 expiry (checked once per second), and when the same player places another sign. Server stop clears them; the
 hold itself is runtime-only.
+
+#### Village signposts
+
+The locked code element `FastTravelVillageSigns` (`~/World Map/Fast Travel`) places one sign per newly generated
+village. Minecraft has no structure-placed event and the project uses no mixins, so it follows NeoForge's
+`ChunkEvent.Load`, whose `isNewChunk()` is true on a chunk's first promotion to a full chunk. That event must not
+touch the level (deadlock risk), so the handler only copies the chunk's own `#minecraft:village` structure
+references into a queue; up to 32 queued chunks are processed per server tick. Only the Overworld is watched, and
+nothing is queued while fast travel is disabled.
+
+A village is keyed `<structure id>|<start chunk x>,<start chunk z>`, the same identity as the village POI. Its
+town center is the first piece of its `StructureStart`, fetched with `StructureManager.fillStartsForStructure`,
+which only reads structure starts of chunks that already exist. A village becomes eligible (`pending`) when a
+newly generated chunk intersects its town-center bounding box; this is the no-retrofit rule. A pending village is
+decided once every chunk under the town center is loaded, checked with `getChunkNow` so nothing loads. Any later
+load of a chunk that references a pending village re-checks it, because town-center chunks can become full at
+very different times.
+
+Deciding scans the town-center box for bells (the spike found one or two in every vanilla town center except the
+zombie taiga meeting point 2; plains houses may contain other bells, which are ignored) and anchors at the bell
+nearest the box center, or at the surface of the box center when there is none. `findSpot` searches columns
+within 4 blocks of the anchor from 4 below to 1 above it, nearest first in a fixed order, then the whole town-center
+box once. A spot needs a sturdy, non-fluid, non-leaf floor that is not a bell, two free blocks (`canBeReplaced`, no
+fluid), and loaded chunks on every side, so placement never loads terrain. `FastTravelSigns.placeGenerated` sets
+both halves with normal block updates and registers the record through the same `register` path as player
+placement, discoverable at once and without naming. If no spot exists or registration fails, the village is marked
+failed and a warning is logged. `findSpot` is the single place to change that rule.
+
+Decisions persist in the `SavedData` `witchercraft:fast_travel/village_signs` (`pending`, `placed`,
+`failed`, `used_names`), so a placed or failed village is never reconsidered, even after its sign is broken.
+
+#### Generated place names
+
+Village sign names are translation keys `signpost_name.witchercraft.<kind>.<id>`, where kind is the path after
+`minecraft:village_` (`plains`, `desert`, `savanna`, `snowy`, `taiga`) or `other` for any other village
+structure. The server builds the lists once from the mod's own `en_us.json` (read from the mod file, so it works
+on a dedicated server), so adding a name means adding a localization entry in MCreator; there is no separate data
+file. A kind without names uses `other`, and no names at all leaves the key empty (coordinates only). Names in
+`used_names` are skipped while unused ones remain. Keys must never be renamed or removed once shipped, because
+saved records keep them.
+
+The record stores the key in `name_key` and the coordinates in `custom_name` as the fallback. Clients resolve
+the key in `WorldMapPlaceNames` (`~/World Map/POI`), called from `WorldMapPoiMarker.displayName`. With an empty
+`mapNameLanguage` it uses the client's current language. Otherwise it loads `assets/witchercraft/lang/<code>.json`
+from the client's resource manager (all packs merged, higher packs winning), falls back to `en_us`, then to
+`custom_name`. Loaded tables are cached and cleared on every POI cache reset. Kind labels and all interface text
+always use the client's own language.
+
+#### Shared discovery
+
+`WorldMapPoiProvider.sharesDiscovery()` (true only for `FastTravelSignPoiProvider`) opts a provider in. Every
+discovery of such a POI, including the placer's `discoverFor`, adds it to `shared_discoveries` whatever the
+setting. While `sharedDiscovery` is on, the first entry into that set grants it to every other online player
+(`grantShared` sets the entry's `shared` flag, creating an `unknown` entry with a fresh presentation UUID if
+needed) and sends them the discovery message without the sound. Login grants every shared discovery silently
+before the cache reset. The manager polls the setting once per second; on a change it re-grants when switched on and
+sends every player a cache reset either way, so clients re-request markers under the new rule. With sharing off,
+`effective` hides `unknown` entries and ignores the flag. A player who walks into the discovery radius of a POI
+known only through sharing silently gains their own discovered state, and a reveal of an `unknown` entry keeps its
+presentation UUID, so switching sharing off later never produces duplicate markers or loses a visit.
+
+#### Recipe
+
+`FastTravelSignRecipe` (`~/World Map/Fast Travel`) is an ordinary MCreator crafting recipe named
+`witchercraft:fast_travel_sign`: oak sign, compass, oak sign over two `#minecraft:logs` in the middle column,
+producing one signpost, unlocked by an advancement when the player holds a compass. It is a placeholder.

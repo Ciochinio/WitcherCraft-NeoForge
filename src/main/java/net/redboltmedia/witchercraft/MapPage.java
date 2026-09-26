@@ -688,7 +688,7 @@ public final class MapPage implements GuiPage {
 	private Component poiName(WorldMapPoiMarker.Discovered marker) {
 		int separator = marker.translationKey().lastIndexOf('.');
 		String fallback = readableIdentifier(separator < 0 ? marker.translationKey() : marker.translationKey().substring(separator + 1));
-		return WorldMapPoiMarker.displayName(Component.translatableWithFallback(marker.translationKey(), fallback), marker.customName());
+		return WorldMapPoiMarker.displayName(Component.translatableWithFallback(marker.translationKey(), fallback), marker.nameKey(), marker.customName());
 	}
 
 	private Component poiDescription(WorldMapPoiMarker.Discovered marker) {
