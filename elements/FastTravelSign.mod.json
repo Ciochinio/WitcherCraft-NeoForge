@@ -159,6 +159,7 @@
     "onDestroyedByPlayer": "FastTravelSignDestroyedByPlayer",
     "onDestroyedByExplosion": "FastTravelSignExploded",
     "onBlockPlayedBy": "FastTravelSignPlaced",
+    "onRightClicked": "FastTravelSignRightClicked",
     "generateFeature": false,
     "restrictionBiomes": [],
     "blocksToReplace": [],

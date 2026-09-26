@@ -1,5 +1,6 @@
 package net.redboltmedia.witchercraft.block;
 
+import net.redboltmedia.witchercraft.procedures.FastTravelSignRightClickedProcedure;
 import net.redboltmedia.witchercraft.procedures.FastTravelSignPlacedProcedure;
 import net.redboltmedia.witchercraft.procedures.FastTravelSignNeighbourChangedProcedure;
 import net.redboltmedia.witchercraft.procedures.FastTravelSignExplodedProcedure;
@@ -9,6 +10,7 @@ import net.redboltmedia.witchercraft.procedures.FastTravelSignCanSurviveProcedur
 import org.jspecify.annotations.Nullable;
 
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.level.redstone.Orientation;
@@ -28,6 +30,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.util.RandomSource;
@@ -100,5 +103,19 @@ public class FastTravelSignBlock extends Block {
 	public void setPlacedBy(Level world, BlockPos pos, BlockState blockstate, LivingEntity entity, ItemStack itemstack) {
 		super.setPlacedBy(world, pos, blockstate, entity, itemstack);
 		FastTravelSignPlacedProcedure.execute(world, pos.getX(), pos.getY(), pos.getZ(), blockstate, entity);
+	}
+
+	@Override
+	public InteractionResult useWithoutItem(BlockState blockstate, Level world, BlockPos pos, Player entity, BlockHitResult hit) {
+		super.useWithoutItem(blockstate, world, pos, entity, hit);
+		int x = pos.getX();
+		int y = pos.getY();
+		int z = pos.getZ();
+		double hitX = hit.getLocation().x;
+		double hitY = hit.getLocation().y;
+		double hitZ = hit.getLocation().z;
+		Direction direction = hit.getDirection();
+		FastTravelSignRightClickedProcedure.execute(world, x, y, z, entity);
+		return InteractionResult.SUCCESS;
 	}
 }

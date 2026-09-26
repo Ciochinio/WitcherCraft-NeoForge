@@ -61,6 +61,12 @@ public final class MapPage implements GuiPage {
 	private WorldMapWaypoints.Waypoint contextWaypoint;
 	private int contextPendingRequest;
 	private Component contextError;
+	/** Travel mode: the signpost being confirmed, the price shown for it, and the latest problem. */
+	private WorldMapPoiMarker travelTarget;
+	private int travelQuotedPrice;
+	private Component travelError;
+	/** Shown in the bottom bar after travel mode ended on the server's word. */
+	private Component travelStatus;
 
 	@Override
 	public String id() {
@@ -90,7 +96,10 @@ public final class MapPage implements GuiPage {
 		hoverSelection = null;
 		closeContextMenu();
 		contextPendingRequest = 0;
-		if (!restore)
+		travelTarget = null;
+		travelError = null;
+		travelStatus = null;
+		if (!restore || FastTravelClient.active())
 			centerOnPlayer();
 		hasPreviousView = true;
 		WorldMapClientTileCache.markViewDirty();
@@ -102,6 +111,7 @@ public final class MapPage implements GuiPage {
 	public void render(GuiGraphicsExtractor g, int x, int y, int w, int h, int mouseX, int mouseY, float partial) {
 		checkCreateResult();
 		checkContextResult();
+		checkTravelOutcome();
 		Font font = Minecraft.getInstance().font;
 		int vx = x + MapLayout.VIEW_X, vy = y + MapLayout.VIEW_Y;
 		int vw = Math.min(MapLayout.VIEW_W, w - MapLayout.VIEW_X);
@@ -120,7 +130,7 @@ public final class MapPage implements GuiPage {
 		}
 		if (enabled)
 			drawWaypoints(g, vx, vy, vw, vh);
-		hoverSelection = enabled && !creating && !manager.isOpen() && !filters.isOpen() && contextWaypoint == null
+		hoverSelection = enabled && !creating && !manager.isOpen() && !filters.isOpen() && contextWaypoint == null && travelTarget == null
 			? markerAt(mouseX, mouseY, vx, vy, vw, vh) : null;
 		if (enabled)
 			drawPlayer(g, vx, vy, vw, vh);
@@ -130,13 +140,15 @@ public final class MapPage implements GuiPage {
 		}
 		if (creating)
 			drawCreationOverlay(g, font, vx, vy, vw, vh, mouseX, mouseY);
+		if (travelTarget != null)
+			drawTravelOverlay(g, font, vx, vy, vw, vh, mouseX, mouseY);
 		g.disableScissor();
 		drawBorder(g, vx, vy, vw, vh, MapLayout.VIEW_BORDER);
 
 		int bx = x + MapLayout.BAR_X, by = y + MapLayout.BAR_Y;
 		int bw = Math.min(MapLayout.BAR_W, w - MapLayout.BAR_X);
 		g.fill(bx, by, bx + bw, by + MapLayout.BAR_H, MapLayout.BAR_BG);
-		boolean noModal = enabled && !creating && !manager.isOpen() && !filters.isOpen() && contextWaypoint == null;
+		boolean noModal = enabled && !creating && !manager.isOpen() && !filters.isOpen() && contextWaypoint == null && travelTarget == null;
 		drawButton(g, font, bx + MapLayout.WAYPOINTS_X, by + MapLayout.BUTTON_Y, MapLayout.WAYPOINTS_W, Component.translatableWithFallback("gui.witchercraft.map.waypoints", "Waypoints"), mouseX, mouseY, noModal);
 		drawButton(g, font, bx + MapLayout.FILTERS_X, by + MapLayout.BUTTON_Y, MapLayout.FILTERS_W, Component.translatableWithFallback("gui.witchercraft.map.filters", "Filters"), mouseX, mouseY, noModal);
 		drawButton(g, font, bx + MapLayout.CENTER_X, by + MapLayout.BUTTON_Y, MapLayout.CENTER_W, Component.translatableWithFallback("gui.witchercraft.map.center", "Center"), mouseX, mouseY, noModal);
@@ -144,8 +156,11 @@ public final class MapPage implements GuiPage {
 		drawButton(g, font, bx + MapLayout.ZOOM_IN_X, by + MapLayout.BUTTON_Y, MapLayout.ZOOM_W, Component.literal("+"), mouseX, mouseY, noModal);
 
 		g.text(font, Component.literal(String.format(java.util.Locale.ROOT, "%.2fx", zoom)), bx + MapLayout.HINT_X, by + MapLayout.HINT_Y, MapLayout.TEXT_DIM, false);
-		String help = Component.translatableWithFallback("gui.witchercraft.map.help", "Drag Move | RMB Target/Menu | x2 Waypoint | Wheel Zoom").getString();
-		g.text(font, Component.literal(fit(font, help, MapLayout.HELP_W)), bx + MapLayout.HELP_X, by + MapLayout.HELP_Y, MapLayout.TEXT_DIM, false);
+		Component helpText = travelStatus != null ? travelStatus : FastTravelClient.active()
+			? Component.translatableWithFallback("gui.witchercraft.map.travel.help", "LMB Signpost to travel | Drag Move | Wheel Zoom | Esc Cancel")
+			: Component.translatableWithFallback("gui.witchercraft.map.help", "Drag Move | RMB Target/Menu | x2 Waypoint | Wheel Zoom");
+		g.text(font, Component.literal(fit(font, helpText.getString(), MapLayout.HELP_W)), bx + MapLayout.HELP_X, by + MapLayout.HELP_Y,
+			travelStatus != null ? MapLayout.ERROR : FastTravelClient.active() ? MapLayout.TRAVEL_DESTINATION : MapLayout.TEXT_DIM, false);
 		if (hoverSelection != null)
 			drawSelectionCard(g, font, vx, vy, vw, vh);
 		if (contextWaypoint != null)
@@ -171,6 +186,15 @@ public final class MapPage implements GuiPage {
 			return handleCreationClick(vx, vy, vw, vh, mouseX, mouseY, button);
 		if (contextWaypoint != null)
 			return handleContextClick(vx, vy, vw, vh, mouseX, mouseY, button);
+		if (travelTarget != null)
+			return handleTravelClick(vx, vy, vw, vh, mouseX, mouseY, button);
+		if (button == 0 && FastTravelClient.active() && inside(mouseX, mouseY, vx, vy, vw, vh)) {
+			WorldMapPoiMarker poi = poiAt(mouseX, mouseY, vx, vy, vw, vh);
+			if (poi != null && FastTravelClient.isDestination(poi)) {
+				openTravel(poi);
+				return true;
+			}
+		}
 		if (button == 1 && inside(mouseX, mouseY, vx, vy, vw, vh)) {
 			var player = Minecraft.getInstance().player;
 			if (player == null)
@@ -260,7 +284,7 @@ public final class MapPage implements GuiPage {
 
 	@Override
 	public boolean mouseDragged(int x, int y, int w, int h, double mouseX, double mouseY, int button, double dragX, double dragY) {
-		if (creating || manager.isOpen() || filters.isOpen() || contextWaypoint != null)
+		if (creating || manager.isOpen() || filters.isOpen() || contextWaypoint != null || travelTarget != null)
 			return true;
 		if (button == 0 && dragging) {
 			centerX -= dragX / zoom;
@@ -276,7 +300,7 @@ public final class MapPage implements GuiPage {
 	public boolean mouseScrolled(int x, int y, int w, int h, double mouseX, double mouseY, double scrollX, double scrollY) {
 		if (manager.isOpen())
 			return manager.mouseScrolled(scrollY);
-		if (filters.isOpen() || contextWaypoint != null)
+		if (filters.isOpen() || contextWaypoint != null || travelTarget != null)
 			return true;
 		if (creating)
 			return true;
@@ -295,6 +319,13 @@ public final class MapPage implements GuiPage {
 			return filters.keyPressed(keyCode);
 		if (contextWaypoint != null && keyCode == GLFW.GLFW_KEY_ESCAPE) {
 			closeContextMenu();
+			return true;
+		}
+		if (travelTarget != null) {
+			if (keyCode == GLFW.GLFW_KEY_ESCAPE && !FastTravelClient.pending())
+				travelTarget = null;
+			else if (keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_KP_ENTER)
+				confirmTravel();
 			return true;
 		}
 		if (!creating)
@@ -342,6 +373,96 @@ public final class MapPage implements GuiPage {
 		filters.close();
 		pendingPing = false;
 		closeContextMenu();
+		travelTarget = null;
+	}
+
+	/** Leaving the map tab or closing the menu ends travel mode; returning never restores it. */
+	@Override
+	public void onHidden() {
+		travelTarget = null;
+		FastTravelClient.leave();
+	}
+
+	private void openTravel(WorldMapPoiMarker marker) {
+		dragging = false;
+		pendingPing = false;
+		travelTarget = marker;
+		travelQuotedPrice = FastTravelClient.price(marker);
+		travelError = null;
+	}
+
+	private void confirmTravel() {
+		if (travelTarget == null || FastTravelClient.pending() || FastTravelClient.spendable() < travelQuotedPrice)
+			return;
+		travelError = null;
+		FastTravelClient.request(travelTarget, travelQuotedPrice);
+	}
+
+	private void checkTravelOutcome() {
+		FastTravelClient.Outcome outcome = FastTravelClient.takeOutcome();
+		if (outcome == null)
+			return;
+		Component text = FastTravelResultMessage.text(outcome.result(), outcome.price());
+		switch (outcome.result()) {
+			case PRICE_CHANGED -> {
+				travelQuotedPrice = outcome.price();
+				travelError = text;
+			}
+			case SESSION_ENDED, NO_SESSION, TOO_FAR, DISABLED -> {
+				travelTarget = null;
+				travelStatus = text;
+			}
+			default -> {
+				if (travelTarget != null)
+					travelError = text;
+				else
+					travelStatus = text;
+			}
+		}
+	}
+
+	private boolean handleTravelClick(int vx, int vy, int vw, int vh, double mouseX, double mouseY, int button) {
+		if (button != 0)
+			return true;
+		int ox = vx + (vw - MapLayout.TRAVEL_W) / 2;
+		int oy = vy + (vh - MapLayout.TRAVEL_H) / 2;
+		int buttonY = oy + MapLayout.TRAVEL_ACTION_Y;
+		if (inside(mouseX, mouseY, ox + MapLayout.TRAVEL_PADDING, buttonY, MapLayout.TRAVEL_ACTION_W, MapLayout.BUTTON_H)) {
+			if (!FastTravelClient.pending())
+				travelTarget = null;
+		} else if (inside(mouseX, mouseY, ox + MapLayout.TRAVEL_W - MapLayout.TRAVEL_PADDING - MapLayout.TRAVEL_ACTION_W, buttonY,
+			MapLayout.TRAVEL_ACTION_W, MapLayout.BUTTON_H)) {
+			confirmTravel();
+		}
+		return true;
+	}
+
+	private void drawTravelOverlay(GuiGraphicsExtractor g, Font font, int vx, int vy, int vw, int vh, int mouseX, int mouseY) {
+		g.fill(vx, vy, vx + vw, vy + vh, MapLayout.OVERLAY_DIM);
+		int ox = vx + (vw - MapLayout.TRAVEL_W) / 2;
+		int oy = vy + (vh - MapLayout.TRAVEL_H) / 2;
+		g.fill(ox, oy, ox + MapLayout.TRAVEL_W, oy + MapLayout.TRAVEL_H, MapLayout.OVERLAY_BG);
+		drawBorder(g, ox, oy, MapLayout.TRAVEL_W, MapLayout.TRAVEL_H, MapLayout.OVERLAY_BORDER);
+		int left = ox + MapLayout.TRAVEL_PADDING;
+		Component name = travelTarget instanceof WorldMapPoiMarker.Discovered discovered ? poiName(discovered) : Component.empty();
+		drawCenteredFitted(g, font, name, ox, oy + MapLayout.TRAVEL_NAME_Y, MapLayout.TRAVEL_W, MapLayout.TRAVEL_DESTINATION);
+		Component cost = travelQuotedPrice == 0 ? Component.translatableWithFallback("gui.witchercraft.map.travel.free", "Free")
+			: Component.translatableWithFallback("gui.witchercraft.map.travel.xp", "%s XP", travelQuotedPrice);
+		drawCenteredFitted(g, font, Component.translatableWithFallback("gui.witchercraft.map.travel.summary", "%s blocks | %s",
+			FastTravelClient.distance(travelTarget), cost), ox, oy + MapLayout.TRAVEL_DETAIL_Y, MapLayout.TRAVEL_W, MapLayout.TEXT);
+		long spendable = FastTravelClient.spendable();
+		boolean affordable = spendable >= travelQuotedPrice;
+		Component line = travelError != null ? travelError
+			: Component.translatableWithFallback("gui.witchercraft.map.travel.have", "You have %s XP", spendable);
+		drawCenteredFitted(g, font, line, ox, oy + MapLayout.TRAVEL_INFO_Y, MapLayout.TRAVEL_W,
+			travelError != null || !affordable ? MapLayout.ERROR : MapLayout.TEXT_DIM);
+		boolean pending = FastTravelClient.pending();
+		int buttonY = oy + MapLayout.TRAVEL_ACTION_Y;
+		drawButton(g, font, left, buttonY, MapLayout.TRAVEL_ACTION_W, Component.translatableWithFallback("gui.cancel", "Cancel"), mouseX, mouseY, !pending);
+		Component action = pending ? Component.translatableWithFallback("gui.witchercraft.map.travel.travelling", "Travelling...")
+			: Component.translatableWithFallback("gui.witchercraft.map.travel.confirm", "Travel");
+		drawButton(g, font, ox + MapLayout.TRAVEL_W - MapLayout.TRAVEL_PADDING - MapLayout.TRAVEL_ACTION_W, buttonY, MapLayout.TRAVEL_ACTION_W, action,
+			mouseX, mouseY, !pending && affordable);
 	}
 
 	private void showOnMap(WorldMapWaypoints.Waypoint waypoint) {
@@ -568,6 +689,15 @@ public final class MapPage implements GuiPage {
 			return new MapSelection(Component.translatableWithFallback("gui.witchercraft.map.poi.undiscovered", "Undiscovered location"),
 				Component.translatableWithFallback("gui.witchercraft.map.poi.unknown_hint", "Explore nearby to identify it."), MapLayout.POI_UNKNOWN_COLOR);
 		WorldMapPoiMarker.Discovered discovered = (WorldMapPoiMarker.Discovered) marker;
+		if (FastTravelClient.active() && FastTravelClient.isSignpost(marker)) {
+			if (FastTravelClient.isOrigin(marker))
+				return new MapSelection(poiName(discovered), Component.translatableWithFallback("gui.witchercraft.map.travel.origin", "You are here"), MapLayout.TRAVEL_ORIGIN);
+			int price = FastTravelClient.price(marker);
+			Component cost = price == 0 ? Component.translatableWithFallback("gui.witchercraft.map.travel.free", "Free")
+				: Component.translatableWithFallback("gui.witchercraft.map.travel.xp", "%s XP", price);
+			return new MapSelection(poiName(discovered), Component.translatableWithFallback("gui.witchercraft.map.travel.card", "%s | %s blocks | Click to travel",
+				cost, FastTravelClient.distance(marker)), MapLayout.TRAVEL_DESTINATION);
+		}
 		return new MapSelection(poiName(discovered), poiDescription(discovered), MapLayout.POI_DISCOVERED_COLOR);
 	}
 
@@ -679,7 +809,8 @@ public final class MapPage implements GuiPage {
 		List<WorldMapPoiMarker> result = new ArrayList<>();
 		UUID worldId = WorldMapPoiClientCache.worldId();
 		for (WorldMapPoiMarker marker : WorldMapPoiClientCache.markers(dimension))
-			if (WorldMapPoiFilterPreferences.poiVisible(worldId, marker) && zoom >= marker.minimumZoom())
+			if (WorldMapPoiFilterPreferences.poiVisible(worldId, marker) && zoom >= marker.minimumZoom()
+				|| FastTravelClient.active() && FastTravelClient.isSignpost(marker))
 				result.add(marker);
 		result.sort(Comparator.comparing(WorldMapPoiMarker::markerId));
 		return result;

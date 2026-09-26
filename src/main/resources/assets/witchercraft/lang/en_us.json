@@ -480,5 +480,16 @@
   "message.witchercraft.fast_travel.result.busy": "You are already setting off.",
   "message.witchercraft.fast_travel.result.destination_gone": "That signpost is gone.",
   "message.witchercraft.fast_travel.result.no_safe_spot": "There is no safe place to arrive at that signpost.",
-  "message.witchercraft.fast_travel.result.timeout": "The journey could not be prepared in time. Try again."
+  "message.witchercraft.fast_travel.result.timeout": "The journey could not be prepared in time. Try again.",
+  "gui.witchercraft.map.travel.help": "LMB Signpost to travel | Drag Move | Wheel Zoom | Esc Cancel",
+  "gui.witchercraft.map.travel.have": "You have %s XP",
+  "gui.witchercraft.map.travel.confirm": "Travel",
+  "gui.witchercraft.map.travel.travelling": "Travelling...",
+  "gui.witchercraft.map.travel.origin": "You are here",
+  "gui.witchercraft.map.travel.free": "Free",
+  "gui.witchercraft.map.travel.xp": "%s XP",
+  "gui.witchercraft.map.travel.card": "%s | %s blocks | Click to travel",
+  "message.witchercraft.fast_travel.result.session_ended": "Travel cancelled.",
+  "message.witchercraft.fast_travel.arrived": "You arrive at %s.",
+  "gui.witchercraft.map.travel.summary": "%s blocks | %s"
 }

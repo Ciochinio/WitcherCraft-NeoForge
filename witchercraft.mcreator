@@ -10050,6 +10050,115 @@
         ]
       },
       "path": "~/Admin/EnemyNearby"
+    },
+    {
+      "name": "FastTravelSignRightClicked",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "fast_travel_sign_right_clicked",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "world",
+            "type": "world"
+          },
+          {
+            "name": "x",
+            "type": "number"
+          },
+          {
+            "name": "y",
+            "type": "number"
+          },
+          {
+            "name": "z",
+            "type": "number"
+          },
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/FastTravelSignRightClickedProcedure.java"
+        ]
+      },
+      "path": "~/World Map/Fast Travel"
+    },
+    {
+      "name": "FastTravelSignStartTravel",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "fast_travel_sign_start_travel",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "world",
+            "type": "world"
+          },
+          {
+            "name": "x",
+            "type": "number"
+          },
+          {
+            "name": "y",
+            "type": "number"
+          },
+          {
+            "name": "z",
+            "type": "number"
+          },
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/FastTravelSignStartTravelProcedure.java"
+        ]
+      },
+      "path": "~/World Map/Fast Travel"
+    },
+    {
+      "name": "FastTravelClient",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "fast_travel_client",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/FastTravelClient.java"
+        ]
+      },
+      "path": "~/World Map/Fast Travel"
+    },
+    {
+      "name": "FastTravelOpenMessage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "fast_travel_open_message",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/FastTravelOpenMessage.java"
+        ]
+      },
+      "path": "~/World Map/Fast Travel"
+    },
+    {
+      "name": "FastTravelLeaveMessage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "fast_travel_leave_message",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/FastTravelLeaveMessage.java"
+        ]
+      },
+      "path": "~/World Map/Fast Travel"
     }
   ],
   "variable_elements": [
@@ -11433,7 +11542,18 @@
       "message.witchercraft.fast_travel.result.busy": "You are already setting off.",
       "message.witchercraft.fast_travel.result.destination_gone": "That signpost is gone.",
       "message.witchercraft.fast_travel.result.no_safe_spot": "There is no safe place to arrive at that signpost.",
-      "message.witchercraft.fast_travel.result.timeout": "The journey could not be prepared in time. Try again."
+      "message.witchercraft.fast_travel.result.timeout": "The journey could not be prepared in time. Try again.",
+      "gui.witchercraft.map.travel.help": "LMB Signpost to travel | Drag Move | Wheel Zoom | Esc Cancel",
+      "gui.witchercraft.map.travel.have": "You have %s XP",
+      "gui.witchercraft.map.travel.confirm": "Travel",
+      "gui.witchercraft.map.travel.travelling": "Travelling...",
+      "gui.witchercraft.map.travel.origin": "You are here",
+      "gui.witchercraft.map.travel.free": "Free",
+      "gui.witchercraft.map.travel.xp": "%s XP",
+      "gui.witchercraft.map.travel.card": "%s | %s blocks | Click to travel",
+      "message.witchercraft.fast_travel.result.session_ended": "Travel cancelled.",
+      "message.witchercraft.fast_travel.arrived": "You arrive at %s.",
+      "gui.witchercraft.map.travel.summary": "%s blocks | %s"
     }
   },
   "metadata": {

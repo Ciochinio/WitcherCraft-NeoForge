@@ -123,4 +123,11 @@ public interface GuiPage {
 	/** Called when the shell closes while this page is active. */
 	default void onClose() {
 	}
+
+	/**
+	 * Called when this page stops being shown: another tab was chosen, or the shell was removed for any
+	 * reason (closed, replaced by another screen, disconnect). Runs after {@link #onClose} when closing.
+	 */
+	default void onHidden() {
+	}
 }

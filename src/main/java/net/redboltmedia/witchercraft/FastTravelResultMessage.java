@@ -5,7 +5,6 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
@@ -18,8 +17,8 @@ import java.util.Locale;
 /**
  * HAND-MAINTAINED (locked code element, ~/World Map/Fast Travel). CLIENTBOUND: the outcome of a travel
  * request, or notice that the travel session ended. {@code price} is the current price where it matters
- * (price changed, not enough XP, travelling). Until the map travel mode exists (stage 4), the client
- * shows the outcome as an action-bar message.
+ * (price changed, not enough XP, travelling). {@link FastTravelClient#onResult} shows it on the map in travel
+ * mode, or as an action-bar message otherwise.
  */
 @EventBusSubscriber
 public record FastTravelResultMessage(FastTravel.Result result, int price) implements CustomPacketPayload {
@@ -55,10 +54,7 @@ public record FastTravelResultMessage(FastTravel.Result result, int price) imple
 
 	public static void handleData(FastTravelResultMessage message, IPayloadContext context) {
 		if (context.flow() == PacketFlow.CLIENTBOUND)
-			context.enqueueWork(() -> {
-				if (message.result != FastTravel.Result.SESSION_ENDED && Minecraft.getInstance().player != null)
-					Minecraft.getInstance().gui.setOverlayMessage(text(message.result, message.price), false);
-			});
+			context.enqueueWork(() -> FastTravelClient.onResult(message.result, message.price));
 	}
 
 	@SubscribeEvent

@@ -599,7 +599,9 @@ small helpers may remain unowned. MCreator does not regenerate either form:
 
 - **`GuiPage`** - the page interface. `render(g, x, y, w, h, mouseX, mouseY, partial)` plus design-space
   mouse click, release, drag, and scroll callbacks, then `keyPressed` / `pollTooltip` / `onShown` /
-  `onClose`. The shell
+  `onClose` / `onHidden`. `onHidden` runs when the page stops being shown: on a tab switch (before the new
+  page's `onShown`) and from the shell's `removed()`, however the shell goes away (closed, replaced by
+  another screen, disconnect). It is the reliable place to end page-scoped modes such as map travel. The shell
   hands every page the **content region** - the whole area below the navbar - as a design-coords rect;
   the page fills it however it likes. All coords are design-canvas pixels (see 3.3a).
 - **`WitcherGuiScreen`** - the shell. Renders against a **fixed virtual design canvas**
@@ -1991,10 +1993,15 @@ very different times.
 Deciding scans the town-center box for bells (the spike found one or two in every vanilla town center except the
 zombie taiga meeting point 2; plains houses may contain other bells, which are ignored) and anchors at the bell
 nearest the box center, or at the surface of the box center when there is none. `findSpot` searches columns
-within 4 blocks of the anchor from 4 below to 1 above it, nearest first in a fixed order, then the whole town-center
-box once. A spot needs a sturdy, non-fluid, non-leaf floor that is not a bell, two free blocks (`canBeReplaced`, no
+at least 3 and at most 6 blocks from the anchor, from 4 below to 1 above it, nearest first in a fixed order, then the
+whole town-center box once (still at least 3 blocks away). The minimum distance keeps the sign off the bell's own
+structure, such as a well. A spot needs natural ground as its floor (`#minecraft:dirt`, `#minecraft:sand`, dirt
+path, gravel, or snow block; sturdy on top except dirt path, which vanilla turns into dirt under the sign), no
+fluid, two free blocks (`canBeReplaced`, no
 fluid), and loaded chunks on every side, so placement never loads terrain. `FastTravelSigns.placeGenerated` sets
-both halves with normal block updates and registers the record through the same `register` path as player
+both halves without neighbour updates (`UPDATE_CLIENTS | UPDATE_KNOWN_SHAPE`), then runs shape and neighbour
+updates for both once the sign is complete. Placing the lower half with normal updates first let a shape update
+(for example from grass in the upper spot) reach it while it stood alone, and its survival rule removed it. It then registers the record through the same `register` path as player
 placement, discoverable at once and without naming. If no spot exists or registration fails, the village is marked
 failed and a warning is logged. `findSpot` is the single place to change that rule.
 
@@ -2039,8 +2046,8 @@ producing one signpost, unlocked by an advancement when the player holds a compa
 
 #### Travel service
 
-Stage 3 adds the authoritative server side of travel. Nothing starts a session yet; stage 4 wires the sign's
-right-click and the map travel mode onto this API.
+Stage 3 adds the authoritative server side of travel; stage 4 (below) wires the sign's right-click and the map
+travel mode onto this API.
 
 | Class (code element) | Role |
 | --- | --- |
@@ -2106,3 +2113,46 @@ XP changes, so no XP loss lowers WitcherCraft progress.
 except for zombified piglins, which require anger at the player. `MeditationCanStart` uses the same helper at the
 player's feet, replacing its former 12-block any-monster box. `anyMonster` is the fallback for a non-player
 entity.
+
+#### Map travel mode
+
+Stage 4 connects the travel service to the sign and the map.
+
+| Element | Role |
+| --- | --- |
+| `FastTravelSignRightClicked` (Blockly procedure, `~/World Map/Fast Travel`) | The block's `onRightClicked` trigger (`useWithoutItem`, both halves). Calls the locked procedure. |
+| `FastTravelSignStartTravel` (locked procedure, `~/World Map/Fast Travel`) | Server only: `FastTravel.openFromSign(player, clicked)`. |
+| `FastTravelOpenMessage` (`~/World Map/Fast Travel`) | Clientbound: origin anchor X and Z, plus the player's presentation UUID for the origin marker when they know it. |
+| `FastTravelLeaveMessage` (`~/World Map/Fast Travel`) | Serverbound, empty: the player left travel mode; calls `FastTravel.endSession`. |
+| `FastTravelClient` (`~/World Map/Fast Travel`) | Client state of travel mode, request forwarding, and result handling. |
+
+`openFromSign` resolves the lower half (the clicked block, or the one below it), calls `startSession` (which now
+returns a `Result`), and answers either with `FastTravelOpenMessage` or with a `FastTravelResultMessage` giving the
+reason (`DISABLED`, `BUSY`, `NO_SESSION`). `FastTravelClient.open` sets travel mode and opens
+`WitcherGuiScreen` on the map tab; nothing else enters travel mode.
+
+`MapPage` in travel mode:
+
+- A marker is a signpost when it is `Discovered` with category `witchercraft:fast_travel`. The origin is the
+  marker whose presentation UUID matches, or, when the player does not know the origin marker, the one at the
+  origin anchor's X and Z. Every other signpost is a destination.
+- `visiblePois` includes signposts regardless of filter preferences and minimum zoom. Preferences are not
+  modified.
+- Signposts are drawn like any other marker, without frames. The hover card shows price and distance in
+  `MapLayout.TRAVEL_DESTINATION`, or "You are here" in `TRAVEL_ORIGIN`.
+- A left click on a destination opens the confirmation overlay (`MapLayout.TRAVEL_*` geometry, editable in
+  `tools/map-layout-creator.html`): a compact panel with the name, a "distance | price" line, and either the
+  spendable XP or the latest error, all computed with
+  `FastTravelCosts` from synced config and the local player's XP. On `SUCCESS` the client shows "You arrive at <name>"
+  using the destination's bare place name remembered at confirmation. Travel is disabled while a request is pending
+  or the player cannot afford it. Enter confirms; Escape or Cancel closes the overlay unless a request is pending.
+- The quoted price is fixed when the overlay opens. `PRICE_CHANGED` replaces it with the server's price and asks
+  for a new confirmation. Other failures show in the overlay. `SESSION_ENDED`, `NO_SESSION`, `TOO_FAR`, and
+  `DISABLED` end travel mode and show the reason in the bottom bar. `SUCCESS` closes the menu and shows the
+  arrival message.
+- `MapPage.onHidden` calls `FastTravelClient.leave()`, which sends `FastTravelLeaveMessage` once. A tab switch,
+  Escape, damage closing the shell, or another screen replacing it all end travel mode. Returning to the map tab
+  never restores it.
+
+The server never depends on the leave message: its own distance, expiry, death, dimension, and logout checks
+still apply. Closing the map while a journey is being prepared cancels that journey before any charge.

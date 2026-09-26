@@ -62,6 +62,14 @@ public final class MapLayout {
 	public static final int FILTER_ROW_Y = 30;
 	public static final int FILTER_ROW_H = 23;
 	public static final int FILTER_ROW_GAP = 27;
+	public static final int TRAVEL_W = 200;
+	public static final int TRAVEL_H = 82;
+	public static final int TRAVEL_PADDING = 12;
+	public static final int TRAVEL_NAME_Y = 8;
+	public static final int TRAVEL_DETAIL_Y = 22;
+	public static final int TRAVEL_INFO_Y = 35;
+	public static final int TRAVEL_ACTION_Y = 52;
+	public static final int TRAVEL_ACTION_W = 76;
 
 	public static final int VIEW_BG = 0xFF11151A;
 	public static final int VIEW_BORDER = 0xFF665E4A;
@@ -84,4 +92,6 @@ public final class MapLayout {
 	public static final int WAYPOINT_COLOR = 0xFFD6AD52;
 	public static final int POI_UNKNOWN_COLOR = 0xFFD4C9A9;
 	public static final int POI_DISCOVERED_COLOR = 0xFFD6AD52;
+	public static final int TRAVEL_DESTINATION = 0xFFD6AD52;
+	public static final int TRAVEL_ORIGIN = 0xFF8FB3C9;
 }

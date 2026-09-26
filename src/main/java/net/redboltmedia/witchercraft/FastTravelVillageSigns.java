@@ -69,7 +69,9 @@ public final class FastTravelVillageSigns {
 	public static final String OTHER_KIND = "other";
 	private static final int MAX_QUEUED_PER_TICK = 32;
 	/** First search: columns within this horizontal distance of the anchor. */
-	private static final int NEAR_RADIUS = 4;
+	private static final int NEAR_RADIUS = 6;
+	/** Keeps the sign off the bell's own structure (wells, frames): at least this far from the anchor. */
+	private static final int MIN_ANCHOR_DISTANCE = 3;
 	private static final int SEARCH_DOWN = 4;
 	private static final int SEARCH_UP = 1;
 
@@ -195,7 +197,8 @@ public final class FastTravelVillageSigns {
 	}
 
 	/**
-	 * The nearest free spot for the sign's lower half. First columns within {@link #NEAR_RADIUS} blocks of
+	 * The nearest free spot for the sign's lower half, on natural ground and at least
+	 * {@link #MIN_ANCHOR_DISTANCE} blocks from the anchor. First columns within {@link #NEAR_RADIUS} blocks of
 	 * the anchor, near its height; if none, the whole town-center piece. Never replaces solid blocks.
 	 * Change this method to change what happens when a village center has no room.
 	 */
@@ -212,7 +215,8 @@ public final class FastTravelVillageSigns {
 		List<int[]> columns = new ArrayList<>();
 		for (int dx = -radius; dx <= radius; dx++)
 			for (int dz = -radius; dz <= radius; dz++)
-				if ((dx != 0 || dz != 0) && (within == null || within.isInside(anchor.getX() + dx, within.minY(), anchor.getZ() + dz)))
+				if (dx * dx + dz * dz >= MIN_ANCHOR_DISTANCE * MIN_ANCHOR_DISTANCE
+					&& (within == null || within.isInside(anchor.getX() + dx, within.minY(), anchor.getZ() + dz)))
 					columns.add(new int[] {dx, dz});
 		columns.sort(Comparator.<int[]>comparingInt(column -> column[0] * column[0] + column[1] * column[1])
 			.thenComparingInt(column -> column[0]).thenComparingInt(column -> column[1]));
@@ -240,10 +244,20 @@ public final class FastTravelVillageSigns {
 					return false;
 		BlockPos below = pos.below();
 		BlockState floor = level.getBlockState(below);
-		if (!floor.isFaceSturdy(level, below, Direction.UP) || !floor.getFluidState().isEmpty() || floor.is(BlockTags.LEAVES)
-			|| floor.is(Blocks.BELL))
+		if (!naturalGround(floor) || !floor.getFluidState().isEmpty()
+			|| !floor.is(Blocks.DIRT_PATH) && !floor.isFaceSturdy(level, below, Direction.UP))
 			return false;
 		return free(level.getBlockState(pos)) && free(level.getBlockState(pos.above()));
+	}
+
+	/**
+	 * Grass, dirt and its relatives, sand, dirt path, gravel, or snow: the open ground of a village square,
+	 * never a building block such as a well's logs. Dirt path is not a full block, but vanilla turns it into
+	 * dirt under the sign, so the sign never floats.
+	 */
+	private static boolean naturalGround(BlockState floor) {
+		return floor.is(BlockTags.DIRT) || floor.is(BlockTags.SAND) || floor.is(Blocks.DIRT_PATH) || floor.is(Blocks.GRAVEL)
+			|| floor.is(Blocks.SNOW_BLOCK);
 	}
 
 	private static boolean free(BlockState state) {

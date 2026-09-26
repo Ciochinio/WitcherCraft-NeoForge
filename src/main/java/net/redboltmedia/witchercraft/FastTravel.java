@@ -78,17 +78,36 @@ public final class FastTravel {
 
 	/**
 	 * Starts a travel session at the sign whose lower half is {@code anchor}, replacing any earlier session.
-	 * Returns false when the sign is not a registered, complete signpost or travel is unavailable.
+	 * Returns SUCCESS, DISABLED, BUSY (a journey is being prepared), or NO_SESSION (not a registered,
+	 * complete signpost).
 	 */
-	public static boolean startSession(ServerPlayer player, BlockPos anchor) {
+	public static Result startSession(ServerPlayer player, BlockPos anchor) {
 		ServerLevel level = player.level();
-		if (!WorldMapServerConfig.fastTravelEnabled() || !level.dimension().equals(Level.OVERWORLD) || PENDING.containsKey(player.getUUID()))
-			return false;
+		if (!WorldMapServerConfig.fastTravelEnabled() || !level.dimension().equals(Level.OVERWORLD))
+			return Result.DISABLED;
+		if (PENDING.containsKey(player.getUUID()))
+			return Result.BUSY;
 		WorldMapPoiInstance origin = WorldMapPoiManager.lifecycleInstanceAt(level.getServer(), level.dimension().identifier(), anchor);
 		if (origin == null || !FastTravelSigns.PROVIDER_ID.equals(origin.providerType()) || !FastTravelSigns.isCompleteSign(level, anchor))
-			return false;
+			return Result.NO_SESSION;
 		SESSIONS.put(player.getUUID(), new Session(origin.markerId(), anchor.immutable(), level.getServer().getTickCount() + SESSION_TICKS));
-		return true;
+		return Result.SUCCESS;
+	}
+
+	/**
+	 * A player right-clicked either half of a signpost at {@code clicked}: start a session there and open the
+	 * map in travel mode, or explain why not. Called through the locked procedure FastTravelSignStartTravel.
+	 */
+	public static void openFromSign(ServerPlayer player, BlockPos clicked) {
+		ServerLevel level = player.level();
+		BlockPos anchor = FastTravelSigns.isLowerHalf(level.getBlockState(clicked)) ? clicked : clicked.below();
+		Result result = startSession(player, anchor);
+		if (result != Result.SUCCESS) {
+			reply(player, result, 0);
+			return;
+		}
+		UUID origin = SESSIONS.get(player.getUUID()).originMarker();
+		PacketDistributor.sendToPlayer(player, new FastTravelOpenMessage(anchor.getX(), anchor.getZ(), WorldMapPoiManager.presentationId(player, origin)));
 	}
 
 	/** The origin marker of the player's session, or null without one. */

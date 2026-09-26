@@ -839,7 +839,8 @@ Signposts are tall wooden posts that work as fast-travel destinations. Each one 
 
 **Where signposts come from**
 
-- Every village has a signpost next to its bell, with a name that fits the village type. Only villages generated
+- Every village has a signpost a few steps from its bell, standing on open ground (grass, dirt, path, sand, or
+  snow), never on the well or other village structures. It has a name that fits the village type. Only villages generated
   after fast travel was added have one, and a village never gets a second one if its signpost is broken.
 - Players can craft signposts and place them anywhere in the Overworld. They are also in the WitcherCraft creative
   tab.
@@ -868,10 +869,17 @@ again.
 Two oak signs with a compass between them on the top row, and two logs of any kind below the compass. The recipe
 unlocks when you pick up a compass. This recipe is a placeholder.
 
-**Travelling (coming soon)**
+**Travelling**
 
-Right-clicking a signpost will open the map in travel mode. Pick another signpost you have discovered and confirm
-the price: **5** XP points plus **1** for every started **100** blocks of distance, so a trip of 250 blocks costs 8.
+Right-click either half of a signpost to open the map in travel mode. Your map filters never hide signposts in
+travel mode. Hovering a signpost shows its price and distance, or "You are here" for the one you are at. Click
+another signpost to open a small confirmation with its name, distance, price, and how much XP you have, then
+choose Travel or Cancel. The map closes when you arrive, with the message "You arrive at <name>". If the trip
+cannot happen, the
+reason shows in the confirmation and you pay nothing. Closing the map or switching to another tab ends travel
+mode; opening the map any other way never lets you travel.
+
+The price is **5** XP points plus **1** for every started **100** blocks of distance, so a trip of 250 blocks costs 8.
 Travel is free in creative mode. It spends vanilla XP only and never touches WitcherCraft level progress.
 
 - You cannot set off while in combat, while monsters are nearby (the same rule as sleeping in a bed), or while

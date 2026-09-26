@@ -244,6 +244,7 @@ public class WitcherGuiScreen extends Screen {
 				if (dmx >= tx && dmx < tx + WitcherGuiLayout.NAV_TAB_W && dmy >= ty && dmy < ty + WitcherGuiLayout.NAV_H) {
 					String pid = WitcherGuiLayout.NAV[i].pageId;
 					if (!pid.equals(activeTabId)) {
+						activePage().onHidden();
 						activeTabId = pid;
 						activePage().onShown();
 					}
@@ -313,6 +314,13 @@ public class WitcherGuiScreen extends Screen {
 	public void onClose() {
 		activePage().onClose();
 		this.minecraft.setScreen(null); // opened via setScreen, so close the same way
+	}
+
+	/** Runs however the shell goes away (closed, replaced by another screen, disconnect). */
+	@Override
+	public void removed() {
+		activePage().onHidden();
+		super.removed();
 	}
 
 	@Override

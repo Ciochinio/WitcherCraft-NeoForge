@@ -137,10 +137,22 @@ public final class FastTravelSigns {
 	 */
 	public static boolean placeGenerated(ServerLevel level, BlockPos anchor, Identifier source, String nameKey) {
 		BlockState lower = WitchercraftModBlocks.FAST_TRAVEL_SIGN.get().defaultBlockState().setValue(FastTravelSignBlock.UPPER, false);
-		level.setBlock(anchor, lower, 3);
-		level.setBlock(anchor.above(), lower.setValue(FastTravelSignBlock.UPPER, true), 3);
-		if (isCompleteSign(level, anchor) && register(level, anchor, source, true, nameKey) != null)
+		// Place both halves before any neighbour reacts. Otherwise a shape update (for example from grass or
+		// snow in the upper spot) can reach the lower half while it stands alone, and its survival rule
+		// removes it. Neighbours are updated once the sign is complete.
+		int quiet = net.minecraft.world.level.block.Block.UPDATE_CLIENTS | net.minecraft.world.level.block.Block.UPDATE_KNOWN_SHAPE;
+		level.setBlock(anchor, lower, quiet);
+		level.setBlock(anchor.above(), lower.setValue(FastTravelSignBlock.UPPER, true), quiet);
+		for (BlockPos half : new BlockPos[] {anchor, anchor.above()}) {
+			BlockState state = level.getBlockState(half);
+			state.updateNeighbourShapes(level, half, net.minecraft.world.level.block.Block.UPDATE_ALL);
+			level.updateNeighborsAt(half, state.getBlock());
+		}
+		boolean complete = isCompleteSign(level, anchor);
+		if (complete && register(level, anchor, source, true, nameKey) != null)
 			return true;
+		WitchercraftMod.LOGGER.warn("Generated signpost at [{}, {}, {}] failed: complete={}, below={}, lower={}, upper={}", anchor.getX(), anchor.getY(),
+			anchor.getZ(), complete, level.getBlockState(anchor.below()), level.getBlockState(anchor), level.getBlockState(anchor.above()));
 		level.removeBlock(anchor.above(), false);
 		level.removeBlock(anchor, false);
 		return false;
