@@ -568,171 +568,9 @@ manual unequip first. When a node has more than one connecting line to earlier p
 ONE of them is enough - multiple parents are alternative routes into that node, not a checklist you
 have to clear in full, so a tree can branch and re-converge without gating a node behind everything
 that feeds into it. Hovering a node or a slotted perk shows its name (in its branch's colour) and a
-one-line description; whether it's locked, available, or equipped is left to the art alone. The Map
-tab now has an interactive terrain view. Dragging pans the view, and mouse-wheel or button input sets
-a target zoom that the view smoothly approaches while preserving the world position under the cursor.
-The bottom bar provides center and zoom controls plus access to the waypoint manager and map filters.
-The terrain view includes personal waypoints, temporary navigation targets, and discovered or unknown
-points of interest. The player appears as a gold directional triangle with a dark outline.
-It rotates with the player's facing, scales with map zoom within readable limits, and has a client-side
-size setting. The remaining unfinished tabs use placeholders until those systems
-get their own screens.
-
-Personal waypoints belong to one player in one saved world. A waypoint records its dimension, X and Z
-coordinates, name, icon, and visibility. Names contain 1 to 64 non-control characters. Players choose from
-home, camp, chest, danger, herb, monster, and quest icons. Every icon uses the same fixed UI color. A player may keep up to 200 waypoints. Waypoints survive death
-and world restart. They cannot move after creation, but the player may rename, hide, or delete them.
-
-Left mouse dragging pans the map. One right-click places or replaces a temporary gold pin in the current
-dimension after a short delay. A second right-click during that delay cancels the pin and opens a compact
-saved-waypoint creation panel at that X and Z position. Temporary pins survive closing the map but remain
-client-side and disappear on disconnect. They do not count toward the saved-waypoint limit. The HUD minimap
-treats the pin as its active navigation target.
-
-The HUD minimap is a square, player-centered view of the same explored terrain used by the full map. Its
-outer frame is an editable 64 by 64 texture, while a configurable inset defines a smaller inner terrain
-viewport so map imagery never leaks behind or beyond thicker frame artwork. Client settings control whether
-it is shown, its corner, outer size, zoom, inset, whether north or the player's facing remains at the top, and
-the arrival radius that completes active navigation. Setting that radius to zero disables automatic completion.
-The world/server may disable the minimap independently without disabling the full-screen map. It is hidden
-outside the Overworld, with F1, and while another screen is open.
-
-Visible personal waypoints and authorized unknown or discovered POIs use the same icons, filters, and
-visibility rules on both maps. Marker positions move continuously with the interpolated player position.
-The active navigation target keeps its ordinary gold pin while it is inside the minimap. When it is outside
-the inner viewport, a separate editable 16 by 16 directional-arrow texture clamps to the inner border and
-points toward it. The arrow is guidance to the pin, not a replacement for the destination marker.
-Entering the configured arrival radius removes the temporary target, so the navigation pin and arrow stay gone
-even if the player leaves the area again.
-
-The compact creation panel accepts a name and icon and remains open with an error message if the server rejects the
-request. Visible waypoints render only on their recorded
-dimension. Player and waypoint markers use subpixel positions and scale with the square root of map zoom,
-clamped between 0.5 and 2.5 times their base size. Waypoint opacity remains constant at every zoom level.
-Hovering a marker opens a compact, centered two-line
-information card above the bottom controls. Saved waypoints and temporary targets show their name and coordinates.
-An unknown point of interest shows a generic name and exploration hint; a discovered point of interest shows its
-name and description.
-
-The Waypoints button opens a compact manager over the darkened map. It lists all saved waypoints with the
-current dimension first, supports case-insensitive name search and mouse-wheel scrolling, and shows either
-the player's distance or the waypoint's dimension on each row. Row controls toggle visibility, open the same
-compact name editor, request deletion behind a confirmation prompt, or center the map
-on a waypoint in the current dimension. Show-on-map is unavailable for waypoints in other dimensions.
-Escape closes the confirmation prompt, editor, and manager in that order.
-
-The bottom control bar places a permanent, width-limited input guide between its left-side menu buttons and
-right-side map controls. Its position and width belong to the editable map layout.
-
-Right-clicking a visible saved waypoint opens a small marker menu centered below it. Target places or replaces
-the temporary pin at that waypoint, while Delete removes the saved waypoint immediately.
-Right-clicking the temporary pin removes it immediately. Marker actions take priority over the empty-space
-right-click and double-right-click actions. Escape or clicking elsewhere closes the marker menu. Map zoom is
-disabled while the menu is open.
-
-An unknown point of interest appears directly over its real world anchor rather than at a random offset. It hides
-the location's identity and icon until discovery, but does not obscure where the player should explore.
-Right-clicking either an unknown or discovered point of interest immediately places or replaces the temporary
-navigation target there; POIs do not open a marker menu.
-
-Points of interest will first be tested against a small generated development structure named
-`poi_test_structure`. It is a hollow 4 by 4 by 4 stone-brick cube with a doorway and a chiseled
-stone-brick roof marker. It generates on the Overworld surface with deliberately frequent development
-spacing. The structure exists to validate real structure discovery and stable map-marker identity. It is
-not production world content and must be removed or disabled before release.
-
-Production structure POIs include vanilla pillager outposts, presented with the bandit-camp icon, and every
-vanilla structure in `#minecraft:village`, presented with the innkeeper icon. They use the same reveal,
-discovery, filtering, persistence, and temporary-target behavior as other structure-backed POIs.
-Vanilla `minecraft:meeting` point-of-interest records also use the innkeeper icon, placing a marker at each
-village bell meeting point observed in a watched chunk. Service POIs are identified as soon as they are revealed,
-can be hidden together through the Services map filter, and disappear below their configured minimum zoom. Services
-begin hidden through the client configuration's default-hidden category list unless a player saves a per-world override.
-
-World-map exploration begins when the server sends a loaded Overworld chunk to a player. That event
-records the chunk in that player's private exploration history and queues a shared terrain sample.
-The map system never generates or force-loads a chunk. If the chunk unloads before its queued turn,
-the capture is skipped, but watching it again or requesting it while it is already loaded queues a repair.
-The server processes several captures when tick time permits so ordinary travel does not outrun the queue.
-Each horizontal block column records separate ground, tree-foliage, water, and
-decoration information. Decorative grass and flowers do not replace the ground color, but players can
-show them as a separate map layer. Terrain shading follows the visible layer: open columns use ground
-height, tree-covered columns use foliage height, and water uses its surface height. Raised foliage casts a
-one-pixel contact shadow onto lower ground to its east, south, and southeast. Shadow darkness scales with
-the height difference and has its own client setting. A separate canopy-relief setting controls the slope
-contrast within and along tree crowns without increasing contrast across all terrain. Decorations keep the
-ground height. Water retains its biome color and captured depth. The renderer uses that depth while
-compositing translucent water over the captured underwater ground. Shallow water preserves more of the
-seabed, while opacity and darkening increase gradually with depth. The water color combines the active
-resource pack's still-water texture with a strong contribution from the captured biome tint.
-On new-format tiles, a captured block without a map color can still use its baked texture. Legacy tiles
-without either source remain transparent instead of producing black terrain pixels.
-
-The map requests visible terrain from the server in small batches. The server checks every requested
-chunk against that player's exploration history before returning a tile. The client combines
-authorized chunk samples into 256 by 256-block regions. Requests continue at the server's permitted
-rate until every chunk in the current view has been checked. Region color and hillshade construction
-runs outside GUI rendering, combines multiple arriving chunks into one pending rebuild, and keeps the
-previous region image visible until its replacement is ready. The render thread uploads at most one
-finished region image per frame. New terrain samples retain a compact palette of
-block states. The client derives their map colors from the active resource pack's baked block textures,
-checks the selected model quad to determine whether the texture accepts biome tint, and measures each
-texture's alpha coverage. Blocks in Minecraft's flower tag never receive biome tint on the map, so vanilla
-and properly tagged modded flowers keep their texture color. For those flower textures, the resolver
-discards stem-green candidates, ranks the remaining pixels by brightness and saturation, and averages the
-highest-scoring quarter. This makes petals determine the single map-pixel color, including the upper half
-of sunflowers. Other tintable grass, foliage, and plant models receive the captured biome color. Foliage
-and optional decorations blend over the ground according to that coverage. Separate client scales can
-strengthen or reduce either layer. Decorations have a 65 percent minimum before their scale applies, so
-sparse flower sprites remain visible when one world column becomes one map pixel. Older samples and
-unresolved textures retain a 75 percent fallback.
-Ground remains opaque, and biome-colored water keeps its separate seabed composite. Terrain relief compares each visible height with its northern and northwestern
-neighbors and applies stepped light or dark shading. Players can configure the height-difference sensitivity
-separately from the brightness contrast. Every zoom uses one terrain texture pixel per world block. Zoomed-out
-views group those pixels into persistent 256-block overview pages, reducing draw calls without reducing source
-resolution.
-Unexplored chunks and captured tiles that have not arrived yet remain hidden by the black map background.
-Each time the map page opens, it centers on the player at 1.00x zoom. Zoom changes made during that view
-do not carry into the next opening.
-After the server authorizes a terrain tile, the client retains its raw samples and completed 64 by 64-block leaf
-image under the game directory's `witchercraft/world-map` data root, scoped to the world, player, dimension, resource packs, and terrain
-display settings. Panning may release decoded samples or GPU textures, but returning to that area loads
-the retained image instead of downloading and rendering it again. The server remains authoritative and
-checks cached tile capture times in the background, sending replacements only when its copy is newer.
-Raw terrain uses compressed 4 by 4-chunk containers aligned with rendered leaves. This keeps detailed,
-resource-pack-independent terrain samples without creating one allocation-heavy disk file per chunk.
-Each saved leaf records which of its 16 chunks contributed to the image. A coverage mismatch marks the
-PNG for repair, but the client may display that older image until its replacement is complete. The map
-also prepares 256 blocks of leaves beyond each viewport edge so ordinary panning
-is less likely to expose an unbuilt strip. Terrain captured while the map is closed is combined after a
-short delay and written as a finished leaf image in the background, without allocating a GPU texture.
-Deleting or corrupting the client cache loses no permanent exploration data because the server can send
-authorized terrain again. Decoded terrain and uploaded leaf images remain separately bounded in memory,
-so long journeys do not keep every visited area in RAM or GPU memory.
-Below 0.65x zoom the map draws overview pages instead of hundreds of leaves. It returns to leaves above
-0.85x, so animated zoom cannot repeatedly switch detail levels near the boundary. An available overview
-stays behind detailed leaves during zoom and movement, while existing leaves temporarily fill an overview
-that is still being built. Terrain therefore does not disappear while asynchronous cache work catches up.
-Terrain pages share one floating-point transform for pan and zoom. Page positions and sizes are not rounded
-independently, so fractional camera movement stays continuous and adjacent page edges remain aligned.
-Crossing into another set of visible pages starts its disk-cache lookup immediately. Repeated checks of an
-unchanged view remain paced, and visible pages load before the surrounding prefetch ring.
-
-World-map settings are available from **Mods > WitcherCraft > Config**. Personal presentation settings live under
-**Client Settings > World Map** and include terrain appearance, marker size, zoom sensitivity, opening behavior,
-the discovery action-bar message, and initial filter visibility. The discovery sound itself is fixed. Gameplay and
-workload rules live under **World Settings > World Map**. They belong to the saved world in both single-player and
-dedicated-server play; remote players can see the synchronized rules but cannot edit them. World owners can disable
-the map or POIs, select enabled POI definitions, set omitted-definition radius defaults, tune capture workload and
-refresh cadence, and change the waypoint limit. **Map Name Language** shows place names, such as village
-signpost names, in one language for every player on the server (for example Polish), instead of each player's own
-game language. Menus and labels always stay in each player's own language. Disabling a system hides and stops it
-without deleting exploration, waypoints, POI instances, or discoveries.
-
-Opening the map does not pause the world. The Witcher menu uses full-screen art, so damage from a hostile
-mob or another player closes it and returns control to the player. Environmental damage such as fire,
-lava, falling, drowning, or poison leaves it open. A new map view can take longer to finish at distant
-zoom because it must check more terrain while the integrated server continues running.
+one-line description; whether it's locked, available, or equipped is left to the art alone. The **Map**
+tab holds the world map, described under World Map in section 9. The remaining unfinished tabs use
+placeholders until those systems get their own screens.
 
 The whole hub is a **reskinnable shell**: the navbar and every page's layout live in one data file,
 so tabs and panels can be rearranged, relabelled, or repointed without touching game logic. Each perk now
@@ -913,6 +751,84 @@ menu shows its price beside the hunger icon and refuses a session the player can
 Cancelling pays only for the world time that actually passed, plus the setup cost. World owners can
 disable or tune these costs. A normal or soul campfire within four horizontal blocks and one vertical
 block waives the setup cost, rewarding prepared and revisited campsites.
+
+### World Map
+
+The world map lives in the **Map** tab of the WitcherCraft menu (**P**). It shows the Overworld as you have
+explored it, along with your own waypoints and the points of interest you have found. A small minimap can also sit
+in a corner of the screen.
+
+**Exploring**
+
+- The map only shows places you have actually been near. Everything else stays black.
+- Each player has their own explored map, saved with the world, so it survives death and restarts. Other players'
+  exploration never shows on your map.
+- Terrain looks like it did the last time you were there and updates when you come back.
+- Colours come from the blocks themselves and follow your resource pack. Trees, water depth, and hills are shaded,
+  and grass and flowers can be shown as an extra layer.
+- A far zoomed-out view can take a moment to fill in.
+
+**Using the map**
+
+- The map opens centred on you. Drag to move around; scroll or use the zoom buttons to zoom in and out.
+- You are the gold arrow, pointing where you face.
+- The bottom bar has buttons to re-centre, zoom, open the waypoint list, and filter which markers show, plus a
+  short guide to the controls.
+- Hover any marker to see its name and details.
+- The world keeps running while the map is open. Getting hit by a monster or another player closes it; fire,
+  falling, drowning, and other environmental damage do not.
+
+**Waypoints**
+
+- Waypoints are your own saved markers. Nobody else sees them.
+- Right-click the map to drop a temporary gold pin, your current navigation target. Right-click twice quickly to
+  create a waypoint there instead.
+- Give a waypoint a name (up to **64** characters) and an icon: home, camp, chest, danger, herb, monster, or quest.
+- You can keep up to **200** waypoints per world. They survive death and restarts. Waypoints cannot be moved, but
+  they can be renamed, hidden, or deleted.
+- The temporary pin stays when you close the map but disappears when you leave the world, and it does not count
+  toward the limit.
+- Right-click a waypoint to target it or delete it. Right-click the pin to remove it.
+- The waypoint list shows all your waypoints with search, distance, and buttons to show, hide, rename, delete, or
+  jump to one on the map.
+
+**Points of interest**
+
+Places worth visiting appear on the map on their own as you explore:
+
+- Villages (innkeeper icon).
+- Pillager outposts (bandit camp icon).
+- Fast-travel signposts (see Fast Travel below).
+- Village bell squares, listed as services (innkeeper icon).
+
+Most points of interest first appear as a question mark when you get within **256** blocks, at their exact spot,
+so you know where to look. Getting within **32** blocks discovers them: you get a short message and a sound, and
+the marker shows its real icon and name. Services are simpler: they show with their real icon as soon as you get
+near, without a question mark or a discovery message, and only when the map is zoomed in. Right-clicking any point
+of interest sets it as your navigation target. The filters let you hide whole groups; services start hidden.
+
+A small stone-brick test cube also generates around the world for now. It exists only for testing the map and will
+be removed before release.
+
+**Minimap**
+
+- A square map in a screen corner, always centred on you, showing the same explored terrain, waypoints, and points
+  of interest as the full map.
+- You choose whether it shows, its corner, size, and zoom, and whether north stays up or the map turns with you.
+- When your navigation target is off the minimap, an arrow on its edge points toward it. Reaching the target clears
+  it; the distance that counts as arriving is a setting, and zero turns that off.
+- It hides outside the Overworld, when the HUD is hidden (F1), and while a menu is open.
+
+**Settings** (Mods > WitcherCraft > Config)
+
+- **Client Settings > World Map** are your own: how the terrain looks, marker size, zoom speed, how the map opens,
+  the discovery message, which marker groups start hidden, and the minimap options.
+- **World Settings > World Map** belong to the world and apply to everyone. They can turn off the map, points of
+  interest, or the minimap, choose which kinds of points of interest exist, change how far away they appear and
+  are discovered, change the waypoint limit, and tune how fast terrain is recorded. **Map Name Language** shows
+  place names, such as village signpost names, in one language for every player (for example Polish), instead of
+  each player's own game language. Menus and labels always stay in each player's own language.
+- Turning something off hides it without deleting exploration, waypoints, or discoveries.
 
 ### Fast Travel
 
