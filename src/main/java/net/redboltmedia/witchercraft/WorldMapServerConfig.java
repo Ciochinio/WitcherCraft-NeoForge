@@ -29,6 +29,13 @@ public final class WorldMapServerConfig {
 	private static final int DEFAULT_PLAYER_SIGN_LIMIT = 256;
 	private static final boolean DEFAULT_SHARED_SIGN_DISCOVERY = false;
 	private static final String DEFAULT_MAP_NAME_LANGUAGE = "";
+	private static final boolean DEFAULT_FREE_TRAVEL = false;
+	private static final int DEFAULT_BASE_XP_COST = 5;
+	private static final int DEFAULT_BLOCKS_PER_XP = 100;
+	private static final int DEFAULT_MAXIMUM_XP_COST = 0;
+	private static final boolean DEFAULT_BLOCK_TRAVEL_IN_COMBAT = true;
+	private static final boolean DEFAULT_BLOCK_TRAVEL_NEAR_MONSTERS = true;
+	public static final int HARD_MAX_TRAVEL_XP = 100_000;
 	public static final int HARD_MAX_PLAYER_SIGN_LIMIT = 100_000;
 	public static final int HARD_MAX_CAPTURES_PER_TICK = 32;
 	public static final int HARD_MAX_CAPTURE_BUDGET_MICROS = 20_000;
@@ -55,6 +62,12 @@ public final class WorldMapServerConfig {
 	private static final ModConfigSpec.IntValue PLAYER_SIGN_LIMIT;
 	private static final ModConfigSpec.BooleanValue SHARED_SIGN_DISCOVERY;
 	private static final ModConfigSpec.ConfigValue<String> MAP_NAME_LANGUAGE;
+	private static final ModConfigSpec.BooleanValue FREE_TRAVEL;
+	private static final ModConfigSpec.IntValue BASE_XP_COST;
+	private static final ModConfigSpec.IntValue BLOCKS_PER_XP;
+	private static final ModConfigSpec.IntValue MAXIMUM_XP_COST;
+	private static final ModConfigSpec.BooleanValue BLOCK_TRAVEL_IN_COMBAT;
+	private static final ModConfigSpec.BooleanValue BLOCK_TRAVEL_NEAR_MONSTERS;
 
 	static {
 		ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
@@ -91,6 +104,12 @@ public final class WorldMapServerConfig {
 		SIGN_DROPS_ITEM = fastTravelOption(builder, "sign_drops_item", "Destroyed signposts drop a placeable signpost item outside creative mode.").define("signDropsItem", DEFAULT_SIGN_DROPS_ITEM);
 		PLAYER_SIGN_LIMIT = fastTravelOption(builder, "player_sign_limit", "Maximum player-placed signposts in this world. Zero means no limit. Village signposts do not count. Lowering this never removes signs.").defineInRange("playerSignLimit", DEFAULT_PLAYER_SIGN_LIMIT, 0, HARD_MAX_PLAYER_SIGN_LIMIT);
 		SHARED_SIGN_DISCOVERY = fastTravelOption(builder, "shared_discovery", "A signpost discovered by any player counts as discovered for every player. Switching this off returns everyone to their own discoveries.").define("sharedDiscovery", DEFAULT_SHARED_SIGN_DISCOVERY);
+		FREE_TRAVEL = fastTravelOption(builder, "free_travel", "Fast travel costs no XP. Every other travel rule still applies.").define("freeTravel", DEFAULT_FREE_TRAVEL);
+		BASE_XP_COST = fastTravelOption(builder, "base_xp_cost", "Flat raw XP points charged for every journey.").defineInRange("baseXpCost", DEFAULT_BASE_XP_COST, 0, HARD_MAX_TRAVEL_XP);
+		BLOCKS_PER_XP = fastTravelOption(builder, "blocks_per_xp", "One more XP point is charged for every started stretch of this many blocks of horizontal distance.").defineInRange("blocksPerXp", DEFAULT_BLOCKS_PER_XP, 1, HARD_MAX_TRAVEL_XP);
+		MAXIMUM_XP_COST = fastTravelOption(builder, "maximum_xp_cost", "Highest XP price of one journey. Zero means no cap.").defineInRange("maximumXpCost", DEFAULT_MAXIMUM_XP_COST, 0, HARD_MAX_TRAVEL_XP);
+		BLOCK_TRAVEL_IN_COMBAT = fastTravelOption(builder, "block_in_combat", "Players who are in combat cannot set off.").define("blockInCombat", DEFAULT_BLOCK_TRAVEL_IN_COMBAT);
+		BLOCK_TRAVEL_NEAR_MONSTERS = fastTravelOption(builder, "block_near_monsters", "Players cannot set off while monsters are nearby, using the same rule as sleeping in a bed.").define("blockNearMonsters", DEFAULT_BLOCK_TRAVEL_NEAR_MONSTERS);
 		builder.pop();
 		SPEC = builder.build();
 	}
@@ -155,6 +174,12 @@ public final class WorldMapServerConfig {
 	public static boolean fastTravelEnabled() { return poisEnabled() && (!loaded() ? DEFAULT_FAST_TRAVEL_ENABLED : FAST_TRAVEL_ENABLED.getAsBoolean()); }
 	public static boolean signDropsItem() { return loaded() ? SIGN_DROPS_ITEM.getAsBoolean() : DEFAULT_SIGN_DROPS_ITEM; }
 	public static int playerSignLimit() { return loaded() ? PLAYER_SIGN_LIMIT.getAsInt() : DEFAULT_PLAYER_SIGN_LIMIT; }
+	public static boolean freeTravel() { return loaded() ? FREE_TRAVEL.getAsBoolean() : DEFAULT_FREE_TRAVEL; }
+	public static int baseXpCost() { return loaded() ? BASE_XP_COST.getAsInt() : DEFAULT_BASE_XP_COST; }
+	public static int blocksPerXp() { return Math.max(1, loaded() ? BLOCKS_PER_XP.getAsInt() : DEFAULT_BLOCKS_PER_XP); }
+	public static int maximumXpCost() { return loaded() ? MAXIMUM_XP_COST.getAsInt() : DEFAULT_MAXIMUM_XP_COST; }
+	public static boolean blockTravelInCombat() { return loaded() ? BLOCK_TRAVEL_IN_COMBAT.getAsBoolean() : DEFAULT_BLOCK_TRAVEL_IN_COMBAT; }
+	public static boolean blockTravelNearMonsters() { return loaded() ? BLOCK_TRAVEL_NEAR_MONSTERS.getAsBoolean() : DEFAULT_BLOCK_TRAVEL_NEAR_MONSTERS; }
 	public static boolean sharedSignDiscovery() { return loaded() ? SHARED_SIGN_DISCOVERY.getAsBoolean() : DEFAULT_SHARED_SIGN_DISCOVERY; }
 	/** Empty means each player's own game language. Synced to clients with the rest of the server config. */
 	public static String mapNameLanguage() {

@@ -2036,3 +2036,73 @@ presentation UUID, so switching sharing off later never produces duplicate marke
 `FastTravelSignRecipe` (`~/World Map/Fast Travel`) is an ordinary MCreator crafting recipe named
 `witchercraft:fast_travel_sign`: oak sign, compass, oak sign over two `#minecraft:logs` in the middle column,
 producing one signpost, unlocked by an advancement when the player holds a compass. It is a placeholder.
+
+#### Travel service
+
+Stage 3 adds the authoritative server side of travel. Nothing starts a session yet; stage 4 wires the sign's
+right-click and the map travel mode onto this API.
+
+| Class (code element) | Role |
+| --- | --- |
+| `FastTravel` (`~/World Map/Fast Travel`) | Sessions, requests, destination loading, commit. Server thread only. |
+| `FastTravelCosts` (`~/World Map/Fast Travel`) | Price and exact XP arithmetic, shared by server and client. |
+| `FastTravelRequestMessage` (`~/World Map/Fast Travel`) | Serverbound: destination presentation UUID and the price the client displayed. |
+| `FastTravelResultMessage` (`~/World Map/Fast Travel`) | Clientbound: a `FastTravel.Result` (ordinal on the wire) and the current price. Until stage 4 the client shows it as an action-bar message. |
+| `NearbyMonsters` (`~/Admin/EnemyNearby`) | The vanilla bed rule, shared with meditation. |
+
+**Sessions.** `FastTravel.startSession(player, anchor)` records the origin marker and anchor with a five-minute
+expiry. It is refused unless travel is enabled, the player is in the Overworld with no journey being prepared,
+and the anchor holds a complete, registered signpost. `endSession` (the player left travel mode) also cancels a
+journey still being prepared. Sessions end with a `SESSION_ENDED` notice on death and dimension change, silently on
+logout, and in a once-per-second sweep when the session expired, the player is more than 8 blocks from the
+origin anchor, or the origin record or its blocks are gone. The sweep checks distance before touching the origin
+blocks, so it never loads a chunk. Combat, monsters, sleeping, and riding only refuse a request; they never end a
+session.
+
+**Requests.** `FastTravel.request` resolves the destination with
+`WorldMapPoiManager.discoveredByPresentation`, which walks only the sender's knowledge through
+`WorldMapPoiKnowledge.effective`. It therefore accepts only an active, accepted POI the player sees as discovered,
+shared discoveries included, and gives the same `UNKNOWN_DESTINATION` answer for undiscovered and nonexistent
+signs. The destination must be a signpost in the Overworld other than the origin. The server recomputes the price.
+A different quoted price answers `PRICE_CHANGED` with the new price and charges nothing. Insufficient XP answers
+`NOT_ENOUGH_XP`. One journey can be in preparation per player; further requests answer `BUSY`.
+
+**Loading.** An accepted request adds a `witchercraft:fast_travel` ticket (registered through `RegisterEvent`;
+`FLAG_LOADING` only, 40-tick timeout, radius 1) with `addTicketAndLoadWithRadius`, refreshes it every 20 ticks,
+and answers `TRAVELLING`. The server tick polls the 3 by 3 chunk area with `getChunkNow`. Success, failure,
+timeout (10 seconds), logout, and `endSession` all remove the ticket, and its timeout releases it even if a path
+is missed. Map browsing and discovery never load chunks; only a confirmed request does.
+
+**Commit.** With the area loaded, one server-tick step re-runs every player check, re-resolves the destination
+through the same presentation UUID and requires the same marker and a complete sign. It then recomputes the price
+and XP, and searches for an arrival spot with `DismountHelper.findSafeDismountLocation(PLAYER, level, pos, true)`.
+That check covers dangerous blocks, collision, invalid spawn blocks, and the world border. The search visits the
+north, east, south, and west sides of the lower half, then the corners, then the ring at distance 2, each at the
+anchor height, one above, and one below. Only then does it debit, teleport with `teleportTo` facing the sign, reset
+fall distance and motion, and end the session. Any failing check returns a reason and charges nothing. Monsters at
+the destination are never checked.
+
+**Player checks** (`checkPlayer`, in this order): travel enabled; a live, unexpired session in the Overworld;
+within 8 blocks of the origin; origin record and blocks present; alive, not sleeping, not a passenger, not a
+spectator; no `IN_COMBAT` effect when Block Travel in Combat is on; `NearbyMonsters.preventRest` false at the
+player's position when Block Travel Near Monsters is on.
+
+**Price.** `FastTravelCosts.price(from, to, creative)` is zero with Free Travel or in creative mode. Otherwise
+it is the base cost plus the number of started stretches of "blocks per XP" of horizontal anchor distance,
+computed exactly in integers (smallest k with (k times stretch) squared at least the squared distance), then capped
+when a cap above zero is set. Settings live in the `fastTravel` config section: `freeTravel`, `baseXpCost`,
+`blocksPerXp` (minimum 1), `maximumXpCost`, `blockInCombat`, and `blockNearMonsters`. All apply immediately.
+
+**XP.** `spendablePoints` is the vanilla closed-form total for the current level plus the floor of progress times
+that level's point requirement. `debit` subtracts in whole points, finds the new level by binary search over the
+closed forms, and sets level and points with `setExperienceLevels` and `setExperiencePoints`. It lowers
+`totalExperience` by the same amount. It never calls `giveExperiencePoints`, so the XP-change event that WitcherCraft
+levelling listens to never fires, and float progress cannot drift. The closed forms were checked against summed
+per-level requirements up to level 2000. Independently, `CharacterExperienceCalculator` now only counts positive
+XP changes, so no XP loss lowers WitcherCraft progress.
+
+**Monster rule.** `NearbyMonsters.preventRest(level, player, center)` mirrors the bed check: any `Monster` within
+8 blocks horizontally and 5 vertically whose `isPreventingPlayerRest(level, player)` is true. Vanilla returns true
+except for zombified piglins, which require anger at the player. `MeditationCanStart` uses the same helper at the
+player's feet, replacing its former 12-block any-monster box. `anyMonster` is the fallback for a non-player
+entity.

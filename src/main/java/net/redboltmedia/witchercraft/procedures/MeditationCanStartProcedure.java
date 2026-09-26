@@ -1,8 +1,8 @@
 package net.redboltmedia.witchercraft.procedures;
 
-import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.core.BlockPos;
@@ -10,8 +10,8 @@ import net.minecraft.core.BlockPos;
 /**
  * HAND-MAINTAINED (locked_code procedure, ~/Meditation2). The meditation safety
  * gate, re-validated server-side before a session starts: you must have open
- * space around you (not meditating boxed in a 1x1 hole) and no hostile monster
- * nearby (safe, like sleeping).
+ * space around you (not meditating boxed in a 1x1 hole) and no monster nearby,
+ * using exactly the vanilla bed rule ({@link net.redboltmedia.witchercraft.NearbyMonsters}).
  *
  * NOTE: this was meant to be a Blockly procedure. It is Java for now because a
  * robust "any monster in radius" scan + multi-block air check can't be safely
@@ -28,9 +28,6 @@ public class MeditationCanStartProcedure {
 
 	/** Open-air cells required around the head (of the 6 checked) - "not boxed in". */
 	private static final int MIN_AIR = 5;
-	/** No hostile monster may be within this radius (blocks). */
-	private static final double MONSTER_RADIUS = 12.0;
-
 	// head-level ring + one above: enough openness to rule out a 1x1 hole
 	private static final int[][] AIR_OFFSETS = {{0, 1, 0}, {1, 1, 0}, {-1, 1, 0}, {0, 1, 1}, {0, 1, -1}, {0, 2, 0}};
 
@@ -47,8 +44,11 @@ public class MeditationCanStartProcedure {
 		if (air < MIN_AIR)
 			return BLOCKED_SPACE;
 
-		AABB box = new AABB(base).inflate(MONSTER_RADIUS);
-		if (!level.getEntitiesOfClass(Monster.class, box, Entity::isAlive).isEmpty())
+		Vec3 center = Vec3.atBottomCenterOf(base);
+		boolean monsters = entity instanceof Player player
+			? net.redboltmedia.witchercraft.NearbyMonsters.preventRest(level, player, center)
+			: net.redboltmedia.witchercraft.NearbyMonsters.anyMonster(level, center);
+		if (monsters)
 			return BLOCKED_MONSTER;
 
 		return OK;

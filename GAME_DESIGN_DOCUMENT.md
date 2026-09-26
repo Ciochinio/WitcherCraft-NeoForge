@@ -741,7 +741,8 @@ hour on a 24-hour dial, and the world time-lapses to that hour: the real sky acc
 while the GUI fades out, rather than a jarring instant jump. It replaces sleeping as the way to move
 time, and it exists for the hunt: waiting for night to bring out the monsters that only appear then,
 skipping to daylight, or simply passing the time while Toxicity drains back to safe. You cannot
-meditate boxed into a tight space or with monsters nearby, and a campfire is placed for you; because
+meditate boxed into a tight space or with monsters nearby (the same rule as sleeping in a bed:
+within **8** blocks, or **5** up or down), and a campfire is placed for you; because
 meditation is not rest, it does not hold off the phantoms that a lack of sleep brings. The menu never
 pauses single-player, so meditation begins as soon as the server accepts it. Taking real health damage
 from a hostile mob or another player closes the menu and cancels an active meditation.
@@ -870,9 +871,17 @@ unlocks when you pick up a compass. This recipe is a placeholder.
 **Travelling (coming soon)**
 
 Right-clicking a signpost will open the map in travel mode. Pick another signpost you have discovered and confirm
-the price: **5** XP points plus **1** for every started **100** blocks of distance. Travel uses vanilla XP only and
-never touches WitcherCraft level progress. You cannot set off while in combat, near hostile mobs, sleeping, or
-riding. Monsters waiting at the destination do not stop you from arriving.
+the price: **5** XP points plus **1** for every started **100** blocks of distance, so a trip of 250 blocks costs 8.
+Travel is free in creative mode. It spends vanilla XP only and never touches WitcherCraft level progress.
+
+- You cannot set off while in combat, while monsters are nearby (the same rule as sleeping in a bed), or while
+  sleeping or riding.
+- Stay within **8** blocks of the signpost while choosing. Walking away, dying, or taking a portal cancels the trip,
+  and the choice expires after **5** minutes.
+- You arrive standing next to the destination signpost, facing it. Monsters waiting there do not stop you from
+  arriving.
+- If anything goes wrong on the way (the signpost was broken, there is no safe place to stand, or the destination
+  takes more than **10** seconds to prepare), you stay where you are and pay nothing.
 
 **World settings** (Mods > WitcherCraft > Config > World Settings > Fast Travel)
 
@@ -882,6 +891,12 @@ riding. Monsters waiting at the destination do not stop you from arriving.
 | Signposts Drop as Items | **on** | Broken signposts drop an item (never in creative mode). |
 | Player-Placed Signpost Limit | **256** | Zero means no limit. |
 | Shared Signpost Discovery | **off** | When one player discovers a signpost, every player has it. Turning it off again returns everyone to their own discoveries. |
+| Free Travel | **off** | Travel costs no XP. |
+| Base XP Cost | **5** | Flat price of every trip. |
+| Blocks per XP | **100** | One more XP point per started stretch of this many blocks. |
+| Maximum XP Cost | **0** | Highest price of one trip. Zero means no cap. |
+| Block Travel in Combat | **on** | Players in combat cannot set off. |
+| Block Travel Near Monsters | **on** | Players cannot set off with monsters nearby. |
 
 ### Glossary
 

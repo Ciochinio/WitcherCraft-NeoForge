@@ -140,6 +140,38 @@ public final class WorldMapPoiManager {
 			state.discover(player, instance, definition, definitions.generation());
 	}
 
+	/**
+	 * The active, accepted instance a player has discovered under the presentation UUID their client
+	 * knows, counting shared discoveries while sharing is on. Null for anything else, so a client can only
+	 * ever name a POI it was shown as discovered.
+	 */
+	public static @Nullable WorldMapPoiInstance discoveredByPresentation(ServerPlayer player, UUID presentationId) {
+		ServerState state = SERVERS.computeIfAbsent(player.level().getServer(), ServerState::new);
+		WorldMapPoiDefinitions.Snapshot definitions = WorldMapPoiDefinitions.active();
+		for (WorldMapPoiKnowledge.Entry stored : state.knowledge.entries(player.getUUID())) {
+			if (!stored.presentationId().equals(presentationId))
+				continue;
+			WorldMapPoiKnowledge.Entry entry = WorldMapPoiKnowledge.effective(stored, state.sharing);
+			WorldMapPoiInstance instance = state.instances.get(stored.markerId());
+			if (entry == null || entry.state() != WorldMapPoiKnowledge.State.DISCOVERED || instance == null || !instance.active()
+				|| !definitions.accepts(instance))
+				return null;
+			return instance;
+		}
+		return null;
+	}
+
+	/** The presentation UUID a player's client uses for a marker, or null when the player does not know it. */
+	public static @Nullable UUID presentationId(ServerPlayer player, UUID markerId) {
+		ServerState state = SERVERS.computeIfAbsent(player.level().getServer(), ServerState::new);
+		WorldMapPoiKnowledge.Entry entry = state.known(player.getUUID(), markerId);
+		return entry == null ? null : entry.presentationId();
+	}
+
+	public static @Nullable WorldMapPoiInstance instance(MinecraftServer server, UUID markerId) {
+		return SERVERS.computeIfAbsent(server, ServerState::new).instances.get(markerId);
+	}
+
 	/** The lifecycle-managed instance anchored at an exact block, if any. */
 	public static @Nullable WorldMapPoiInstance lifecycleInstanceAt(MinecraftServer server, Identifier dimension, BlockPos anchor) {
 		ServerState state = SERVERS.computeIfAbsent(server, ServerState::new);
