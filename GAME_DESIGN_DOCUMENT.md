@@ -507,8 +507,9 @@ Minecraft one, and spending what you earn is where builds are made.
 
 WitcherCraft rides on Minecraft's own experience. Every point of vanilla XP you gain also feeds a
 separate WitcherCraft experience pool; fill the pool and you level up, and it resets for the next
-level. The bar you have to fill grows in brackets, so early levels come quickly and later ones
-take real time:
+level. Only gains count: spending vanilla XP (enchanting, repairing, fast travel) or losing it on
+death never lowers your WitcherCraft progress. The bar you have to fill grows in brackets, so early
+levels come quickly and later ones take real time:
 
 | Levels | Added to the next level's requirement |
 |--------|---------------------------------------|
