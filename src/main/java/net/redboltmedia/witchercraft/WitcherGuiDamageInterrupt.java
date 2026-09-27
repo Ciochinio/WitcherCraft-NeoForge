@@ -20,7 +20,8 @@ import net.minecraft.world.entity.player.Player;
 
 /**
  * Closes the opaque Witcher GUI shell after real damage from a hostile mob or
- * another player. Environmental damage leaves the shell open.
+ * another player. Environmental damage leaves the shell open. Container-backed
+ * tabs (Alchemy) are closed on the server instead, which returns their items.
  *
  * HAND-MAINTAINED: tracked by the locked WitcherGuiScreen code element.
  */
@@ -35,8 +36,12 @@ public final class WitcherGuiDamageInterrupt {
 			return;
 
 		Entity attacker = event.getSource().getEntity();
-		if (attacker instanceof Enemy || attacker instanceof Player)
+		if (attacker instanceof Enemy || attacker instanceof Player) {
+			// container tabs close through the server, so the menu returns its items
+			if (player.containerMenu instanceof AlchemyMenu)
+				player.closeContainer();
 			PacketDistributor.sendToPlayer(player, CloseMessage.INSTANCE);
+		}
 	}
 
 	public record CloseMessage() implements CustomPacketPayload {

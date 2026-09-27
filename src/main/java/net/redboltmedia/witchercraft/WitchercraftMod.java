@@ -61,6 +61,7 @@ public class WitchercraftMod {
 		WitchercraftModParticleTypes.REGISTRY.register(modEventBus);
 		WitchercraftModAttributes.REGISTRY.register(modEventBus);
 		// Start of user code block mod init
+		AlchemyMenu.MENUS.register(modEventBus);
 		// End of user code block mod init
 	}
 

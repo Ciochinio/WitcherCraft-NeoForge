@@ -2,7 +2,8 @@ package net.redboltmedia.witchercraft.client.gui;
 
 import net.redboltmedia.witchercraft.world.inventory.PauseMenuGuiMenu;
 import net.redboltmedia.witchercraft.init.WitchercraftModScreens;
-import net.redboltmedia.witchercraft.WitcherGuiScreen;
+import net.redboltmedia.witchercraft.WitcherGuiPages;
+import net.redboltmedia.witchercraft.ShellChrome;
 import net.redboltmedia.witchercraft.WitcherGuiLayout;
 import net.redboltmedia.witchercraft.PauseMenuLayout;
 
@@ -36,8 +37,9 @@ import com.mojang.blaze3d.platform.InputConstants;
  *
  * All geometry, background and the tab list live in {@link PauseMenuLayout}
  * (data-driven, edited in tools/pause-menu-creator.html); this class is just
- * render + input. Clicking a tab opens {@code new WitcherGuiScreen(pageId)}
- * client-side (opening a screen is not server-authoritative state, see TDD 3.9).
+ * render + input. Clicking a tab opens it through {@code WitcherGuiPages.open(pageId)}
+ * (client-side for plain shell tabs; a container tab such as Alchemy asks the
+ * server to open its menu).
  * The old Alchemy/Glossary/Character/Bestiary container GUIs are reached via
  * commands now, not this menu.
  */
@@ -47,7 +49,7 @@ public class PauseMenuGuiScreen extends AbstractContainerScreen<PauseMenuGuiMenu
 	private final Player entity;
 	private boolean menuStateUpdateActive = false;
 
-	// shell-matching palette (mirrors WitcherGuiScreen's private constants)
+	// shell-matching palette (mirrors ShellChrome's private constants)
 	private static final int LETTERBOX = 0xFF000000;
 	private static final int PANEL_DIM = 0x33000000;
 	private static final int TAB_BG = 0x66101015;
@@ -124,7 +126,7 @@ public class PauseMenuGuiScreen extends AbstractContainerScreen<PauseMenuGuiMenu
 		g.pose().scale(s, s);
 
 		// same readout as the navbar, same coords -> visually continuous
-		WitcherGuiScreen.drawLevelReadout(g, this.font);
+		ShellChrome.drawLevelReadout(g, this.font);
 		drawNav(g, dmx, dmy);
 
 		g.pose().popMatrix();
@@ -181,7 +183,7 @@ public class PauseMenuGuiScreen extends AbstractContainerScreen<PauseMenuGuiMenu
 				int ty = PauseMenuLayout.NAV_Y;
 				if (dmx >= tx && dmx < tx + PauseMenuLayout.NAV_TAB_W && dmy >= ty && dmy < ty + PauseMenuLayout.NAV_H) {
 					// opening a screen is not server-authoritative state (see TDD 3.9)
-					Minecraft.getInstance().setScreen(new WitcherGuiScreen(PauseMenuLayout.NAV[i].pageId));
+					WitcherGuiPages.open(PauseMenuLayout.NAV[i].pageId);
 					return true;
 				}
 			}

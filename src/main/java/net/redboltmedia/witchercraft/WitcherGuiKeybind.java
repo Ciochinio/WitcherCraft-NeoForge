@@ -18,8 +18,9 @@ import net.minecraft.client.Minecraft;
  *
  * Hand-written (no MCreator element): auto-registered via {@code @EventBusSubscriber}.
  * Unlike the MCreator GUI keybinds (which send a server message to open a
- * container menu), the shell is a plain client Screen, so these just call
- * {@code Minecraft.setScreen} directly - no networking.
+ * container menu), the shell is a plain client Screen, so these go through
+ * {@link WitcherGuiPages#open}: a direct {@code Minecraft.setScreen}, except for
+ * container tabs (Alchemy), which ask the server to open their menu.
  *
  * - {@link #OPEN_SHELL} (default key P) opens the shell on its default tab.
  * - One keybind per navbar page ({@link #PAGE_KEYS}, built from
@@ -78,7 +79,7 @@ public class WitcherGuiKeybind {
 				while (PAGE_KEYS[i].consumeClick())
 					target = PAGE_IDS[i];
 			if (target != null && Minecraft.getInstance().screen == null && Minecraft.getInstance().player != null)
-				Minecraft.getInstance().setScreen(new WitcherGuiScreen(target));
+				WitcherGuiPages.open(target);
 		}
 	}
 }

@@ -95,6 +95,71 @@
       "path": "~/NAVBAR"
     },
     {
+      "name": "ShellChrome",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "shell_chrome",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/ShellChrome.java"
+        ]
+      },
+      "path": "~/NAVBAR"
+    },
+    {
+      "name": "AlchemyLayout",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "alchemy_layout",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/AlchemyLayout.java"
+        ]
+      },
+      "path": "~/Alchemy"
+    },
+    {
+      "name": "AlchemyMenu",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "alchemy_menu",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/AlchemyMenu.java"
+        ]
+      },
+      "path": "~/Alchemy"
+    },
+    {
+      "name": "AlchemyScreen",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "alchemy_screen",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/AlchemyScreen.java"
+        ]
+      },
+      "path": "~/Alchemy"
+    },
+    {
+      "name": "AlchemyOpenMessage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "alchemy_open_message",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/AlchemyOpenMessage.java"
+        ]
+      },
+      "path": "~/Alchemy"
+    },
+    {
       "name": "PauseMenuLayout",
       "type": "code",
       "compiles": true,

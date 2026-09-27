@@ -644,8 +644,9 @@ small helpers may remain unowned. MCreator does not regenerate either form:
 - **`WitcherGuiKeybind`** - a hand-written `@EventBusSubscriber(Dist.CLIENT)` that registers the **P**
   mapping plus one **per-page** mapping built from `NAV[]` (`key.witchercraft.open_shell.<pageId>`; the
   six known pages get conflict-free defaults - I / K / J / N / M / G - via a `DEFAULT_KEYS` map, any
-  other tab stays unbound; all rebindable in Controls), and opens the shell on a client tick
-  (`ClientTickEvent.Post`, game bus) onto the matching tab. No server message, no MCreator keybind
+  other tab stays unbound; all rebindable in Controls), and opens the matching tab on a client tick
+  (`ClientTickEvent.Post`, game bus) through `WitcherGuiPages.open` (3.3b). No server message except
+  for container tabs, no MCreator keybind
   element; auto-detected by FML like the HUD overlay classes. Adding a nav tab in the tool
   automatically gets it a keybind.
 
@@ -679,6 +680,42 @@ Costs: input and tooltips need care. `mouseClicked` maps the screen cursor back 
 must not call `setTooltipForNextFrame` itself (it would be scaled and mispositioned); instead it
 stashes the tooltip and the shell reads it via `GuiPage.pollTooltip()` after popping the transform and
 renders it at the real cursor.
+
+### 3.3b Container-backed tabs (Alchemy)
+
+A tab that needs **real item slots** cannot be a `GuiPage`: slots need a server-side menu, and
+vanilla slot code assumes normal GUI pixels, not the scaled design canvas. Such a tab is its own
+`AbstractContainerScreen` that draws the same chrome, so to the player it is just another tab. Alchemy
+is the first (built in the alchemy redesign's step 0; see `ALCHEMY_REDESIGN_PLAN.md`).
+
+- **`ShellChrome`** - the chrome extracted from `WitcherGuiScreen`: the design-canvas transform, the
+  letterboxed per-tab background, the navbar with the level readout, a navbar hit-test
+  (`navTabAt`), and the content region in **screen** pixels (`contentScreenX/Y/W/H`). Both the shell
+  and container tabs draw through it; the pause menu uses its `drawLevelReadout`.
+- **One routing point.** `WitcherGuiPages.open(pageId)` is how every entry point (nav click, P, per-tab
+  keys, pause menu) opens a tab. `isContainerTab(pageId)` (only `alchemy` today) makes it send a
+  serverbound open packet (`AlchemyOpenMessage`) instead of calling `setScreen`. Inside the shell, a
+  nav click on a container tab goes through the same call. `FastTravelClient` still opens the map
+  directly, which is fine because the map is not a container tab.
+- **Opening.** The server opens the menu with a `MenuProvider` whose
+  `shouldTriggerClientSideContainerClosingOnOpen()` is false, so the screen being replaced (shell or
+  the container-based pause menu) is swapped straight for the new one. A client-side close first would
+  drop to the world for a frame and re-centre the cursor.
+- **Leaving to another tab.** The container screen sends `ServerboundContainerClosePacket`, resets the
+  client's `containerMenu`, and `setScreen`s the shell on the target tab, for the same no-flash reason.
+  The server's `removed()` returns the grid. The release of a navbar click is swallowed so vanilla does
+  not treat it as a click outside the GUI and throw the carried item.
+- **Two scales on one screen.** The chrome scales with the 640x360 canvas; the slot block (and a
+  future recipe book panel) stays at normal GUI scale, centred in the content region. At other window
+  sizes or GUI scales the block looks larger or smaller relative to the background, so any art framing
+  the slots must be drawn with the block, never painted into the fullscreen background. The block is
+  placed below the navbar and may overflow the bottom edge only when the screen is too short for it.
+- **Registration without MCreator gui elements.** `AlchemyMenu` owns a `DeferredRegister<MenuType<?>>`
+  attached to the mod bus in `WitchercraftMod`'s "mod init" user code block; `AlchemyScreen` binds
+  itself in `RegisterMenuScreensEvent`. A fake MCreator `gui` element would register a menu class
+  MCreator does not own and break the build.
+- **Damage interrupt.** `WitcherGuiDamageInterrupt` closes an open `AlchemyMenu` on the server
+  (`player.closeContainer()`), which returns its items, in addition to the shell's clientbound close.
 
 ### 3.4 The tools: one per GUI, plus a navbar-only chrome editor
 
@@ -780,9 +817,9 @@ divergence risk the way the `en_us.json` gotcha (3.11) is.
 
 ### 3.8 Known limitations
 
-- **Placeholder pages.** Skills, Meditation, and Map have real pages. Inventory, Alchemy, and Glossary
-  remain `PlaceholderPage` "coming soon" tabs until each is built (own class + own tool). None wire real
-  item slots yet - a page that needs live inventory slots must bring a container.
+- **Placeholder pages.** Skills, Meditation, and Map have real pages. Alchemy is a container-backed tab
+  (3.3b), currently a test build with empty slots and no brewing. Inventory and Glossary remain
+  `PlaceholderPage` "coming soon" tabs until each is built (own class + own tool).
 - **Existing standalone screens are only partly folded in.** The perk screen (Skills) and Meditation
   are now real shell pages; Meditation's old container GUI + in-world opener were deleted outright in
   the meditation-redesign slice 4, and the ESC pause-menu "Meditation" button now opens the shell tab

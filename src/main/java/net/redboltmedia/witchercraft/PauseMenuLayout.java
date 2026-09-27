@@ -8,7 +8,7 @@ package net.redboltmedia.witchercraft;
  * the shell on the matching page ({@code new WitcherGuiScreen(pageId)}), so its
  * tab set mirrors the navbar. It renders against the shell's virtual design
  * canvas and also draws the same level/XP readout
- * ({@link WitcherGuiScreen#drawLevelReadout}), which is edited in the navbar
+ * ({@link ShellChrome#drawLevelReadout}), which is edited in the navbar
  * tool; this class owns only the pause chrome: canvas, background and the tabs.
  *
  * {@link net.redboltmedia.witchercraft.client.gui.PauseMenuGuiScreen} reads this

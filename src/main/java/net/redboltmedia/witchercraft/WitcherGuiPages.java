@@ -3,6 +3,10 @@ package net.redboltmedia.witchercraft;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+
+import net.minecraft.client.Minecraft;
+
 /**
  * The "route table": maps a pageId to the {@link GuiPage} that renders it.
  *
@@ -49,5 +53,26 @@ public final class WitcherGuiPages {
 	/** The first navbar tab's pageId, used as the default active tab. */
 	public static String defaultPageId() {
 		return WitcherGuiLayout.NAV.length > 0 ? WitcherGuiLayout.NAV[0].pageId : "";
+	}
+
+	/**
+	 * Tabs backed by a server-side container menu (real item slots). They are not
+	 * {@link GuiPage}s: the server opens the menu and its own screen draws the
+	 * shell chrome through {@link ShellChrome}.
+	 */
+	public static boolean isContainerTab(String pageId) {
+		return "alchemy".equals(pageId);
+	}
+
+	/**
+	 * THE routing point for opening the shell on a tab (nav clicks, P, per-tab
+	 * keys, the pause menu). A container tab asks the server to open its menu; any
+	 * other tab opens {@link WitcherGuiScreen} directly.
+	 */
+	public static void open(String pageId) {
+		if (isContainerTab(pageId))
+			ClientPacketDistributor.sendToServer(AlchemyOpenMessage.INSTANCE);
+		else
+			Minecraft.getInstance().setScreen(new WitcherGuiScreen(pageId));
 	}
 }
