@@ -710,6 +710,9 @@ is the first (built in the alchemy redesign's step 0; see `ALCHEMY_REDESIGN_PLAN
   sizes or GUI scales the block looks larger or smaller relative to the background, so any art framing
   the slots must be drawn with the block, never painted into the fullscreen background. The block is
   placed below the navbar and may overflow the bottom edge only when the screen is too short for it.
+  Alchemy's art is separate textures listed in `AlchemyLayout` (one 18x18 sprite per slot type, a
+  circle ornament, and panel images), drawn at the slots' own positions, so a layout change never
+  needs repainted art.
 - **Registration without MCreator gui elements.** `AlchemyMenu` owns a `DeferredRegister<MenuType<?>>`
   attached to the mod bus in `WitchercraftMod`'s "mod init" user code block; `AlchemyScreen` binds
   itself in `RegisterMenuScreensEvent`. A fake MCreator `gui` element would register a menu class

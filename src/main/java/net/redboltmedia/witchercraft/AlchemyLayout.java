@@ -48,9 +48,29 @@ public final class AlchemyLayout {
 	public static final int INVENTORY_Y = 98;
 	public static final int HOTBAR_Y = 156;
 
-	// --- colours -----------------------------------------------------------------
-	public static final int PANEL_COLOR = 0xD0101015;
-	public static final int PANEL_BORDER_COLOR = 0xFF33333D;
-	public static final int BOOK_COLOR = 0x80101015;
-	public static final int MISFIT_COLOR = 0xFFD04040; // outline when the block does not fit (step 0 check)
+	// --- art ---------------------------------------------------------------------
+	// Every piece is drawn with the slot block (never baked into the fullscreen tab
+	// background), so it stays aligned at every GUI scale and window size. Slot
+	// sprites are 18x18 and drawn at each slot's frame (1px outside the item), so
+	// moving a slot moves its art. An empty path draws nothing.
+	public static final String SLOT_BASE_TEX = "witchercraft:textures/screens/alchemy_slot_base.png";
+	public static final String SLOT_INGREDIENT_TEX = "witchercraft:textures/screens/alchemy_slot_ingredient.png";
+	public static final String SLOT_OUTPUT_TEX = "witchercraft:textures/screens/alchemy_slot_output.png";
+	public static final String SLOT_INVENTORY_TEX = "witchercraft:textures/screens/alchemy_slot_inventory.png";
+	public static final int SLOT_TEX_SIZE = 18;
+
+	// behind the whole block, BLOCK_W x BLOCK_H
+	public static final String PANEL_TEX = "witchercraft:textures/screens/alchemy_panel.png";
+	// behind the recipe book panel, BOOK_W x BOOK_H
+	public static final String BOOK_TEX = "witchercraft:textures/screens/alchemy_book_panel.png";
+
+	// ornament behind the circle slots, drawn at this rect inside the block
+	public static final String CIRCLE_TEX = "witchercraft:textures/screens/alchemy_circle_frame.png";
+	public static final int CIRCLE_X = 26;
+	public static final int CIRCLE_Y = 0;
+	public static final int CIRCLE_W = 88;
+	public static final int CIRCLE_H = 88;
+
+	// outline when the block or book panel does not fit the content region (step 0 check)
+	public static final int MISFIT_COLOR = 0xFFD04040;
 }

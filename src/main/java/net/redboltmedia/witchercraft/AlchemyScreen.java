@@ -8,8 +8,10 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ServerboundContainerClosePacket;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 
@@ -23,7 +25,8 @@ import net.minecraft.world.inventory.Slot;
  * circle, output, inventory and recipe book panel stay at normal GUI scale so
  * vanilla handles hover, clicks, shift-click, drag-splitting, double-click
  * collect and the carried item. Any art framing the slots must therefore be
- * drawn with the slot block, never painted into the fullscreen background.
+ * drawn with the slot block, never painted into the fullscreen background: the
+ * panel, circle ornament and per-slot sprites all come from {@link AlchemyLayout}.
  *
  * Step 0 test build: the recipe book panel is an empty reserved area, and the
  * block and panel are outlined red when they do not fit the content region.
@@ -33,11 +36,6 @@ import net.minecraft.world.inventory.Slot;
  */
 public class AlchemyScreen extends AbstractContainerScreen<AlchemyMenu> {
 	private static final String TAB_ID = "alchemy";
-
-	// vanilla-style slot bevel
-	private static final int SLOT_DARK = 0xFF373737;
-	private static final int SLOT_LIGHT = 0xFFFFFFFF;
-	private static final int SLOT_FILL = 0xFF8B8B8B;
 
 	private int bookX, bookY;
 	private boolean fitsWidth, fitsHeight;
@@ -89,15 +87,36 @@ public class AlchemyScreen extends AbstractContainerScreen<AlchemyMenu> {
 		g.pose().popMatrix();
 
 		// recipe book panel (reserved space for now)
-		g.fill(bookX, bookY, bookX + AlchemyLayout.BOOK_W, bookY + AlchemyLayout.BOOK_H, AlchemyLayout.BOOK_COLOR);
-		outline(g, bookX, bookY, AlchemyLayout.BOOK_W, AlchemyLayout.BOOK_H, fitsWidth ? AlchemyLayout.PANEL_BORDER_COLOR : AlchemyLayout.MISFIT_COLOR);
+		blit(g, AlchemyLayout.BOOK_TEX, bookX, bookY, AlchemyLayout.BOOK_W, AlchemyLayout.BOOK_H);
+		if (!fitsWidth)
+			outline(g, bookX, bookY, AlchemyLayout.BOOK_W, AlchemyLayout.BOOK_H, AlchemyLayout.MISFIT_COLOR);
 
-		// slot block panel
-		g.fill(leftPos, topPos, leftPos + imageWidth, topPos + imageHeight, AlchemyLayout.PANEL_COLOR);
-		outline(g, leftPos, topPos, imageWidth, imageHeight, fitsHeight ? AlchemyLayout.PANEL_BORDER_COLOR : AlchemyLayout.MISFIT_COLOR);
+		// slot block: panel, circle ornament, then one sprite per slot
+		blit(g, AlchemyLayout.PANEL_TEX, leftPos, topPos, imageWidth, imageHeight);
+		blit(g, AlchemyLayout.CIRCLE_TEX, leftPos + AlchemyLayout.CIRCLE_X, topPos + AlchemyLayout.CIRCLE_Y, AlchemyLayout.CIRCLE_W, AlchemyLayout.CIRCLE_H);
+		if (!fitsHeight)
+			outline(g, leftPos, topPos, imageWidth, imageHeight, AlchemyLayout.MISFIT_COLOR);
 
+		int size = AlchemyLayout.SLOT_TEX_SIZE;
 		for (Slot slot : this.menu.slots)
-			drawSlotFrame(g, leftPos + slot.x - 1, topPos + slot.y - 1);
+			blit(g, slotTexture(slot.index), leftPos + slot.x - 1, topPos + slot.y - 1, size, size);
+	}
+
+	private static String slotTexture(int index) {
+		if (index == AlchemyMenu.BASE_SLOT)
+			return AlchemyLayout.SLOT_BASE_TEX;
+		if (index < AlchemyMenu.OUTPUT_SLOT)
+			return AlchemyLayout.SLOT_INGREDIENT_TEX;
+		if (index == AlchemyMenu.OUTPUT_SLOT)
+			return AlchemyLayout.SLOT_OUTPUT_TEX;
+		return AlchemyLayout.SLOT_INVENTORY_TEX;
+	}
+
+	/** Draw a whole texture stretched to a rect; an empty path draws nothing. */
+	private static void blit(GuiGraphicsExtractor g, String texture, int x, int y, int w, int h) {
+		if (texture == null || texture.isEmpty())
+			return;
+		g.blit(RenderPipelines.GUI_TEXTURED, Identifier.parse(texture), x, y, 0, 0, w, h, w, h);
 	}
 
 	private static void outline(GuiGraphicsExtractor g, int x, int y, int w, int h, int color) {
@@ -105,14 +124,6 @@ public class AlchemyScreen extends AbstractContainerScreen<AlchemyMenu> {
 		g.fill(x, y + h - 1, x + w, y + h, color);
 		g.fill(x, y, x + 1, y + h, color);
 		g.fill(x + w - 1, y, x + w, y + h, color);
-	}
-
-	private static void drawSlotFrame(GuiGraphicsExtractor g, int x, int y) {
-		g.fill(x, y, x + 18, y + 18, SLOT_FILL);
-		g.fill(x, y, x + 17, y + 1, SLOT_DARK);
-		g.fill(x, y, x + 1, y + 17, SLOT_DARK);
-		g.fill(x + 1, y + 17, x + 18, y + 18, SLOT_LIGHT);
-		g.fill(x + 17, y + 1, x + 18, y + 18, SLOT_LIGHT);
 	}
 
 	@Override
