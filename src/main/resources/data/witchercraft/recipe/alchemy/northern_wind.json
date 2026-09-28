@@ -1,0 +1,15 @@
+{
+  "type": "witchercraft:alchemy",
+  "category": "bomb",
+  "base": "witchercraft:saltpeter",
+  "ingredients": [
+    "witchercraft:quebrith",
+    "witchercraft:aether",
+    "witchercraft:aether",
+    "witchercraft:hydragenum"
+  ],
+  "result": {
+    "id": "witchercraft:northern_wind",
+    "count": 3
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "type": "witchercraft:alchemy",
+  "category": "oil",
+  "base": "witchercraft:tallow",
+  "ingredients": [
+    "witchercraft:vitriol",
+    "witchercraft:aether"
+  ],
+  "result": {
+    "id": "witchercraft:necrophage_oil",
+    "count": 3
+  },
+  "starter": true
+}

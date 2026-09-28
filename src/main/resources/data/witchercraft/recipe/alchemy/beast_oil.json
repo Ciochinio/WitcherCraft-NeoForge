@@ -1,0 +1,14 @@
+{
+  "type": "witchercraft:alchemy",
+  "category": "oil",
+  "base": "witchercraft:tallow",
+  "ingredients": [
+    "witchercraft:rebis",
+    "witchercraft:quebrith",
+    "witchercraft:aether"
+  ],
+  "result": {
+    "id": "witchercraft:beast_oil",
+    "count": 3
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "type": "witchercraft:alchemy",
+  "category": "potion",
+  "base": "#witchercraft:alcohol",
+  "ingredients": [
+    "witchercraft:rebis",
+    "witchercraft:rebis",
+    "witchercraft:vitriol",
+    "witchercraft:aether"
+  ],
+  "result": "witchercraft:swallow",
+  "starter": true
+}

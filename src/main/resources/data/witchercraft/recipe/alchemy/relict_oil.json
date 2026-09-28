@@ -1,0 +1,15 @@
+{
+  "type": "witchercraft:alchemy",
+  "category": "oil",
+  "base": "witchercraft:tallow",
+  "ingredients": [
+    "witchercraft:vermilion",
+    "witchercraft:rebis",
+    "witchercraft:vitriol",
+    "witchercraft:hydragenum"
+  ],
+  "result": {
+    "id": "witchercraft:relict_oil",
+    "count": 3
+  }
+}

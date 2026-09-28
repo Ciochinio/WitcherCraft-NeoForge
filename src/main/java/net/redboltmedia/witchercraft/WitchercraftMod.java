@@ -51,6 +51,7 @@ public class WitchercraftMod {
 		// End of user code block mod constructor
 		NeoForge.EVENT_BUS.register(this);
 		modEventBus.addListener(this::registerNetworking);
+		WitchercraftModSounds.REGISTRY.register(modEventBus);
 		WitchercraftModBlocks.REGISTRY.register(modEventBus);
 		WitchercraftModItems.REGISTRY.register(modEventBus);
 		WitchercraftModEntities.REGISTRY.register(modEventBus);
@@ -62,6 +63,7 @@ public class WitchercraftMod {
 		WitchercraftModAttributes.REGISTRY.register(modEventBus);
 		// Start of user code block mod init
 		AlchemyMenu.MENUS.register(modEventBus);
+		AlchemyRecipes.register(modEventBus);
 		// End of user code block mod init
 	}
 

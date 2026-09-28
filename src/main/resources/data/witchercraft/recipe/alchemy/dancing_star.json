@@ -1,0 +1,14 @@
+{
+  "type": "witchercraft:alchemy",
+  "category": "bomb",
+  "base": "witchercraft:saltpeter",
+  "ingredients": [
+    "witchercraft:vitriol",
+    "witchercraft:aether",
+    "witchercraft:hydragenum"
+  ],
+  "result": {
+    "id": "witchercraft:dancing_star",
+    "count": 3
+  }
+}

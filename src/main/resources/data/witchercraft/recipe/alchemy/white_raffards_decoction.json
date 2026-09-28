@@ -1,0 +1,12 @@
+{
+  "type": "witchercraft:alchemy",
+  "category": "potion",
+  "base": "#witchercraft:alcohol",
+  "ingredients": [
+    "witchercraft:rebis",
+    "witchercraft:vitriol",
+    "witchercraft:hydragenum",
+    "witchercraft:hydragenum"
+  ],
+  "result": "witchercraft:white_raffards_decoction"
+}

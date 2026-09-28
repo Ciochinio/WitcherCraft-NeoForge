@@ -1,0 +1,15 @@
+{
+  "type": "witchercraft:alchemy",
+  "category": "oil",
+  "base": "witchercraft:tallow",
+  "ingredients": [
+    "witchercraft:vermilion",
+    "witchercraft:vitriol",
+    "witchercraft:quebrith",
+    "witchercraft:hydragenum"
+  ],
+  "result": {
+    "id": "witchercraft:vampire_oil",
+    "count": 3
+  }
+}

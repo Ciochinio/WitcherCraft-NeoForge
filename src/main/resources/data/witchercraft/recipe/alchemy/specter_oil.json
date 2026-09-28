@@ -1,0 +1,15 @@
+{
+  "type": "witchercraft:alchemy",
+  "category": "oil",
+  "base": "witchercraft:tallow",
+  "ingredients": [
+    "witchercraft:rebis",
+    "witchercraft:vitriol",
+    "witchercraft:aether",
+    "witchercraft:aether"
+  ],
+  "result": {
+    "id": "witchercraft:specter_oil",
+    "count": 3
+  }
+}

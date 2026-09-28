@@ -1,0 +1,20 @@
+{
+  "alchemy_brew": {
+    "subtitle": "subtitles.alchemy_brew",
+    "sounds": [
+      {
+        "name": "witchercraft:alchemy_brew",
+        "stream": false
+      }
+    ]
+  },
+  "alchemy_fail": {
+    "subtitle": "subtitles.alchemy_fail",
+    "sounds": [
+      {
+        "name": "witchercraft:alchemy_fail",
+        "stream": false
+      }
+    ]
+  }
+}

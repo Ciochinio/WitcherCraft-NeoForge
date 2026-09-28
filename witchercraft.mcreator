@@ -160,6 +160,71 @@
       "path": "~/Alchemy"
     },
     {
+      "name": "AlchemyInput",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "alchemy_input",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/AlchemyInput.java"
+        ]
+      },
+      "path": "~/Alchemy"
+    },
+    {
+      "name": "AlchemyRecipe",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "alchemy_recipe",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/AlchemyRecipe.java"
+        ]
+      },
+      "path": "~/Alchemy"
+    },
+    {
+      "name": "AlchemyRecipes",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "alchemy_recipes",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/AlchemyRecipes.java"
+        ]
+      },
+      "path": "~/Alchemy"
+    },
+    {
+      "name": "AlchemyBrewMessage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "alchemy_brew_message",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/AlchemyBrewMessage.java"
+        ]
+      },
+      "path": "~/Alchemy"
+    },
+    {
+      "name": "AlchemyFeedbackMessage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "alchemy_feedback_message",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/AlchemyFeedbackMessage.java"
+        ]
+      },
+      "path": "~/Alchemy"
+    },
+    {
       "name": "PauseMenuLayout",
       "type": "code",
       "compiles": true,
@@ -1716,6 +1781,21 @@
           "src/main/resources/assets/witchercraft/items/tallow.json",
           "src/main/java/net/redboltmedia/witchercraft/item/TallowItem.java",
           "src/main/resources/assets/witchercraft/models/item/tallow.json"
+        ]
+      },
+      "path": "~/Items"
+    },
+    {
+      "name": "PlaceholderAlcohol",
+      "type": "item",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "placeholder_alcohol",
+      "metadata": {
+        "files": [
+          "src/main/resources/assets/witchercraft/items/placeholder_alcohol.json",
+          "src/main/java/net/redboltmedia/witchercraft/item/PlaceholderAlcoholItem.java",
+          "src/main/resources/assets/witchercraft/models/item/placeholder_alcohol.json"
         ]
       },
       "path": "~/Items"
@@ -11044,7 +11124,24 @@
       "value": "0"
     }
   ],
-  "sound_elements": [],
+  "sound_elements": [
+    {
+      "name": "alchemy_brew",
+      "files": [
+        "alchemy_brew"
+      ],
+      "category": "player",
+      "subtitle": "Alchemy brews"
+    },
+    {
+      "name": "alchemy_fail",
+      "files": [
+        "alchemy_fail"
+      ],
+      "category": "player",
+      "subtitle": "Alchemy fizzles"
+    }
+  ],
   "tag_elements": {
     "ENTITIES:mod:necrophage": [
       "EntityZombie",
@@ -11233,6 +11330,11 @@
       "item.witchercraft.white_gull": "White Gull",
       "gui.witchercraft.foglet_gui.label_type_hostal": "Type: Hostile",
       "item.witchercraft.tallow": "Tallow",
+      "gui.witchercraft.alchemy.nothing_happens": "Nothing happens.",
+      "subtitles.alchemy_brew": "Alchemy brews",
+      "subtitles.alchemy_fail": "Alchemy fizzles",
+      "item.witchercraft.placeholder_alcohol": "Alcohol (Placeholder)",
+      "gui.witchercraft.alchemy.brew": "Brew",
       "item.witchercraft.feline_armor_helmet": "Feline Armor Helmet",
       "gui.witchercraft.graveir_gui.label_type_hostal": "Type: Hostile",
       "item.witchercraft.wolven_armor_leggings": "Wolven Armor Leggings",
@@ -11636,9 +11738,11 @@
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModEntityRenderers.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModEntities.java",
       "src/main/java/net/redboltmedia/witchercraft/WitchercraftMod.java",
+      "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModSounds.java",
       "src/main/resources/META-INF/accesstransformer.cfg",
       "src/main/resources/pack.mcmeta",
       "src/main/resources/META-INF/neoforge.mods.toml",
+      "src/main/resources/assets/witchercraft/sounds.json",
       "src/main/java/net/redboltmedia/witchercraft/network/WitchercraftModVariables.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModTabs.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModModels.java"

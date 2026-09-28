@@ -1,0 +1,16 @@
+{
+  "type": "witchercraft:alchemy",
+  "category": "oil",
+  "base": "witchercraft:tallow",
+  "ingredients": [
+    "witchercraft:vermilion",
+    "witchercraft:vitriol",
+    "witchercraft:quebrith",
+    "witchercraft:aether",
+    "witchercraft:hydragenum"
+  ],
+  "result": {
+    "id": "witchercraft:cursed_oil",
+    "count": 3
+  }
+}

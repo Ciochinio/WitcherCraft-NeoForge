@@ -1,0 +1,13 @@
+{
+  "type": "witchercraft:alchemy",
+  "category": "potion",
+  "base": "#witchercraft:alcohol",
+  "ingredients": [
+    "witchercraft:vermilion",
+    "witchercraft:vermilion",
+    "witchercraft:rebis",
+    "witchercraft:vitriol",
+    "witchercraft:hydragenum"
+  ],
+  "result": "witchercraft:thunderbolt"
+}

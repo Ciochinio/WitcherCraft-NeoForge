@@ -1,0 +1,16 @@
+{
+  "type": "witchercraft:alchemy",
+  "category": "oil",
+  "base": "witchercraft:tallow",
+  "ingredients": [
+    "witchercraft:vermilion",
+    "witchercraft:rebis",
+    "witchercraft:vitriol",
+    "witchercraft:aether",
+    "witchercraft:hydragenum"
+  ],
+  "result": {
+    "id": "witchercraft:hanged_mans_venom",
+    "count": 3
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "type": "witchercraft:alchemy",
+  "category": "bomb",
+  "base": "witchercraft:saltpeter",
+  "ingredients": [
+    "witchercraft:rebis",
+    "witchercraft:aether",
+    "witchercraft:aether",
+    "witchercraft:hydragenum"
+  ],
+  "result": {
+    "id": "witchercraft:devils_puffball",
+    "count": 3
+  }
+}

@@ -18,6 +18,7 @@ Anything marked **tunable** is a value you are expected to change. Anything desc
 3. [The GUI shell](#3-the-gui-shell)
 4. [Cockatrice and hybrid mob movement](#4-cockatrice-and-hybrid-mob-movement)
 5. [World map terrain pipeline](#5-world-map-terrain-pipeline)
+6. [Alchemy recipes](#6-alchemy-recipes)
 
 ---
 
@@ -2196,3 +2197,109 @@ reason (`DISABLED`, `BUSY`, `NO_SESSION`). `FastTravelClient.open` sets travel m
 
 The server never depends on the leave message: its own distance, expiry, death, dimension, and logout checks
 still apply. Closing the map while a journey is being prepared cancels that journey before any charge.
+
+## 6. Alchemy recipes
+
+Alchemy crafting is being rebuilt (see `ALCHEMY_REDESIGN_PLAN.md`). This section covers the recipe
+system from slice 1. The Alchemy tab's screen is described in 3.3b.
+
+### 6.1 Ownership
+
+All hand-written locked code elements in `~/Alchemy`, never regenerated:
+
+- **`AlchemyRecipe`** - the recipe class, its `Category` enum (`potion`, `decoction`, `oil`, `bomb`,
+  `white_gull`), and its JSON and stream codecs.
+- **`AlchemyInput`** - the `RecipeInput`: index 0 is the base, 1 to 5 the ingredient slots.
+- **`AlchemyRecipes`** - registers the `witchercraft:alchemy` recipe type and serializer through
+  `DeferredRegister`s (attached in `WitchercraftMod`'s "mod init" user code block), and answers every
+  server-side question about recipes.
+- **`AlchemyBrewMessage`** - the Brew button's serverbound packet. It ignores incomplete grids, reports "Nothing happens.",
+  or (slice 1) reports the match; slice 2 makes a match brew. See 6.5.
+- **`AlchemyFeedbackMessage`** - clientbound; the short message shown below the Brew button.
+
+Recipes are data: `data/<namespace>/recipe/**.json` with `"type": "witchercraft:alchemy"`. The ported
+set lives in `data/witchercraft/recipe/alchemy/`. The `witchercraft:alcohol` item tag
+(`data/witchercraft/tags/item/alcohol.json`) is the potion base. Datapacks can add, override, or
+remove recipes like any vanilla recipe.
+
+### 6.2 Recipe format and matching contract
+
+```json
+{
+  "type": "witchercraft:alchemy",
+  "category": "oil",
+  "base": "witchercraft:tallow",
+  "ingredients": ["witchercraft:rebis", "witchercraft:quebrith", "witchercraft:aether"],
+  "result": { "id": "witchercraft:beast_oil", "count": 3 },
+  "starter": false
+}
+```
+
+- `base` and each ingredient are vanilla `Ingredient`s: an item id or a `#tag`.
+- `ingredients` holds 1 to 5 entries. A repeated entry needs a separate slot for each copy.
+- `result` is an item id or `{id, count}` (count 1 to 99).
+- `starter` is optional and defaults to false.
+- Matching is **shapeless and exact**. The base must match the base slot. The filled ingredient slots
+  must pair one-to-one with the recipe's ingredients, with nothing missing and nothing extra.
+  Pairing uses NeoForge's `RecipeMatcher.findMatches`, a real bipartite match, because a tag
+  ingredient can overlap a specific item.
+- **Tie-break:** `find` returns the matching recipe with the lowest id (string order), so the result
+  never depends on load order.
+
+### 6.3 Keeping alchemy out of the vanilla recipe book
+
+`AlchemyRecipe` returns no `display()` entries, is `isSpecial()`, and uses
+`PlacementInfo.NOT_PLACEABLE`. With no display entries, the recipe manager never creates vanilla
+recipe-book entries, so even `/recipe give` shows nothing. Being special also skips the
+"can't be placed" load warning. `recipeBookCategory()` returns a vanilla category only because the
+interface requires one.
+
+### 6.4 The per-reload index
+
+`AlchemyRecipes` caches, per recipe load, the recipes sorted by id and the **ingredient allowlist**:
+every item any recipe uses as an ingredient, with tags expanded. The cache key is the identity of
+`server.getRecipeManager().recipeMap()`, which is replaced on world load and on `/reload`, so the
+index can never go stale. It is also rebuilt eagerly on `ServerStartedEvent` and on
+`OnDatapackSyncEvent` with no player (a `/reload`), so its log lines appear at load time:
+
+- `Loaded N alchemy recipes using M ingredient items`.
+- An **overlap warning** for every pair of recipes that some grid could match. Two recipes overlap
+  when they have the same number of ingredients, their bases share an item, and their ingredients
+  can be paired one-to-one so that each pair shares an item. Only the lower id can then be brewed
+  from that grid. This was verified with a deliberate duplicate recipe that used a tag.
+
+### 6.5 Bases, brew outcomes, and feedback
+
+`AlchemyRecipes.isBase` is a fixed list: any `#witchercraft:alcohol` item, White Gull, Tallow, or
+Saltpeter. It is in code, not derived from recipes, because a base must be valid before any recipe
+uses it. For example, White Gull is the decoction base, but no decoction recipe exists yet.
+
+`AlchemyBrewMessage` decides every Brew click on the server, in this order:
+
+| Grid | Result | Sound |
+|------|--------|-------|
+| Output slot occupied, base slot empty, or no ingredients | Silently ignored, like a crafting table | none |
+| No recipe matches | "Nothing happens." | `alchemy_fail` |
+| A recipe matches | Brewed (slice 1: reported only) | `alchemy_brew` |
+
+"Nothing happens." is the only message. A successful brew shows no text: the result appearing in the
+output slot is the feedback.
+
+**Nothing is ever consumed unless a recipe matches.** Wrong brews used to consume the grid and give a
+per-base failure item; that was dropped on 2026-09-28, and the three failure items were removed.
+
+- **Feedback** goes back as the clientbound `AlchemyFeedbackMessage` (a `Component`). `AlchemyScreen`
+  draws it below the Brew button (`AlchemyLayout.MESSAGE_*`), wrapped to a width, for 2 seconds with
+  a fade over the last half second. It never goes to chat. If the tab has closed, it is dropped.
+- **Sounds** are world sounds at the brewer (`SoundSource.PLAYERS`), so nearby players hear them.
+  They are MCreator sound elements (`sound_elements` in `witchercraft.mcreator`), generated into
+  `WitchercraftModSounds` and `assets/witchercraft/sounds.json`. Each points at one file,
+  `sounds/alchemy_brew.ogg` and `sounds/alchemy_fail.ogg`, currently copies of vanilla sounds. Replacing
+  a file changes the sound with no code change. Subtitles are `subtitles.alchemy_brew` and
+  `subtitles.alchemy_fail`.
+
+### 6.6 Known limitations
+
+- `isBase` and `isIngredient` exist but are not yet applied to the slots. Slice 2 applies them once
+  the allowlist is synced to the client.
+- The ported recipes use the six old substance items as placeholder ingredients until slice 5.

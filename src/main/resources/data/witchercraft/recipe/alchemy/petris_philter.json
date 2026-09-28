@@ -1,0 +1,13 @@
+{
+  "type": "witchercraft:alchemy",
+  "category": "potion",
+  "base": "#witchercraft:alcohol",
+  "ingredients": [
+    "witchercraft:vermilion",
+    "witchercraft:rebis",
+    "witchercraft:rebis",
+    "witchercraft:quebrith",
+    "witchercraft:hydragenum"
+  ],
+  "result": "witchercraft:petris_philter"
+}

@@ -43,6 +43,24 @@ public final class AlchemyLayout {
 	public static final int OUTPUT_X = 144;
 	public static final int OUTPUT_Y = 36;
 
+	// --- Brew button, below the output -------------------------------------------
+	public static final int BREW_X = 135;
+	public static final int BREW_Y = 58;
+	public static final int BREW_W = 34;
+	public static final int BREW_H = 14;
+	public static final int BREW_TEXT_COLOR = 0xFFE8D9A8;
+	public static final int BREW_TEXT_HOVER_COLOR = 0xFFFFDD55;
+
+	// --- brew feedback ("Nothing happens."), below the Brew button ----------------
+	// Centred on MESSAGE_CENTER_X, wrapped to MESSAGE_W, shown for MESSAGE_MS and
+	// faded out over the last MESSAGE_FADE_MS.
+	public static final int MESSAGE_CENTER_X = 152;
+	public static final int MESSAGE_Y = 75;
+	public static final int MESSAGE_W = 64;
+	public static final int MESSAGE_COLOR = 0xE8D9A8;
+	public static final int MESSAGE_MS = 2000;
+	public static final int MESSAGE_FADE_MS = 500;
+
 	// --- player inventory (3 rows) and hotbar -----------------------------------
 	public static final int INVENTORY_X = 8;
 	public static final int INVENTORY_Y = 98;
@@ -63,6 +81,10 @@ public final class AlchemyLayout {
 	public static final String PANEL_TEX = "witchercraft:textures/screens/alchemy_panel.png";
 	// behind the recipe book panel, BOOK_W x BOOK_H
 	public static final String BOOK_TEX = "witchercraft:textures/screens/alchemy_book_panel.png";
+
+	// Brew button, BREW_W x BREW_H; the label is drawn by code on top
+	public static final String BREW_TEX = "witchercraft:textures/screens/alchemy_brew_button.png";
+	public static final String BREW_HOVER_TEX = "witchercraft:textures/screens/alchemy_brew_button_hover.png";
 
 	// ornament behind the circle slots, drawn at this rect inside the block
 	public static final String CIRCLE_TEX = "witchercraft:textures/screens/alchemy_circle_frame.png";

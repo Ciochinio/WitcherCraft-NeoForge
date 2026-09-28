@@ -4,6 +4,12 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Util;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -100,6 +106,51 @@ public class AlchemyScreen extends AbstractContainerScreen<AlchemyMenu> {
 		int size = AlchemyLayout.SLOT_TEX_SIZE;
 		for (Slot slot : this.menu.slots)
 			blit(g, slotTexture(slot.index), leftPos + slot.x - 1, topPos + slot.y - 1, size, size);
+
+		// Brew button: art, then a centred label
+		boolean hover = overBrew(mouseX, mouseY);
+		int bx = leftPos + AlchemyLayout.BREW_X, by = topPos + AlchemyLayout.BREW_Y;
+		blit(g, hover ? AlchemyLayout.BREW_HOVER_TEX : AlchemyLayout.BREW_TEX, bx, by, AlchemyLayout.BREW_W, AlchemyLayout.BREW_H);
+		Component label = Component.translatable("gui.witchercraft.alchemy.brew");
+		g.text(this.font, label, bx + (AlchemyLayout.BREW_W - this.font.width(label)) / 2, by + (AlchemyLayout.BREW_H - 8) / 2,
+				hover ? AlchemyLayout.BREW_TEXT_HOVER_COLOR : AlchemyLayout.BREW_TEXT_COLOR, false);
+
+		drawFeedback(g);
+	}
+
+	// ---- brew feedback ---------------------------------------------------------------
+
+	private Component feedback;
+	private long feedbackShownAt;
+
+	/** Show a short message below the Brew button (sent by the server after a Brew click). */
+	public void showFeedback(Component text) {
+		this.feedback = text;
+		this.feedbackShownAt = Util.getMillis();
+	}
+
+	private void drawFeedback(GuiGraphicsExtractor g) {
+		if (feedback == null)
+			return;
+		long age = Util.getMillis() - feedbackShownAt;
+		if (age >= AlchemyLayout.MESSAGE_MS) {
+			feedback = null;
+			return;
+		}
+		long left = AlchemyLayout.MESSAGE_MS - age;
+		float alpha = Math.min(1f, (float) left / AlchemyLayout.MESSAGE_FADE_MS);
+		int a = Math.max(8, (int) (alpha * 255f)); // text below ~4 alpha is skipped entirely
+		int color = (a << 24) | AlchemyLayout.MESSAGE_COLOR;
+		int y = topPos + AlchemyLayout.MESSAGE_Y;
+		for (FormattedCharSequence line : this.font.split(feedback, AlchemyLayout.MESSAGE_W)) {
+			g.text(this.font, line, leftPos + AlchemyLayout.MESSAGE_CENTER_X - this.font.width(line) / 2, y, color, false);
+			y += this.font.lineHeight;
+		}
+	}
+
+	private boolean overBrew(double mx, double my) {
+		int bx = leftPos + AlchemyLayout.BREW_X, by = topPos + AlchemyLayout.BREW_Y;
+		return mx >= bx && mx < bx + AlchemyLayout.BREW_W && my >= by && my < by + AlchemyLayout.BREW_H;
 	}
 
 	private static String slotTexture(int index) {
@@ -144,6 +195,12 @@ public class AlchemyScreen extends AbstractContainerScreen<AlchemyMenu> {
 				swallowRelease = true;
 				if (!pid.equals(TAB_ID))
 					switchToTab(pid);
+				return true;
+			}
+			if (overBrew(event.x(), event.y())) {
+				swallowRelease = true;
+				this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+				ClientPacketDistributor.sendToServer(AlchemyBrewMessage.INSTANCE);
 				return true;
 			}
 		}

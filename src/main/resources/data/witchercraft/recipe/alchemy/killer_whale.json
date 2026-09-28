@@ -1,0 +1,10 @@
+{
+  "type": "witchercraft:alchemy",
+  "category": "potion",
+  "base": "#witchercraft:alcohol",
+  "ingredients": [
+    "witchercraft:vitriol",
+    "witchercraft:quebrith"
+  ],
+  "result": "witchercraft:killer_whale"
+}

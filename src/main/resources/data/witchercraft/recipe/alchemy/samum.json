@@ -1,0 +1,15 @@
+{
+  "type": "witchercraft:alchemy",
+  "category": "bomb",
+  "base": "witchercraft:saltpeter",
+  "ingredients": [
+    "witchercraft:vermilion",
+    "witchercraft:rebis",
+    "witchercraft:rebis",
+    "witchercraft:aether"
+  ],
+  "result": {
+    "id": "witchercraft:samum",
+    "count": 3
+  }
+}

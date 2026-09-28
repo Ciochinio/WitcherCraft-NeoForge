@@ -1,0 +1,14 @@
+{
+  "type": "witchercraft:alchemy",
+  "category": "oil",
+  "base": "witchercraft:tallow",
+  "ingredients": [
+    "witchercraft:vermilion",
+    "witchercraft:quebrith",
+    "witchercraft:hydragenum"
+  ],
+  "result": {
+    "id": "witchercraft:draconid_oil",
+    "count": 3
+  }
+}

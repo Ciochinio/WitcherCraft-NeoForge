@@ -1,0 +1,12 @@
+{
+  "type": "witchercraft:alchemy",
+  "category": "potion",
+  "base": "#witchercraft:alcohol",
+  "ingredients": [
+    "witchercraft:vitriol",
+    "witchercraft:vitriol",
+    "witchercraft:aether",
+    "witchercraft:aether"
+  ],
+  "result": "witchercraft:golden_oriole"
+}

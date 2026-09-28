@@ -1,0 +1,15 @@
+{
+  "type": "witchercraft:alchemy",
+  "category": "oil",
+  "base": "witchercraft:tallow",
+  "ingredients": [
+    "witchercraft:vermilion",
+    "witchercraft:rebis",
+    "witchercraft:quebrith",
+    "witchercraft:aether"
+  ],
+  "result": {
+    "id": "witchercraft:insectoid_oil",
+    "count": 3
+  }
+}

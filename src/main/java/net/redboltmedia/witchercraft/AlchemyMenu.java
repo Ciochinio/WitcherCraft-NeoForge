@@ -1,5 +1,8 @@
 package net.redboltmedia.witchercraft;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -24,7 +27,8 @@ import net.minecraft.world.item.ItemStack;
  * damage interrupt, death, disconnect) returns every grid slot, output included,
  * to the inventory, or drops it if the player is gone.
  *
- * Step 0 test build: no recipes, no placement filters, no Brew logic yet.
+ * Slice 1 test build: no placement filters yet, and Brew only reports which
+ * recipe the grid matches ({@link AlchemyBrewMessage}); nothing is consumed.
  *
  * HAND-MAINTAINED: locked code element. The MenuType is registered here, not
  * through an MCreator gui element; {@link #MENUS} is attached to the mod bus in
@@ -109,6 +113,14 @@ public class AlchemyMenu extends AbstractContainerMenu {
 			return ItemStack.EMPTY;
 		slot.onTake(player, stack);
 		return moved;
+	}
+
+	/** The grid as a recipe input: the base slot and the five ingredient slots. */
+	public AlchemyInput recipeInput() {
+		List<ItemStack> ingredients = new ArrayList<>(INGREDIENT_SLOTS);
+		for (int i = 0; i < INGREDIENT_SLOTS; i++)
+			ingredients.add(grid.getItem(FIRST_INGREDIENT_SLOT + i));
+		return new AlchemyInput(grid.getItem(BASE_SLOT), ingredients);
 	}
 
 	@Override

@@ -1,0 +1,11 @@
+{
+  "type": "witchercraft:alchemy",
+  "category": "potion",
+  "base": "#witchercraft:alcohol",
+  "ingredients": [
+    "witchercraft:rebis",
+    "witchercraft:quebrith",
+    "witchercraft:quebrith"
+  ],
+  "result": "witchercraft:cat"
+}
