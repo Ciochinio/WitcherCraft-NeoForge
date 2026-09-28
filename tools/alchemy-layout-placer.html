@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WitcherCraft - Alchemy Layout Placer</title>
+<style>
+  :root {
+    --bg: #14141a; --ink: #e8e8ef; --dim: #9a9aa6; --line: #33333d; --accent: #ffdd55; --bad: #d04040; --good: #55cc77;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  header { padding: 10px 16px; border-bottom: 1px solid var(--line); display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+  header h1 { font-size: 15px; margin: 0; font-weight: 600; }
+  header .hint { color: var(--dim); font-size: 12px; max-width: 900px; }
+  .wrap { display: flex; gap: 16px; padding: 16px; align-items: flex-start; flex-wrap: wrap; }
+  .main { flex: 1 1 700px; min-width: 0; }
+  .side { flex: 1 1 360px; min-width: 320px; max-width: 560px; }
+  .stage { background:#0b0b0f; border:1px solid var(--line); box-shadow:0 6px 30px #0008; overflow:auto; max-width:100%;
+           background-image: linear-gradient(#ffffff08 1px, transparent 1px), linear-gradient(90deg, #ffffff08 1px, transparent 1px);
+           background-size: 10px 10px; }
+  svg { display:block; touch-action:none; }
+  svg image, canvas { image-rendering: pixelated; }
+  svg .drag { cursor: grab; }
+  svg .handle { cursor: nwse-resize; }
+  svg text { font: 8px ui-monospace, Consolas, monospace; pointer-events: none; }
+  fieldset { border: 1px solid var(--line); border-radius: 6px; margin: 0 0 12px; padding: 10px 12px; }
+  legend { color: var(--dim); padding: 0 6px; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+  label { display:inline-flex; align-items:center; gap:6px; margin: 3px 10px 3px 0; color: var(--dim); }
+  input[type=number]{ width:62px; background:#0e0e13; border:1px solid var(--line); color:var(--ink); padding:3px 5px; border-radius:4px; font:inherit; }
+  input[type=text], select { background:#0e0e13; border:1px solid var(--line); color:var(--ink); padding:3px 5px; border-radius:4px; font:inherit; }
+  .txtrow, .colrow { display:flex; align-items:center; gap:6px; margin:3px 0; }
+  .txtrow span.k, .colrow span.k { color:var(--dim); width:170px; flex:none; }
+  .txtrow input[type=text]{ width:100%; }
+  .colrow input[type=text]{ width:110px; }
+  .sw { width:16px; height:16px; border:1px solid var(--line); border-radius:3px; display:inline-block; flex:none; }
+  button { background:#2a2a34; color:var(--ink); border:1px solid var(--line); border-radius:5px; padding:6px 12px; cursor:pointer; font:inherit; }
+  button:hover { background:#34343f; }
+  button.primary { background:var(--accent); color:#161009; border-color:var(--accent); font-weight:600; }
+  .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:8px; }
+  textarea { width:100%; height:300px; background:#0e0e13; color:#cfe8cf; border:1px solid var(--line); border-radius:6px; padding:10px; font:12px/1.45 ui-monospace,Consolas,monospace; resize:vertical; }
+  .note { color: var(--dim); margin: 6px 0; }
+  table.fit { border-collapse: collapse; margin-top: 8px; font-size: 12px; }
+  table.fit th, table.fit td { border: 1px solid var(--line); padding: 3px 7px; text-align: center; }
+  table.fit th { color: var(--dim); font-weight: normal; }
+  td.ok { color: var(--good); } td.bad { color: var(--bad); } td.part { color: var(--accent); }
+  h2 { font-size: 13px; margin: 18px 0 6px; color: var(--dim); font-weight: normal; text-transform: uppercase; letter-spacing: .06em; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Alchemy Layout Placer</h1>
+  <span class="hint">Drag any slot, the Brew button, the message, the circle ornament, or the inventory (the hotbar drags on its own).
+  Yellow corner handles resize the block, book panel, circle, Brew button and message width. Coordinates are <b>normal GUI pixels</b> inside the slot block
+  (slot x/y = the 16x16 item position, like vanilla), not the 640x360 shell canvas. Output regenerates
+  <code>src/main/java/net/redboltmedia/witchercraft/AlchemyLayout.java</code> &rarr; Copy &rarr; paste over the file.
+  Art previews load from <code>../src/main/resources</code>.</span>
+</header>
+
+<div class="wrap">
+  <div class="main">
+    <div class="row">
+      <label>zoom <select id="zoom"><option>2</option><option selected>3</option><option>4</option><option>5</option></select></label>
+      <label>snap <select id="snap"><option>1</option><option selected>2</option><option>9</option><option>18</option></select> px</label>
+      <label><input type="checkbox" id="outlines"> slot outlines</label>
+      <label><input type="checkbox" id="showArt" checked> art</label>
+    </div>
+    <div class="stage"><svg id="svg"></svg></div>
+    <div class="note" id="selinfo">Book panel (left) and slot block (right). The dashed box under the message shows its wrap width.</div>
+
+    <h2>Fit preview (how it sits in the Alchemy tab)</h2>
+    <div class="row">
+      <label>window <input type="number" id="winW" value="1920"> x <input type="number" id="winH" value="1080"> px</label>
+      <label>GUI scale <select id="guiScale"><option value="auto" selected>auto</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></label>
+    </div>
+    <div class="stage" style="display:inline-block"><canvas id="fit" width="640" height="360"></canvas></div>
+    <div class="note" id="fitinfo"></div>
+    <table class="fit" id="fitTable"></table>
+    <div class="note">Matches <code>AlchemyScreen.init</code>: the book panel + gap + block are centred in the content region below the navbar,
+    then shifted by the block offset; the block never goes above the content region and only overflows the bottom if the screen is too short.
+    Red in game = does not fit (the same outline the screen draws).</div>
+  </div>
+
+  <div class="side">
+    <fieldset><legend>Slot block &amp; book panel</legend><div id="grpBlock"></div></fieldset>
+    <fieldset><legend>Circle (base + ingredients)</legend><div id="grpCircle"></div><div id="grpIng"></div></fieldset>
+    <fieldset><legend>Output, Brew button &amp; message</legend><div id="grpOut"></div></fieldset>
+    <fieldset><legend>Inventory</legend><div id="grpInv"></div></fieldset>
+    <fieldset><legend>Textures (namespace:path, empty = draw nothing)</legend><div id="grpTex"></div></fieldset>
+    <fieldset><legend>Colours</legend><div id="grpColors"></div>
+      <div class="note">Brew text and misfit are 0xAARRGGBB. The message colour is 0xRRGGBB: the screen adds its own fading alpha.</div></fieldset>
+    <div class="row">
+      <button class="primary" id="copy">Copy AlchemyLayout.java</button>
+      <button id="reset">Reset defaults</button>
+    </div>
+    <textarea id="out" spellcheck="false"></textarea>
+
+    <fieldset style="margin-top:12px">
+      <legend>Import from Java</legend>
+      <div class="note">Paste the current <code>AlchemyLayout.java</code> to load its numbers, textures and colours, so you start from the checked-in file.</div>
+      <textarea id="impArea" spellcheck="false" style="height:120px" placeholder="paste AlchemyLayout.java here"></textarea>
+      <div class="row" style="margin-top:6px"><button id="impDo">Import</button><span class="note" id="impInfo"></span></div>
+    </fieldset>
+  </div>
+</div>
+
+<script>
+const SVG_NS = "http://www.w3.org/2000/svg";
+const SLOT = 18;          // slot frame / sprite size (AlchemyLayout.SLOT_TEX_SIZE)
+const MARGIN = 10;        // editor margin around book + block, GUI px
+
+// shell chrome constants, from WitcherGuiLayout (for the fit preview only)
+const DESIGN_W = 640, DESIGN_H = 360, NAV_Y = 8, NAV_H = 30, NAV_TAB_W = 60, NAV_GAP = 4, NAV_COUNT = 6, CONTENT_MARGIN = 3;
+const SHELL_BG = "witchercraft:textures/screens/shell_background_alchemy.png";
+
+// --- defaults must match AlchemyLayout.java ---------------------------------
+const DEFAULTS = {
+  BLOCK_W:176, BLOCK_H:180, BLOCK_OFFSET_X:0, BLOCK_OFFSET_Y:0,
+  BOOK_W:147, BOOK_H:166, BOOK_GAP:4,
+  BASE_X:62, BASE_Y:36,
+  OUTPUT_X:144, OUTPUT_Y:36,
+  BREW_X:135, BREW_Y:58, BREW_W:34, BREW_H:14,
+  MESSAGE_CENTER_X:152, MESSAGE_Y:75, MESSAGE_W:64, MESSAGE_MS:2000, MESSAGE_FADE_MS:500,
+  INVENTORY_X:8, INVENTORY_Y:98, HOTBAR_Y:156,
+  CIRCLE_X:26, CIRCLE_Y:0, CIRCLE_W:88, CIRCLE_H:88
+};
+const ING_DEFAULTS = { X:[62, 92, 81, 43, 32], Y:[4, 26, 62, 62, 26] };
+const STRINGS = {
+  SLOT_BASE_TEX:"witchercraft:textures/screens/alchemy_slot_base.png",
+  SLOT_INGREDIENT_TEX:"witchercraft:textures/screens/alchemy_slot_ingredient.png",
+  SLOT_OUTPUT_TEX:"witchercraft:textures/screens/alchemy_slot_output.png",
+  SLOT_INVENTORY_TEX:"witchercraft:textures/screens/alchemy_slot_inventory.png",
+  PANEL_TEX:"witchercraft:textures/screens/alchemy_panel.png",
+  BOOK_TEX:"witchercraft:textures/screens/alchemy_book_panel.png",
+  BREW_TEX:"witchercraft:textures/screens/alchemy_brew_button.png",
+  BREW_HOVER_TEX:"witchercraft:textures/screens/alchemy_brew_button_hover.png",
+  CIRCLE_TEX:"witchercraft:textures/screens/alchemy_circle_frame.png"
+};
+const COLORS = {
+  BREW_TEXT_COLOR:"0xFFE8D9A8", BREW_TEXT_HOVER_COLOR:"0xFFFFDD55", MESSAGE_COLOR:"0xE8D9A8", MISFIT_COLOR:"0xFFD04040"
+};
+
+let S = Object.assign({}, DEFAULTS);
+let ING = { X: ING_DEFAULTS.X.slice(), Y: ING_DEFAULTS.Y.slice() };
+let T = Object.assign({}, STRINGS);
+let C = Object.assign({}, COLORS);
+
+const GROUPS = {
+  grpBlock:  ["BLOCK_W","BLOCK_H","BLOCK_OFFSET_X","BLOCK_OFFSET_Y","BOOK_W","BOOK_H","BOOK_GAP"],
+  grpCircle: ["BASE_X","BASE_Y","CIRCLE_X","CIRCLE_Y","CIRCLE_W","CIRCLE_H"],
+  grpOut:    ["OUTPUT_X","OUTPUT_Y","BREW_X","BREW_Y","BREW_W","BREW_H","MESSAGE_CENTER_X","MESSAGE_Y","MESSAGE_W","MESSAGE_MS","MESSAGE_FADE_MS"],
+  grpInv:    ["INVENTORY_X","INVENTORY_Y","HOTBAR_Y"]
+};
+
+// --- helpers -------------------------------------------------------------------
+function colorToCss(v, forceAlpha){ // "0xAARRGGBB" or "0xRRGGBB" -> rgba()
+  const hex = String(v).replace(/^0x/i,"");
+  const n = parseInt(hex,16);
+  if (isNaN(n)) return "rgba(0,0,0,0)";
+  const hasAlpha = hex.length > 6;
+  const a = forceAlpha !== undefined ? forceAlpha : (hasAlpha ? ((n>>>24)&255)/255 : 1);
+  return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a.toFixed(3)})`;
+}
+// "witchercraft:textures/screens/x.png" -> repo-relative file path for previews
+function texHref(id){
+  if(!id) return "";
+  const i=id.indexOf(":"); if(i<0) return "";
+  return "../src/main/resources/assets/"+id.slice(0,i)+"/"+id.slice(i+1);
+}
+const snapV = v => { const s = parseInt(document.getElementById("snap").value,10)||1; return Math.round(v/s)*s; };
+// rough Minecraft font width, for the message wrap preview only
+function mcWidth(str){ let w=0; for(const ch of str){ w += ch===" "?4 : "il.,:;!|'".includes(ch)?2 : "tI[]".includes(ch)?4 : 6; } return w; }
+function wrap(str, width){
+  const words=str.split(" "), lines=[]; let cur="";
+  for(const w of words){ const t=cur?cur+" "+w:w; if(cur && mcWidth(t)>width){ lines.push(cur); cur=w; } else cur=t; }
+  if(cur) lines.push(cur); return lines;
+}
+
+// --- inputs --------------------------------------------------------------------
+function numInput(label, get, set){
+  const l=document.createElement("label"); l.textContent=label;
+  const i=document.createElement("input"); i.type="number"; i.value=get();
+  i.addEventListener("input",()=>{ set(Math.round(parseFloat(i.value)||0)); redraw(); });
+  i._sync=()=>{ if(document.activeElement!==i) i.value=get(); };
+  l.appendChild(i); return l;
+}
+const syncers=[];
+for (const [gid,keys] of Object.entries(GROUPS)){
+  const box=document.getElementById(gid);
+  keys.forEach(k=>{ const l=numInput(k.toLowerCase(),()=>S[k],v=>S[k]=v); syncers.push(l.firstElementChild); box.appendChild(l); });
+}
+for (let i=0;i<5;i++){
+  const box=document.getElementById("grpIng");
+  for (const axis of ["X","Y"]){
+    const l=numInput(`ingredient ${i+1} ${axis.toLowerCase()}`,()=>ING[axis][i],v=>ING[axis][i]=v);
+    syncers.push(l.querySelector("input")); box.appendChild(l);
+  }
+}
+for (const key of Object.keys(T)){
+  const row=document.createElement("div"); row.className="txtrow";
+  const k=document.createElement("span"); k.className="k"; k.textContent=key.replace(/_TEX$/,"").toLowerCase();
+  const t=document.createElement("input"); t.type="text"; t.value=T[key];
+  t.addEventListener("input",()=>{ T[key]=t.value.trim(); redraw(); });
+  t._sync=()=>{ if(document.activeElement!==t) t.value=T[key]; }; syncers.push(t);
+  row.append(k,t); document.getElementById("grpTex").appendChild(row);
+}
+const swatches={};
+for (const key of Object.keys(C)){
+  const row=document.createElement("div"); row.className="colrow";
+  const k=document.createElement("span"); k.className="k"; k.textContent=key.toLowerCase();
+  const sw=document.createElement("span"); sw.className="sw"; swatches[key]=sw;
+  const t=document.createElement("input"); t.type="text"; t.value=C[key];
+  t.addEventListener("input",()=>{ C[key]=t.value.trim(); redraw(); });
+  t._sync=()=>{ if(document.activeElement!==t) t.value=C[key]; }; syncers.push(t);
+  row.append(k,sw,t); document.getElementById("grpColors").appendChild(row);
+}
+["zoom","snap","outlines","showArt","winW","winH","guiScale"].forEach(id=>document.getElementById(id).addEventListener("input",redraw));
+
+// --- editor (SVG) ----------------------------------------------------------------
+const svg=document.getElementById("svg");
+function el(name,attrs){ const e=document.createElementNS(SVG_NS,name); for(const k in attrs) e.setAttribute(k,attrs[k]); return e; }
+function image(tex,x,y,w,h,extra){
+  if(!document.getElementById("showArt").checked) return null;
+  const href=texHref(tex); if(!href) return null;
+  const im=el("image",Object.assign({x,y,width:w,height:h,preserveAspectRatio:"none"},extra||{}));
+  im.setAttribute("href",href); svg.appendChild(im); return im;
+}
+function slotBox(x,y,tex,label,dragId,color){
+  image(tex,x-1,y-1,SLOT,SLOT);
+  const r=el("rect",{x:x-1,y:y-1,width:SLOT,height:SLOT,fill:"#ffffff01",
+    stroke: document.getElementById("outlines").checked ? color : "none","stroke-width":0.5,class:dragId?"drag":""});
+  if(dragId){ r.dataset.drag=dragId; r.addEventListener("pointerdown",startDrag); }
+  svg.appendChild(r);
+  if(label){ const t=el("text",{x:x+8,y:y+11,fill:color,"text-anchor":"middle"}); t.textContent=label; svg.appendChild(t); }
+}
+function handle(id,x,y){
+  const c=el("rect",{x:x-2.5,y:y-2.5,width:5,height:5,fill:"#ffdd55",stroke:"#000","stroke-width":0.5,class:"handle"});
+  c.dataset.drag=id; c.addEventListener("pointerdown",startDrag); svg.appendChild(c);
+}
+function dragRect(id,x,y,w,h){
+  const r=el("rect",{x,y,width:w,height:h,fill:"#ffffff01",class:"drag"});
+  r.dataset.drag=id; r.addEventListener("pointerdown",startDrag); svg.appendChild(r);
+}
+
+function viewBox(){
+  const left=-(S.BOOK_GAP+S.BOOK_W)-MARGIN, top=-MARGIN;
+  const right=S.BLOCK_W+MARGIN, bottom=Math.max(S.BLOCK_H,S.BOOK_H, S.HOTBAR_Y+SLOT)+MARGIN;
+  return {left,top,w:right-left,h:bottom-top};
+}
+
+function drawEditor(){
+  const z=parseFloat(document.getElementById("zoom").value);
+  const vb=viewBox();
+  svg.setAttribute("width",vb.w*z); svg.setAttribute("height",vb.h*z);
+  svg.setAttribute("viewBox",`${vb.left} ${vb.top} ${vb.w} ${vb.h}`);
+  svg.innerHTML="";
+
+  // book panel (left of the block)
+  const bx=-(S.BOOK_GAP+S.BOOK_W);
+  image(T.BOOK_TEX,bx,0,S.BOOK_W,S.BOOK_H);
+  svg.appendChild(el("rect",{x:bx,y:0,width:S.BOOK_W,height:S.BOOK_H,fill:"none",stroke:"#ffffff30","stroke-width":0.5,"stroke-dasharray":"2 2"}));
+  const bt=el("text",{x:bx+S.BOOK_W/2,y:S.BOOK_H/2,fill:"#9a9aa6","text-anchor":"middle"}); bt.textContent="recipe book (slice 3)"; svg.appendChild(bt);
+
+  // block panel + circle ornament
+  image(T.PANEL_TEX,0,0,S.BLOCK_W,S.BLOCK_H);
+  svg.appendChild(el("rect",{x:0,y:0,width:S.BLOCK_W,height:S.BLOCK_H,fill:"none",stroke:"#ffffff40","stroke-width":0.5}));
+  image(T.CIRCLE_TEX,S.CIRCLE_X,S.CIRCLE_Y,S.CIRCLE_W,S.CIRCLE_H);
+  svg.appendChild(el("rect",{x:S.CIRCLE_X,y:S.CIRCLE_Y,width:S.CIRCLE_W,height:S.CIRCLE_H,fill:"none",stroke:"#c4a04055","stroke-width":0.5,"stroke-dasharray":"1 2"}));
+  dragRect("circle",S.CIRCLE_X,S.CIRCLE_Y,S.CIRCLE_W,S.CIRCLE_H);
+
+  // inventory: 27 + 9 slot sprites, then one drag area over the grid and one over the hotbar
+  for(let r=0;r<3;r++) for(let c=0;c<9;c++) slotBox(S.INVENTORY_X+c*18,S.INVENTORY_Y+r*18,T.SLOT_INVENTORY_TEX,"",null,"#8888aa");
+  for(let c=0;c<9;c++) slotBox(S.INVENTORY_X+c*18,S.HOTBAR_Y,T.SLOT_INVENTORY_TEX,"",null,"#8888aa");
+  dragRect("inventory",S.INVENTORY_X-1,S.INVENTORY_Y-1,9*SLOT,3*SLOT);
+  dragRect("hotbar",S.INVENTORY_X-1,S.HOTBAR_Y-1,9*SLOT,SLOT);
+
+  // message sample + wrap width
+  const lines=wrap("Nothing happens.",S.MESSAGE_W);
+  svg.appendChild(el("rect",{x:S.MESSAGE_CENTER_X-S.MESSAGE_W/2,y:S.MESSAGE_Y,width:S.MESSAGE_W,height:lines.length*9,fill:"none",stroke:"#ffdd5566","stroke-width":0.5,"stroke-dasharray":"2 2"}));
+  lines.forEach((ln,i)=>{ const t=el("text",{x:S.MESSAGE_CENTER_X,y:S.MESSAGE_Y+7+i*9,fill:colorToCss(C.MESSAGE_COLOR),"text-anchor":"middle"}); t.textContent=ln; svg.appendChild(t); });
+  dragRect("message",S.MESSAGE_CENTER_X-S.MESSAGE_W/2,S.MESSAGE_Y,S.MESSAGE_W,Math.max(9,lines.length*9));
+
+  // circle + output slots
+  slotBox(S.BASE_X,S.BASE_Y,T.SLOT_BASE_TEX,"B","base","#ffdd55");
+  for(let i=0;i<5;i++) slotBox(ING.X[i],ING.Y[i],T.SLOT_INGREDIENT_TEX,String(i+1),"ing"+i,"#cfcfe0");
+  slotBox(S.OUTPUT_X,S.OUTPUT_Y,T.SLOT_OUTPUT_TEX,"O","output","#ffdd55");
+
+  // Brew button
+  image(T.BREW_TEX,S.BREW_X,S.BREW_Y,S.BREW_W,S.BREW_H);
+  if(!document.getElementById("showArt").checked || !T.BREW_TEX)
+    svg.appendChild(el("rect",{x:S.BREW_X,y:S.BREW_Y,width:S.BREW_W,height:S.BREW_H,fill:"#1a1920",stroke:"#8a8c98","stroke-width":0.5}));
+  const brewT=el("text",{x:S.BREW_X+S.BREW_W/2,y:S.BREW_Y+S.BREW_H/2+3,fill:colorToCss(C.BREW_TEXT_COLOR),"text-anchor":"middle"}); brewT.textContent="Brew"; svg.appendChild(brewT);
+  dragRect("brew",S.BREW_X,S.BREW_Y,S.BREW_W,S.BREW_H);
+
+  // resize handles
+  handle("blockSize",S.BLOCK_W,S.BLOCK_H);
+  handle("bookSize",bx,S.BOOK_H);
+  handle("circleSize",S.CIRCLE_X+S.CIRCLE_W,S.CIRCLE_Y+S.CIRCLE_H);
+  handle("brewSize",S.BREW_X+S.BREW_W,S.BREW_Y+S.BREW_H);
+  handle("messageWidth",S.MESSAGE_CENTER_X+S.MESSAGE_W/2,S.MESSAGE_Y);
+}
+
+// --- dragging ------------------------------------------------------------------
+// Each draggable: get() -> [x,y] of the point being dragged, set(x,y).
+const DRAG = {
+  base:    { get:()=>[S.BASE_X,S.BASE_Y], set:(x,y)=>{ S.BASE_X=x; S.BASE_Y=y; } },
+  output:  { get:()=>[S.OUTPUT_X,S.OUTPUT_Y], set:(x,y)=>{ S.OUTPUT_X=x; S.OUTPUT_Y=y; } },
+  brew:    { get:()=>[S.BREW_X,S.BREW_Y], set:(x,y)=>{ S.BREW_X=x; S.BREW_Y=y; } },
+  message: { get:()=>[S.MESSAGE_CENTER_X,S.MESSAGE_Y], set:(x,y)=>{ S.MESSAGE_CENTER_X=x; S.MESSAGE_Y=y; } },
+  circle:  { get:()=>[S.CIRCLE_X,S.CIRCLE_Y], set:(x,y)=>{ S.CIRCLE_X=x; S.CIRCLE_Y=y; } },
+  inventory:{ get:()=>[S.INVENTORY_X,S.INVENTORY_Y], set:(x,y)=>{ const dy=y-S.INVENTORY_Y; S.INVENTORY_X=x; S.INVENTORY_Y=y; S.HOTBAR_Y+=dy; } },
+  hotbar:  { get:()=>[S.INVENTORY_X,S.HOTBAR_Y], set:(x,y)=>{ S.HOTBAR_Y=y; } },
+  blockSize:{ get:()=>[S.BLOCK_W,S.BLOCK_H], set:(x,y)=>{ S.BLOCK_W=Math.max(18,x); S.BLOCK_H=Math.max(18,y); } },
+  bookSize:{ get:()=>[-(S.BOOK_GAP+S.BOOK_W),S.BOOK_H], set:(x,y)=>{ S.BOOK_W=Math.max(0,-S.BOOK_GAP-x); S.BOOK_H=Math.max(0,y); } },
+  circleSize:{ get:()=>[S.CIRCLE_X+S.CIRCLE_W,S.CIRCLE_Y+S.CIRCLE_H], set:(x,y)=>{ S.CIRCLE_W=Math.max(1,x-S.CIRCLE_X); S.CIRCLE_H=Math.max(1,y-S.CIRCLE_Y); } },
+  brewSize:{ get:()=>[S.BREW_X+S.BREW_W,S.BREW_Y+S.BREW_H], set:(x,y)=>{ S.BREW_W=Math.max(4,x-S.BREW_X); S.BREW_H=Math.max(4,y-S.BREW_Y); } },
+  messageWidth:{ get:()=>[S.MESSAGE_CENTER_X+S.MESSAGE_W/2,S.MESSAGE_Y], set:(x,y)=>{ S.MESSAGE_W=Math.max(8,2*(x-S.MESSAGE_CENTER_X)); } }
+};
+for(let i=0;i<5;i++) DRAG["ing"+i]={ get:()=>[ING.X[i],ING.Y[i]], set:(x,y)=>{ ING.X[i]=x; ING.Y[i]=y; } };
+
+let drag=null;
+function svgPoint(ev){
+  const pt=svg.createSVGPoint(); pt.x=ev.clientX; pt.y=ev.clientY;
+  const p=pt.matrixTransform(svg.getScreenCTM().inverse()); return [p.x,p.y];
+}
+function startDrag(ev){
+  const id=ev.currentTarget.dataset.drag, d=DRAG[id]; if(!d) return;
+  const [px,py]=svgPoint(ev), [ox,oy]=d.get();
+  drag={id, dx:px-ox, dy:py-oy};
+  svg.setPointerCapture(ev.pointerId); ev.preventDefault();
+  document.getElementById("selinfo").textContent="Dragging: "+id;
+}
+svg.addEventListener("pointermove",ev=>{
+  if(!drag) return;
+  const [px,py]=svgPoint(ev);
+  DRAG[drag.id].set(snapV(px-drag.dx), snapV(py-drag.dy));
+  redraw();
+});
+svg.addEventListener("pointerup",()=>{ drag=null; });
+
+// --- fit preview (canvas) --------------------------------------------------------
+const imgCache={};
+function img(tex){
+  const href=texHref(tex); if(!href) return null;
+  if(!imgCache[href]){ const im=new Image(); im.onload=()=>drawFit(); im.src=href; imgCache[href]=im; }
+  const im=imgCache[href]; return im.complete && im.naturalWidth ? im : null;
+}
+function autoGuiScale(w,h){ // Minecraft's "auto" GUI scale
+  let s=1; while(w/(s+1)>=320 && h/(s+1)>=240) s++; return s;
+}
+// the exact placement AlchemyScreen.init computes, in gui-scaled screen px
+function placement(winW,winH,gui){
+  const width=Math.ceil(winW/gui), height=Math.ceil(winH/gui);
+  const s=Math.min(width/DESIGN_W, height/DESIGN_H);
+  const offX=(width-DESIGN_W*s)/2, offY=(height-DESIGN_H*s)/2;
+  const contentX=CONTENT_MARGIN, contentY=NAV_Y+NAV_H+CONTENT_MARGIN, contentW=DESIGN_W-2*CONTENT_MARGIN, contentH=DESIGN_H-contentY-CONTENT_MARGIN;
+  const cx=Math.round(offX+contentX*s), cy=Math.round(offY+contentY*s), cw=Math.round(contentW*s), ch=Math.round(contentH*s);
+  const groupW=S.BOOK_W+S.BOOK_GAP+S.BLOCK_W;
+  const leftPos=cx+Math.trunc((cw-groupW)/2)+S.BOOK_W+S.BOOK_GAP+S.BLOCK_OFFSET_X;
+  const top=cy+Math.trunc((ch-S.BLOCK_H)/2)+S.BLOCK_OFFSET_Y;
+  const topPos=Math.max(cy, Math.min(top, height-S.BLOCK_H));
+  return { width, height, s, offX, offY, cx, cy, cw, ch, leftPos, topPos,
+           bookX:leftPos-S.BOOK_GAP-S.BOOK_W, bookY:topPos,
+           fitsWidth:groupW<=cw, fitsHeight:S.BLOCK_H<=ch };
+}
+function guiFor(winW,winH){ const v=document.getElementById("guiScale").value; return v==="auto"?autoGuiScale(winW,winH):parseInt(v,10); }
+
+function drawFit(){
+  const winW=parseInt(document.getElementById("winW").value,10)||1920, winH=parseInt(document.getElementById("winH").value,10)||1080;
+  const gui=guiFor(winW,winH), P=placement(winW,winH,gui);
+  const cv=document.getElementById("fit"), k=640/P.width;
+  cv.width=640; cv.height=Math.round(P.height*k);
+  const g=cv.getContext("2d"); g.imageSmoothingEnabled=false;
+  g.fillStyle="#000"; g.fillRect(0,0,cv.width,cv.height);
+  // design canvas: tab background + navbar + content region
+  const dx=P.offX*k, dy=P.offY*k, ds=P.s*k;
+  const bg=img(SHELL_BG);
+  if(bg) g.drawImage(bg,dx,dy,DESIGN_W*ds,DESIGN_H*ds); else { g.fillStyle="#1d2a22"; g.fillRect(dx,dy,DESIGN_W*ds,DESIGN_H*ds); }
+  g.fillStyle="rgba(0,0,0,0.2)"; g.fillRect(dx,dy,DESIGN_W*ds,DESIGN_H*ds);
+  const navStart=(DESIGN_W-(NAV_COUNT*NAV_TAB_W+(NAV_COUNT-1)*NAV_GAP))/2;
+  for(let i=0;i<NAV_COUNT;i++){ g.fillStyle=i===1?"rgba(0,0,0,0.7)":"rgba(16,16,21,0.4)"; g.fillRect(dx+(navStart+i*(NAV_TAB_W+NAV_GAP))*ds,dy+NAV_Y*ds,NAV_TAB_W*ds,NAV_H*ds); }
+  g.setLineDash([4,3]); g.strokeStyle="rgba(255,255,255,0.25)"; g.strokeRect(P.cx*k+0.5,P.cy*k+0.5,P.cw*k,P.ch*k); g.setLineDash([]);
+  // book panel + block, at normal GUI scale
+  const draw=(tex,x,y,w,h)=>{ const im=img(tex); if(im) g.drawImage(im,x*k,y*k,w*k,h*k); };
+  draw(T.BOOK_TEX,P.bookX,P.bookY,S.BOOK_W,S.BOOK_H);
+  draw(T.PANEL_TEX,P.leftPos,P.topPos,S.BLOCK_W,S.BLOCK_H);
+  draw(T.CIRCLE_TEX,P.leftPos+S.CIRCLE_X,P.topPos+S.CIRCLE_Y,S.CIRCLE_W,S.CIRCLE_H);
+  const slot=(tex,x,y)=>draw(tex,P.leftPos+x-1,P.topPos+y-1,SLOT,SLOT);
+  slot(T.SLOT_BASE_TEX,S.BASE_X,S.BASE_Y);
+  for(let i=0;i<5;i++) slot(T.SLOT_INGREDIENT_TEX,ING.X[i],ING.Y[i]);
+  slot(T.SLOT_OUTPUT_TEX,S.OUTPUT_X,S.OUTPUT_Y);
+  for(let r=0;r<3;r++) for(let c=0;c<9;c++) slot(T.SLOT_INVENTORY_TEX,S.INVENTORY_X+c*18,S.INVENTORY_Y+r*18);
+  for(let c=0;c<9;c++) slot(T.SLOT_INVENTORY_TEX,S.INVENTORY_X+c*18,S.HOTBAR_Y);
+  draw(T.BREW_TEX,P.leftPos+S.BREW_X,P.topPos+S.BREW_Y,S.BREW_W,S.BREW_H);
+  // the screen's own misfit outlines
+  g.strokeStyle=colorToCss(C.MISFIT_COLOR); g.lineWidth=Math.max(1,k);
+  if(!P.fitsWidth) g.strokeRect(P.bookX*k,P.bookY*k,S.BOOK_W*k,S.BOOK_H*k);
+  if(!P.fitsHeight) g.strokeRect(P.leftPos*k,P.topPos*k,S.BLOCK_W*k,S.BLOCK_H*k);
+
+  document.getElementById("fitinfo").innerHTML =
+    `${winW}x${winH}, GUI scale ${gui}${document.getElementById("guiScale").value==="auto"?" (auto)":""} &rarr; screen ${P.width}x${P.height} GUI px, content region ${P.cw}x${P.ch}. `+
+    `Book + block need ${S.BOOK_W+S.BOOK_GAP+S.BLOCK_W}x${S.BLOCK_H}: width `+(P.fitsWidth?'<span style="color:var(--good)">fits</span>':'<span style="color:var(--bad)">does not fit</span>')+
+    `, height `+(P.fitsHeight?'<span style="color:var(--good)">fits</span>':'<span style="color:var(--bad)">does not fit</span>')+'.';
+  drawFitTable();
+}
+function drawFitTable(){
+  const wins=[[1280,720],[1366,768],[1600,900],[1920,1080],[2560,1440],[3840,2160]];
+  let h="<tr><th>window</th><th>auto</th>"+[1,2,3,4,5,6].map(s=>`<th>GUI ${s}</th>`).join("")+"</tr>";
+  for(const [w,hh] of wins){
+    h+=`<tr><td>${w}x${hh}</td>`;
+    for(const gui of [autoGuiScale(w,hh),1,2,3,4,5,6]){
+      const P=placement(w,hh,gui);
+      if(P.width<320||P.height<240){ h+='<td style="color:#555">-</td>'; continue; }
+      const cls=P.fitsWidth&&P.fitsHeight?"ok":(P.fitsHeight?"part":"bad");
+      const txt=P.fitsWidth&&P.fitsHeight?"fits":(P.fitsHeight?"no book":"too tall");
+      h+=`<td class="${cls}">${txt}</td>`;
+    }
+    h+="</tr>";
+  }
+  document.getElementById("fitTable").innerHTML=h;
+}
+
+// --- redraw ----------------------------------------------------------------------
+function redraw(){
+  syncers.forEach(i=>i._sync && i._sync());
+  for (const key in swatches) swatches[key].style.background=colorToCss(C[key]);
+  drawEditor();
+  drawFit();
+  regen();
+}
+
+// --- Java output -------------------------------------------------------------------
+function regen(){
+  const n=k=>S[k];
+  const out=
+`package net.redboltmedia.witchercraft;
+
+/**
+ * Geometry of the Alchemy tab's SLOT BLOCK: the alchemy circle (base in the
+ * centre, five ingredients around it), the output slot, and the player
+ * inventory. Shared by {@link AlchemyMenu} (slot positions) and
+ * {@link AlchemyScreen} (drawing and placement).
+ *
+ * Unlike the other shell layouts, these are NORMAL GUI pixels, not the 640x360
+ * design canvas: real item slots draw at vanilla scale so vanilla handles every
+ * click, drag and tooltip. Slot coords are the 16x16 item position inside the
+ * block, like vanilla {@code Slot} x/y; the 18x18 frame is drawn 1px outside.
+ *
+ * The whole block (with the recipe book panel to its left) is centred in the
+ * shell's content region, then shifted by BLOCK_OFFSET_X/Y.
+ *
+ * Generated by tools/alchemy-layout-placer.html - paste this over the file
+ * wholesale. Keep it a dumb data holder (no logic) so the tool can overwrite it.
+ */
+public final class AlchemyLayout {
+\tprivate AlchemyLayout() {
+\t}
+
+\t// --- slot block size and placement (GUI pixels) --------------------------
+\tpublic static final int BLOCK_W = ${n("BLOCK_W")};
+\tpublic static final int BLOCK_H = ${n("BLOCK_H")};
+\tpublic static final int BLOCK_OFFSET_X = ${n("BLOCK_OFFSET_X")};
+\tpublic static final int BLOCK_OFFSET_Y = ${n("BLOCK_OFFSET_Y")};
+
+\t// --- recipe book panel, left of the block (reserved space until slice 3) --
+\tpublic static final int BOOK_W = ${n("BOOK_W")};
+\tpublic static final int BOOK_H = ${n("BOOK_H")};
+\tpublic static final int BOOK_GAP = ${n("BOOK_GAP")};
+
+\t// --- alchemy circle --------------------------------------------------------
+\tpublic static final int BASE_X = ${n("BASE_X")};
+\tpublic static final int BASE_Y = ${n("BASE_Y")};
+\t// ingredient slots clockwise from the top
+\tpublic static final int[] INGREDIENT_X = {${ING.X.join(", ")}};
+\tpublic static final int[] INGREDIENT_Y = {${ING.Y.join(", ")}};
+
+\t// --- output ------------------------------------------------------------------
+\tpublic static final int OUTPUT_X = ${n("OUTPUT_X")};
+\tpublic static final int OUTPUT_Y = ${n("OUTPUT_Y")};
+
+\t// --- Brew button ---------------------------------------------------------------
+\tpublic static final int BREW_X = ${n("BREW_X")};
+\tpublic static final int BREW_Y = ${n("BREW_Y")};
+\tpublic static final int BREW_W = ${n("BREW_W")};
+\tpublic static final int BREW_H = ${n("BREW_H")};
+\tpublic static final int BREW_TEXT_COLOR = ${C.BREW_TEXT_COLOR};
+\tpublic static final int BREW_TEXT_HOVER_COLOR = ${C.BREW_TEXT_HOVER_COLOR};
+
+\t// --- brew feedback ("Nothing happens."), below the Brew button ----------------
+\t// Centred on MESSAGE_CENTER_X, wrapped to MESSAGE_W, shown for MESSAGE_MS and
+\t// faded out over the last MESSAGE_FADE_MS. MESSAGE_COLOR is 0xRRGGBB (no alpha).
+\tpublic static final int MESSAGE_CENTER_X = ${n("MESSAGE_CENTER_X")};
+\tpublic static final int MESSAGE_Y = ${n("MESSAGE_Y")};
+\tpublic static final int MESSAGE_W = ${n("MESSAGE_W")};
+\tpublic static final int MESSAGE_COLOR = ${C.MESSAGE_COLOR};
+\tpublic static final int MESSAGE_MS = ${n("MESSAGE_MS")};
+\tpublic static final int MESSAGE_FADE_MS = ${n("MESSAGE_FADE_MS")};
+
+\t// --- player inventory (3 rows) and hotbar -----------------------------------
+\tpublic static final int INVENTORY_X = ${n("INVENTORY_X")};
+\tpublic static final int INVENTORY_Y = ${n("INVENTORY_Y")};
+\tpublic static final int HOTBAR_Y = ${n("HOTBAR_Y")};
+
+\t// --- art ---------------------------------------------------------------------
+\t// Every piece is drawn with the slot block (never baked into the fullscreen tab
+\t// background), so it stays aligned at every GUI scale and window size. Slot
+\t// sprites are 18x18 and drawn at each slot's frame (1px outside the item), so
+\t// moving a slot moves its art. An empty path draws nothing.
+\tpublic static final String SLOT_BASE_TEX = "${T.SLOT_BASE_TEX}";
+\tpublic static final String SLOT_INGREDIENT_TEX = "${T.SLOT_INGREDIENT_TEX}";
+\tpublic static final String SLOT_OUTPUT_TEX = "${T.SLOT_OUTPUT_TEX}";
+\tpublic static final String SLOT_INVENTORY_TEX = "${T.SLOT_INVENTORY_TEX}";
+\tpublic static final int SLOT_TEX_SIZE = ${SLOT};
+
+\t// behind the whole block, BLOCK_W x BLOCK_H
+\tpublic static final String PANEL_TEX = "${T.PANEL_TEX}";
+\t// behind the recipe book panel, BOOK_W x BOOK_H
+\tpublic static final String BOOK_TEX = "${T.BOOK_TEX}";
+
+\t// Brew button, BREW_W x BREW_H; the label is drawn by code on top
+\tpublic static final String BREW_TEX = "${T.BREW_TEX}";
+\tpublic static final String BREW_HOVER_TEX = "${T.BREW_HOVER_TEX}";
+
+\t// ornament behind the circle slots, drawn at this rect inside the block
+\tpublic static final String CIRCLE_TEX = "${T.CIRCLE_TEX}";
+\tpublic static final int CIRCLE_X = ${n("CIRCLE_X")};
+\tpublic static final int CIRCLE_Y = ${n("CIRCLE_Y")};
+\tpublic static final int CIRCLE_W = ${n("CIRCLE_W")};
+\tpublic static final int CIRCLE_H = ${n("CIRCLE_H")};
+
+\t// outline when the block or book panel does not fit the content region
+\tpublic static final int MISFIT_COLOR = ${C.MISFIT_COLOR};
+}
+`;
+  document.getElementById("out").value=out;
+}
+
+document.getElementById("copy").addEventListener("click",()=>{
+  const t=document.getElementById("out"); t.select(); document.execCommand("copy");
+});
+document.getElementById("reset").addEventListener("click",()=>{
+  S=Object.assign({},DEFAULTS); ING={X:ING_DEFAULTS.X.slice(),Y:ING_DEFAULTS.Y.slice()};
+  T=Object.assign({},STRINGS); C=Object.assign({},COLORS); redraw();
+});
+
+// ---- import from Java ----
+function parseLayoutJava(txt){
+  const S2=Object.assign({},DEFAULTS), T2=Object.assign({},STRINGS), C2=Object.assign({},COLORS);
+  const ING2={X:ING_DEFAULTS.X.slice(),Y:ING_DEFAULTS.Y.slice()};
+  const intOf=k=>{const m=txt.match(new RegExp('\\bint\\s+'+k+'\\s*=\\s*(-?\\d+)\\s*;'));return m?parseInt(m[1],10):undefined;};
+  const hexOf=k=>{const m=txt.match(new RegExp('\\bint\\s+'+k+'\\s*=\\s*(0x[0-9A-Fa-f]+)\\s*;'));return m?m[1]:undefined;};
+  const strOf=k=>{const m=txt.match(new RegExp('\\bString\\s+'+k+'\\s*=\\s*"([^"]*)"\\s*;'));return m?m[1]:undefined;};
+  const arrOf=k=>{const m=txt.match(new RegExp('\\bint\\[\\]\\s+'+k+'\\s*=\\s*\\{([^}]*)\\}'));return m?m[1].split(",").map(v=>parseInt(v.trim(),10)):undefined;};
+  Object.keys(DEFAULTS).forEach(k=>{const v=intOf(k);if(v!==undefined)S2[k]=v;});
+  Object.keys(STRINGS).forEach(k=>{const v=strOf(k);if(v!==undefined)T2[k]=v;});
+  Object.keys(COLORS).forEach(k=>{const v=hexOf(k);if(v!==undefined)C2[k]=v;});
+  const ax=arrOf("INGREDIENT_X"), ay=arrOf("INGREDIENT_Y");
+  if(ax&&ax.length===5&&ax.every(Number.isFinite)) ING2.X=ax;
+  if(ay&&ay.length===5&&ay.every(Number.isFinite)) ING2.Y=ay;
+  return {S:S2,T:T2,C:C2,ING:ING2};
+}
+document.getElementById("impDo").addEventListener("click",()=>{
+  const t=document.getElementById("impArea").value, info=document.getElementById("impInfo");
+  if(!t.trim()){ info.textContent="Paste some Java first."; return; }
+  try{ const r=parseLayoutJava(t); S=r.S; T=r.T; C=r.C; ING=r.ING; redraw(); info.textContent="Imported."; }
+  catch(e){ info.textContent="Parse error: "+e.message; }
+});
+
+redraw();
+</script>
+</body>
+</html>

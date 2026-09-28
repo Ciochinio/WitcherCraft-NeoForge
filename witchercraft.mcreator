@@ -225,6 +225,32 @@
       "path": "~/Alchemy"
     },
     {
+      "name": "AlchemyClientIndex",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "alchemy_client_index",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/AlchemyClientIndex.java"
+        ]
+      },
+      "path": "~/Alchemy"
+    },
+    {
+      "name": "AlchemyIndexSyncMessage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "alchemy_index_sync_message",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/AlchemyIndexSyncMessage.java"
+        ]
+      },
+      "path": "~/Alchemy"
+    },
+    {
       "name": "PauseMenuLayout",
       "type": "code",
       "compiles": true,

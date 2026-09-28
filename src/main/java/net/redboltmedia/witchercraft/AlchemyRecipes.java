@@ -15,6 +15,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -189,16 +190,19 @@ public final class AlchemyRecipes {
 		return false;
 	}
 
-	// ---- rebuild eagerly so load-time warnings appear at load time ------------------
+	// ---- rebuild eagerly so load-time warnings appear at load time -----------------
+	// ---- and send the client its copy of the allowlist ------------------------------
 
 	@SubscribeEvent
 	public static void onServerStarted(ServerStartedEvent event) {
 		index(event.getServer());
 	}
 
+	/** Fires for one player on login, and for everyone (player == null) after /reload. */
 	@SubscribeEvent
 	public static void onDatapackSync(OnDatapackSyncEvent event) {
-		if (event.getPlayer() == null) // null = /reload, not a player joining
-			index(event.getPlayerList().getServer());
+		Index index = index(event.getPlayerList().getServer());
+		AlchemyIndexSyncMessage sync = new AlchemyIndexSyncMessage(List.copyOf(index.ingredientItems()));
+		event.getRelevantPlayers().forEach(player -> PacketDistributor.sendToPlayer(player, sync));
 	}
 }

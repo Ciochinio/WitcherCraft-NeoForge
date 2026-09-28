@@ -822,7 +822,7 @@ divergence risk the way the `en_us.json` gotcha (3.11) is.
 ### 3.8 Known limitations
 
 - **Placeholder pages.** Skills, Meditation, and Map have real pages. Alchemy is a container-backed tab
-  (3.3b), currently a test build with empty slots and no brewing. Inventory and Glossary remain
+  (3.3b) with working brewing (section 6). Inventory and Glossary remain
   `PlaceholderPage` "coming soon" tabs until each is built (own class + own tool).
 - **Existing standalone screens are only partly folded in.** The perk screen (Skills) and Meditation
   are now real shell pages; Meditation's old container GUI + in-world opener were deleted outright in
@@ -2214,8 +2214,9 @@ All hand-written locked code elements in `~/Alchemy`, never regenerated:
   `DeferredRegister`s (attached in `WitchercraftMod`'s "mod init" user code block), and answers every
   server-side question about recipes.
 - **`AlchemyBrewMessage`** - the Brew button's serverbound packet. It ignores incomplete grids, reports "Nothing happens.",
-  or (slice 1) reports the match; slice 2 makes a match brew. See 6.5.
+  or brews: the grid is consumed and the result goes to the output slot. See 6.5.
 - **`AlchemyFeedbackMessage`** - clientbound; the short message shown below the Brew button.
+- **`AlchemyIndexSyncMessage`** and **`AlchemyClientIndex`** - the client's copy of the ingredient allowlist (6.6).
 
 Recipes are data: `data/<namespace>/recipe/**.json` with `"type": "witchercraft:alchemy"`. The ported
 set lives in `data/witchercraft/recipe/alchemy/`. The `witchercraft:alcohol` item tag
@@ -2280,7 +2281,7 @@ uses it. For example, White Gull is the decoction base, but no decoction recipe 
 |------|--------|-------|
 | Output slot occupied, base slot empty, or no ingredients | Silently ignored, like a crafting table | none |
 | No recipe matches | "Nothing happens." | `alchemy_fail` |
-| A recipe matches | Brewed (slice 1: reported only) | `alchemy_brew` |
+| A recipe matches | Grid consumed, result in the output slot | `alchemy_brew` |
 
 "Nothing happens." is the only message. A successful brew shows no text: the result appearing in the
 output slot is the feedback.
@@ -2298,8 +2299,39 @@ per-base failure item; that was dropped on 2026-09-28, and the three failure ite
   a file changes the sound with no code change. Subtitles are `subtitles.alchemy_brew` and
   `subtitles.alchemy_fail`.
 
-### 6.6 Known limitations
+### 6.6 Slot filters and the client's ingredient list
 
-- `isBase` and `isIngredient` exist but are not yet applied to the slots. Slice 2 applies them once
-  the allowlist is synced to the client.
+The base slot accepts only `AlchemyRecipes.isBase` (an item tag and three fixed items; tags already
+reach the client, so both sides agree). The ingredient slots accept only the **ingredient
+allowlist** from 6.4. The client never receives recipe contents, so it gets the allowlist on its own:
+
+- `AlchemyIndexSyncMessage` (clientbound) carries the allowlist as item ids. `AlchemyRecipes` sends it
+  from `OnDatapackSyncEvent`: to one player on login, and to everyone after `/reload`. Slice 3 adds
+  the recipe id to result map to the same message.
+- `AlchemyClientIndex` holds the client's copy. It is plain static state with no client-only types,
+  so the common `AlchemyMenu` can reference it.
+- `AlchemyMenu` picks its ingredient check when it is constructed: `AlchemyRecipes.isIngredient` for
+  a `ServerPlayer`, `AlchemyClientIndex::isIngredient` otherwise. Both sides therefore predict
+  placement identically; if they ever disagree (for example, just after a `/reload`), the server is
+  authoritative and vanilla resyncs the slot.
+- Items already in a slot are never kicked out when the allowlist changes. They stay until taken out.
+
+Shift-click from the inventory tries the base slot first, then the ingredient slots, so an item that
+is both a base and an ingredient (an alcohol, once White Gull has its recipe) fills the base first.
+
+### 6.7 Layout tool
+
+`tools/alchemy-layout-placer.html` edits and regenerates `AlchemyLayout.java` wholesale (the
+checked-in file is byte-identical to the tool's default output). It drags and resizes every slot,
+the Brew button, the message area, the circle ornament, the inventory, the block and the book panel;
+imports the current Java; and previews the art from `src/main/resources`. Its fit preview reproduces
+`AlchemyScreen.init` placement for a chosen window size and GUI scale, plus a table of common window
+sizes, with the same "does not fit" outline the screen draws.
+
+Textures load by relative path, so the tool must be opened from the repo (a file:// URL or any local
+static server rooted at the repo), not copied elsewhere.
+
+### 6.8 Known limitations
+
 - The ported recipes use the six old substance items as placeholder ingredients until slice 5.
+- The recipe book panel is reserved space until slice 3.

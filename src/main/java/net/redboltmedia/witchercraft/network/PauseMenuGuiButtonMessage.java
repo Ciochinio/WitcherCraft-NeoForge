@@ -54,10 +54,9 @@ public record PauseMenuGuiButtonMessage(int buttonID, int x, int y, int z) imple
 
 			CharacterGuiOpenProcedure.execute(world, x, y, z, entity);
 		}
-		if (buttonID == 2) {
-
-			AlchemyGuiOpenProcedure.execute(world, x, y, z, entity);
-		}
+		// buttonID 2 ("Alchemy") retired in the alchemy redesign (slice 2): the client no
+		// longer sends it; the Alchemy tab opens through WitcherGuiPages.open. The old
+		// AlchemyGui elements are removed in slice 6.
 		if (buttonID == 3) {
 
 			GlossaryMenuGuiOpenProcedure.execute(world, x, y, z, entity);

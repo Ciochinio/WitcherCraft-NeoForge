@@ -19,7 +19,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
 /**
@@ -29,11 +28,11 @@ import net.minecraft.world.item.crafting.RecipeHolder;
  * - output slot occupied, no base, or no ingredients: silently ignored;
  * - a wrong recipe: "Nothing happens." below the Brew button
  *   ({@link AlchemyFeedbackMessage}) and the fail sound, nothing consumed;
- * - a match: the brew sound; the result appearing is the feedback.
+ * - a match: the grid is consumed, the result appears in the output slot, and
+ *   the brew sound plays. No message: the result appearing is the feedback.
  *
- * SLICE 1 TEST BUILD: a match only reports what it would brew and consumes
- * nothing; slice 2 turns it into real brewing. That one report is temporary
- * and therefore not localized.
+ * On a match the grid (base and every ingredient) is consumed and the result
+ * goes to the output slot.
  *
  * HAND-MAINTAINED: locked code element.
  */
@@ -73,10 +72,8 @@ public record AlchemyBrewMessage() implements CustomPacketPayload {
 			return;
 		}
 
-		// TEMPORARY (slice 1): report only; slice 2 consumes the grid and fills the output
-		ItemStack result = match.get().value().result().create();
+		menu.brew(match.get().value().assemble(input));
 		playSound(player, WitchercraftModSounds.ALCHEMY_BREW.get(), BREW_VOLUME);
-		feedback(player, Component.literal("[Test] Would brew " + result.getCount() + "x ").append(result.getHoverName()));
 	}
 
 	/** A world sound at the brewer, so players nearby hear it too. */

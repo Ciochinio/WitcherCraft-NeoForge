@@ -75,7 +75,7 @@ in upgraded "alternate" versions that change how a Sign plays, not just its numb
 
 #### Alchemy Anywhere
 
-Potions, decoctions, oils, and bombs, all brewed from in-game menus with no crafting table.
+Potions, decoctions, oils, and bombs, all brewed in the Alchemy tab with no crafting table.
 Potions are timed buffs. Decoctions are stronger and last far longer. Oils coat your weapon to
 hit one monster category harder. Bombs are thrown as projectiles and go off in an area.
 
@@ -274,23 +274,41 @@ drinking everything at once. Oils and bombs cost no Toxicity.
 
 ### Brewing
 
-Brewing happens in the alchemy menu, opened from the pause/system menu. There's no crafting
-table, furnace, or brewing stand - the menu is the whole workbench.
+Brewing happens in the Alchemy tab of the WitcherCraft menu (**P**, or **J** to open it directly).
+There's no crafting table, furnace, or brewing stand - you can brew anywhere.
 
-The grid has a base slot plus ingredient slots. What you put in the **base slot** decides what
-family you're brewing:
+The tab is laid out as an alchemy circle: one base slot in the centre, **5 ingredient slots**
+around it, and an output slot beside it, above your inventory. Each slot holds a single item, so a
+recipe that needs two of something uses two slots.
 
-| Base reagent | Makes |
-|--------------|-------|
-| **White Gull** | Potions and decoctions |
-| **Saltpeter** | Bombs |
+The base decides which family you're brewing:
+
+| Base | Makes |
+|------|-------|
+| **Any alcohol** | Potions |
+| **White Gull** | Decoctions |
 | **Tallow** | Oils |
+| **Saltpeter** | Bombs |
 
-The remaining slots take the Witcher alchemical substances - Vitriol, Rebis, Aether, and the
-rest. Fill a recipe exactly and hit brew: the ingredients are consumed and a stack of the
-result appears in the output. Recipes yield in batches rather than one at a time - for
-example, Swallow brews from White Gull + Rebis x**2** + Vitriol + Aether and produces **3**
-doses.
+Only bases go in the centre slot, and only items that some recipe uses go in the ingredient slots.
+
+Recipes are exact but order doesn't matter: put in the base and exactly the recipe's ingredients,
+in any of the ingredient slots, nothing missing and nothing extra. Then press Brew:
+
+- **Right recipe:** the base and ingredients are used up and the result appears in the output slot,
+  with a bubbling sound. A potion or decoction gives **1** item; an oil or bomb gives a stack of
+  **3**.
+- **Wrong recipe:** nothing happens and nothing is used up. The tab says "Nothing happens." and
+  you hear a quiet fizzle, so trying combinations costs nothing.
+- **Output slot full, or no base or ingredients:** Brew does nothing, like a crafting table with
+  nothing to craft.
+
+Closing the tab, switching to another tab, or taking a hit from a monster puts everything in the
+circle and the output slot back into your inventory.
+
+Today's recipes still use the old alchemical substances (Vitriol, Rebis, Aether, and the rest) as
+placeholder ingredients, and a placeholder alcohol stands in for the real ones. Herbs, monster
+parts, and proper alcohols replace them later.
 
 ### Potions
 
@@ -690,7 +708,7 @@ Almost everything is reached through two keys plus the system menu:
 | **R** | Cast the active Sign |
 | **B** | The system menu |
 
-The system menu (**B**) is the hub: from it you reach Alchemy (brewing), the Skill Tree, the
+The system menu (**B**) is the hub: from it you reach the Alchemy tab (brewing), the Skill Tree, the
 Character screen, the Bestiary, the Glossary, and Meditation.
 
 ### Custom HUD
