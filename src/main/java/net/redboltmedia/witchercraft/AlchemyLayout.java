@@ -23,29 +23,59 @@ public final class AlchemyLayout {
 
 	// --- slot block size and placement (GUI pixels) --------------------------
 	public static final int BLOCK_W = 176;
-	public static final int BLOCK_H = 180;
+	public static final int BLOCK_H = 190;
 	public static final int BLOCK_OFFSET_X = 0;
 	public static final int BLOCK_OFFSET_Y = 0;
 
 	// --- recipe book panel, left of the block (reserved space until slice 3) --
+	// Shown or hidden with the book button; hidden, the block is centred alone.
 	public static final int BOOK_W = 147;
 	public static final int BOOK_H = 166;
 	public static final int BOOK_GAP = 4;
 
+	// --- recipe book show/hide button (inside the block) ----------------------
+	public static final int BOOK_BUTTON_X = 4;
+	public static final int BOOK_BUTTON_Y = 4;
+	public static final int BOOK_BUTTON_W = 20;
+	public static final int BOOK_BUTTON_H = 18;
+
 	// --- alchemy circle --------------------------------------------------------
-	public static final int BASE_X = 62;
-	public static final int BASE_Y = 36;
+	public static final int BASE_X = 80;
+	public static final int BASE_Y = 47;
 	// ingredient slots clockwise from the top
-	public static final int[] INGREDIENT_X = {62, 92, 81, 43, 32};
-	public static final int[] INGREDIENT_Y = {4, 26, 62, 62, 26};
+	public static final int[] INGREDIENT_X = {80, 118, 104, 56, 42};
+	public static final int[] INGREDIENT_Y = {7, 35, 79, 79, 35};
+
+	// A ring (RING_*_TEX, RING_*_SIZE square) is centred on each circle slot and the
+	// output. Ring sizes must be EVEN: slots are 18 wide, so an odd ring cannot be
+	// centred. RING_CORNER is how far the ring art's corners are cut (0 = square); the
+	// lines use it to stop just outside the rings.
+	public static final int RING_BASE_SIZE = 28;
+	public static final int RING_INGREDIENT_SIZE = 26;
+	public static final int RING_OUTPUT_SIZE = 26;
+	public static final int RING_CORNER = 4;
+
+	// Lines drawn by code as hard 1x pixel art, between slot centres, so they follow
+	// the slots wherever they move: the frame (a pentagon through the ingredient slots)
+	// and the spokes (base to each ingredient). Every GUI pixel within width / 2 of a
+	// line gets its colour, and within width / 2 + LINE_OUTLINE the outline colour.
+	// Each line stops LINE_GAP pixels outside the rings. A width of 0 draws nothing.
+	// Colours are 0xAARRGGBB.
+	public static final float FRAME_LINE_WIDTH = 2.0F;
+	public static final int FRAME_LINE_COLOR = 0xFFC4A040;
+	public static final float SPOKE_WIDTH = 2.0F;
+	public static final int SPOKE_COLOR = 0xFF8A6F2A;
+	public static final int LINE_OUTLINE = 1;
+	public static final int LINE_OUTLINE_COLOR = 0xFF050506;
+	public static final float LINE_GAP = 1.5F;
 
 	// --- output ------------------------------------------------------------------
-	public static final int OUTPUT_X = 144;
-	public static final int OUTPUT_Y = 36;
+	public static final int OUTPUT_X = 148;
+	public static final int OUTPUT_Y = 47;
 
 	// --- Brew button ---------------------------------------------------------------
-	public static final int BREW_X = 135;
-	public static final int BREW_Y = 58;
+	public static final int BREW_X = 139;
+	public static final int BREW_Y = 73;
 	public static final int BREW_W = 34;
 	public static final int BREW_H = 14;
 	public static final int BREW_TEXT_COLOR = 0xFFE8D9A8;
@@ -54,8 +84,8 @@ public final class AlchemyLayout {
 	// --- brew feedback ("Nothing happens."), below the Brew button ----------------
 	// Centred on MESSAGE_CENTER_X, wrapped to MESSAGE_W, shown for MESSAGE_MS and
 	// faded out over the last MESSAGE_FADE_MS. MESSAGE_COLOR is 0xRRGGBB (no alpha).
-	public static final int MESSAGE_CENTER_X = 152;
-	public static final int MESSAGE_Y = 75;
+	public static final int MESSAGE_CENTER_X = 156;
+	public static final int MESSAGE_Y = 90;
 	public static final int MESSAGE_W = 64;
 	public static final int MESSAGE_COLOR = 0xE8D9A8;
 	public static final int MESSAGE_MS = 2000;
@@ -63,35 +93,50 @@ public final class AlchemyLayout {
 
 	// --- player inventory (3 rows) and hotbar -----------------------------------
 	public static final int INVENTORY_X = 8;
-	public static final int INVENTORY_Y = 98;
-	public static final int HOTBAR_Y = 156;
+	public static final int INVENTORY_Y = 108;
+	public static final int HOTBAR_Y = 166;
 
 	// --- art ---------------------------------------------------------------------
 	// Every piece is drawn with the slot block (never baked into the fullscreen tab
 	// background), so it stays aligned at every GUI scale and window size. Slot
 	// sprites are 18x18 and drawn at each slot's frame (1px outside the item), so
-	// moving a slot moves its art. An empty path draws nothing.
+	// moving a slot moves its art. An empty path draws nothing. Each texture is
+	// stretched whole into its rect, so art may be any resolution; the placeholders
+	// are 1x pixel art.
 	public static final String SLOT_BASE_TEX = "witchercraft:textures/screens/alchemy_slot_base.png";
 	public static final String SLOT_INGREDIENT_TEX = "witchercraft:textures/screens/alchemy_slot_ingredient.png";
 	public static final String SLOT_OUTPUT_TEX = "witchercraft:textures/screens/alchemy_slot_output.png";
 	public static final String SLOT_INVENTORY_TEX = "witchercraft:textures/screens/alchemy_slot_inventory.png";
 	public static final int SLOT_TEX_SIZE = 18;
 
+	// rings around the circle slots and the output, RING_*_SIZE square
+	public static final String RING_BASE_TEX = "witchercraft:textures/screens/alchemy_ring_base.png";
+	public static final String RING_INGREDIENT_TEX = "witchercraft:textures/screens/alchemy_ring_ingredient.png";
+	public static final String RING_OUTPUT_TEX = "witchercraft:textures/screens/alchemy_ring_output.png";
+
 	// behind the whole block, BLOCK_W x BLOCK_H
 	public static final String PANEL_TEX = "witchercraft:textures/screens/alchemy_panel.png";
 	// behind the recipe book panel, BOOK_W x BOOK_H
 	public static final String BOOK_TEX = "witchercraft:textures/screens/alchemy_book_panel.png";
 
+	// recipe book show/hide button, BOOK_BUTTON_W x BOOK_BUTTON_H
+	public static final String BOOK_BUTTON_TEX = "witchercraft:textures/screens/alchemy_book_button.png";
+	public static final String BOOK_BUTTON_HOVER_TEX = "witchercraft:textures/screens/alchemy_book_button_hover.png";
+	// book icon drawn 16x16, centred on the button (a copy of the vanilla book; replace freely)
+	public static final String BOOK_ICON_TEX = "witchercraft:textures/screens/alchemy_book_icon.png";
+
 	// Brew button, BREW_W x BREW_H; the label is drawn by code on top
 	public static final String BREW_TEX = "witchercraft:textures/screens/alchemy_brew_button.png";
 	public static final String BREW_HOVER_TEX = "witchercraft:textures/screens/alchemy_brew_button_hover.png";
 
-	// ornament behind the circle slots, drawn at this rect inside the block
-	public static final String CIRCLE_TEX = "witchercraft:textures/screens/alchemy_circle_frame.png";
-	public static final int CIRCLE_X = 26;
-	public static final int CIRCLE_Y = 0;
-	public static final int CIRCLE_W = 88;
-	public static final int CIRCLE_H = 88;
+	// optional single image for the whole circle, drawn at this rect under the lines
+	// and rings (empty = none). For one unified piece of art, set it and set the line
+	// widths to 0 and the ring paths to empty. It does not follow moved slots.
+	public static final String FRAME_TEX = "";
+	public static final int FRAME_TEX_X = 34;
+	public static final int FRAME_TEX_Y = 1;
+	public static final int FRAME_TEX_W = 108;
+	public static final int FRAME_TEX_H = 102;
 
 	// outline when the block or book panel does not fit the content region
 	public static final int MISFIT_COLOR = 0xFFD04040;

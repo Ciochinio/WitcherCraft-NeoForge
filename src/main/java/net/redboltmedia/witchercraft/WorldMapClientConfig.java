@@ -9,7 +9,7 @@ import net.minecraft.resources.Identifier;
 
 import java.util.List;
 
-/** Client-owned world-map visual settings. */
+/** Client-owned settings: world map, minimap, and the Alchemy tab (the class predates the alchemy section). */
 public final class WorldMapClientConfig {
 	private static final ModConfigSpec SPEC;
 	private static final ModConfigSpec.BooleanValue SHOW_DECORATIONS;
@@ -36,6 +36,7 @@ public final class WorldMapClientConfig {
 	private static final ModConfigSpec.IntValue MINIMAP_SIZE;
 	private static final ModConfigSpec.IntValue MINIMAP_VIEWPORT_INSET;
 	private static final ModConfigSpec.DoubleValue MINIMAP_TARGET_ARRIVAL_RADIUS;
+	private static final ModConfigSpec.BooleanValue ALCHEMY_RECIPE_BOOK_OPEN;
 
 	public enum MinimapCorner { TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT }
 
@@ -72,6 +73,11 @@ public final class WorldMapClientConfig {
 		MINIMAP_VIEWPORT_INSET = minimapOption(builder, "viewport_inset", "Inset of the terrain viewport from each edge, measured in texels of the 64 by 64 frame texture.").defineInRange("viewportInset", 5, 0, 24);
 		MINIMAP_TARGET_ARRIVAL_RADIUS = minimapOption(builder, "target_arrival_radius", "Clear the active navigation target when you arrive within this many blocks of the destination. Set to 0 to disable automatic completion.")
 			.defineInRange("targetArrivalRadius", 15.0, 0.0, 64.0);
+		builder.pop();
+		builder.comment("Personal settings for the WitcherCraft Alchemy tab.")
+			.translation("witchercraft.configuration.alchemy").push("alchemy");
+		ALCHEMY_RECIPE_BOOK_OPEN = builder.comment("Show the recipe book panel in the Alchemy tab. The book button in the tab toggles it and saves the choice here.")
+			.translation("witchercraft.configuration.alchemy.recipe_book_open").define("recipeBookOpen", true);
 		builder.pop();
 		SPEC = builder.build();
 	}
@@ -115,6 +121,12 @@ public final class WorldMapClientConfig {
 	public static int minimapSize() { return MINIMAP_SIZE.getAsInt(); }
 	public static int minimapViewportInset() { return MINIMAP_VIEWPORT_INSET.getAsInt(); }
 	public static double minimapTargetArrivalRadius() { return MINIMAP_TARGET_ARRIVAL_RADIUS.getAsDouble(); }
+	public static boolean alchemyRecipeBookOpen() { return ALCHEMY_RECIPE_BOOK_OPEN.getAsBoolean(); }
+	/** Remember the Alchemy tab's recipe book state, like vanilla's recipe book. */
+	public static void setAlchemyRecipeBookOpen(boolean open) {
+		ALCHEMY_RECIPE_BOOK_OPEN.set(open);
+		ALCHEMY_RECIPE_BOOK_OPEN.save();
+	}
 	private static boolean validIdentifier(Object value) {
 		return value instanceof String string && Identifier.tryParse(string) != null;
 	}

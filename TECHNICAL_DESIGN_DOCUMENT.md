@@ -712,8 +712,29 @@ is the first (built in the alchemy redesign's step 0; see `ALCHEMY_REDESIGN_PLAN
   the slots must be drawn with the block, never painted into the fullscreen background. The block is
   placed below the navbar and may overflow the bottom edge only when the screen is too short for it.
   Alchemy's art is separate textures listed in `AlchemyLayout` (one 18x18 sprite per slot type, a
-  circle ornament, and panel images), drawn at the slots' own positions, so a layout change never
-  needs repainted art.
+  cut-corner ring per circle slot and the output, panel images, and an optional single `FRAME_TEX`),
+  drawn at the slots' own positions. Each texture is stretched whole into its GUI rect (the `blit` UVs
+  are 0 to 1 whatever the file size), so art could be painted above 1x, but the placeholders are
+  deliberately 1x pixel art. Ring sizes must be even, or a ring cannot centre on an 18px slot.
+- **Circle lines drawn by code.** `AlchemyScreen.buildCircleLineRuns` draws the frame (a pentagon
+  through the ingredient centres) and the spokes (base to each ingredient) as hard 1x pixel art, so
+  they follow the slots and a layout change never needs repainted art. Rules that keep it clean:
+  - Every GUI pixel within width / 2 of a line gets its colour, and within width / 2 + `LINE_OUTLINE`
+    the outline colour (distance to the segment, so ends are round). Outlines are painted into a grid
+    first, then spokes, then the frame, so an outline never cuts across another line.
+  - Each line is trimmed to stop `LINE_GAP` outside both rings. The ring is modelled as a square of
+    half its size with `RING_CORNER` cut corners (the exit distance along a direction is
+    min(h / |ux|, h / |uy|, (2h - corner) / (|ux| + |uy|))). Letting lines run into a ring edge at a
+    different angle gave ragged joins. Changing the ring art's shape means updating `RING_CORNER`.
+  - Slot centres sit on pixel boundaries, so an even width is sampled at pixel centres and an odd
+    width half a pixel over; otherwise a straight line splits into half-covered pixels.
+  - The pixels are built once (the layout is constant) and drawn as horizontal runs, one `fill` each.
+    `tools/alchemy-layout-placer.html` runs the same algorithm for its previews.
+- **Recipe book shown or hidden.** The book button toggles the book panel like vanilla's recipe book.
+  Shown, the book and block are centred as a pair; hidden, the block is centred alone.
+  `AlchemyScreen.placeBlock` recomputes the placement on each toggle. The state is the client config
+  value `alchemy.recipeBookOpen` (in `WorldMapClientConfig`, which predates the alchemy section):
+  read when the screen opens and saved on every toggle, so it is remembered like vanilla's.
 - **Registration without MCreator gui elements.** `AlchemyMenu` owns a `DeferredRegister<MenuType<?>>`
   attached to the mod bus in `WitchercraftMod`'s "mod init" user code block; `AlchemyScreen` binds
   itself in `RegisterMenuScreensEvent`. A fake MCreator `gui` element would register a menu class
@@ -2323,10 +2344,13 @@ is both a base and an ingredient (an alcohol, once White Gull has its recipe) fi
 
 `tools/alchemy-layout-placer.html` edits and regenerates `AlchemyLayout.java` wholesale (the
 checked-in file is byte-identical to the tool's default output). It drags and resizes every slot,
-the Brew button, the message area, the circle ornament, the inventory, the block and the book panel;
+the Brew button, the book button, the message area, the optional frame image, the inventory, the block
+and the book panel, and draws the rings, frame and spokes with the same algorithm as the screen. Ring
+sizes are forced even;
 imports the current Java; and previews the art from `src/main/resources`. Its fit preview reproduces
-`AlchemyScreen.init` placement for a chosen window size and GUI scale, plus a table of common window
-sizes, with the same "does not fit" outline the screen draws.
+`AlchemyScreen.placeBlock` for a chosen window size, GUI scale, and book state, plus a table of common
+window sizes that says whether each fits with the book shown, only with it hidden, or not at all,
+with the same "does not fit" outline the screen draws.
 
 Textures load by relative path, so the tool must be opened from the repo (a file:// URL or any local
 static server rooted at the repo), not copied elsewhere.
