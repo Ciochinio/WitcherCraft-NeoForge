@@ -289,8 +289,11 @@ The base decides which family you're brewing:
 | **White Gull** | Decoctions |
 | **Tallow** | Oils |
 | **Saltpeter** | Bombs |
+| **A mutagen** | Mutagens (recipes to come; each uses mutagens as its base) |
 
 Only bases go in the centre slot, and only items that some recipe uses go in the ingredient slots.
+The list of bases is data (the `witchercraft:alchemy_base` item tag), so new bases such as
+mutagens are added without code.
 
 Recipes are exact but order doesn't matter: put in the base and exactly the recipe's ingredients,
 in any of the ingredient slots, nothing missing and nothing extra. Then press Brew:
@@ -309,6 +312,40 @@ circle and the output slot back into your inventory.
 Today's recipes still use the old alchemical substances (Vitriol, Rebis, Aether, and the rest) as
 placeholder ingredients, and a placeholder alcohol stands in for the real ones. Herbs, monster
 parts, and proper alcohols replace them later.
+
+### Recipe book and learning recipes
+
+The Alchemy tab has a **recipe book**: a ragged manuscript page to the left of the circle, shown or
+hidden with the book button (the choice is remembered). It has one tab per family - **Potions,
+Oils, Bombs, Decoctions, Mutagens** - and lists the recipes you know as icons. White Gull, the
+decoction base, sits first in the Decoctions tab. Each family fits on one page, so there is no
+scrolling.
+
+- **Hover** a recipe to see its base and ingredients, and a short description of what it does.
+- **Click** a recipe to set it up: whatever is in the circle goes back to your inventory, then the
+  recipe's base and ingredients move in from your inventory. Anything you're missing shows as a
+  faded ghost item in its slot, so you can see what to gather. The output slot is left alone.
+- A recipe you can fully set up from your inventory looks normal; one you're missing ingredients
+  for is tinted red.
+
+You learn a recipe by:
+
+- **Knowing it from the start.** Every new character knows **Swallow**, **Necrophage Oil**, and
+  **Grapeshot** - one potion, oil, and bomb. (White Gull joins them once it has its recipe.)
+- **Brewing it.** Since wrong guesses cost nothing, experimenting is a real way to learn: the
+  first time a brew succeeds, the recipe goes into your book with a "New recipe learned" popup.
+- **Reading a formula** (coming next).
+
+Known recipes survive death and relogging.
+
+**Server option - recipe knowledge.** A server setting decides how much of the recipe list
+players see, and can be changed while the server runs:
+
+| Setting | Recipe book shows |
+|---------|-------------------|
+| **Discovery** (default) | Only recipes you know |
+| **Show locked** | Recipes you know, plus every other recipe as a locked entry: just its result's icon and name, not its ingredients |
+| **All known** | Every recipe, from the start. Your real progress is kept, so switching back restores it |
 
 ### Potions
 

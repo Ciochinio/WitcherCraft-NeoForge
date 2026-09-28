@@ -18,6 +18,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 
 /**
  * Server-side container behind the Alchemy tab: the alchemy circle (one base
@@ -29,7 +30,7 @@ import net.minecraft.world.item.ItemStack;
  * damage interrupt, death, disconnect) returns every grid slot, output included,
  * to the inventory, or drops it if the player is gone.
  *
- * The base slot accepts only {@link AlchemyRecipes#isBase}; ingredient slots only
+ * The base slot accepts only {@link AlchemyRecipes#isBase} (the alchemy_base item tag); ingredient slots only
  * items on the ingredient allowlist, checked against {@link AlchemyRecipes} on
  * the server and the synced {@link AlchemyClientIndex} on the client, so both
  * sides predict placement identically. The output slot is take-only; Brew fills
@@ -151,6 +152,38 @@ public class AlchemyMenu extends AbstractContainerMenu {
 			grid.setItem(i, ItemStack.EMPTY);
 		grid.setItem(OUTPUT_SLOT, result);
 		this.broadcastChanges();
+	}
+
+	/**
+	 * Fill the grid from the recipe book: return the base and ingredient slots to
+	 * the inventory (dropped if it is full), then move one matching item from the
+	 * inventory into the base slot and into ingredient slot i for the recipe's
+	 * ingredient i. Any item of a tag works; the first match found is used. What
+	 * the inventory lacks stays empty, and the client shows it as a ghost item.
+	 * The output slot is left alone. Server only.
+	 */
+	public void fillFrom(ServerPlayer player, AlchemyRecipe recipe) {
+		Inventory inventory = player.getInventory();
+		for (int i = BASE_SLOT; i < OUTPUT_SLOT; i++) {
+			ItemStack returned = grid.removeItemNoUpdate(i);
+			if (!returned.isEmpty())
+				inventory.placeItemBackInInventory(returned);
+		}
+		grid.setItem(BASE_SLOT, takeOne(inventory, recipe.base()));
+		List<Ingredient> ingredients = recipe.ingredients();
+		for (int i = 0; i < ingredients.size() && i < INGREDIENT_SLOTS; i++)
+			grid.setItem(FIRST_INGREDIENT_SLOT + i, takeOne(inventory, ingredients.get(i)));
+		this.broadcastChanges();
+	}
+
+	/** Remove one item matching {@code ingredient} from the main inventory and hotbar; empty if none matches. */
+	private static ItemStack takeOne(Inventory inventory, Ingredient ingredient) {
+		for (int slot = 0; slot < Inventory.INVENTORY_SIZE; slot++) {
+			ItemStack stack = inventory.getItem(slot);
+			if (!stack.isEmpty() && ingredient.test(stack))
+				return inventory.removeItem(slot, 1);
+		}
+		return ItemStack.EMPTY;
 	}
 
 	@Override

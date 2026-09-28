@@ -86,6 +86,7 @@
 
   <div class="side">
     <fieldset><legend>Slot block &amp; book panel</legend><div id="grpBlock"></div></fieldset>
+    <fieldset><legend>Recipe book (tabs, title, entry grid)</legend><div id="grpBook"></div></fieldset>
     <fieldset><legend>Circle (base + ingredients)</legend><div id="grpCircle"></div><div id="grpIng"></div></fieldset>
     <fieldset><legend>Output, Brew button &amp; message</legend><div id="grpOut"></div></fieldset>
     <fieldset><legend>Inventory</legend><div id="grpInv"></div></fieldset>
@@ -119,7 +120,10 @@ const SHELL_BG = "witchercraft:textures/screens/shell_background_alchemy.png";
 // --- defaults must match AlchemyLayout.java ---------------------------------
 const DEFAULTS = {
   BLOCK_W:176, BLOCK_H:190, BLOCK_OFFSET_X:0, BLOCK_OFFSET_Y:0,
-  BOOK_W:147, BOOK_H:166, BOOK_GAP:4,
+  BOOK_W:97, BOOK_H:166, BOOK_GAP:4,
+  BOOK_TAB_X:-30, BOOK_TAB_Y:6, BOOK_TAB_STEP:27, BOOK_TAB_W:35, BOOK_TAB_H:27, BOOK_TAB_SELECTED_SHIFT:2, BOOK_TAB_ICON_X:9, BOOK_TAB_ICON_Y:5,
+  BOOK_TITLE_Y:9,
+  BOOK_GRID_X:11, BOOK_GRID_Y:24, BOOK_COLUMNS:3, BOOK_ROWS:5, BOOK_ENTRY_SIZE:25,
   BOOK_BUTTON_X:4, BOOK_BUTTON_Y:4, BOOK_BUTTON_W:20, BOOK_BUTTON_H:18,
   BASE_X:80, BASE_Y:47,
   RING_BASE_SIZE:28, RING_INGREDIENT_SIZE:26, RING_OUTPUT_SIZE:26, RING_CORNER:4,
@@ -141,6 +145,16 @@ const STRINGS = {
   RING_OUTPUT_TEX:"witchercraft:textures/screens/alchemy_ring_output.png",
   PANEL_TEX:"witchercraft:textures/screens/alchemy_panel.png",
   BOOK_TEX:"witchercraft:textures/screens/alchemy_book_panel.png",
+  BOOK_TAB_TEX:"witchercraft:textures/screens/alchemy_book_tab.png",
+  BOOK_TAB_SELECTED_TEX:"witchercraft:textures/screens/alchemy_book_tab_selected.png",
+  TAB_ICON_POTIONS_TEX:"witchercraft:textures/screens/alchemy_tab_icon_potions.png",
+  TAB_ICON_OILS_TEX:"witchercraft:textures/screens/alchemy_tab_icon_oils.png",
+  TAB_ICON_BOMBS_TEX:"witchercraft:textures/screens/alchemy_tab_icon_bombs.png",
+  TAB_ICON_DECOCTIONS_TEX:"witchercraft:textures/screens/alchemy_tab_icon_decoctions.png",
+  TAB_ICON_MUTAGENS_TEX:"witchercraft:textures/screens/alchemy_tab_icon_mutagens.png",
+  BOOK_ENTRY_TEX:"witchercraft:textures/screens/alchemy_book_entry.png",
+  BOOK_ENTRY_MISSING_TEX:"witchercraft:textures/screens/alchemy_book_entry_missing.png",
+  BOOK_ENTRY_LOCKED_TEX:"witchercraft:textures/screens/alchemy_book_entry_locked.png",
   BOOK_BUTTON_TEX:"witchercraft:textures/screens/alchemy_book_button.png",
   BOOK_BUTTON_HOVER_TEX:"witchercraft:textures/screens/alchemy_book_button_hover.png",
   BOOK_ICON_TEX:"witchercraft:textures/screens/alchemy_book_icon.png",
@@ -156,7 +170,7 @@ const toEven = v => Math.max(0, Math.round(v/2)*2);
 const fmtFloat = v => (Number.isInteger(v) ? v.toFixed(1) : String(v)) + "F";
 const COLORS = {
   FRAME_LINE_COLOR:"0xFFC4A040", SPOKE_COLOR:"0xFF8A6F2A", LINE_OUTLINE_COLOR:"0xFF050506",
-  BREW_TEXT_COLOR:"0xFFE8D9A8", BREW_TEXT_HOVER_COLOR:"0xFFFFDD55", MESSAGE_COLOR:"0xE8D9A8", MISFIT_COLOR:"0xFFD04040"
+  BOOK_TITLE_COLOR:"0xFF4A3520", BREW_TEXT_COLOR:"0xFFE8D9A8", BREW_TEXT_HOVER_COLOR:"0xFFFFDD55", MESSAGE_COLOR:"0xE8D9A8", MISFIT_COLOR:"0xFFD04040"
 };
 
 let S = Object.assign({}, DEFAULTS);
@@ -166,6 +180,8 @@ let C = Object.assign({}, COLORS);
 
 const GROUPS = {
   grpBlock:  ["BLOCK_W","BLOCK_H","BLOCK_OFFSET_X","BLOCK_OFFSET_Y","BOOK_W","BOOK_H","BOOK_GAP","BOOK_BUTTON_X","BOOK_BUTTON_Y","BOOK_BUTTON_W","BOOK_BUTTON_H"],
+  grpBook:   ["BOOK_TAB_X","BOOK_TAB_Y","BOOK_TAB_STEP","BOOK_TAB_W","BOOK_TAB_H","BOOK_TAB_SELECTED_SHIFT","BOOK_TAB_ICON_X","BOOK_TAB_ICON_Y",
+              "BOOK_TITLE_Y","BOOK_GRID_X","BOOK_GRID_Y","BOOK_COLUMNS","BOOK_ROWS","BOOK_ENTRY_SIZE"],
   grpCircle: ["BASE_X","BASE_Y","RING_BASE_SIZE","RING_INGREDIENT_SIZE","RING_OUTPUT_SIZE","RING_CORNER",
               "FRAME_LINE_WIDTH","SPOKE_WIDTH","LINE_OUTLINE","LINE_GAP","FRAME_TEX_X","FRAME_TEX_Y","FRAME_TEX_W","FRAME_TEX_H"],
   grpOut:    ["OUTPUT_X","OUTPUT_Y","BREW_X","BREW_Y","BREW_W","BREW_H","MESSAGE_CENTER_X","MESSAGE_Y","MESSAGE_W","MESSAGE_MS","MESSAGE_FADE_MS"],
@@ -265,8 +281,11 @@ function dragRect(id,x,y,w,h){
   r.dataset.drag=id; r.addEventListener("pointerdown",startDrag); svg.appendChild(r);
 }
 
+// how far the tabs reach left of the book page (AlchemyRecipeBook.tabsOut)
+const tabsOut=()=>Math.max(0,S.BOOK_TAB_SELECTED_SHIFT-S.BOOK_TAB_X);
+const TABS=[["POTIONS","Potions"],["OILS","Oils"],["BOMBS","Bombs"],["DECOCTIONS","Decoctions"],["MUTAGENS","Mutagens"]];
 function viewBox(){
-  const left=-(S.BOOK_GAP+S.BOOK_W)-MARGIN, top=-MARGIN;
+  const left=-(S.BOOK_GAP+S.BOOK_W)-tabsOut()-MARGIN, top=-MARGIN;
   const right=S.BLOCK_W+MARGIN, bottom=Math.max(S.BLOCK_H,S.BOOK_H, S.HOTBAR_Y+SLOT)+MARGIN;
   return {left,top,w:right-left,h:bottom-top};
 }
@@ -328,10 +347,26 @@ function drawEditor(){
 
   // book panel (left of the block); dimmed when the preview has the book hidden
   const bx=-(S.BOOK_GAP+S.BOOK_W);
-  const bookImg=image(T.BOOK_TEX,bx,0,S.BOOK_W,S.BOOK_H);
-  if(bookImg && !bookOpen()) bookImg.setAttribute("opacity","0.25");
+  const bookEls=[];
+  // tabs first (the first one drawn selected), so the page covers where they tuck under it
+  TABS.forEach(([key],i)=>{
+    const tx=bx+S.BOOK_TAB_X-(i===0?S.BOOK_TAB_SELECTED_SHIFT:0), ty=S.BOOK_TAB_Y+i*S.BOOK_TAB_STEP;
+    bookEls.push(image(i===0?T.BOOK_TAB_SELECTED_TEX:T.BOOK_TAB_TEX,tx,ty,S.BOOK_TAB_W,S.BOOK_TAB_H));
+    bookEls.push(image(T["TAB_ICON_"+key+"_TEX"],tx+S.BOOK_TAB_ICON_X,ty+S.BOOK_TAB_ICON_Y,16,16));
+  });
+  bookEls.push(image(T.BOOK_TEX,bx,0,S.BOOK_W,S.BOOK_H));
   svg.appendChild(el("rect",{x:bx,y:0,width:S.BOOK_W,height:S.BOOK_H,fill:"none",stroke:"#ffffff30","stroke-width":0.5,"stroke-dasharray":"2 2"}));
-  const bt=el("text",{x:bx+S.BOOK_W/2,y:S.BOOK_H/2,fill:"#9a9aa6","text-anchor":"middle"}); bt.textContent=bookOpen()?"recipe book (slice 3)":"recipe book (hidden)"; svg.appendChild(bt);
+  const bt=el("text",{x:bx+S.BOOK_W/2,y:S.BOOK_TITLE_Y+7,fill:colorToCss(C.BOOK_TITLE_COLOR),"text-anchor":"middle"}); bt.textContent="Potions"; svg.appendChild(bt);
+  // entry grid: sample entries (brewable, missing, locked) then empty cells
+  for(let i=0;i<S.BOOK_COLUMNS*S.BOOK_ROWS;i++){
+    const ex=bx+S.BOOK_GRID_X+(i%S.BOOK_COLUMNS)*S.BOOK_ENTRY_SIZE, ey=S.BOOK_GRID_Y+Math.floor(i/S.BOOK_COLUMNS)*S.BOOK_ENTRY_SIZE;
+    if(i<6) bookEls.push(image(i<3?T.BOOK_ENTRY_TEX:i<5?T.BOOK_ENTRY_MISSING_TEX:T.BOOK_ENTRY_LOCKED_TEX,ex,ey,S.BOOK_ENTRY_SIZE,S.BOOK_ENTRY_SIZE));
+    svg.appendChild(el("rect",{x:ex,y:ey,width:S.BOOK_ENTRY_SIZE,height:S.BOOK_ENTRY_SIZE,fill:"none",stroke:"#4a352055","stroke-width":0.5}));
+  }
+  if(!bookOpen()) bookEls.forEach(e=>e && e.setAttribute("opacity","0.25"));
+  dragRect("bookTabs",bx+S.BOOK_TAB_X,S.BOOK_TAB_Y,-S.BOOK_TAB_X,TABS.length*S.BOOK_TAB_STEP);
+  dragRect("bookGrid",bx+S.BOOK_GRID_X,S.BOOK_GRID_Y,S.BOOK_COLUMNS*S.BOOK_ENTRY_SIZE,S.BOOK_ROWS*S.BOOK_ENTRY_SIZE);
+  dragRect("bookTitle",bx+S.BOOK_W/2-20,S.BOOK_TITLE_Y,40,9);
 
   // block panel + optional frame image (its rect is only shown while an image is set)
   image(T.PANEL_TEX,0,0,S.BLOCK_W,S.BLOCK_H);
@@ -396,6 +431,9 @@ const DRAG = {
   base:    { get:()=>[S.BASE_X,S.BASE_Y], set:(x,y)=>{ S.BASE_X=x; S.BASE_Y=y; } },
   output:  { get:()=>[S.OUTPUT_X,S.OUTPUT_Y], set:(x,y)=>{ S.OUTPUT_X=x; S.OUTPUT_Y=y; } },
   brew:    { get:()=>[S.BREW_X,S.BREW_Y], set:(x,y)=>{ S.BREW_X=x; S.BREW_Y=y; } },
+  bookTabs:{ get:()=>[S.BOOK_TAB_X,S.BOOK_TAB_Y], set:(x,y)=>{ S.BOOK_TAB_X=x; S.BOOK_TAB_Y=y; } },
+  bookGrid:{ get:()=>[S.BOOK_GRID_X,S.BOOK_GRID_Y], set:(x,y)=>{ S.BOOK_GRID_X=x; S.BOOK_GRID_Y=y; } },
+  bookTitle:{ get:()=>[0,S.BOOK_TITLE_Y], set:(x,y)=>{ S.BOOK_TITLE_Y=y; } },
   bookButton:{ get:()=>[S.BOOK_BUTTON_X,S.BOOK_BUTTON_Y], set:(x,y)=>{ S.BOOK_BUTTON_X=x; S.BOOK_BUTTON_Y=y; } },
   message: { get:()=>[S.MESSAGE_CENTER_X,S.MESSAGE_Y], set:(x,y)=>{ S.MESSAGE_CENTER_X=x; S.MESSAGE_Y=y; } },
   frameTex:{ get:()=>[S.FRAME_TEX_X,S.FRAME_TEX_Y], set:(x,y)=>{ S.FRAME_TEX_X=x; S.FRAME_TEX_Y=y; } },
@@ -448,7 +486,7 @@ function placement(winW,winH,gui,open){
   const contentX=CONTENT_MARGIN, contentY=NAV_Y+NAV_H+CONTENT_MARGIN, contentW=DESIGN_W-2*CONTENT_MARGIN, contentH=DESIGN_H-contentY-CONTENT_MARGIN;
   const cx=Math.round(offX+contentX*s), cy=Math.round(offY+contentY*s), cw=Math.round(contentW*s), ch=Math.round(contentH*s);
   // with the book shown, the book + gap + block are centred as a group; hidden, the block alone
-  const bookSpan=open ? S.BOOK_W+S.BOOK_GAP : 0;
+  const bookSpan=open ? tabsOut()+S.BOOK_W+S.BOOK_GAP : 0;
   const groupW=bookSpan+S.BLOCK_W;
   const leftPos=cx+Math.trunc((cw-groupW)/2)+bookSpan+S.BLOCK_OFFSET_X;
   const top=cy+Math.trunc((ch-S.BLOCK_H)/2)+S.BLOCK_OFFSET_Y;
@@ -476,7 +514,14 @@ function drawFit(){
   g.setLineDash([4,3]); g.strokeStyle="rgba(255,255,255,0.25)"; g.strokeRect(P.cx*k+0.5,P.cy*k+0.5,P.cw*k,P.ch*k); g.setLineDash([]);
   // book panel (if shown) + block, at normal GUI scale
   const draw=(tex,x,y,w,h)=>{ const im=img(tex); if(im) g.drawImage(im,x*k,y*k,w*k,h*k); };
-  if(P.open) draw(T.BOOK_TEX,P.bookX,P.bookY,S.BOOK_W,S.BOOK_H);
+  if(P.open){
+    TABS.forEach(([key],i)=>{
+      const tx=P.bookX+S.BOOK_TAB_X-(i===0?S.BOOK_TAB_SELECTED_SHIFT:0), ty=P.bookY+S.BOOK_TAB_Y+i*S.BOOK_TAB_STEP;
+      draw(i===0?T.BOOK_TAB_SELECTED_TEX:T.BOOK_TAB_TEX,tx,ty,S.BOOK_TAB_W,S.BOOK_TAB_H);
+      draw(T["TAB_ICON_"+key+"_TEX"],tx+S.BOOK_TAB_ICON_X,ty+S.BOOK_TAB_ICON_Y,16,16);
+    });
+    draw(T.BOOK_TEX,P.bookX,P.bookY,S.BOOK_W,S.BOOK_H);
+  }
   draw(T.PANEL_TEX,P.leftPos,P.topPos,S.BLOCK_W,S.BLOCK_H);
   draw(T.FRAME_TEX,P.leftPos+S.FRAME_TEX_X,P.topPos+S.FRAME_TEX_Y,S.FRAME_TEX_W,S.FRAME_TEX_H);
   for(const [px,py,c] of circleLinePixels()){ g.fillStyle=colorToCss(c); g.fillRect((P.leftPos+px)*k,(P.topPos+py)*k,k,k); }
@@ -499,7 +544,7 @@ function drawFit(){
   if(P.open && !P.fitsWidth) g.strokeRect(P.bookX*k,P.bookY*k,S.BOOK_W*k,S.BOOK_H*k);
   if(!P.fitsHeight || (!P.open && !P.fitsWidth)) g.strokeRect(P.leftPos*k,P.topPos*k,S.BLOCK_W*k,S.BLOCK_H*k);
 
-  const need=P.open?`Book + block need ${S.BOOK_W+S.BOOK_GAP+S.BLOCK_W}x${S.BLOCK_H}`:`Block alone (book hidden) needs ${S.BLOCK_W}x${S.BLOCK_H}`;
+  const need=P.open?`Tabs + book + block need ${tabsOut()+S.BOOK_W+S.BOOK_GAP+S.BLOCK_W}x${S.BLOCK_H}`:`Block alone (book hidden) needs ${S.BLOCK_W}x${S.BLOCK_H}`;
   const yes='<span style="color:var(--good)">fits</span>', no='<span style="color:var(--bad)">does not fit</span>';
   document.getElementById("fitinfo").innerHTML =
     `${winW}x${winH}, GUI scale ${gui}${document.getElementById("guiScale").value==="auto"?" (auto)":""} &rarr; screen ${P.width}x${P.height} GUI px, content region ${P.cw}x${P.ch}. `+
@@ -568,11 +613,34 @@ public final class AlchemyLayout {
 \tpublic static final int BLOCK_OFFSET_X = ${n("BLOCK_OFFSET_X")};
 \tpublic static final int BLOCK_OFFSET_Y = ${n("BLOCK_OFFSET_Y")};
 
-\t// --- recipe book panel, left of the block (reserved space until slice 3) --
+\t// --- recipe book panel, left of the block ----------------------------------
 \t// Shown or hidden with the book button; hidden, the block is centred alone.
 \tpublic static final int BOOK_W = ${n("BOOK_W")};
 \tpublic static final int BOOK_H = ${n("BOOK_H")};
 \tpublic static final int BOOK_GAP = ${n("BOOK_GAP")};
+
+\t// Category tabs down the book's left edge. X is relative to the book (negative
+\t// sticks out to the left); the selected tab sits BOOK_TAB_SELECTED_SHIFT further
+\t// out. The centring reserves room for the tabs. Icons are drawn 16x16.
+\tpublic static final int BOOK_TAB_X = ${n("BOOK_TAB_X")};
+\tpublic static final int BOOK_TAB_Y = ${n("BOOK_TAB_Y")};
+\tpublic static final int BOOK_TAB_STEP = ${n("BOOK_TAB_STEP")};
+\tpublic static final int BOOK_TAB_W = ${n("BOOK_TAB_W")};
+\tpublic static final int BOOK_TAB_H = ${n("BOOK_TAB_H")};
+\tpublic static final int BOOK_TAB_SELECTED_SHIFT = ${n("BOOK_TAB_SELECTED_SHIFT")};
+\tpublic static final int BOOK_TAB_ICON_X = ${n("BOOK_TAB_ICON_X")};
+\tpublic static final int BOOK_TAB_ICON_Y = ${n("BOOK_TAB_ICON_Y")};
+
+\t// the selected tab's name, centred at the top of the page
+\tpublic static final int BOOK_TITLE_Y = ${n("BOOK_TITLE_Y")};
+\tpublic static final int BOOK_TITLE_COLOR = ${C.BOOK_TITLE_COLOR};
+
+\t// recipe entries: BOOK_COLUMNS x BOOK_ROWS buttons, BOOK_ENTRY_SIZE square, no paging
+\tpublic static final int BOOK_GRID_X = ${n("BOOK_GRID_X")};
+\tpublic static final int BOOK_GRID_Y = ${n("BOOK_GRID_Y")};
+\tpublic static final int BOOK_COLUMNS = ${n("BOOK_COLUMNS")};
+\tpublic static final int BOOK_ROWS = ${n("BOOK_ROWS")};
+\tpublic static final int BOOK_ENTRY_SIZE = ${n("BOOK_ENTRY_SIZE")};
 
 \t// --- recipe book show/hide button (inside the block) ----------------------
 \tpublic static final int BOOK_BUTTON_X = ${n("BOOK_BUTTON_X")};
@@ -659,6 +727,20 @@ public final class AlchemyLayout {
 \tpublic static final String PANEL_TEX = "${T.PANEL_TEX}";
 \t// behind the recipe book panel, BOOK_W x BOOK_H
 \tpublic static final String BOOK_TEX = "${T.BOOK_TEX}";
+
+\t// recipe book tabs, BOOK_TAB_W x BOOK_TAB_H, and one icon per tab
+\tpublic static final String BOOK_TAB_TEX = "${T.BOOK_TAB_TEX}";
+\tpublic static final String BOOK_TAB_SELECTED_TEX = "${T.BOOK_TAB_SELECTED_TEX}";
+\tpublic static final String TAB_ICON_POTIONS_TEX = "${T.TAB_ICON_POTIONS_TEX}";
+\tpublic static final String TAB_ICON_OILS_TEX = "${T.TAB_ICON_OILS_TEX}";
+\tpublic static final String TAB_ICON_BOMBS_TEX = "${T.TAB_ICON_BOMBS_TEX}";
+\tpublic static final String TAB_ICON_DECOCTIONS_TEX = "${T.TAB_ICON_DECOCTIONS_TEX}";
+\tpublic static final String TAB_ICON_MUTAGENS_TEX = "${T.TAB_ICON_MUTAGENS_TEX}";
+
+\t// recipe entries, BOOK_ENTRY_SIZE square: fillable from the inventory, missing ingredients, locked
+\tpublic static final String BOOK_ENTRY_TEX = "${T.BOOK_ENTRY_TEX}";
+\tpublic static final String BOOK_ENTRY_MISSING_TEX = "${T.BOOK_ENTRY_MISSING_TEX}";
+\tpublic static final String BOOK_ENTRY_LOCKED_TEX = "${T.BOOK_ENTRY_LOCKED_TEX}";
 
 \t// recipe book show/hide button, BOOK_BUTTON_W x BOOK_BUTTON_H
 \tpublic static final String BOOK_BUTTON_TEX = "${T.BOOK_BUTTON_TEX}";

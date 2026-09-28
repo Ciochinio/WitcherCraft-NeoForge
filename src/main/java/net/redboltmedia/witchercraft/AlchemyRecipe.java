@@ -53,9 +53,12 @@ import net.minecraft.world.level.Level;
 public class AlchemyRecipe implements Recipe<AlchemyInput> {
 	public static final int MAX_INGREDIENTS = 5;
 
-	/** Groups the WitcherCraft recipe book. Explicit, because alcohol is the base of both potions and White Gull. */
+	/**
+	 * Picks the recipe book tab. Explicit, because alcohol is the base of both
+	 * potions and White Gull. White Gull shows in the Decoctions tab.
+	 */
 	public enum Category implements StringRepresentable {
-		POTION("potion"), DECOCTION("decoction"), OIL("oil"), BOMB("bomb"), WHITE_GULL("white_gull");
+		POTION("potion"), DECOCTION("decoction"), OIL("oil"), BOMB("bomb"), MUTAGEN("mutagen"), WHITE_GULL("white_gull");
 
 		public static final Codec<Category> CODEC = StringRepresentable.fromEnum(Category::values);
 		public static final StreamCodec<RegistryFriendlyByteBuf, Category> STREAM_CODEC = ByteBufCodecs.idMapper(i -> values()[i], Category::ordinal).cast();

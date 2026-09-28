@@ -35,6 +35,7 @@ public final class WorldMapServerConfig {
 	private static final int DEFAULT_MAXIMUM_XP_COST = 0;
 	private static final boolean DEFAULT_BLOCK_TRAVEL_IN_COMBAT = true;
 	private static final boolean DEFAULT_BLOCK_TRAVEL_NEAR_MONSTERS = true;
+	private static final AlchemyKnowledge.Mode DEFAULT_ALCHEMY_RECIPE_KNOWLEDGE = AlchemyKnowledge.Mode.DISCOVERY;
 	public static final int HARD_MAX_TRAVEL_XP = 100_000;
 	public static final int HARD_MAX_PLAYER_SIGN_LIMIT = 100_000;
 	public static final int HARD_MAX_CAPTURES_PER_TICK = 32;
@@ -68,6 +69,7 @@ public final class WorldMapServerConfig {
 	private static final ModConfigSpec.IntValue MAXIMUM_XP_COST;
 	private static final ModConfigSpec.BooleanValue BLOCK_TRAVEL_IN_COMBAT;
 	private static final ModConfigSpec.BooleanValue BLOCK_TRAVEL_NEAR_MONSTERS;
+	private static final ModConfigSpec.EnumValue<AlchemyKnowledge.Mode> ALCHEMY_RECIPE_KNOWLEDGE;
 
 	static {
 		ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
@@ -111,6 +113,11 @@ public final class WorldMapServerConfig {
 		BLOCK_TRAVEL_IN_COMBAT = fastTravelOption(builder, "block_in_combat", "Players who are in combat cannot set off.").define("blockInCombat", DEFAULT_BLOCK_TRAVEL_IN_COMBAT);
 		BLOCK_TRAVEL_NEAR_MONSTERS = fastTravelOption(builder, "block_near_monsters", "Players cannot set off while monsters are nearby, using the same rule as sleeping in a bed.").define("blockNearMonsters", DEFAULT_BLOCK_TRAVEL_NEAR_MONSTERS);
 		builder.pop();
+		builder.comment("Per-world rules for alchemy.")
+			.translation("witchercraft.configuration.alchemy").push("alchemy");
+		ALCHEMY_RECIPE_KNOWLEDGE = alchemyOption(builder, "recipe_knowledge", "How much of the alchemy recipe list players see. DISCOVERY: known recipes only, learned from starters, formulas, and successful brews. SHOW_LOCKED: also every unknown recipe as a locked entry showing only its result. ALL_KNOWN: every recipe from the start; players' real progress is kept for switching back.")
+			.defineEnum("recipeKnowledge", DEFAULT_ALCHEMY_RECIPE_KNOWLEDGE);
+		builder.pop();
 		SPEC = builder.build();
 	}
 
@@ -126,6 +133,10 @@ public final class WorldMapServerConfig {
 
 	private static ModConfigSpec.Builder meditationOption(ModConfigSpec.Builder builder, String key, String comment) {
 		return builder.comment(comment).translation("witchercraft.configuration.meditation." + key);
+	}
+
+	private static ModConfigSpec.Builder alchemyOption(ModConfigSpec.Builder builder, String key, String comment) {
+		return builder.comment(comment).translation("witchercraft.configuration.alchemy." + key);
 	}
 
 	private static ModConfigSpec.Builder fastTravelOption(ModConfigSpec.Builder builder, String key, String comment) {
@@ -180,6 +191,7 @@ public final class WorldMapServerConfig {
 	public static int maximumXpCost() { return loaded() ? MAXIMUM_XP_COST.getAsInt() : DEFAULT_MAXIMUM_XP_COST; }
 	public static boolean blockTravelInCombat() { return loaded() ? BLOCK_TRAVEL_IN_COMBAT.getAsBoolean() : DEFAULT_BLOCK_TRAVEL_IN_COMBAT; }
 	public static boolean blockTravelNearMonsters() { return loaded() ? BLOCK_TRAVEL_NEAR_MONSTERS.getAsBoolean() : DEFAULT_BLOCK_TRAVEL_NEAR_MONSTERS; }
+	public static AlchemyKnowledge.Mode alchemyRecipeKnowledge() { return loaded() ? ALCHEMY_RECIPE_KNOWLEDGE.get() : DEFAULT_ALCHEMY_RECIPE_KNOWLEDGE; }
 	public static boolean sharedSignDiscovery() { return loaded() ? SHARED_SIGN_DISCOVERY.getAsBoolean() : DEFAULT_SHARED_SIGN_DISCOVERY; }
 	/** Empty means each player's own game language. Synced to clients with the rest of the server config. */
 	public static String mapNameLanguage() {

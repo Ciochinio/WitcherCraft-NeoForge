@@ -706,8 +706,8 @@ is the first (built in the alchemy redesign's step 0; see `ALCHEMY_REDESIGN_PLAN
   client's `containerMenu`, and `setScreen`s the shell on the target tab, for the same no-flash reason.
   The server's `removed()` returns the grid. The release of a navbar click is swallowed so vanilla does
   not treat it as a click outside the GUI and throw the carried item.
-- **Two scales on one screen.** The chrome scales with the 640x360 canvas; the slot block (and a
-  future recipe book panel) stays at normal GUI scale, centred in the content region. At other window
+- **Two scales on one screen.** The chrome scales with the 640x360 canvas; the slot block (and the
+  recipe book panel with its tabs) stays at normal GUI scale, centred in the content region. At other window
   sizes or GUI scales the block looks larger or smaller relative to the background, so any art framing
   the slots must be drawn with the block, never painted into the fullscreen background. The block is
   placed below the navbar and may overflow the bottom edge only when the screen is too short for it.
@@ -2222,14 +2222,15 @@ still apply. Closing the map while a journey is being prepared cancels that jour
 ## 6. Alchemy recipes
 
 Alchemy crafting is being rebuilt (see `ALCHEMY_REDESIGN_PLAN.md`). This section covers the recipe
-system from slice 1. The Alchemy tab's screen is described in 3.3b.
+system (slice 1) and recipe knowledge and the recipe book (slice 3, 6.9). The Alchemy tab's screen is
+described in 3.3b.
 
 ### 6.1 Ownership
 
 All hand-written locked code elements in `~/Alchemy`, never regenerated:
 
 - **`AlchemyRecipe`** - the recipe class, its `Category` enum (`potion`, `decoction`, `oil`, `bomb`,
-  `white_gull`), and its JSON and stream codecs.
+  `mutagen`, `white_gull`; it picks the recipe book tab), and its JSON and stream codecs.
 - **`AlchemyInput`** - the `RecipeInput`: index 0 is the base, 1 to 5 the ingredient slots.
 - **`AlchemyRecipes`** - registers the `witchercraft:alchemy` recipe type and serializer through
   `DeferredRegister`s (attached in `WitchercraftMod`'s "mod init" user code block), and answers every
@@ -2237,11 +2238,17 @@ All hand-written locked code elements in `~/Alchemy`, never regenerated:
 - **`AlchemyBrewMessage`** - the Brew button's serverbound packet. It ignores incomplete grids, reports "Nothing happens.",
   or brews: the grid is consumed and the result goes to the output slot. See 6.5.
 - **`AlchemyFeedbackMessage`** - clientbound; the short message shown below the Brew button.
-- **`AlchemyIndexSyncMessage`** and **`AlchemyClientIndex`** - the client's copy of the ingredient allowlist (6.6).
+- **`AlchemyIndexSyncMessage`** and **`AlchemyClientIndex`** - the client's copy of the recipe index and
+  known recipes (6.6, 6.9).
+- **`AlchemyKnowledge`**, **`AlchemyKnownSyncMessage`**, **`AlchemyFillMessage`**, **`AlchemyCommands`** -
+  per-player known recipes, their sync, filling the grid from the book, and the dev command (6.9).
+- **`AlchemyRecipeBook`**, **`AlchemyRecipeTooltip`**, **`AlchemyToast`** - client: the book panel, its
+  hover tooltip, and the "New recipe learned" toast (6.9).
 
 Recipes are data: `data/<namespace>/recipe/**.json` with `"type": "witchercraft:alchemy"`. The ported
 set lives in `data/witchercraft/recipe/alchemy/`. The `witchercraft:alcohol` item tag
-(`data/witchercraft/tags/item/alcohol.json`) is the potion base. Datapacks can add, override, or
+(`data/witchercraft/tags/item/alcohol.json`) is the potion base, and the `witchercraft:alchemy_base`
+item tag (`alchemy_base.json`) lists everything the base slot accepts. Datapacks can add, override, or
 remove recipes like any vanilla recipe.
 
 ### 6.2 Recipe format and matching contract
@@ -2292,9 +2299,13 @@ index can never go stale. It is also rebuilt eagerly on `ServerStartedEvent` and
 
 ### 6.5 Bases, brew outcomes, and feedback
 
-`AlchemyRecipes.isBase` is a fixed list: any `#witchercraft:alcohol` item, White Gull, Tallow, or
-Saltpeter. It is in code, not derived from recipes, because a base must be valid before any recipe
-uses it. For example, White Gull is the decoction base, but no decoction recipe exists yet.
+`AlchemyRecipes.isBase` is the `witchercraft:alchemy_base` item tag: `#witchercraft:alcohol`, White
+Gull, Tallow, and Saltpeter today, and mutagens once they exist. It is data rather than derived from
+recipes, because a base must be valid before any recipe uses it (White Gull is the decoction base,
+but no decoction recipe exists yet). Changed from a hard-coded list on 2026-09-29 so new bases need no
+code. **To add a base:** add its item id (or a `#tag`) to
+`data/witchercraft/tags/item/alchemy_base.json`; a recipe then names it (or a tag of several) in
+`"base"`.
 
 `AlchemyBrewMessage` decides every Brew click on the server, in this order:
 
@@ -2322,13 +2333,14 @@ per-base failure item; that was dropped on 2026-09-28, and the three failure ite
 
 ### 6.6 Slot filters and the client's ingredient list
 
-The base slot accepts only `AlchemyRecipes.isBase` (an item tag and three fixed items; tags already
-reach the client, so both sides agree). The ingredient slots accept only the **ingredient
+The base slot accepts only `AlchemyRecipes.isBase` (an item tag; tags already reach the client, so
+both sides agree). The ingredient slots accept only the **ingredient
 allowlist** from 6.4. The client never receives recipe contents, so it gets the allowlist on its own:
 
-- `AlchemyIndexSyncMessage` (clientbound) carries the allowlist as item ids. `AlchemyRecipes` sends it
-  from `OnDatapackSyncEvent`: to one player on login, and to everyone after `/reload`. Slice 3 adds
-  the recipe id to result map to the same message.
+- `AlchemyIndexSyncMessage` (clientbound) carries the allowlist as item ids, plus every recipe's id,
+  category and result item (never its base or ingredients) and the knowledge mode (6.9).
+  `AlchemyRecipes.sendIndex` sends it from `OnDatapackSyncEvent` (to one player on login, to everyone
+  after `/reload`) and after a server config reload.
 - `AlchemyClientIndex` holds the client's copy. It is plain static state with no client-only types,
   so the common `AlchemyMenu` can reference it.
 - `AlchemyMenu` picks its ingredient check when it is constructed: `AlchemyRecipes.isIngredient` for
@@ -2358,4 +2370,71 @@ static server rooted at the repo), not copied elsewhere.
 ### 6.8 Known limitations
 
 - The ported recipes use the six old substance items as placeholder ingredients until slice 5.
-- The recipe book panel is reserved space until slice 3.
+- A book tab holds at most `BOOK_COLUMNS` x `BOOK_ROWS` (3 x 5 = 15) entries; more are cut off, since the
+  book deliberately has no paging.
+- The "can fill" highlight takes items greedily; a recipe whose tag ingredients overlap in unusual
+  ways could show as missing when a different assignment would work. The fill itself is unaffected.
+
+### 6.9 Recipe knowledge and the recipe book (slice 3)
+
+**Storage.** `AlchemyKnowledge.DATA` is a player data attachment (`witchercraft:alchemy_knowledge`,
+registered in `WitchercraftMod`'s "mod init" user code block) holding an immutable
+`Data(Set<Identifier> known, boolean startersGranted)`, serialized with a map codec and
+`copyOnDeath()` (NeoForge also copies it when returning from the End). Every change replaces the
+value with `setData`. It is its own attachment, never a field of MCreator's `PlayerVariables`.
+**Deliberate divergence:** `WorldMapPoiKnowledge` is a world `SavedData` keyed by UUID; alchemy
+knowledge is purely per-player, so an attachment travels with the player file and gets
+copy-on-death for free. The two patterns are not an inconsistency.
+
+**The effective known set.** Every "does the player know it" question (sync, fill, the command,
+formulas in slice 4) goes through `AlchemyKnowledge.effectiveKnown`: every loaded recipe in
+`ALL_KNOWN` mode, otherwise the recorded set intersected with the loaded recipe ids. Recorded ids
+that no longer exist (renamed or removed recipes, datapack changes) are skipped silently, never
+deleted, so they come back if the recipe does. Recording happens in every mode, so leaving
+`ALL_KNOWN` restores real progress.
+
+**Learning.** `learn(player, id, announce)` records the id and, if the player did not effectively
+know it before, sends it to the client with the toast flag. A successful brew calls it with
+`announce = true`, so in `ALL_KNOWN` nothing is announced. **Starters:** on
+`PlayerLoggedInEvent`, a player whose `startersGranted` is false learns every recipe marked
+`"starter": true` (without toasts) and the flag is set, so later starter changes never re-grant.
+
+**Sync and secrecy.** The client never receives the base or ingredients of a recipe the player does
+not know. `AlchemyKnownSyncMessage(replace, announce, entries)` carries full recipes (id plus
+`AlchemyRecipe.STREAM_CODEC`) of known recipes only: the whole set with `replace` on login (after
+starters), after `/reload`, after a config reload and after dev commands, or single entries when a
+recipe is learned. `AlchemyClientIndex` keeps them next to the index. Locked entries and formula
+names come from the index's id to result list, which is not secret.
+
+**Knowledge mode.** `WorldMapServerConfig`, section `alchemy`, option `recipeKnowledge`
+(`DISCOVERY`, `SHOW_LOCKED`, `ALL_KNOWN`; read through `alchemyRecipeKnowledge()`). On
+`ModConfigEvent.Reloading` for the mod's SERVER config, `AlchemyKnowledge` re-sends the index
+(which carries the mode) and the known set to every online player on the server thread, so a change
+needs no restart. This is the project's first config-reload hook.
+
+**Filling from the book.** `AlchemyFillMessage(recipeId)` (serverbound) is honoured only while the
+player's open menu is an `AlchemyMenu` and the recipe is effectively known.
+`AlchemyMenu.fillFrom` returns the base and ingredient slots to the inventory
+(`placeItemBackInInventory`, dropping if full), then takes one matching item from the main inventory
+and hotbar for the base slot and for ingredient slot i per recipe ingredient i. The output slot is
+never touched. **Ghost items** are computed on the client each frame from the "ghost recipe" (the last
+recipe clicked): the base if the base slot is empty, and every recipe ingredient no filled slot
+satisfies, in the empty ingredient slots, drawn with vanilla's ghost tints. Clicking a grid slot or
+Brew clears the ghost recipe.
+
+**The book** (`AlchemyRecipeBook`, client). Tabs are an enum mapping to categories (Decoctions shows
+`white_gull` first, then `decoction`); entries are sorted by category order, then result name. Art
+and positions are in `AlchemyLayout` (`BOOK_*`, `TAB_ICON_*`), and `AlchemyScreen.placeBlock`
+reserves `AlchemyRecipeBook.tabsOut()` to the left of the page for the tabs. The hover tooltip's
+icon row is a `TooltipComponent` (`AlchemyRecipeTooltip`) whose client factory is registered in
+`RegisterClientTooltipComponentFactoriesEvent`; vanilla places it right after the name. An optional
+**description** follows, from the lang key `AlchemyRecipeBook.descriptionKey(id)`:
+`alchemy.recipe.<namespace>.<path>.description` with slashes as dots (Swallow:
+`alchemy.recipe.witchercraft.alchemy.swallow.description`), wrapped to 160 pixels. A recipe with no
+such key shows no description; locked entries never show one. Like every string, it goes in
+`language_map` as well as `en_us.json`. The toast (`AlchemyToast`) reuses vanilla's
+`toast/recipe` sprite and joins newly learned recipes into one cycling toast.
+
+**Dev command** (`AlchemyCommands`, gamemaster level): `/witchercraft alchemy learn|forget (all|<id>)
+[<players>]`, `reset [<players>]` (a new player again: clear, then grant starters), and
+`list [<player>]`. `forget all` keeps the starters-granted flag.

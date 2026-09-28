@@ -500,5 +500,21 @@
   "gui.witchercraft.map.travel.card": "%s | %s blocks | Click to travel",
   "message.witchercraft.fast_travel.result.session_ended": "Travel cancelled.",
   "message.witchercraft.fast_travel.arrived": "You arrive at %s.",
-  "gui.witchercraft.map.travel.summary": "%s blocks | %s"
+  "gui.witchercraft.map.travel.summary": "%s blocks | %s",
+  "gui.witchercraft.alchemy.toast.title": "New recipe learned",
+  "gui.witchercraft.alchemy.tab.potions": "Potions",
+  "gui.witchercraft.alchemy.tab.oils": "Oils",
+  "gui.witchercraft.alchemy.tab.bombs": "Bombs",
+  "gui.witchercraft.alchemy.tab.decoctions": "Decoctions",
+  "gui.witchercraft.alchemy.tab.mutagens": "Mutagens",
+  "gui.witchercraft.alchemy.locked": "Not yet discovered",
+  "witchercraft.configuration.alchemy.recipe_knowledge": "Recipe knowledge",
+  "commands.witchercraft.alchemy.unknown_recipe": "Unknown alchemy recipe: %s",
+  "commands.witchercraft.alchemy.learn.one": "Taught %s to %s player(s)",
+  "commands.witchercraft.alchemy.learn.all": "Taught every alchemy recipe to %s player(s)",
+  "commands.witchercraft.alchemy.forget.one": "Removed %s from %s player(s)",
+  "commands.witchercraft.alchemy.forget.all": "Cleared the alchemy recipes of %s player(s); starters stay granted",
+  "commands.witchercraft.alchemy.reset": "Reset the alchemy knowledge of %s player(s) to a new player",
+  "commands.witchercraft.alchemy.list": "%s knows %s of %s alchemy recipes (mode %s): %s",
+  "alchemy.recipe.witchercraft.alchemy.swallow.description": "Increases health regeneration."
 }

@@ -27,11 +27,34 @@ public final class AlchemyLayout {
 	public static final int BLOCK_OFFSET_X = 0;
 	public static final int BLOCK_OFFSET_Y = 0;
 
-	// --- recipe book panel, left of the block (reserved space until slice 3) --
+	// --- recipe book panel, left of the block ----------------------------------
 	// Shown or hidden with the book button; hidden, the block is centred alone.
-	public static final int BOOK_W = 147;
+	public static final int BOOK_W = 97;
 	public static final int BOOK_H = 166;
 	public static final int BOOK_GAP = 4;
+
+	// Category tabs down the book's left edge. X is relative to the book (negative
+	// sticks out to the left); the selected tab sits BOOK_TAB_SELECTED_SHIFT further
+	// out. The centring reserves room for the tabs. Icons are drawn 16x16.
+	public static final int BOOK_TAB_X = -30;
+	public static final int BOOK_TAB_Y = 6;
+	public static final int BOOK_TAB_STEP = 27;
+	public static final int BOOK_TAB_W = 35;
+	public static final int BOOK_TAB_H = 27;
+	public static final int BOOK_TAB_SELECTED_SHIFT = 2;
+	public static final int BOOK_TAB_ICON_X = 9;
+	public static final int BOOK_TAB_ICON_Y = 5;
+
+	// the selected tab's name, centred at the top of the page
+	public static final int BOOK_TITLE_Y = 9;
+	public static final int BOOK_TITLE_COLOR = 0xFF4A3520;
+
+	// recipe entries: BOOK_COLUMNS x BOOK_ROWS buttons, BOOK_ENTRY_SIZE square, no paging
+	public static final int BOOK_GRID_X = 11;
+	public static final int BOOK_GRID_Y = 24;
+	public static final int BOOK_COLUMNS = 3;
+	public static final int BOOK_ROWS = 5;
+	public static final int BOOK_ENTRY_SIZE = 25;
 
 	// --- recipe book show/hide button (inside the block) ----------------------
 	public static final int BOOK_BUTTON_X = 4;
@@ -118,6 +141,20 @@ public final class AlchemyLayout {
 	public static final String PANEL_TEX = "witchercraft:textures/screens/alchemy_panel.png";
 	// behind the recipe book panel, BOOK_W x BOOK_H
 	public static final String BOOK_TEX = "witchercraft:textures/screens/alchemy_book_panel.png";
+
+	// recipe book tabs, BOOK_TAB_W x BOOK_TAB_H, and one icon per tab
+	public static final String BOOK_TAB_TEX = "witchercraft:textures/screens/alchemy_book_tab.png";
+	public static final String BOOK_TAB_SELECTED_TEX = "witchercraft:textures/screens/alchemy_book_tab_selected.png";
+	public static final String TAB_ICON_POTIONS_TEX = "witchercraft:textures/screens/alchemy_tab_icon_potions.png";
+	public static final String TAB_ICON_OILS_TEX = "witchercraft:textures/screens/alchemy_tab_icon_oils.png";
+	public static final String TAB_ICON_BOMBS_TEX = "witchercraft:textures/screens/alchemy_tab_icon_bombs.png";
+	public static final String TAB_ICON_DECOCTIONS_TEX = "witchercraft:textures/screens/alchemy_tab_icon_decoctions.png";
+	public static final String TAB_ICON_MUTAGENS_TEX = "witchercraft:textures/screens/alchemy_tab_icon_mutagens.png";
+
+	// recipe entries, BOOK_ENTRY_SIZE square: fillable from the inventory, missing ingredients, locked
+	public static final String BOOK_ENTRY_TEX = "witchercraft:textures/screens/alchemy_book_entry.png";
+	public static final String BOOK_ENTRY_MISSING_TEX = "witchercraft:textures/screens/alchemy_book_entry_missing.png";
+	public static final String BOOK_ENTRY_LOCKED_TEX = "witchercraft:textures/screens/alchemy_book_entry_locked.png";
 
 	// recipe book show/hide button, BOOK_BUTTON_W x BOOK_BUTTON_H
 	public static final String BOOK_BUTTON_TEX = "witchercraft:textures/screens/alchemy_book_button.png";

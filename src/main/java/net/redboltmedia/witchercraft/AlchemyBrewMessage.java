@@ -29,7 +29,8 @@ import net.minecraft.world.item.crafting.RecipeHolder;
  * - a wrong recipe: "Nothing happens." below the Brew button
  *   ({@link AlchemyFeedbackMessage}) and the fail sound, nothing consumed;
  * - a match: the grid is consumed, the result appears in the output slot, and
- *   the brew sound plays. No message: the result appearing is the feedback.
+ *   the brew sound plays. No message: the result appearing is the feedback. A
+ *   recipe the player did not know is learned, with a "New recipe learned" toast.
  *
  * On a match the grid (base and every ingredient) is consumed and the result
  * goes to the output slot.
@@ -74,6 +75,8 @@ public record AlchemyBrewMessage() implements CustomPacketPayload {
 
 		menu.brew(match.get().value().assemble(input));
 		playSound(player, WitchercraftModSounds.ALCHEMY_BREW.get(), BREW_VOLUME);
+		// experimentation teaches: a first successful brew adds the recipe to the book, with a toast
+		AlchemyKnowledge.learn(player, AlchemyRecipes.idOf(match.get()), true);
 	}
 
 	/** A world sound at the brewer, so players nearby hear it too. */

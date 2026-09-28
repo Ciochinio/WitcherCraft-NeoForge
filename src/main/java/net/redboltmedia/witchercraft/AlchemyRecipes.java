@@ -1,14 +1,15 @@
 package net.redboltmedia.witchercraft;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import net.redboltmedia.witchercraft.init.WitchercraftModItems;
 
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -23,6 +24,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -59,6 +61,9 @@ public final class AlchemyRecipes {
 	/** Every alcohol counts as a potion base. Add new alcohols to data/witchercraft/tags/item/alcohol.json. */
 	public static final TagKey<Item> ALCOHOL = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "alcohol"));
 
+	/** Everything the base slot accepts. Add new bases (such as mutagens) to data/witchercraft/tags/item/alchemy_base.json. */
+	public static final TagKey<Item> BASE = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "alchemy_base"));
+
 	public static void register(IEventBus modEventBus) {
 		RECIPE_TYPES.register(modEventBus);
 		RECIPE_SERIALIZERS.register(modEventBus);
@@ -67,13 +72,14 @@ public final class AlchemyRecipes {
 	// ---- bases -----------------------------------------------------------------------
 
 	/**
-	 * Whether a stack may go in the base slot: any alcohol, White Gull, Tallow, or
-	 * Saltpeter. A fixed list rather than derived from recipes, because a base must
-	 * be valid before any recipe uses it (no decoction recipe exists yet).
+	 * Whether a stack may go in the base slot: anything in the
+	 * {@code witchercraft:alchemy_base} item tag (any alcohol, White Gull, Tallow,
+	 * Saltpeter, and later mutagens). A tag rather than derived from recipes,
+	 * because a base must be valid before any recipe uses it. Item tags are synced
+	 * to the client, so both sides predict placement identically.
 	 */
 	public static boolean isBase(ItemStack stack) {
-		return !stack.isEmpty() && (stack.is(ALCOHOL) || stack.is(WitchercraftModItems.WHITE_GULL.get()) || stack.is(WitchercraftModItems.TALLOW.get())
-				|| stack.is(WitchercraftModItems.SALTPETER.get()));
+		return !stack.isEmpty() && stack.is(BASE);
 	}
 
 	// ---- queries ---------------------------------------------------------------------
@@ -81,6 +87,20 @@ public final class AlchemyRecipes {
 	/** Every alchemy recipe, sorted by id. */
 	public static List<RecipeHolder<AlchemyRecipe>> all(MinecraftServer server) {
 		return index(server).recipes;
+	}
+
+	/** The id of every alchemy recipe, sorted. */
+	public static Set<Identifier> ids(MinecraftServer server) {
+		return index(server).byId.keySet();
+	}
+
+	/** One recipe by id, if it is loaded. */
+	public static Optional<RecipeHolder<AlchemyRecipe>> byId(MinecraftServer server, Identifier id) {
+		return Optional.ofNullable(index(server).byId.get(id));
+	}
+
+	public static Identifier idOf(RecipeHolder<AlchemyRecipe> holder) {
+		return holder.id().identifier();
 	}
 
 	/** The recipe matching a grid. If several match, the lowest id wins, so results never depend on load order. */
@@ -103,7 +123,7 @@ public final class AlchemyRecipes {
 
 	// ---- per-reload index --------------------------------------------------------------
 
-	private record Index(RecipeMap source, List<RecipeHolder<AlchemyRecipe>> recipes, Set<Item> ingredientItems) {
+	private record Index(RecipeMap source, List<RecipeHolder<AlchemyRecipe>> recipes, Map<Identifier, RecipeHolder<AlchemyRecipe>> byId, Set<Item> ingredientItems) {
 	}
 
 	private static Index cached;
@@ -124,9 +144,13 @@ public final class AlchemyRecipes {
 			for (Ingredient ingredient : holder.value().ingredients())
 				ingredientItems.addAll(itemsOf(ingredient));
 
+		Map<Identifier, RecipeHolder<AlchemyRecipe>> byId = new LinkedHashMap<>();
+		for (RecipeHolder<AlchemyRecipe> holder : recipes)
+			byId.put(idOf(holder), holder);
+
 		warnAboutOverlaps(recipes);
 		WitchercraftMod.LOGGER.info("Loaded {} alchemy recipes using {} ingredient items", recipes.size(), ingredientItems.size());
-		return new Index(map, List.copyOf(recipes), Set.copyOf(ingredientItems));
+		return new Index(map, List.copyOf(recipes), Collections.unmodifiableMap(byId), Set.copyOf(ingredientItems));
 	}
 
 	@SuppressWarnings("deprecation")
@@ -198,11 +222,31 @@ public final class AlchemyRecipes {
 		index(event.getServer());
 	}
 
-	/** Fires for one player on login, and for everyone (player == null) after /reload. */
+	/**
+	 * Fires for one player on login, and for everyone (player == null) after
+	 * /reload. On login {@link AlchemyKnowledge} sends the known recipes itself,
+	 * after granting starters; after /reload they are re-sent here, since recipes
+	 * may have changed.
+	 */
 	@SubscribeEvent
 	public static void onDatapackSync(OnDatapackSyncEvent event) {
-		Index index = index(event.getPlayerList().getServer());
-		AlchemyIndexSyncMessage sync = new AlchemyIndexSyncMessage(List.copyOf(index.ingredientItems()));
-		event.getRelevantPlayers().forEach(player -> PacketDistributor.sendToPlayer(player, sync));
+		event.getRelevantPlayers().forEach(player -> {
+			sendIndex(player);
+			if (event.getPlayer() == null)
+				AlchemyKnowledge.syncKnown(player);
+		});
+	}
+
+	/**
+	 * Send a player the recipe index: the ingredient allowlist, every recipe's id,
+	 * category and result item (never its base or ingredients), and the knowledge
+	 * mode. Enough for slot placement, locked book entries, and formula names.
+	 */
+	public static void sendIndex(ServerPlayer player) {
+		Index index = index(player.level().getServer());
+		List<AlchemyIndexSyncMessage.Entry> entries = new ArrayList<>(index.recipes().size());
+		for (RecipeHolder<AlchemyRecipe> holder : index.recipes())
+			entries.add(new AlchemyIndexSyncMessage.Entry(idOf(holder), holder.value().category(), holder.value().result().item().value()));
+		PacketDistributor.sendToPlayer(player, new AlchemyIndexSyncMessage(List.copyOf(index.ingredientItems()), entries, AlchemyKnowledge.mode()));
 	}
 }

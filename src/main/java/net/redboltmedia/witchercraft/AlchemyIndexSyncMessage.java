@@ -17,19 +17,42 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 
 /**
- * CLIENTBOUND: the alchemy ingredient allowlist (item ids only, no recipe
- * contents), stored in {@link AlchemyClientIndex}. Sent by
- * {@link AlchemyRecipes} to a player on login and to everyone on /reload, so
- * the client predicts slot placement exactly like the server. Slice 3 adds the
- * recipe id to result map here.
+ * CLIENTBOUND: the alchemy recipe index, stored in {@link AlchemyClientIndex}:
+ *
+ * - the ingredient allowlist (item ids), so the client predicts slot placement
+ *   exactly like the server;
+ * - every recipe's id, category and result item, but never its base or
+ *   ingredients. Enough for locked book entries and formula names, and not
+ *   secret: a formula's name reveals its result anyway;
+ * - the knowledge mode, so the book knows whether to show locked entries.
+ *
+ * Sent by {@link AlchemyRecipes#sendIndex} on login, after /reload, and after a
+ * server config reload. Recipe contents travel separately, and only for known
+ * recipes ({@link AlchemyKnownSyncMessage}).
  *
  * HAND-MAINTAINED: locked code element.
  */
 @EventBusSubscriber
-public record AlchemyIndexSyncMessage(List<Item> ingredientItems) implements CustomPacketPayload {
+public record AlchemyIndexSyncMessage(List<Item> ingredientItems, List<Entry> recipes, AlchemyKnowledge.Mode mode) implements CustomPacketPayload {
 	public static final Type<AlchemyIndexSyncMessage> TYPE = new Type<>(Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "alchemy_index_sync"));
+
+	/** One recipe as every player may see it: id, book category, and result item. */
+	public record Entry(Identifier id, AlchemyRecipe.Category category, Item result) {
+		public static final StreamCodec<RegistryFriendlyByteBuf, Entry> STREAM_CODEC = StreamCodec.composite(
+				Identifier.STREAM_CODEC, Entry::id,
+				AlchemyRecipe.Category.STREAM_CODEC, Entry::category,
+				ByteBufCodecs.registry(Registries.ITEM), Entry::result,
+				Entry::new);
+	}
+
+	private static final StreamCodec<RegistryFriendlyByteBuf, AlchemyKnowledge.Mode> MODE_STREAM_CODEC = ByteBufCodecs
+			.idMapper(i -> AlchemyKnowledge.Mode.values()[i], AlchemyKnowledge.Mode::ordinal).cast();
+
 	public static final StreamCodec<RegistryFriendlyByteBuf, AlchemyIndexSyncMessage> STREAM_CODEC = StreamCodec.composite(
-			ByteBufCodecs.registry(Registries.ITEM).apply(ByteBufCodecs.list()), AlchemyIndexSyncMessage::ingredientItems, AlchemyIndexSyncMessage::new);
+			ByteBufCodecs.registry(Registries.ITEM).apply(ByteBufCodecs.list()), AlchemyIndexSyncMessage::ingredientItems,
+			Entry.STREAM_CODEC.apply(ByteBufCodecs.list()), AlchemyIndexSyncMessage::recipes,
+			MODE_STREAM_CODEC, AlchemyIndexSyncMessage::mode,
+			AlchemyIndexSyncMessage::new);
 
 	@Override
 	public Type<AlchemyIndexSyncMessage> type() {
@@ -38,7 +61,7 @@ public record AlchemyIndexSyncMessage(List<Item> ingredientItems) implements Cus
 
 	public static void handleData(AlchemyIndexSyncMessage message, IPayloadContext context) {
 		if (context.flow() == PacketFlow.CLIENTBOUND)
-			context.enqueueWork(() -> AlchemyClientIndex.setIngredientItems(message.ingredientItems()));
+			context.enqueueWork(() -> AlchemyClientIndex.setIndex(message.ingredientItems(), message.recipes(), message.mode()));
 	}
 
 	@SubscribeEvent

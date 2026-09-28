@@ -251,6 +251,97 @@
       "path": "~/Alchemy"
     },
     {
+      "name": "AlchemyKnowledge",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "alchemy_knowledge",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/AlchemyKnowledge.java"
+        ]
+      },
+      "path": "~/Alchemy"
+    },
+    {
+      "name": "AlchemyKnownSyncMessage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "alchemy_known_sync_message",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/AlchemyKnownSyncMessage.java"
+        ]
+      },
+      "path": "~/Alchemy"
+    },
+    {
+      "name": "AlchemyFillMessage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "alchemy_fill_message",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/AlchemyFillMessage.java"
+        ]
+      },
+      "path": "~/Alchemy"
+    },
+    {
+      "name": "AlchemyCommands",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "alchemy_commands",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/AlchemyCommands.java"
+        ]
+      },
+      "path": "~/Alchemy"
+    },
+    {
+      "name": "AlchemyToast",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "alchemy_toast",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/AlchemyToast.java"
+        ]
+      },
+      "path": "~/Alchemy"
+    },
+    {
+      "name": "AlchemyRecipeTooltip",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "alchemy_recipe_tooltip",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/AlchemyRecipeTooltip.java"
+        ]
+      },
+      "path": "~/Alchemy"
+    },
+    {
+      "name": "AlchemyRecipeBook",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "alchemy_recipe_book",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/AlchemyRecipeBook.java"
+        ]
+      },
+      "path": "~/Alchemy"
+    },
+    {
       "name": "PauseMenuLayout",
       "type": "code",
       "compiles": true,
@@ -11750,7 +11841,23 @@
       "gui.witchercraft.map.travel.card": "%s | %s blocks | Click to travel",
       "message.witchercraft.fast_travel.result.session_ended": "Travel cancelled.",
       "message.witchercraft.fast_travel.arrived": "You arrive at %s.",
-      "gui.witchercraft.map.travel.summary": "%s blocks | %s"
+      "gui.witchercraft.map.travel.summary": "%s blocks | %s",
+      "gui.witchercraft.alchemy.toast.title": "New recipe learned",
+      "gui.witchercraft.alchemy.tab.potions": "Potions",
+      "gui.witchercraft.alchemy.tab.oils": "Oils",
+      "gui.witchercraft.alchemy.tab.bombs": "Bombs",
+      "gui.witchercraft.alchemy.tab.decoctions": "Decoctions",
+      "gui.witchercraft.alchemy.tab.mutagens": "Mutagens",
+      "gui.witchercraft.alchemy.locked": "Not yet discovered",
+      "witchercraft.configuration.alchemy.recipe_knowledge": "Recipe knowledge",
+      "commands.witchercraft.alchemy.unknown_recipe": "Unknown alchemy recipe: %s",
+      "commands.witchercraft.alchemy.learn.one": "Taught %s to %s player(s)",
+      "commands.witchercraft.alchemy.learn.all": "Taught every alchemy recipe to %s player(s)",
+      "commands.witchercraft.alchemy.forget.one": "Removed %s from %s player(s)",
+      "commands.witchercraft.alchemy.forget.all": "Cleared the alchemy recipes of %s player(s); starters stay granted",
+      "commands.witchercraft.alchemy.reset": "Reset the alchemy knowledge of %s player(s) to a new player",
+      "commands.witchercraft.alchemy.list": "%s knows %s of %s alchemy recipes (mode %s): %s",
+      "alchemy.recipe.witchercraft.alchemy.swallow.description": "Increases health regeneration."
     }
   },
   "metadata": {

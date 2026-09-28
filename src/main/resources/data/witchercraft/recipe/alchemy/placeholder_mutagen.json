@@ -1,0 +1,11 @@
+{
+  "type": "witchercraft:alchemy",
+  "category": "mutagen",
+  "base": "minecraft:redstone",
+  "ingredients": [
+    "witchercraft:rebis",
+    "witchercraft:rebis",
+    "witchercraft:rebis"
+  ],
+  "result": "minecraft:gunpowder"
+}

@@ -11,6 +11,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Util;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -19,7 +20,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ServerboundContainerClosePacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.crafting.Ingredient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,24 +43,34 @@ import java.util.List;
  *
  * The book button shows or hides the recipe book panel, like vanilla's recipe
  * book: shown, the book and block are centred as a pair; hidden, the block is
- * centred alone. The choice is remembered in the client config. The panel is
- * empty until slice 3. The block and panel are outlined red when they do not fit
- * the content region.
+ * centred alone. The choice is remembered in the client config. The book
+ * ({@link AlchemyRecipeBook}) lists known recipes by family; clicking one sends
+ * {@link AlchemyFillMessage}, and whatever the server could not move in shows as
+ * ghost items: the recipe's unmet requirements, faded, in the empty slots, until
+ * the player clicks a grid slot or brews. The block and panel are outlined red
+ * when they do not fit the content region.
  *
  * HAND-MAINTAINED: locked code element. The screen is bound to the menu type
  * here, not through an MCreator gui element.
  */
 public class AlchemyScreen extends AbstractContainerScreen<AlchemyMenu> {
 	private static final String TAB_ID = "alchemy";
+	// vanilla's ghost item tints: a red wash behind, a white wash in front
+	private static final int GHOST_BACK = 0x30FF0000;
+	private static final int GHOST_FRONT = 0x30FFFFFF;
 
 	private boolean bookOpen;
 	private int bookX, bookY;
 	private boolean fitsWidth, fitsHeight;
 	private boolean swallowRelease;
+	private final AlchemyRecipeBook book;
+	/** The recipe last filled from the book, whose unmet requirements show as ghost items; null for none. */
+	private Identifier ghostRecipe;
 
 	public AlchemyScreen(AlchemyMenu menu, Inventory inventory, Component title) {
 		super(menu, inventory, title, AlchemyLayout.BLOCK_W, AlchemyLayout.BLOCK_H);
 		this.bookOpen = WorldMapClientConfig.alchemyRecipeBookOpen();
+		this.book = new AlchemyRecipeBook(Minecraft.getInstance().font, menu, inventory);
 	}
 
 	@EventBusSubscriber(Dist.CLIENT)
@@ -76,14 +89,14 @@ public class AlchemyScreen extends AbstractContainerScreen<AlchemyMenu> {
 		placeBlock();
 	}
 
-	/** Centre the block (with the book panel to its left, if shown) in the shell's content region. */
+	/** Centre the block (with the book panel and its tabs to its left, if shown) in the shell's content region. */
 	private void placeBlock() {
 		int cx = ShellChrome.contentScreenX(this.width, this.height);
 		int cy = ShellChrome.contentScreenY(this.width, this.height);
 		int cw = ShellChrome.contentScreenW(this.width, this.height);
 		int ch = ShellChrome.contentScreenH(this.width, this.height);
 
-		int bookSpan = bookOpen ? AlchemyLayout.BOOK_W + AlchemyLayout.BOOK_GAP : 0;
+		int bookSpan = bookOpen ? AlchemyRecipeBook.tabsOut() + AlchemyLayout.BOOK_W + AlchemyLayout.BOOK_GAP : 0;
 		int groupW = bookSpan + this.imageWidth;
 		fitsWidth = groupW <= cw;
 		fitsHeight = this.imageHeight <= ch;
@@ -95,6 +108,7 @@ public class AlchemyScreen extends AbstractContainerScreen<AlchemyMenu> {
 
 		this.bookX = this.leftPos - AlchemyLayout.BOOK_GAP - AlchemyLayout.BOOK_W;
 		this.bookY = this.topPos;
+		this.book.setPosition(bookX, bookY);
 	}
 
 	private void toggleBook() {
@@ -112,9 +126,9 @@ public class AlchemyScreen extends AbstractContainerScreen<AlchemyMenu> {
 		ShellChrome.drawNavbar(g, this.font, TAB_ID);
 		g.pose().popMatrix();
 
-		// recipe book panel (reserved space until slice 3)
+		// recipe book: tabs, page, title and entries
 		if (bookOpen) {
-			blit(g, AlchemyLayout.BOOK_TEX, bookX, bookY, AlchemyLayout.BOOK_W, AlchemyLayout.BOOK_H);
+			book.extract(g, mouseX, mouseY);
 			if (!fitsWidth)
 				outline(g, bookX, bookY, AlchemyLayout.BOOK_W, AlchemyLayout.BOOK_H, AlchemyLayout.MISFIT_COLOR);
 		}
@@ -134,6 +148,7 @@ public class AlchemyScreen extends AbstractContainerScreen<AlchemyMenu> {
 		int size = AlchemyLayout.SLOT_TEX_SIZE;
 		for (Slot slot : this.menu.slots)
 			blit(g, slotTexture(slot.index), leftPos + slot.x - 1, topPos + slot.y - 1, size, size);
+		drawGhosts(g);
 
 		// Brew button: art, then a centred label
 		boolean hover = overBrew(mouseX, mouseY);
@@ -157,6 +172,62 @@ public class AlchemyScreen extends AbstractContainerScreen<AlchemyMenu> {
 		super.extractRenderState(g, mouseX, mouseY, partial);
 		if (overBookButton(mouseX, mouseY))
 			g.setTooltipForNextFrame(this.font, Component.translatable(bookOpen ? "gui.witchercraft.alchemy.hide_recipes" : "gui.witchercraft.alchemy.show_recipes"), mouseX, mouseY);
+		else if (bookOpen)
+			book.extractTooltip(g, mouseX, mouseY);
+	}
+
+	// ---- ghost items -------------------------------------------------------------------
+
+	/**
+	 * The ghost recipe's unmet requirements, faded, in the empty grid slots, like
+	 * vanilla's ghost recipe: the base in the base slot if it is empty, and each
+	 * ingredient no filled slot satisfies in the next empty ingredient slot. A fill
+	 * puts ingredient i in slot i, so a missing ingredient shows in its own slot.
+	 * Tag ingredients cycle through their items.
+	 */
+	private void drawGhosts(GuiGraphicsExtractor g) {
+		if (ghostRecipe == null)
+			return;
+		AlchemyRecipe recipe = AlchemyClientIndex.known(ghostRecipe);
+		if (recipe == null) {
+			ghostRecipe = null;
+			return;
+		}
+		Slot base = this.menu.getSlot(AlchemyMenu.BASE_SLOT);
+		if (!base.hasItem())
+			ghost(g, base, recipe.base());
+		List<Ingredient> unmet = new ArrayList<>(recipe.ingredients());
+		List<Slot> empty = new ArrayList<>();
+		for (int i = 0; i < AlchemyMenu.INGREDIENT_SLOTS; i++) {
+			Slot slot = this.menu.getSlot(AlchemyMenu.FIRST_INGREDIENT_SLOT + i);
+			if (!slot.hasItem()) {
+				empty.add(slot);
+				continue;
+			}
+			for (int j = 0; j < unmet.size(); j++) {
+				if (unmet.get(j).test(slot.getItem())) {
+					unmet.remove(j);
+					break;
+				}
+			}
+		}
+		for (int i = 0; i < unmet.size() && i < empty.size(); i++)
+			ghost(g, empty.get(i), unmet.get(i));
+	}
+
+	private void ghost(GuiGraphicsExtractor g, Slot slot, Ingredient ingredient) {
+		int x = leftPos + slot.x, y = topPos + slot.y;
+		g.fill(x, y, x + 16, y + 16, GHOST_BACK);
+		g.fakeItem(AlchemyRecipeTooltip.cycled(AlchemyRecipeTooltip.stacksOf(ingredient)), x, y);
+		g.fill(x, y, x + 16, y + 16, GHOST_FRONT);
+	}
+
+	@Override
+	protected void slotClicked(Slot slot, int slotId, int buttonNum, ContainerInput containerInput) {
+		// changing the grid by hand ends the ghost recipe, like vanilla
+		if (slot != null && slot.index < AlchemyMenu.OUTPUT_SLOT)
+			ghostRecipe = null;
+		super.slotClicked(slot, slotId, buttonNum, containerInput);
 	}
 
 	/** A ring texture centred on a slot's 16x16 item area. */
@@ -373,8 +444,23 @@ public class AlchemyScreen extends AbstractContainerScreen<AlchemyMenu> {
 			}
 			if (overBrew(event.x(), event.y())) {
 				swallowRelease = true;
+				ghostRecipe = null;
 				playClick();
 				ClientPacketDistributor.sendToServer(AlchemyBrewMessage.INSTANCE);
+				return true;
+			}
+			if (bookOpen && book.contains(event.x(), event.y())) {
+				swallowRelease = true;
+				if (book.clickTab(event.x(), event.y())) {
+					playClick();
+				} else {
+					Identifier recipe = book.recipeAt(event.x(), event.y());
+					if (recipe != null) {
+						playClick();
+						ghostRecipe = recipe;
+						ClientPacketDistributor.sendToServer(new AlchemyFillMessage(recipe));
+					}
+				}
 				return true;
 			}
 			if (overBookButton(event.x(), event.y())) {
@@ -404,8 +490,8 @@ public class AlchemyScreen extends AbstractContainerScreen<AlchemyMenu> {
 
 	@Override
 	protected boolean hasClickedOutside(double mx, double my, int xo, int yo) {
-		// the shown recipe book panel counts as inside, so a click there never throws the carried item
-		if (bookOpen && mx >= bookX && mx < bookX + AlchemyLayout.BOOK_W && my >= bookY && my < bookY + AlchemyLayout.BOOK_H)
+		// the shown recipe book and its tabs count as inside, so a click there never throws the carried item
+		if (bookOpen && book.contains(mx, my))
 			return false;
 		return super.hasClickedOutside(mx, my, xo, yo);
 	}
