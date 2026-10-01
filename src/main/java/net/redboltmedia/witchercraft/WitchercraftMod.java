@@ -65,6 +65,7 @@ public class WitchercraftMod {
 		AlchemyMenu.MENUS.register(modEventBus);
 		AlchemyRecipes.register(modEventBus);
 		AlchemyKnowledge.ATTACHMENT_TYPES.register(modEventBus);
+		AlchemyFormulas.register(modEventBus);
 		// End of user code block mod init
 	}
 

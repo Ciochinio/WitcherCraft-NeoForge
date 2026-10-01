@@ -23,6 +23,7 @@ import net.minecraft.commands.arguments.IdentifierArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * Operator-only dev command for alchemy knowledge, so the recipe book, starters
@@ -33,12 +34,13 @@ import net.minecraft.server.level.ServerPlayer;
  * /witchercraft alchemy forget (all | &lt;recipe&gt;) [&lt;players&gt;]
  * /witchercraft alchemy reset [&lt;players&gt;]   back to a new player: clear, then grant starters
  * /witchercraft alchemy list [&lt;player&gt;]
+ * /witchercraft alchemy formula &lt;recipe&gt; [&lt;players&gt;]   give a formula teaching the recipe
  * </pre>
  *
  * Without players, the command applies to whoever runs it. {@code forget all}
  * keeps the starters-granted flag, so starters do not come back on the next
- * login; {@code reset} grants them again. Slice 4's give-formula command joins
- * this tree.
+ * login; {@code reset} grants them again. {@code formula} works in every
+ * knowledge mode, so formulas can be tested even where loot and trades offer none.
  *
  * HAND-MAINTAINED: locked code element.
  */
@@ -68,6 +70,8 @@ public final class AlchemyCommands {
 								.then(withPlayers(Commands.literal("all"), AlchemyCommands::forgetAll))
 								.then(withPlayers(Commands.argument("recipe", IdentifierArgument.id()).suggests(RECIPES), AlchemyCommands::forgetOne)))
 						.then(withPlayers(Commands.literal("reset"), AlchemyCommands::reset))
+						.then(Commands.literal("formula")
+								.then(withPlayers(Commands.argument("recipe", IdentifierArgument.id()).suggests(RECIPES), AlchemyCommands::giveFormula)))
 						.then(Commands.literal("list")
 								.executes(context -> list(context, context.getSource().getPlayerOrException()))
 								.then(Commands.argument("player", EntityArgument.player())
@@ -122,6 +126,17 @@ public final class AlchemyCommands {
 		for (ServerPlayer player : players)
 			AlchemyKnowledge.reset(player);
 		context.getSource().sendSuccess(() -> Component.translatable("commands.witchercraft.alchemy.reset", players.size()), true);
+		return players.size();
+	}
+
+	private static int giveFormula(CommandContext<CommandSourceStack> context, Collection<ServerPlayer> players) throws CommandSyntaxException {
+		Identifier id = recipeArgument(context);
+		for (ServerPlayer player : players) {
+			ItemStack formula = AlchemyFormulas.create(id);
+			if (!player.getInventory().add(formula))
+				player.drop(formula, false);
+		}
+		context.getSource().sendSuccess(() -> Component.translatable("commands.witchercraft.alchemy.formula", id.toString(), players.size()), true);
 		return players.size();
 	}
 

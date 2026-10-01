@@ -52,6 +52,7 @@ public class WitchercraftModItems {
 	public static final DeferredItem<Item> SALTPETER;
 	public static final DeferredItem<Item> TALLOW;
 	public static final DeferredItem<Item> PLACEHOLDER_ALCOHOL;
+	public static final DeferredItem<Item> FORMULA;
 	public static final DeferredItem<Item> RELICT_OIL;
 	public static final DeferredItem<Item> CURSED_OIL;
 	public static final DeferredItem<Item> VAMPIRE_OIL;
@@ -131,6 +132,7 @@ public class WitchercraftModItems {
 		SALTPETER = register("saltpeter", SaltpeterItem::new);
 		TALLOW = register("tallow", TallowItem::new);
 		PLACEHOLDER_ALCOHOL = register("placeholder_alcohol", PlaceholderAlcoholItem::new);
+		FORMULA = register("formula", FormulaItem::new);
 		RELICT_OIL = register("relict_oil", RelictOilItem::new);
 		CURSED_OIL = register("cursed_oil", CursedOilItem::new);
 		VAMPIRE_OIL = register("vampire_oil", VampireOilItem::new);

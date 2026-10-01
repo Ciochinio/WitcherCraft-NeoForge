@@ -110,6 +110,7 @@
   "subtitles.alchemy_brew": "Alchemy brews",
   "subtitles.alchemy_fail": "Alchemy fizzles",
   "item.witchercraft.placeholder_alcohol": "Alcohol (Placeholder)",
+  "item.witchercraft.formula": "Formula",
   "gui.witchercraft.alchemy.brew": "Brew",
   "gui.witchercraft.alchemy.show_recipes": "Show recipes",
   "gui.witchercraft.alchemy.hide_recipes": "Hide recipes",
@@ -516,5 +517,10 @@
   "commands.witchercraft.alchemy.forget.all": "Cleared the alchemy recipes of %s player(s); starters stay granted",
   "commands.witchercraft.alchemy.reset": "Reset the alchemy knowledge of %s player(s) to a new player",
   "commands.witchercraft.alchemy.list": "%s knows %s of %s alchemy recipes (mode %s): %s",
-  "alchemy.recipe.witchercraft.alchemy.swallow.description": "Increases health regeneration."
+  "alchemy.recipe.witchercraft.alchemy.swallow.description": "Increases health regeneration.",
+  "item.witchercraft.formula.named": "Formula: %s",
+  "item.witchercraft.formula.tooltip.use": "Use to learn this recipe.",
+  "item.witchercraft.formula.tooltip.known": "You already know this recipe.",
+  "item.witchercraft.formula.already_known": "You already know this recipe.",
+  "commands.witchercraft.alchemy.formula": "Gave a formula for %s to %s player(s)"
 }

@@ -1,0 +1,21 @@
+{
+  "wants": {
+    "id": "minecraft:emerald",
+    "count": 8.0
+  },
+  "gives": {
+    "id": "witchercraft:formula"
+  },
+  "given_item_modifiers": [
+    {
+      "function": "witchercraft:random_formula",
+      "categories": ["potion", "oil", "bomb", "decoction"]
+    }
+  ],
+  "max_uses": 1.0,
+  "xp": 1.0,
+  "reputation_discount": 0.05,
+  "merchant_predicate": {
+    "condition": "witchercraft:alchemy_formulas_enabled"
+  }
+}

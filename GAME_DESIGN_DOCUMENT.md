@@ -331,10 +331,23 @@ scrolling.
 You learn a recipe by:
 
 - **Knowing it from the start.** Every new character knows **Swallow**, **Necrophage Oil**, and
-  **Grapeshot** - one potion, oil, and bomb. (White Gull joins them once it has its recipe.)
+  **Grapeshot** - one potion, oil, and bomb - and every **mutagen** recipe. (White Gull joins them
+  once it has its recipe.)
 - **Brewing it.** Since wrong guesses cost nothing, experimenting is a real way to learn: the
   first time a brew succeeds, the recipe goes into your book with a "New recipe learned" popup.
-- **Reading a formula** (coming next).
+- **Reading a formula.** A formula is a single page named after what it teaches ("Formula:
+  Swallow"). Right-click it to learn the recipe, with the same popup; the formula is used up. If you
+  already know the recipe, it says so and you keep the formula, so it can go to a friend. Every
+  formula is equally likely; there are no rare ones. Where to find them:
+  - **Chests:** a **25%** chance of one formula in dungeons, mineshafts, village temples, desert
+    pyramids, jungle temples, shipwreck supply chests, pillager outposts, stronghold libraries,
+    woodland mansions, and ancient cities.
+  - **Clerics:** an Apprentice (level 2) may sell a potion, oil, or bomb formula for **10** emeralds;
+    a Journeyman (level 3) may sell a decoction formula for **16** emeralds. Each trade has **3**
+    uses, and a villager keeps offering the same formula.
+  - **Wandering traders:** occasionally sell any formula for **8** emeralds, once.
+
+  Starter recipes and mutagen recipes never come as formulas.
 
 Known recipes survive death and relogging.
 
@@ -345,7 +358,7 @@ players see, and can be changed while the server runs:
 |---------|-------------------|
 | **Discovery** (default) | Only recipes you know |
 | **Show locked** | Recipes you know, plus every other recipe as a locked entry: just its result's icon and name, not its ingredients |
-| **All known** | Every recipe, from the start. Your real progress is kept, so switching back restores it |
+| **All known** | Every recipe, from the start. Your real progress is kept, so switching back restores it. Formulas stop appearing in chests and new trades |
 
 ### Potions
 

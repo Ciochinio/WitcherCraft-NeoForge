@@ -7,5 +7,6 @@
     "witchercraft:rebis",
     "witchercraft:rebis"
   ],
-  "result": "minecraft:gunpowder"
+  "result": "minecraft:gunpowder",
+  "starter": true
 }

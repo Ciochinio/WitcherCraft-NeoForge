@@ -39,7 +39,10 @@ import net.minecraft.world.level.Level;
  * </pre>
  *
  * The base and each ingredient are an item or a {@code #tag}. {@code result} is
- * an item id or {@code {"id": ..., "count": N}}. {@code starter} is optional.
+ * an item id or {@code {"id": ..., "count": N}}. {@code starter} (default false)
+ * and {@code formula} (default true) are optional. A recipe with
+ * {@code "formula": false} never drops as a formula (see AlchemyFormulas);
+ * starter recipes never do either.
  *
  * Matching is shapeless and EXACT: the base must match the base slot, and the
  * filled ingredient slots must pair one-to-one with the recipe's ingredients,
@@ -80,7 +83,8 @@ public class AlchemyRecipe implements Recipe<AlchemyInput> {
 			Ingredient.CODEC.fieldOf("base").forGetter(AlchemyRecipe::base),
 			Ingredient.CODEC.listOf(1, MAX_INGREDIENTS).fieldOf("ingredients").forGetter(AlchemyRecipe::ingredients),
 			ItemStackTemplate.CODEC.fieldOf("result").forGetter(AlchemyRecipe::result),
-			Codec.BOOL.optionalFieldOf("starter", false).forGetter(AlchemyRecipe::starter)).apply(i, AlchemyRecipe::new));
+			Codec.BOOL.optionalFieldOf("starter", false).forGetter(AlchemyRecipe::starter),
+			Codec.BOOL.optionalFieldOf("formula", true).forGetter(AlchemyRecipe::formulaFlag)).apply(i, AlchemyRecipe::new));
 
 	public static final StreamCodec<RegistryFriendlyByteBuf, AlchemyRecipe> STREAM_CODEC = StreamCodec.composite(
 			Category.STREAM_CODEC, AlchemyRecipe::category,
@@ -88,6 +92,7 @@ public class AlchemyRecipe implements Recipe<AlchemyInput> {
 			Ingredient.CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.list(MAX_INGREDIENTS)), AlchemyRecipe::ingredients,
 			ItemStackTemplate.STREAM_CODEC, AlchemyRecipe::result,
 			ByteBufCodecs.BOOL, AlchemyRecipe::starter,
+			ByteBufCodecs.BOOL, AlchemyRecipe::formulaFlag,
 			AlchemyRecipe::new);
 
 	private final Category category;
@@ -95,13 +100,15 @@ public class AlchemyRecipe implements Recipe<AlchemyInput> {
 	private final List<Ingredient> ingredients;
 	private final ItemStackTemplate result;
 	private final boolean starter;
+	private final boolean formula;
 
-	public AlchemyRecipe(Category category, Ingredient base, List<Ingredient> ingredients, ItemStackTemplate result, boolean starter) {
+	public AlchemyRecipe(Category category, Ingredient base, List<Ingredient> ingredients, ItemStackTemplate result, boolean starter, boolean formula) {
 		this.category = category;
 		this.base = base;
 		this.ingredients = List.copyOf(ingredients);
 		this.result = result;
 		this.starter = starter;
+		this.formula = formula;
 	}
 
 	public Category category() {
@@ -122,6 +129,16 @@ public class AlchemyRecipe implements Recipe<AlchemyInput> {
 
 	public boolean starter() {
 		return starter;
+	}
+
+	/** The JSON {@code formula} flag as written. */
+	public boolean formulaFlag() {
+		return formula;
+	}
+
+	/** Whether formulas may teach this recipe: never for starters or {@code "formula": false}. */
+	public boolean dropsAsFormula() {
+		return formula && !starter;
 	}
 
 	// ---- matching -------------------------------------------------------------

@@ -316,6 +316,19 @@
       "path": "~/Alchemy"
     },
     {
+      "name": "AlchemyFormulas",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "alchemy_formulas",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/AlchemyFormulas.java"
+        ]
+      },
+      "path": "~/Alchemy"
+    },
+    {
       "name": "AlchemyRecipeTooltip",
       "type": "code",
       "compiles": true,
@@ -1913,6 +1926,21 @@
           "src/main/resources/assets/witchercraft/items/placeholder_alcohol.json",
           "src/main/java/net/redboltmedia/witchercraft/item/PlaceholderAlcoholItem.java",
           "src/main/resources/assets/witchercraft/models/item/placeholder_alcohol.json"
+        ]
+      },
+      "path": "~/Items"
+    },
+    {
+      "name": "Formula",
+      "type": "item",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "formula",
+      "metadata": {
+        "files": [
+          "src/main/resources/assets/witchercraft/items/formula.json",
+          "src/main/java/net/redboltmedia/witchercraft/item/FormulaItem.java",
+          "src/main/resources/assets/witchercraft/models/item/formula.json"
         ]
       },
       "path": "~/Items"
@@ -11451,6 +11479,7 @@
       "subtitles.alchemy_brew": "Alchemy brews",
       "subtitles.alchemy_fail": "Alchemy fizzles",
       "item.witchercraft.placeholder_alcohol": "Alcohol (Placeholder)",
+      "item.witchercraft.formula": "Formula",
       "gui.witchercraft.alchemy.brew": "Brew",
       "gui.witchercraft.alchemy.show_recipes": "Show recipes",
       "gui.witchercraft.alchemy.hide_recipes": "Hide recipes",
@@ -11857,7 +11886,12 @@
       "commands.witchercraft.alchemy.forget.all": "Cleared the alchemy recipes of %s player(s); starters stay granted",
       "commands.witchercraft.alchemy.reset": "Reset the alchemy knowledge of %s player(s) to a new player",
       "commands.witchercraft.alchemy.list": "%s knows %s of %s alchemy recipes (mode %s): %s",
-      "alchemy.recipe.witchercraft.alchemy.swallow.description": "Increases health regeneration."
+      "alchemy.recipe.witchercraft.alchemy.swallow.description": "Increases health regeneration.",
+      "item.witchercraft.formula.named": "Formula: %s",
+      "item.witchercraft.formula.tooltip.use": "Use to learn this recipe.",
+      "item.witchercraft.formula.tooltip.known": "You already know this recipe.",
+      "item.witchercraft.formula.already_known": "You already know this recipe.",
+      "commands.witchercraft.alchemy.formula": "Gave a formula for %s to %s player(s)"
     }
   },
   "metadata": {
