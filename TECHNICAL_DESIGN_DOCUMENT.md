@@ -970,8 +970,8 @@ existed to avoid by keeping all mutation server-side.
 Two categories, and where the line actually is:
 
 - **Safe to call directly, client-side.** Pure **read-only** procedures that just report already-synced
-  player state - e.g. `PerkPage` calls `CharacterAbilitiesSkillPointsAvailableProcedure.execute(entity)`
-  every frame to print the points-remaining counter. These read attachment/NBT data the server already
+  player state - e.g. `PerkPage` used to call `CharacterAbilitiesSkillPointsAvailableProcedure.execute(entity)`
+  every frame to print the points-remaining counter (it now reads the same synced vars itself, see 3.11). These read attachment/NBT data the server already
   keeps synced to the client, take no branch on `isClientSide()`, and produce no server-side effect.
   Safe because they're idempotent lookups, not the same reasoning as "it happens not to crash."
 - **Must go through a network message.** Anything that **changes** server-authoritative state - learning
@@ -1069,13 +1069,13 @@ Vanilla's plain `Component.translatable` (no fallback) still renders the raw key
 key is visible immediately in-game and cheap to catch in testing - the fallback variant is only worth the
 extra argument where the string is genuinely GUI-facing every session, like this one.
 
-**One tracked exception:** `PerkPage`'s points-available text (`CharacterAbilitiesSkillPointsAvailableProcedure`)
-returns a pre-formatted, hardcoded-English `String`, not a `Component` - historically shared with the four
-tab GUIs retired in 3.6a (they drew it the same raw way). Localizing it properly means either duplicating
-its `witchercraftPlayerLevel - witchercraftPerksLearned` formula next to a translatable key, or rewriting
-the procedure itself; neither was in scope for the tooltip/description pass that added this note, so it
-stays a known gap rather than a silent one. If you touch that counter again, migrate it properly instead
-of patching around it a second time.
+**Former exception, now resolved:** `PerkPage`'s points-available text used to come from
+`CharacterAbilitiesSkillPointsAvailableProcedure`, a pre-formatted hardcoded-English `String`. It is now
+`gui.witchercraft.shell.skills.points` ("SP available: %s") with the number computed in `PerkPage`
+(`witchercraftPlayerLevel - witchercraftPerksLearned`, the same formula), and the instructions line has
+its own key (`gui.witchercraft.shell.skills.instructions`). The procedure has no callers left; keep its
+formula in sync with `PerkPage` or delete it. Position and scale of both texts are `PerkTree.POINTS_*` /
+`HINT_*`, edited in `tree-node-placer.html`.
 
 **Dead lang keys get removed, not just left to rot.** When 3.6a retired the four tab GUIs, their
 `gui.witchercraft.character_abilities_{combat,alchemy,signs,general}_gui.*` keys (65 entries - buttons,

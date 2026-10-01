@@ -35,6 +35,15 @@ public final class PerkTree {
 	public static final int INVENTORY_X = 0;
 	public static final int INVENTORY_Y = 24;
 
+	// Bottom status texts: skill points and the instructions (x, y = top-left,
+	// scaled about that corner). Wording is in the lang file.
+	public static final int POINTS_X = 8;
+	public static final int POINTS_Y = 186;
+	public static final float POINTS_SCALE = 1f;
+	public static final int HINT_X = 100;
+	public static final int HINT_Y = 186;
+	public static final float HINT_SCALE = 1f;
+
 	public static final class Node {
 		public final int perkId;
 		public final int x, y;

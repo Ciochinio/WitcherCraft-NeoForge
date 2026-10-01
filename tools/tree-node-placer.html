@@ -39,6 +39,7 @@
   .lbox { position:absolute; border:2px solid #c070ff; background:#c070ff18; z-index:3; cursor:grab; user-select:none;
           display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--ink); text-shadow:0 1px 2px #000; }
   .lbox.inv { border-color:#66cccc; background:#66cccc10; align-items:flex-end; }
+  .lbox.txt { border-color:#dddd88; background:#dddd8814; justify-content:flex-start; white-space:nowrap; padding-left:2px; font-size:10px; }
   .lbox .cell { position:absolute; border:1px dashed #ffffff40; pointer-events:none; }
   .tab.b5.active { border-color:#b03030; }
   .del { pointer-events:all; cursor:pointer; }
@@ -73,6 +74,12 @@
       <legend>Editing</legend>
       <label><input type="checkbox" id="linkMode"> Link mode (click parent &rarr; child = child requires parent)</label><br>
       <div class="hint" style="color:var(--dim)">In link mode, click a node then another to add a prerequisite; click the small &times; on a link to remove it. Cycles and duplicates are rejected. Move mode: drag to reposition, arrow keys nudge.</div>
+    </fieldset>
+    <fieldset>
+      <legend>Status text (bottom row)</legend>
+      <label>Skill points scale <input type="number" id="ptsScale" step="0.05" min="0.25" max="3"></label>
+      <label>Instructions scale <input type="number" id="hintScale" step="0.05" min="0.25" max="3"></label>
+      <div class="hint" style="color:var(--dim)">Drag the yellow SP and hint boxes to move the two texts (x, y = top-left of the text; the box width is only an estimate of the text). The wording is in the lang file, not here: <code>gui.witchercraft.shell.skills.points</code> ("SP available: %s", %s = the number), <code>.instructions</code> and <code>.mutagen_instructions</code> (shown on the Mutagens tab) in <code>en_us.json</code>, or MCreator's Localization. Colours are in equip-grid-placer's Colours panel (STATUS_POINTS, STATUS_TEXT).</div>
     </fieldset>
     <fieldset>
       <legend>Canvas</legend>
@@ -132,7 +139,10 @@ const EQUIP = {
   MED_ON:true, MED_X:252, MED_Y:83, MED_W:40, MED_H:20
 };
 // left-side layout owned by this tool (exported into PerkTree.java)
-const LAYOUT_SEED = { TAB_X:[5,37,69,101,133], TAB_Y:1, INVENTORY_X:14, INVENTORY_Y:65 };
+const LAYOUT_SEED = { TAB_X:[4,38,72,106,140], TAB_Y:0, INVENTORY_X:0, INVENTORY_Y:24,
+  POINTS_X:8, POINTS_Y:186, POINTS_SCALE:1, HINT_X:100, HINT_Y:186, HINT_SCALE:1 };
+const PTS_SAMPLE = 'SP available: 20', HINT_SAMPLE = 'R-click=learn  L-click learned=hold';
+const textW = (s, scale) => Math.round(s.length * 5.5 * scale), textH = scale => Math.max(4, Math.round(8 * scale));
 let L = structuredClone(LAYOUT_SEED);
 const INV_W = 9*18, INV_H = 4*18+4; // 3 rows + 4px gap + hotbar
 const TAB_NAMES = ['Combat','Alchemy','Signs','General','Mutagens'];
@@ -181,6 +191,8 @@ function build(){
     attachNode(el);
   }
   for(let i=0;i<5;i++) layoutBox('T'+(i+1), CELL, CELL, ()=>[L.TAB_X[i], L.TAB_Y], (x,y)=>{ L.TAB_X[i]=x; L.TAB_Y=y; }, '', 'Tab T'+(i+1)+' ('+TAB_NAMES[i]+'), y shared by all tabs');
+  layoutBox(PTS_SAMPLE, textW(PTS_SAMPLE, L.POINTS_SCALE), textH(L.POINTS_SCALE), ()=>[L.POINTS_X, L.POINTS_Y], (x,y)=>{ L.POINTS_X=x; L.POINTS_Y=y; }, 'txt', 'Skill points text');
+  layoutBox(HINT_SAMPLE, textW(HINT_SAMPLE, L.HINT_SCALE), textH(L.HINT_SCALE), ()=>[L.HINT_X, L.HINT_Y], (x,y)=>{ L.HINT_X=x; L.HINT_Y=y; }, 'txt', 'Instructions text');
   if(activeBranch===5) layoutBox('inventory (Mutagens tab)', INV_W, INV_H, ()=>[L.INVENTORY_X, L.INVENTORY_Y], (x,y)=>{ L.INVENTORY_X=x; L.INVENTORY_Y=y; }, 'inv', 'Inventory block');
   redrawEdges(); renderOut(); updateInfo(); syncTabs();
 }
@@ -193,7 +205,7 @@ function layoutBox(label, w, h, get, set, cls, name){
   if(cls==='inv'){
     for(let r=0;r<4;r++) for(let c=0;c<9;c++){ const d=document.createElement('div'); d.className='cell';
       d.style.left=(c*18*zoom-2)+'px'; d.style.top=((r*18+(r===3?4:0))*zoom-2)+'px'; d.style.width=d.style.height=CELL*zoom+'px'; el.appendChild(d); }
-  } else {
+  } else if(cls!=='txt') {
     const d=document.createElement('div'); d.className='cell'; d.style.left=d.style.top=(zoom-2)+'px'; d.style.width=d.style.height=16*zoom+'px'; el.appendChild(d);
   }
   el.addEventListener('pointerdown', e=>{
@@ -367,6 +379,15 @@ public final class PerkTree {
 	public static final int INVENTORY_X = ${L.INVENTORY_X};
 	public static final int INVENTORY_Y = ${L.INVENTORY_Y};
 
+	// Bottom status texts: skill points and the instructions (x, y = top-left,
+	// scaled about that corner). Wording is in the lang file.
+	public static final int POINTS_X = ${L.POINTS_X};
+	public static final int POINTS_Y = ${L.POINTS_Y};
+	public static final float POINTS_SCALE = ${L.POINTS_SCALE}f;
+	public static final int HINT_X = ${L.HINT_X};
+	public static final int HINT_Y = ${L.HINT_Y};
+	public static final float HINT_SCALE = ${L.HINT_SCALE}f;
+
 	public static final class Node {
 		public final int perkId;
 		public final int x, y;
@@ -419,10 +440,14 @@ function syncTabs(){ document.querySelectorAll('.tab').forEach(t=>t.classList.to
 })();
 $('zoom').value=zoom; $('zoom').addEventListener('input',()=>{ const v=parseFloat($('zoom').value); if(v>=1){ zoom=v; build(); } });
 $('gridStep').addEventListener('input',build);
+function syncStatusInputs(){ $('ptsScale').value=L.POINTS_SCALE; $('hintScale').value=L.HINT_SCALE; }
+$('ptsScale').addEventListener('input',()=>{ const v=parseFloat($('ptsScale').value); if(v>0){ L.POINTS_SCALE=v; build(); } });
+$('hintScale').addEventListener('input',()=>{ const v=parseFloat($('hintScale').value); if(v>0){ L.HINT_SCALE=v; build(); } });
+syncStatusInputs();
 $('linkMode').addEventListener('change',()=>{ linkMode=$('linkMode').checked; linkSource=null; build(); });
 $('copyBtn').addEventListener('click',async()=>{ out.select(); try{ await navigator.clipboard.writeText(out.value);}catch{document.execCommand('copy');}
   const b=$('copyBtn'), t=b.textContent; b.textContent='Copied!'; setTimeout(()=>b.textContent=t,1200); });
-$('resetBtn').addEventListener('click',()=>{ if(confirm('Reset ALL branches to the default grid and clear prerequisites?')){ nodes=defaultGrid(); L=structuredClone(LAYOUT_SEED); linkSource=null; selected=null; build(); } });
+$('resetBtn').addEventListener('click',()=>{ if(confirm('Reset ALL branches to the default grid and clear prerequisites?')){ nodes=defaultGrid(); L=structuredClone(LAYOUT_SEED); syncStatusInputs(); linkSource=null; selected=null; build(); } });
 
 // ---- import from Java ----
 function parseTreeJava(txt){
@@ -441,14 +466,15 @@ function parseTreeJava(txt){
   }
   const L2=structuredClone(LAYOUT_SEED);
   const intOf=k=>{const m=txt.match(new RegExp('\\bint\\s+'+k+'\\s*=\\s*(-?\\d+)\\s*;'));return m?parseInt(m[1],10):undefined;};
-  for(const k of ['TAB_Y','INVENTORY_X','INVENTORY_Y']){ const v=intOf(k); if(v!==undefined) L2[k]=v; }
+  for(const k of ['POINTS_SCALE','HINT_SCALE']){ const m=txt.match(new RegExp('\\bfloat\\s+'+k+'\\s*=\\s*([0-9.]+)f?\\s*;')); if(m) L2[k]=parseFloat(m[1]); }
+  for(const k of ['TAB_Y','INVENTORY_X','INVENTORY_Y','POINTS_X','POINTS_Y','HINT_X','HINT_Y']){ const v=intOf(k); if(v!==undefined) L2[k]=v; }
   const tm=txt.match(/\bint\[\]\s+TAB_X\s*=\s*\{([^}]*)\}/); if(tm){ const a=tm[1].split(',').map(s=>parseInt(s.trim(),10)); if(a.length===5&&a.every(v=>!isNaN(v))) L2.TAB_X=a; }
   return {nodes:n, count, converted:shift>0, layout:L2};
 }
 $('impDo').addEventListener('click',()=>{
   const t=$('impArea').value;
   if(!t.trim()){ $('impInfo').textContent='Paste some Java first.'; return; }
-  try{ const r=parseTreeJava(t); nodes=r.nodes; L=r.layout;
+  try{ const r=parseTreeJava(t); nodes=r.nodes; L=r.layout; syncStatusInputs();
     linkSource=null; selected=null; build(); $('impInfo').textContent='Imported '+r.count+' nodes'+(r.converted?' (shrunk to 18 around their centres).':'.'); }
   catch(e){ $('impInfo').textContent='Parse error: '+e.message; }
 });

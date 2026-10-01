@@ -2,7 +2,7 @@ package net.redboltmedia.witchercraft;
 
 import java.util.List;
 
-import net.redboltmedia.witchercraft.procedures.CharacterAbilitiesSkillPointsAvailableProcedure;
+import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
 
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
@@ -144,20 +144,17 @@ public class PerkPage implements GuiPage {
 		this.oy = o[1];
 
 		drawTabs(g);
-		// status row: points-available text is not yet localized (a legacy
-		// procedure shared with 3 retired GUIs - see TDD 3.11), so its width is
-		// measured rather than assumed, and the tail text is positioned after it
-		// to avoid the two overlapping regardless of locale/points-string length.
-		String pts = CharacterAbilitiesSkillPointsAvailableProcedure.execute(entity);
-		int statusY = PerkEquipLayout.PANEL_H - 14;
-		text(g, pts, 8, statusY, PerkEquipLayout.STATUS_POINTS);
-		int tailX = 8 + font.width(pts) + 10;
-		// no separate "Holding: X" readout - the node's selection ring and the
-		// lit-up valid-target slots already show what's held and where it can go.
-		if (mutagensShown())
-			textC(g, tt("gui.witchercraft.shell.skills.mutagen_instructions", "Drag a mutagen into a socket"), tailX, statusY, PerkEquipLayout.STATUS_TEXT);
-		else
-			textC(g, tt("gui.witchercraft.shell.skills.instructions", "R-click=learn  L-click learned=hold"), tailX, statusY, PerkEquipLayout.STATUS_TEXT);
+		// status texts: the skill points readout and the instructions (Mutagens tab
+		// has its own). Wording is in the lang file; position and scale are
+		// PerkTree data (tree-node-placer), colours PerkEquipLayout.
+		WitchercraftModVariables.PlayerVariables vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+		String points = new java.text.DecimalFormat("##.##").format(vars.witchercraftPlayerLevel - vars.witchercraftPerksLearned);
+		drawScaledText(g, Component.translatableWithFallback("gui.witchercraft.shell.skills.points", "SP available: %s", points),
+				PerkTree.POINTS_X, PerkTree.POINTS_Y, PerkTree.POINTS_SCALE, PerkEquipLayout.STATUS_POINTS);
+		Component hint = mutagensShown()
+				? tt("gui.witchercraft.shell.skills.mutagen_instructions", "Drag a mutagen into a socket")
+				: tt("gui.witchercraft.shell.skills.instructions", "R-click=learn  L-click learned=hold");
+		drawScaledText(g, hint, PerkTree.HINT_X, PerkTree.HINT_Y, PerkTree.HINT_SCALE, PerkEquipLayout.STATUS_TEXT);
 
 		// the Mutagens tab leaves the tree area to the inventory slots SkillsScreen draws
 		if (!mutagensShown())
@@ -285,6 +282,15 @@ public class PerkPage implements GuiPage {
 
 	private void textC(GuiGraphicsExtractor g, Component c, int x, int y, int col) {
 		g.text(font, c, ox + x, oy + y, col, false);
+	}
+
+	/** One line of text at panel-local (x, y), its top-left, scaled about that corner. */
+	private void drawScaledText(GuiGraphicsExtractor g, Component c, int x, int y, float scale, int col) {
+		g.pose().pushMatrix();
+		g.pose().translate((float) (ox + x), (float) (oy + y));
+		g.pose().scale(scale, scale);
+		g.text(font, c, 0, 0, col, false);
+		g.pose().popMatrix();
 	}
 
 	// shorthand for a translatable with a readable fallback (see PerkRegistry.fallbackName).

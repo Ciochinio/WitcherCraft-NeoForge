@@ -11482,7 +11482,9 @@
       "gui.witchercraft.shell.skills.tab_signs": "Signs",
       "gui.witchercraft.shell.skills.tab_general": "General",
       "gui.witchercraft.shell.skills.tab_mutagens": "Mutagens",
-      "gui.witchercraft.shell.skills.mutagen_instructions": "Drag a mutagen into a socket"
+      "gui.witchercraft.shell.skills.mutagen_instructions": "Drag a mutagen into a socket",
+      "gui.witchercraft.shell.skills.points": "SP available: %s",
+      "gui.witchercraft.shell.skills.instructions": "R-click\u003dlearn  L-click learned\u003dhold"
     }
   },
   "metadata": {
