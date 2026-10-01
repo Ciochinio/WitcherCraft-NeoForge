@@ -694,8 +694,8 @@ is the first (built in the alchemy redesign's step 0; see `ALCHEMY_REDESIGN_PLAN
   (`navTabAt`), and the content region in **screen** pixels (`contentScreenX/Y/W/H`). Both the shell
   and container tabs draw through it; the pause menu uses its `drawLevelReadout`.
 - **One routing point.** `WitcherGuiPages.open(pageId)` is how every entry point (nav click, P, per-tab
-  keys, pause menu) opens a tab. `isContainerTab(pageId)` (only `alchemy` today) makes it send a
-  serverbound open packet (`AlchemyOpenMessage`) instead of calling `setScreen`. Inside the shell, a
+  keys, pause menu) opens a tab. `isContainerTab(pageId)` (`alchemy` and `skills`) makes it send a
+  serverbound open packet (`AlchemyOpenMessage` / `SkillsOpenMessage`) instead of calling `setScreen`. Inside the shell, a
   nav click on a container tab goes through the same call. `FastTravelClient` still opens the map
   directly, which is fine because the map is not a container tab.
 - **Opening.** The server opens the menu with a `MenuProvider` whose
@@ -739,8 +739,71 @@ is the first (built in the alchemy redesign's step 0; see `ALCHEMY_REDESIGN_PLAN
   attached to the mod bus in `WitchercraftMod`'s "mod init" user code block; `AlchemyScreen` binds
   itself in `RegisterMenuScreensEvent`. A fake MCreator `gui` element would register a menu class
   MCreator does not own and break the build.
-- **Damage interrupt.** `WitcherGuiDamageInterrupt` closes an open `AlchemyMenu` on the server
-  (`player.closeContainer()`), which returns its items, in addition to the shell's clientbound close.
+- **Damage interrupt.** `WitcherGuiDamageInterrupt` closes an open `AlchemyMenu` or `SkillsMenu` on
+  the server (`player.closeContainer()`), which returns Alchemy's items, in addition to the shell's
+  clientbound close.
+
+### 3.3c The Skills tab and mutagen items
+
+Skills became the second container-backed tab when mutagens turned into real items. `PerkPage` is
+unchanged as the owner of the tree, equip grid and socket frames; what changed is who hosts it.
+
+- **Pieces.** `SkillsMenu` (4 mutagen slots + 36 inventory slots, own `MENUS` register attached in the
+  "mod init" user code block), `SkillsScreen` (an `AbstractContainerScreen` that draws `ShellChrome`
+  and calls `PerkPage.render` inside the design transform, exactly as `WitcherGuiScreen` did),
+  `SkillsOpenMessage` (copy of `AlchemyOpenMessage`), `MutagenSlots` (the storage),
+  `MutagenEffects` (item queries + applying effects). `PerkPage` stays registered in
+  `WitcherGuiPages.CUSTOM` as a singleton so its sub-tab and held-perk state survive reopening;
+  `SkillsScreen` fetches it from there.
+- **Slots on a scaled layout.** Unlike Alchemy's fixed block, the sockets live inside the perk page's
+  double scale (design canvas, then `PerkPage.layout` fit). `Slot.x` / `Slot.y` are vanilla `final`, so
+  `META-INF/accesstransformer.cfg` (user code block) makes them `public` non-final, and
+  `SkillsScreen.placeSlots` (run from `init`, so on every resize) moves each mutagen slot to the centre
+  of its socket frame and centres the 9x4 inventory in `PerkPage.INVENTORY_AREA_*`. `leftPos` /
+  `topPos` are 0, so slot coordinates are screen coordinates. The slots stay at normal GUI scale (16px
+  items) while the frames scale; on very large or small layouts the item is centred in a frame of a
+  different size. `hasClickedOutside` always returns false: the whole screen is the tab.
+- **The Mutagens sub-tab.** `PerkPage` has five sub-tabs; the fifth (`TAB_MUTAGENS`) skips the tree.
+  `SkillsMenu.inventoryShown` (client field, true on the server) drives `isActive()` of the inventory
+  slots; `SkillsScreen` syncs it from `PerkPage.mutagensShown()` every frame and after each page click.
+  Click order: navbar, then an active slot under the cursor (vanilla), then the perk page; a click the
+  page consumes swallows its release.
+- **Socket frames read the slots.** `PerkPage.setMutagenSource` points at the client menu's socket slots,
+  so frame tint, the connector lines and the `gN:<synergy>` labels follow the synced slot contents. The
+  colour-cycle action (`3000000 + group`) and the medallion click stub (`4000000`,
+  `MutagenMedallionClickProcedure`, moved to `trash/`) are retired; `PerkEquipGuiButtonMessage` ignores
+  both ids.
+- **Storage.** `MutagenSlots.DATA` is a player attachment (`copyOnDeath`, a mutable 4-stack list,
+  serialised with `ItemStack.OPTIONAL_CODEC`). It is NOT synced as an attachment: only the open menu
+  shows the contents, and nothing else on the client needs them. The server menu wraps it in a
+  `Container` whose `setChanged` calls `MutagenEffects.recompute`, so every slot edit re-applies effects;
+  closing the menu returns nothing. The old player vars `witchercraftMutagenSocket1..4` and
+  `witchercraftMutagenOwnedRed/Green/Blue` were removed from the registry and
+  `WitchercraftModVariables`.
+- **What makes an item a mutagen (data).** Exactly one type tag `#witchercraft:mutagen/red|green|blue`
+  plus one level tag `#witchercraft:mutagen/level_1..3` (`data/witchercraft/tags/item/mutagen/`). Tags
+  sync to the client, so placement prediction and frame colours need no packet. Both sides use
+  `MutagenEffects.isMutagen`. `MAX_LEVEL` caps how many level tags are read.
+- **Effects (Blockly).** `ApplyMutagenBonus` is now a locked procedure whose Java calls
+  `MutagenEffects.recompute`; its Blockly stub only keeps the `entity` dependency so
+  `RecomputeEquippedPerks`' call stays valid if the element is ever resaved. Each type has an ordinary
+  Blockly procedure, `Mutagen{Red,Green,Blue}Effect`, with custom number dependencies `level` and
+  `synergy` (read with `custom_dependency_number`). MCreator generates
+  `execute(Entity entity, double level, double synergy)`; `MutagenEffects.Type` binds each type to that
+  method. A procedure that stops reading `level` or `synergy` changes the generated signature and breaks
+  the build, so keep both blocks in it (multiply by 0 if unused).
+- **Per-socket modifier ids.** The Blockly "add attribute modifier" block takes its id as a fixed field,
+  which is why the old procedure was 544 lines of per-socket copies. `recompute` instead: strips every
+  modifier whose id is `witchercraft:mutagen_*` from every attribute instance; then for each filled
+  socket snapshots the modifier ids, runs the type's procedure, and moves every NEW modifier to
+  `witchercraft:mutagen_slot<N>/<namespace>/<path>` (same amount and operation, transient). So effect
+  procedures can use plain names, the same type in two sockets stacks, and the next recompute removes
+  everything. A procedure that adds a modifier id already present (from another system) adds nothing,
+  because the generated block checks `hasModifier` first. Health is restored to
+  `min(previous, new max)` after the pass, so re-adding Max Health never costs the player health.
+- **Adding a type.** A tag under `mutagen/`, a Blockly procedure with the same three dependencies, and a
+  `MutagenEffects.Type` entry (tag id, synergy branch colour, method reference). Adding an item to an
+  existing type or level is a tag edit only.
 
 ### 3.4 The tools: one per GUI, plus a navbar-only chrome editor
 
@@ -778,7 +841,8 @@ else:
 
 `PerkEquipGuiButtonMessage` is self-registering (`@EventBusSubscriber` + `registerMessage`), so it
 survived the retirement intact even though its old owning element is gone - the page keeps sending
-the exact same packets for learn / place / remove / mutagen-cycle.
+the exact same packets for learn / place / remove. (The mutagen-cycle packet was retired when mutagens
+became items; see 3.3c.)
 
 ### 3.6 Retiring the old perk screen
 
@@ -842,8 +906,9 @@ divergence risk the way the `en_us.json` gotcha (3.11) is.
 
 ### 3.8 Known limitations
 
-- **Placeholder pages.** Skills, Meditation, and Map have real pages. Alchemy is a container-backed tab
-  (3.3b) with working brewing (section 6). Inventory and Glossary remain
+- **Placeholder pages.** Meditation and Map have real pages. Alchemy is a container-backed tab
+  (3.3b) with working brewing (section 6); Skills is a container-backed tab around `PerkPage` (3.3c).
+  Inventory and Glossary remain
   `PlaceholderPage` "coming soon" tabs until each is built (own class + own tool).
 - **Existing standalone screens are only partly folded in.** The perk screen (Skills) and Meditation
   are now real shell pages; Meditation's old container GUI + in-world opener were deleted outright in

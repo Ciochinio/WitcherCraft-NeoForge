@@ -433,6 +433,71 @@
       "path": "~/Character Abilities/Perk Gui"
     },
     {
+      "name": "SkillsMenu",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "skills_menu",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/SkillsMenu.java"
+        ]
+      },
+      "path": "~/Character Abilities/Perk Gui"
+    },
+    {
+      "name": "SkillsScreen",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "skills_screen",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/SkillsScreen.java"
+        ]
+      },
+      "path": "~/Character Abilities/Perk Gui"
+    },
+    {
+      "name": "SkillsOpenMessage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "skills_open_message",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/SkillsOpenMessage.java"
+        ]
+      },
+      "path": "~/Character Abilities/Perk Gui"
+    },
+    {
+      "name": "MutagenSlots",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "mutagen_slots",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/MutagenSlots.java"
+        ]
+      },
+      "path": "~/Character Abilities/Perk Calc"
+    },
+    {
+      "name": "MutagenEffects",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "mutagen_effects",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/MutagenEffects.java"
+        ]
+      },
+      "path": "~/Character Abilities/Perk Calc"
+    },
+    {
       "name": "PerkEquipVars",
       "type": "code",
       "compiles": true,
@@ -1785,6 +1850,141 @@
           "src/main/resources/assets/witchercraft/items/tallow.json",
           "src/main/java/net/redboltmedia/witchercraft/item/TallowItem.java",
           "src/main/resources/assets/witchercraft/models/item/tallow.json"
+        ]
+      },
+      "path": "~/Items"
+    },
+    {
+      "name": "LesserRedMutagen",
+      "type": "item",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "lesser_red_mutagen",
+      "metadata": {
+        "files": [
+          "src/main/resources/assets/witchercraft/items/lesser_red_mutagen.json",
+          "src/main/java/net/redboltmedia/witchercraft/item/LesserRedMutagenItem.java",
+          "src/main/resources/assets/witchercraft/models/item/lesser_red_mutagen.json"
+        ]
+      },
+      "path": "~/Items"
+    },
+    {
+      "name": "RedMutagen",
+      "type": "item",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "red_mutagen",
+      "metadata": {
+        "files": [
+          "src/main/resources/assets/witchercraft/items/red_mutagen.json",
+          "src/main/java/net/redboltmedia/witchercraft/item/RedMutagenItem.java",
+          "src/main/resources/assets/witchercraft/models/item/red_mutagen.json"
+        ]
+      },
+      "path": "~/Items"
+    },
+    {
+      "name": "GreaterRedMutagen",
+      "type": "item",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "greater_red_mutagen",
+      "metadata": {
+        "files": [
+          "src/main/resources/assets/witchercraft/items/greater_red_mutagen.json",
+          "src/main/java/net/redboltmedia/witchercraft/item/GreaterRedMutagenItem.java",
+          "src/main/resources/assets/witchercraft/models/item/greater_red_mutagen.json"
+        ]
+      },
+      "path": "~/Items"
+    },
+    {
+      "name": "LesserGreenMutagen",
+      "type": "item",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "lesser_green_mutagen",
+      "metadata": {
+        "files": [
+          "src/main/resources/assets/witchercraft/items/lesser_green_mutagen.json",
+          "src/main/java/net/redboltmedia/witchercraft/item/LesserGreenMutagenItem.java",
+          "src/main/resources/assets/witchercraft/models/item/lesser_green_mutagen.json"
+        ]
+      },
+      "path": "~/Items"
+    },
+    {
+      "name": "GreenMutagen",
+      "type": "item",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "green_mutagen",
+      "metadata": {
+        "files": [
+          "src/main/resources/assets/witchercraft/items/green_mutagen.json",
+          "src/main/java/net/redboltmedia/witchercraft/item/GreenMutagenItem.java",
+          "src/main/resources/assets/witchercraft/models/item/green_mutagen.json"
+        ]
+      },
+      "path": "~/Items"
+    },
+    {
+      "name": "GreaterGreenMutagen",
+      "type": "item",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "greater_green_mutagen",
+      "metadata": {
+        "files": [
+          "src/main/resources/assets/witchercraft/items/greater_green_mutagen.json",
+          "src/main/java/net/redboltmedia/witchercraft/item/GreaterGreenMutagenItem.java",
+          "src/main/resources/assets/witchercraft/models/item/greater_green_mutagen.json"
+        ]
+      },
+      "path": "~/Items"
+    },
+    {
+      "name": "LesserBlueMutagen",
+      "type": "item",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "lesser_blue_mutagen",
+      "metadata": {
+        "files": [
+          "src/main/resources/assets/witchercraft/items/lesser_blue_mutagen.json",
+          "src/main/java/net/redboltmedia/witchercraft/item/LesserBlueMutagenItem.java",
+          "src/main/resources/assets/witchercraft/models/item/lesser_blue_mutagen.json"
+        ]
+      },
+      "path": "~/Items"
+    },
+    {
+      "name": "BlueMutagen",
+      "type": "item",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "blue_mutagen",
+      "metadata": {
+        "files": [
+          "src/main/resources/assets/witchercraft/items/blue_mutagen.json",
+          "src/main/java/net/redboltmedia/witchercraft/item/BlueMutagenItem.java",
+          "src/main/resources/assets/witchercraft/models/item/blue_mutagen.json"
+        ]
+      },
+      "path": "~/Items"
+    },
+    {
+      "name": "GreaterBlueMutagen",
+      "type": "item",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "greater_blue_mutagen",
+      "metadata": {
+        "files": [
+          "src/main/resources/assets/witchercraft/items/greater_blue_mutagen.json",
+          "src/main/java/net/redboltmedia/witchercraft/item/GreaterBlueMutagenItem.java",
+          "src/main/resources/assets/witchercraft/models/item/greater_blue_mutagen.json"
         ]
       },
       "path": "~/Items"
@@ -5599,7 +5799,7 @@
       "name": "ApplyMutagenBonus",
       "type": "procedure",
       "compiles": true,
-      "locked_code": false,
+      "locked_code": true,
       "registry_name": "apply_mutagen_bonus",
       "metadata": {
         "dependencies": [
@@ -5615,20 +5815,82 @@
       "path": "~/Character Abilities/Perk Calc"
     },
     {
-      "name": "MutagenMedallionClick",
+      "name": "MutagenRedEffect",
       "type": "procedure",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "mutagen_medallion_click",
+      "registry_name": "mutagen_red_effect",
       "metadata": {
         "dependencies": [
           {
             "name": "entity",
             "type": "entity"
+          },
+          {
+            "name": "level",
+            "type": "number"
+          },
+          {
+            "name": "synergy",
+            "type": "number"
           }
         ],
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/MutagenMedallionClickProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/MutagenRedEffectProcedure.java"
+        ]
+      },
+      "path": "~/Character Abilities/Perk Calc"
+    },
+    {
+      "name": "MutagenGreenEffect",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "mutagen_green_effect",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "level",
+            "type": "number"
+          },
+          {
+            "name": "synergy",
+            "type": "number"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/MutagenGreenEffectProcedure.java"
+        ]
+      },
+      "path": "~/Character Abilities/Perk Calc"
+    },
+    {
+      "name": "MutagenBlueEffect",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "mutagen_blue_effect",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "level",
+            "type": "number"
+          },
+          {
+            "name": "synergy",
+            "type": "number"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/MutagenBlueEffectProcedure.java"
         ]
       },
       "path": "~/Character Abilities/Perk Calc"
@@ -9898,48 +10160,6 @@
       "value": "0"
     },
     {
-      "name": "witchercraftMutagenSocket1",
-      "type": "number",
-      "scope": "player_persistent",
-      "value": "0"
-    },
-    {
-      "name": "witchercraftMutagenSocket2",
-      "type": "number",
-      "scope": "player_persistent",
-      "value": "0"
-    },
-    {
-      "name": "witchercraftMutagenSocket3",
-      "type": "number",
-      "scope": "player_persistent",
-      "value": "0"
-    },
-    {
-      "name": "witchercraftMutagenSocket4",
-      "type": "number",
-      "scope": "player_persistent",
-      "value": "0"
-    },
-    {
-      "name": "witchercraftMutagenOwnedRed",
-      "type": "number",
-      "scope": "player_persistent",
-      "value": "0"
-    },
-    {
-      "name": "witchercraftMutagenOwnedGreen",
-      "type": "number",
-      "scope": "player_persistent",
-      "value": "0"
-    },
-    {
-      "name": "witchercraftMutagenOwnedBlue",
-      "type": "number",
-      "scope": "player_persistent",
-      "value": "0"
-    },
-    {
       "name": "witchercraftSelectedPerk",
       "type": "number",
       "scope": "player_persistent",
@@ -11247,7 +11467,22 @@
       "item.witchercraft.manuscript.tooltip.use": "Use to learn this recipe.",
       "item.witchercraft.manuscript.tooltip.known": "You already know this recipe.",
       "item.witchercraft.manuscript.already_known": "You already know this recipe.",
-      "commands.witchercraft.alchemy.manuscript": "Gave a manuscript for %s to %s player(s)"
+      "commands.witchercraft.alchemy.manuscript": "Gave a manuscript for %s to %s player(s)",
+      "item.witchercraft.lesser_red_mutagen": "Lesser Red Mutagen",
+      "item.witchercraft.red_mutagen": "Red Mutagen",
+      "item.witchercraft.greater_red_mutagen": "Greater Red Mutagen",
+      "item.witchercraft.lesser_green_mutagen": "Lesser Green Mutagen",
+      "item.witchercraft.green_mutagen": "Green Mutagen",
+      "item.witchercraft.greater_green_mutagen": "Greater Green Mutagen",
+      "item.witchercraft.lesser_blue_mutagen": "Lesser Blue Mutagen",
+      "item.witchercraft.blue_mutagen": "Blue Mutagen",
+      "item.witchercraft.greater_blue_mutagen": "Greater Blue Mutagen",
+      "gui.witchercraft.shell.skills.tab_combat": "Combat",
+      "gui.witchercraft.shell.skills.tab_alchemy": "Alchemy",
+      "gui.witchercraft.shell.skills.tab_signs": "Signs",
+      "gui.witchercraft.shell.skills.tab_general": "General",
+      "gui.witchercraft.shell.skills.tab_mutagens": "Mutagens",
+      "gui.witchercraft.shell.skills.mutagen_instructions": "Drag a mutagen into a socket"
     }
   },
   "metadata": {

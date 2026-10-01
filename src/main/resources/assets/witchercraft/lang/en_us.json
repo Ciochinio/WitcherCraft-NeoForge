@@ -517,5 +517,20 @@
   "item.witchercraft.manuscript.tooltip.use": "Use to learn this recipe.",
   "item.witchercraft.manuscript.tooltip.known": "You already know this recipe.",
   "item.witchercraft.manuscript.already_known": "You already know this recipe.",
-  "commands.witchercraft.alchemy.manuscript": "Gave a manuscript for %s to %s player(s)"
+  "commands.witchercraft.alchemy.manuscript": "Gave a manuscript for %s to %s player(s)",
+  "item.witchercraft.lesser_red_mutagen": "Lesser Red Mutagen",
+  "item.witchercraft.red_mutagen": "Red Mutagen",
+  "item.witchercraft.greater_red_mutagen": "Greater Red Mutagen",
+  "item.witchercraft.lesser_green_mutagen": "Lesser Green Mutagen",
+  "item.witchercraft.green_mutagen": "Green Mutagen",
+  "item.witchercraft.greater_green_mutagen": "Greater Green Mutagen",
+  "item.witchercraft.lesser_blue_mutagen": "Lesser Blue Mutagen",
+  "item.witchercraft.blue_mutagen": "Blue Mutagen",
+  "item.witchercraft.greater_blue_mutagen": "Greater Blue Mutagen",
+  "gui.witchercraft.shell.skills.tab_combat": "Combat",
+  "gui.witchercraft.shell.skills.tab_alchemy": "Alchemy",
+  "gui.witchercraft.shell.skills.tab_signs": "Signs",
+  "gui.witchercraft.shell.skills.tab_general": "General",
+  "gui.witchercraft.shell.skills.tab_mutagens": "Mutagens",
+  "gui.witchercraft.shell.skills.mutagen_instructions": "Drag a mutagen into a socket"
 }

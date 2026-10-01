@@ -30,7 +30,8 @@ public final class WitcherGuiPages {
 	private static final Map<String, GuiPage> PLACEHOLDER_CACHE = new HashMap<>();
 
 	static {
-		// The ported perk equip/tree screen, now a page under the "skills" tab.
+		// The perk tree + equip grid. "skills" is a container tab, so SkillsScreen
+		// (not WitcherGuiScreen) draws this page around the real mutagen slots.
 		PerkPage perk = new PerkPage("skills");
 		CUSTOM.put(perk.id(), perk);
 
@@ -61,7 +62,7 @@ public final class WitcherGuiPages {
 	 * shell chrome through {@link ShellChrome}.
 	 */
 	public static boolean isContainerTab(String pageId) {
-		return "alchemy".equals(pageId);
+		return "alchemy".equals(pageId) || "skills".equals(pageId);
 	}
 
 	/**
@@ -70,8 +71,10 @@ public final class WitcherGuiPages {
 	 * other tab opens {@link WitcherGuiScreen} directly.
 	 */
 	public static void open(String pageId) {
-		if (isContainerTab(pageId))
+		if ("alchemy".equals(pageId))
 			ClientPacketDistributor.sendToServer(AlchemyOpenMessage.INSTANCE);
+		else if ("skills".equals(pageId))
+			ClientPacketDistributor.sendToServer(SkillsOpenMessage.INSTANCE);
 		else
 			Minecraft.getInstance().setScreen(new WitcherGuiScreen(pageId));
 	}

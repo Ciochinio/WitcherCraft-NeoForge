@@ -5,13 +5,14 @@ import net.minecraft.world.entity.player.Player;
 import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
 
 /**
- * Read/write helpers for the 12 perk-socket and 4 mutagen-socket player vars.
+ * Read/write helpers for the 12 perk-socket player vars. (Mutagens are items in
+ * {@link MutagenSlots}; MUTAGEN_GROUPS is the number of mutagen sockets.)
  *
  * Reads are safe on either side (vars sync to the client). Writes must run
  * server-side; they mark the var bundle dirty so the next player tick syncs it
  * down (same pattern the generated buy procedures use). Slot indices are
- * 0-based here; the underlying vars are 1-based (witchercraftPerkSocket1..12,
- * witchercraftMutagenSocket1..4).
+ * 0-based here; the underlying vars are 1-based (witchercraftPerkSocket1..12).
+ * Mutagen socket i covers perk slots 3i..3i+2.
  */
 public final class PerkEquipVars {
 	private PerkEquipVars() {
@@ -90,43 +91,6 @@ public final class PerkEquipVars {
 				break;
 			case 11:
 				v.witchercraftPerkSocket12 = val;
-				break;
-			default:
-				return;
-		}
-		v.markSyncDirty();
-	}
-
-	public static int getMutagenSocket(Player e, int group) {
-		WitchercraftModVariables.PlayerVariables v = e.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-		switch (group) {
-			case 0:
-				return (int) v.witchercraftMutagenSocket1;
-			case 1:
-				return (int) v.witchercraftMutagenSocket2;
-			case 2:
-				return (int) v.witchercraftMutagenSocket3;
-			case 3:
-				return (int) v.witchercraftMutagenSocket4;
-			default:
-				return 0;
-		}
-	}
-
-	public static void setMutagenSocket(Player e, int group, int val) {
-		WitchercraftModVariables.PlayerVariables v = e.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-		switch (group) {
-			case 0:
-				v.witchercraftMutagenSocket1 = val;
-				break;
-			case 1:
-				v.witchercraftMutagenSocket2 = val;
-				break;
-			case 2:
-				v.witchercraftMutagenSocket3 = val;
-				break;
-			case 3:
-				v.witchercraftMutagenSocket4 = val;
 				break;
 			default:
 				return;

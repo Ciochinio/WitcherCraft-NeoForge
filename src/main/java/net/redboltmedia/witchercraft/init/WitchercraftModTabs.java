@@ -49,6 +49,15 @@ public class WitchercraftModTabs {
 				tabData.accept(WitchercraftModItems.WHITE_GULL.get());
 				tabData.accept(WitchercraftModItems.SALTPETER.get());
 				tabData.accept(WitchercraftModItems.TALLOW.get());
+				tabData.accept(WitchercraftModItems.LESSER_RED_MUTAGEN.get());
+				tabData.accept(WitchercraftModItems.RED_MUTAGEN.get());
+				tabData.accept(WitchercraftModItems.GREATER_RED_MUTAGEN.get());
+				tabData.accept(WitchercraftModItems.LESSER_GREEN_MUTAGEN.get());
+				tabData.accept(WitchercraftModItems.GREEN_MUTAGEN.get());
+				tabData.accept(WitchercraftModItems.GREATER_GREEN_MUTAGEN.get());
+				tabData.accept(WitchercraftModItems.LESSER_BLUE_MUTAGEN.get());
+				tabData.accept(WitchercraftModItems.BLUE_MUTAGEN.get());
+				tabData.accept(WitchercraftModItems.GREATER_BLUE_MUTAGEN.get());
 				tabData.accept(WitchercraftModItems.PLACEHOLDER_ALCOHOL.get());
 				tabData.accept(WitchercraftModItems.MANUSCRIPT.get());
 				tabData.accept(WitchercraftModItems.RELICT_OIL.get());

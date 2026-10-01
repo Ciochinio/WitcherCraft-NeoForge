@@ -26,8 +26,7 @@ import net.minecraft.core.SectionPos;
  *   0                              reserved / no-op
  *   1000000 + slotIdx*1000 + perkId   place perkId into perk slot slotIdx (0-11)
  *   2000000 + slotIdx                 clear perk slot slotIdx
- *   3000000 + group                   cycle mutagen colour of group (0-3)
- *   4000000                           medallion click (placeholder button)
+ *   3000000 / 4000000                 retired (mutagen colour cycle, medallion click); ignored
  *   5000000 + perkId                  learn a tree node (prereqs + points enforced)
  * The server re-validates every action; it never trusts the client's view.
  */
@@ -62,15 +61,8 @@ public record PerkEquipGuiButtonMessage(int buttonID, int x, int y, int z) imple
 			return;
 		if (buttonID >= 5000000) { // learn a tree node (perkId), prereqs + points enforced
 			tryLearn(entity, buttonID - 5000000);
-		} else if (buttonID >= 4000000) { // medallion click (placeholder button)
-			if (PerkEquipLayout.MEDALLION_ENABLED)
-				MutagenMedallionClickProcedure.execute(entity);
-		} else if (buttonID >= 3000000) { // cycle mutagen colour: empty -> red -> green -> blue -> empty
-			int group = buttonID - 3000000;
-			if (group < 0 || group >= PerkEquipVars.MUTAGEN_GROUPS)
-				return;
-			int next = (PerkEquipVars.getMutagenSocket(entity, group) + 1) % 4;
-			PerkEquipVars.setMutagenSocket(entity, group, next);
+		} else if (buttonID >= 3000000) { // retired: mutagen colour cycle and medallion click (mutagens are items now)
+			return;
 		} else if (buttonID >= 2000000) { // clear a perk slot
 			int slot = buttonID - 2000000;
 			if (slot < 0 || slot >= PerkEquipVars.PERK_SLOTS)

@@ -630,7 +630,8 @@ present their character panels. Each tab also has its own bindable key (unbound 
 in Controls) so you can jump straight to, say, Skills. **Skills** is
 the progression surface: the four-tab perk tree on the left (right-click a node to learn it,
 left-click a learned one to hold it for equipping), a twelve-slot equip grid on the right, and four
-mutagen sockets whose colour synergises with the perks grouped above them. Holding a perk, every slot
+mutagen sockets that hold real mutagen items (see Mutagens below). A fifth tab, Mutagens, swaps the
+tree for your inventory so you can drag mutagens into the sockets. Holding a perk, every slot
 lights as a valid target: drop onto an empty slot to equip, or onto an occupied one to swap - the
 displaced perk simply returns to the unequipped pool, so re-arranging a full grid never needs a
 manual unequip first. When a node has more than one connecting line to earlier perks, learning any
@@ -647,8 +648,32 @@ renders its own icon, with three states - locked/available, learned-but-not-equi
 so a glyph reads at a glance where it sits in the flow. The icons reuse the per-perk art from the
 original skill screens (the equipped-state glyph is a placeholder for now); the coloured slot frame
 and the selection highlight are drawn by the GUI around the glyph, not baked into it. The navbar
-icons, the background, and the slot/socket frames are still placeholders, so the layout can be
-dialled in before the rest of the art exists.
+icons, the Skills sub-tab icons (an iron sword, a brewing stand, lapis lazuli, cooked beef, and
+redstone for Mutagens), the background, and the slot/socket frames are still placeholders, so the
+layout can be dialled in before the rest of the art exists.
+
+### Mutagens
+
+Mutagens are items. Each socket under the equip grid holds one, and a socketed mutagen grants its
+bonus for as long as it stays there. Equipped mutagens are kept through death.
+
+- **Three types**, each tied to a perk branch: **Red** (Combat), **Green** (Alchemy), **Blue** (Signs).
+- **Three levels** per type: Lesser, regular, and Greater. Every type and level is its own item; which
+  items count as which type and level is data, so mutagens can be added, removed, or re-levelled
+  without code.
+- **Synergy:** every equipped perk of the mutagen's branch colour in the three perk slots above its
+  socket adds a further bonus. A Red mutagen under three Combat perks is the strongest Red setup.
+- **Stacking:** two mutagens of the same type in different sockets both apply.
+
+| Type | Stat | Per mutagen level | Per matching perk |
+|------|------|-------------------|-------------------|
+| Red | Increased Damage | **+10** | **+5** |
+| Green | Max Health | **+2** (one heart) | **+1** |
+| Blue | Sign Intensity | **+10** | **+5** |
+
+A level 1 mutagen gives exactly what the old colour sockets gave; levels 2 and 3 multiply the base
+part. Each type's effect is a tweakable procedure, so the numbers, extra effects, and perks that
+strengthen mutagens are all tuned there.
 
 ---
 

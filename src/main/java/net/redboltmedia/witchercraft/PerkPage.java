@@ -9,6 +9,7 @@ import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.IntFunction;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -19,6 +20,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * The perk tree + equip grid, ported from the retired PerkEquipGuiScreen into a
@@ -30,6 +32,12 @@ import net.minecraft.world.entity.player.Player;
  * server via {@link PerkEquipGuiButtonMessage}; geometry still comes from the
  * tool-generated {@link PerkEquipLayout} + {@link PerkTree}, so the existing
  * tools/equip-grid-placer.html and tools/tree-node-placer.html keep working.
+ *
+ * Drawn by {@link SkillsScreen} (the Skills tab is container-backed): the four
+ * mutagen sockets are real slots there, so this page only draws their frames
+ * and reads their items through {@link #setMutagenSource}. The fifth sub-tab,
+ * Mutagens, hides the tree so the screen can show the player inventory in its
+ * place ({@link #mutagensShown}).
  *
  * The only structural change vs the old container screen: it draws through
  * origin-offset helpers (the shell hands it a content origin instead of the old
@@ -46,20 +54,40 @@ public class PerkPage implements GuiPage {
 	private static final int TEXT_DIM = 0xFF9A9AA2;
 	private static final int TEXT_HELD = 0xFFFFFFFF;
 
-	// Branch tabs (index i -> branch colour i+1: Combat/Alchemy/Signs/General).
+	// Sub-tabs (index i -> activeBranch i+1): the four perk branches
+	// (Combat/Alchemy/Signs/General = branch colours 1-4), then Mutagens, which
+	// shows the player inventory instead of a tree. Icons are placeholders drawn
+	// from vanilla item textures; swap a path to reskin a tab.
+	public static final int TAB_MUTAGENS = 5;
 	private static final String[] TAB_KEYS = {
 			"gui.witchercraft.shell.skills.tab_combat", "gui.witchercraft.shell.skills.tab_alchemy",
-			"gui.witchercraft.shell.skills.tab_signs", "gui.witchercraft.shell.skills.tab_general"};
-	private static final String[] TAB_FALLBACKS = {"CMB", "ALC", "SGN", "GEN"};
-	private static final int[] TAB_X = {8, 52, 96, 140};
-	private static final int TAB_Y = 6, TAB_W = 40, TAB_H = 11;
+			"gui.witchercraft.shell.skills.tab_signs", "gui.witchercraft.shell.skills.tab_general",
+			"gui.witchercraft.shell.skills.tab_mutagens"};
+	private static final String[] TAB_FALLBACKS = {"Combat", "Alchemy", "Signs", "General", "Mutagens"};
+	private static final String[] TAB_ICONS = {
+			"minecraft:textures/item/iron_sword.png", "minecraft:textures/item/brewing_stand.png",
+			"minecraft:textures/item/lapis_lazuli.png", "minecraft:textures/item/cooked_beef.png",
+			"minecraft:textures/item/redstone.png"};
+	private static final int MUTAGENS_TAB_ACCENT = 0xFFB03030;
+	private static final int[] TAB_X = {8, 40, 72, 104, 136};
+	private static final int TAB_Y = 4, TAB_ICON = 12;
+	private static final int TAB_DIM = 0x99000000; // darkens the inactive tab icons
+
+	// The area the Mutagens tab gives the player inventory (perk-local coords):
+	// the tree's half of the panel, between the tab row and the status row.
+	public static final int INVENTORY_AREA_X = 0, INVENTORY_AREA_Y = 20;
+	public static final int INVENTORY_AREA_W = 190, INVENTORY_AREA_H = PerkEquipLayout.PANEL_H - 20 - 16;
 
 	private final String pageId;
 
 	// Client-only selection: the perk id currently "held" (0 = nothing).
 	private int heldPerk = 0;
-	// Active tree branch/tab colour (1 red / 2 green / 3 blue / 4 neutral).
+	// Active sub-tab: tree branch colour (1 red / 2 green / 3 blue / 4 neutral),
+	// or TAB_MUTAGENS.
 	private int activeBranch = 1;
+	// The item in each mutagen socket. SkillsScreen points this at its menu's
+	// socket slots (the sockets themselves are real slots it draws over).
+	private IntFunction<ItemStack> mutagens = gi -> ItemStack.EMPTY;
 
 	// Per-frame context (set at the top of render); helpers offset by (ox, oy).
 	private int ox, oy;
@@ -85,6 +113,30 @@ public class PerkPage implements GuiPage {
 		return Minecraft.getInstance().player;
 	}
 
+	/** Where the mutagen socket contents come from (SkillsScreen's menu). */
+	public void setMutagenSource(IntFunction<ItemStack> source) {
+		this.mutagens = source;
+	}
+
+	/** The Mutagens sub-tab is active: the inventory replaces the tree. */
+	public boolean mutagensShown() {
+		return activeBranch == TAB_MUTAGENS;
+	}
+
+	/**
+	 * Where the 360x230 perk layout lands in a w x h region (design coords), as
+	 * {originX, originY, scale}: uniform fit, centred. Perk-local (lx, ly) maps to
+	 * (originX + lx * scale, originY + ly * scale).
+	 */
+	public static float[] layout(int x, int y, int w, int h) {
+		float scale = fitScale(w, h);
+		return new float[]{x + (w - PerkEquipLayout.PANEL_W * scale) / 2f, y + (h - PerkEquipLayout.PANEL_H * scale) / 2f, scale};
+	}
+
+	private MutagenEffects.Type mutagenType(int gi) {
+		return MutagenEffects.typeOf(mutagens.apply(gi));
+	}
+
 	// ---- rendering (gui-local coords, offset by ox/oy in the helpers) --------
 
 	@Override
@@ -98,9 +150,8 @@ public class PerkPage implements GuiPage {
 		// map the 360x230 perk layout onto the content region (uniform scale,
 		// centred) so the Skills page fills the area below the navbar. Drawing is
 		// in perk-local coords via a nested pose transform (ox/oy stay 0).
-		float scale = fitScale(w, h);
-		float px = x + (w - PerkEquipLayout.PANEL_W * scale) / 2f;
-		float py = y + (h - PerkEquipLayout.PANEL_H * scale) / 2f;
+		float[] fit = layout(x, y, w, h);
+		float px = fit[0], py = fit[1], scale = fit[2];
 		this.ox = 0;
 		this.oy = 0;
 		g.pose().pushMatrix();
@@ -118,9 +169,14 @@ public class PerkPage implements GuiPage {
 		int tailX = 8 + font.width(pts) + 10;
 		// no separate "Holding: X" readout - the node's selection ring and the
 		// lit-up valid-target slots already show what's held and where it can go.
-		textC(g, tt("gui.witchercraft.shell.skills.instructions", "R-click=learn  L-click learned=hold"), tailX, statusY, TEXT_DIM);
+		if (mutagensShown())
+			textC(g, tt("gui.witchercraft.shell.skills.mutagen_instructions", "Drag a mutagen into a socket"), tailX, statusY, TEXT_DIM);
+		else
+			textC(g, tt("gui.witchercraft.shell.skills.instructions", "R-click=learn  L-click learned=hold"), tailX, statusY, TEXT_DIM);
 
-		drawTree(g, entity);
+		// the Mutagens tab leaves the tree area to the inventory slots SkillsScreen draws
+		if (!mutagensShown())
+			drawTree(g, entity);
 		drawConnectors(g, entity);
 
 		// equip grid slots
@@ -140,18 +196,17 @@ public class PerkPage implements GuiPage {
 			}
 		}
 
-		// mutagen sockets
+		// mutagen sockets: the frame, tinted by the socketed mutagen's type. The
+		// mutagen item itself is a real slot SkillsScreen centres in the frame.
 		for (int gi = 0; gi < PerkEquipVars.MUTAGEN_GROUPS; gi++) {
 			int sx = PerkEquipLayout.SOCKET_X[gi];
 			int sy = PerkEquipLayout.SOCKET_Y[gi];
-			int m = PerkEquipVars.getMutagenSocket(entity, gi);
-			if (m > 0) {
-				int c = PerkRegistry.tint(m);
+			MutagenEffects.Type type = mutagenType(gi);
+			if (type != null) {
+				int c = type.tint();
 				drawCell(g, sx, sy, PerkEquipLayout.SOCKET_SIZE, c, withAlpha(c, 0x55));
-				textC(g, tt(mutagenAbbrevKey(m), mutagenAbbrevFallback(m)), sx + 4, sy + PerkEquipLayout.SOCKET_SIZE / 2 - 4, 0xFFFFFFFF);
 			} else {
 				drawCell(g, sx, sy, PerkEquipLayout.SOCKET_SIZE, CELL_EMPTY_BORDER, CELL_EMPTY_INNER);
-				text(g, "-", sx + PerkEquipLayout.SOCKET_SIZE / 2 - 2, sy + PerkEquipLayout.SOCKET_SIZE / 2 - 4, TEXT_DIM);
 			}
 		}
 
@@ -162,8 +217,8 @@ public class PerkPage implements GuiPage {
 		}
 		for (int gi = 0; gi < PerkEquipVars.MUTAGEN_GROUPS; gi++) {
 			int matches = groupMatchCount(gi);
-			int m = PerkEquipVars.getMutagenSocket(entity, gi);
-			int col = m > 0 ? PerkRegistry.tint(m) : TEXT_DIM;
+			MutagenEffects.Type type = mutagenType(gi);
+			int col = type != null ? type.tint() : TEXT_DIM;
 			text(g, "g" + (gi + 1) + ":" + matches, PerkEquipLayout.SOCKET_X[gi] + 2, PerkEquipLayout.SOCKET_Y[gi] + PerkEquipLayout.SOCKET_SIZE + 1, col);
 		}
 
@@ -173,7 +228,10 @@ public class PerkPage implements GuiPage {
 		// Hit-test in perk-local coords (map the mouse back through the fit scale).
 		int lx = (int) ((mouseX - px) / scale), ly = (int) ((mouseY - py) / scale);
 		int np = hitNode(lx, ly);
-		if (np > 0) {
+		int hoveredTab = hitTab(lx, ly);
+		if (hoveredTab > 0) {
+			pendingTooltip = List.of(tt(TAB_KEYS[hoveredTab - 1], TAB_FALLBACKS[hoveredTab - 1]));
+		} else if (np > 0) {
 			pendingTooltip = perkTooltip(np);
 		} else {
 			int si = hitSlot(lx, ly);
@@ -295,20 +353,36 @@ public class PerkPage implements GuiPage {
 	// ---- left panel: perk tree ----------------------------------------------
 
 	private void drawTabs(GuiGraphicsExtractor g) {
-		for (int i = 0; i < TAB_KEYS.length; i++) {
+		for (int i = 0; i < TAB_ICONS.length; i++) {
 			boolean active = activeBranch == i + 1;
-			textC(g, tt(TAB_KEYS[i], TAB_FALLBACKS[i]), TAB_X[i], TAB_Y, active ? 0xFFFFFFFF : TEXT_DIM);
+			drawTexture(g, TAB_ICONS[i], TAB_X[i], TAB_Y, TAB_ICON);
 			if (active)
-				fill(g, TAB_X[i] - 1, TAB_Y + 9, TAB_X[i] + 22, TAB_Y + 10, PerkRegistry.tint(i + 1));
+				fill(g, TAB_X[i] - 1, TAB_Y + TAB_ICON + 1, TAB_X[i] + TAB_ICON + 1, TAB_Y + TAB_ICON + 2, tabAccent(i + 1));
+			else
+				fill(g, TAB_X[i], TAB_Y, TAB_X[i] + TAB_ICON, TAB_Y + TAB_ICON, TAB_DIM);
 		}
 	}
 
+	private static int tabAccent(int tab) {
+		return tab == TAB_MUTAGENS ? MUTAGENS_TAB_ACCENT : PerkRegistry.tint(tab);
+	}
+
 	private int hitTab(int lx, int ly) {
-		for (int i = 0; i < TAB_KEYS.length; i++) {
-			if (lx >= TAB_X[i] - 2 && lx < TAB_X[i] + TAB_W && ly >= TAB_Y - 2 && ly < TAB_Y + TAB_H)
+		for (int i = 0; i < TAB_ICONS.length; i++) {
+			if (lx >= TAB_X[i] - 2 && lx < TAB_X[i] + TAB_ICON + 2 && ly >= TAB_Y - 2 && ly < TAB_Y + TAB_ICON + 3)
 				return i + 1;
 		}
 		return -1;
+	}
+
+	/** A whole square texture (any source size, 16 for item textures) scaled into a size x size box. */
+	private void drawTexture(GuiGraphicsExtractor g, String texture, int x, int y, int size) {
+		float s = size / 16f;
+		g.pose().pushMatrix();
+		g.pose().translate((float) (ox + x), (float) (oy + y));
+		g.pose().scale(s, s);
+		g.blit(RenderPipelines.GUI_TEXTURED, Identifier.parse(texture), 0, 0, 0, 0, 16, 16, 16, 16);
+		g.pose().popMatrix();
 	}
 
 	private void drawTree(GuiGraphicsExtractor g, Player entity) {
@@ -370,10 +444,11 @@ public class PerkPage implements GuiPage {
 
 	private void drawConnectors(GuiGraphicsExtractor g, Player entity) {
 		for (int gi = 0; gi < PerkEquipVars.MUTAGEN_GROUPS; gi++) {
-			int m = PerkEquipVars.getMutagenSocket(entity, gi);
-			if (m <= 0)
+			MutagenEffects.Type type = mutagenType(gi);
+			if (type == null)
 				continue;
-			int col = withAlpha(PerkRegistry.tint(m), 0xCC);
+			int m = type.branch;
+			int col = withAlpha(type.tint(), 0xCC);
 			int sox = PerkEquipLayout.SOCKET_X[gi];
 			int scx = sox + PerkEquipLayout.SOCKET_SIZE / 2;
 			int scy = PerkEquipLayout.SOCKET_Y[gi] + PerkEquipLayout.SOCKET_SIZE / 2;
@@ -435,11 +510,9 @@ public class PerkPage implements GuiPage {
 		Player entity = player();
 		if (entity == null)
 			return false;
-		float scale = fitScale(w, h);
-		float px = x + (w - PerkEquipLayout.PANEL_W * scale) / 2f;
-		float py = y + (h - PerkEquipLayout.PANEL_H * scale) / 2f;
-		int lx = (int) ((mouseX - px) / scale);
-		int ly = (int) ((mouseY - py) / scale);
+		float[] fit = layout(x, y, w, h);
+		int lx = (int) ((mouseX - fit[0]) / fit[2]);
+		int ly = (int) ((mouseY - fit[1]) / fit[2]);
 		int nodePerk = hitNode(lx, ly);
 		if (button == 1) { // right-click a node = learn (server enforces prereqs + points)
 			if (nodePerk > 0) {
@@ -472,15 +545,7 @@ public class PerkPage implements GuiPage {
 				}
 				return true;
 			}
-			int gi = hitSocket(lx, ly);
-			if (gi >= 0) {
-				sendAction(3000000 + gi, entity); // cycle mutagen colour
-				return true;
-			}
-			if (hitMedallion(lx, ly)) {
-				sendAction(4000000, entity); // medallion click (placeholder)
-				return true;
-			}
+			// mutagen sockets are real slots: SkillsScreen hands those clicks to the container
 			// left-click on empty space cancels the held selection
 			if (heldPerk != 0) {
 				heldPerk = 0;
@@ -523,23 +588,6 @@ public class PerkPage implements GuiPage {
 		return -1;
 	}
 
-	private boolean hitMedallion(int lx, int ly) {
-		if (!PerkEquipLayout.MEDALLION_ENABLED)
-			return false;
-		return lx >= PerkEquipLayout.MEDALLION_X && lx < PerkEquipLayout.MEDALLION_X + PerkEquipLayout.MEDALLION_W
-				&& ly >= PerkEquipLayout.MEDALLION_Y && ly < PerkEquipLayout.MEDALLION_Y + PerkEquipLayout.MEDALLION_H;
-	}
-
-	private int hitSocket(int lx, int ly) {
-		for (int gi = 0; gi < PerkEquipVars.MUTAGEN_GROUPS; gi++) {
-			int sx = PerkEquipLayout.SOCKET_X[gi];
-			int sy = PerkEquipLayout.SOCKET_Y[gi];
-			if (lx >= sx && lx < sx + PerkEquipLayout.SOCKET_SIZE && ly >= sy && ly < sy + PerkEquipLayout.SOCKET_SIZE)
-				return gi;
-		}
-		return -1;
-	}
-
 	// ---- helpers -------------------------------------------------------------
 
 	/** Uniform scale to fit the 360x230 perk layout into a w x h content region. */
@@ -549,44 +597,10 @@ public class PerkPage implements GuiPage {
 
 	private int groupMatchCount(int gi) {
 		Player entity = player();
-		if (entity == null)
+		MutagenEffects.Type type = mutagenType(gi);
+		if (entity == null || type == null)
 			return 0;
-		int m = PerkEquipVars.getMutagenSocket(entity, gi);
-		if (m <= 0)
-			return 0;
-		int n = 0;
-		for (int s = gi * 3; s < gi * 3 + 3; s++) {
-			int id = PerkEquipVars.getPerkSocket(entity, s);
-			if (id > 0 && PerkRegistry.color(id) == m)
-				n++;
-		}
-		return n;
-	}
-
-	private static String mutagenAbbrevKey(int m) {
-		switch (m) {
-			case 1:
-				return "gui.witchercraft.shell.skills.mutagen_red";
-			case 2:
-				return "gui.witchercraft.shell.skills.mutagen_green";
-			case 3:
-				return "gui.witchercraft.shell.skills.mutagen_blue";
-			default:
-				return "gui.witchercraft.shell.skills.mutagen_empty";
-		}
-	}
-
-	private static String mutagenAbbrevFallback(int m) {
-		switch (m) {
-			case 1:
-				return "RED";
-			case 2:
-				return "GRN";
-			case 3:
-				return "BLU";
-			default:
-				return "-";
-		}
+		return MutagenEffects.synergy(entity, gi, type);
 	}
 
 	private static String trim(String s, int max) {
