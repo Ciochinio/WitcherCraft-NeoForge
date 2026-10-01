@@ -8,6 +8,6 @@ public class CharacterAbilitiesSkillPointsAvailableProcedure {
 	public static String execute(Entity entity) {
 		if (entity == null)
 			return "";
-		return "SP available: " + new java.text.DecimalFormat("##.##").format(entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerLevel - entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksLearned);
+		return "SP available: " + new java.text.DecimalFormat("##.##").format((entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerLevel - 1) - entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksLearned);
 	}
 }

@@ -309,10 +309,10 @@ public class WitchercraftModVariables {
 		public boolean witchercraftPerksFloodOfAnger = false;
 		public boolean witchercraftPerksRazorFocus = false;
 		public boolean witchercraftPerksUndying = false;
-		public double witchercraftPlayerLevel = 0;
+		public double witchercraftPlayerLevel = 1;
 		public double witchercraftMedallion = 0;
 		public double witchercraftPlayerExperience = 0;
-		public double witchercraftPlayerExperienceRequirement = 0.0;
+		public double witchercraftPlayerExperienceRequirement = 25;
 		public double witchercraftToxicity = 0;
 		public double witchercraftPerksCombatSkillPointsUsed = 0;
 		public double witchercraftPerksAlchemySkillPointsUsed = 0;

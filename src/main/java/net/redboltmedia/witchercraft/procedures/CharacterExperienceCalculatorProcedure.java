@@ -29,7 +29,15 @@ public class CharacterExperienceCalculatorProcedure {
 	private static void execute(@Nullable Event event, Entity entity, double amount) {
 		if (entity == null)
 			return;
-		if (amount > 0) {
+		double LevelCap = 0;
+		double StepLevels1To10 = 0;
+		double StepLevels11To20 = 0;
+		double StepAfterLevel20 = 0;
+		LevelCap = 60;
+		StepLevels1To10 = 25;
+		StepLevels11To20 = 50;
+		StepAfterLevel20 = 10;
+		if (amount > 0 && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerLevel < LevelCap) {
 			if (entity instanceof ServerPlayer _player)
 				_player.sendSystemMessage(Component.literal(("xp  " + amount)), false);
 			{
@@ -37,10 +45,15 @@ public class CharacterExperienceCalculatorProcedure {
 				_vars.witchercraftPlayerExperience = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerExperience + amount;
 				_vars.markSyncDirty();
 			}
-			if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerExperience >= entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerExperienceRequirement) {
+			while (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerExperience >= entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerExperienceRequirement
+					&& entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerLevel < LevelCap) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 					_vars.witchercraftPlayerExperience = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerExperience - entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerExperienceRequirement;
+					_vars.markSyncDirty();
+				}
+				{
+					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 					_vars.witchercraftPlayerLevel = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerLevel + 1;
 					_vars.markSyncDirty();
 				}
@@ -49,21 +62,28 @@ public class CharacterExperienceCalculatorProcedure {
 				if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerLevel >= 21) {
 					{
 						WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-						_vars.witchercraftPlayerExperienceRequirement = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerExperienceRequirement + 100;
+						_vars.witchercraftPlayerExperienceRequirement = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerExperienceRequirement + StepAfterLevel20;
 						_vars.markSyncDirty();
 					}
-				} else if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerLevel <= 20 && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerLevel > 10) {
+				} else if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerLevel > 10) {
 					{
 						WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-						_vars.witchercraftPlayerExperienceRequirement = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerExperienceRequirement + 50;
+						_vars.witchercraftPlayerExperienceRequirement = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerExperienceRequirement + StepLevels11To20;
 						_vars.markSyncDirty();
 					}
-				} else if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerLevel <= 10) {
+				} else {
 					{
 						WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-						_vars.witchercraftPlayerExperienceRequirement = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerExperienceRequirement + 25;
+						_vars.witchercraftPlayerExperienceRequirement = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerExperienceRequirement + StepLevels1To10;
 						_vars.markSyncDirty();
 					}
+				}
+			}
+			if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerLevel >= LevelCap) {
+				{
+					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+					_vars.witchercraftPlayerExperience = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerExperienceRequirement;
+					_vars.markSyncDirty();
 				}
 			}
 		}

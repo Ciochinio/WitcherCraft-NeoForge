@@ -44,13 +44,14 @@ public final class PerkEquipLayout {
 	public static final int MEDALLION_H = 20;
 
 	// What each mutagen socket gives ("+15 Increased Damage", one line per bonus,
-	// 10px apart at scale 1, BONUS_TEXT on a BONUS_BG background): a box per
+	// 10px apart at scale 1, BONUS_TEXT on a BONUS_BG background, both picked by
+	// the socketed mutagen's type: 0 red, 1 green, 2 blue): a box per
 	// socket, the text left- or right-aligned inside it (not clipped).
-	public static final int[] BONUS_X = {118, 116, 248, 248};
+	public static final int[] BONUS_X = {158, 116, 248, 248};
 	public static final int[] BONUS_Y = {50, 158, 50, 158};
-	public static final int[] BONUS_W = {110, 110, 110, 110};
+	public static final int[] BONUS_W = {70, 110, 110, 110};
 	public static final boolean[] BONUS_ALIGN_RIGHT = {true, true, true, true};
-	public static final float BONUS_TEXT_SCALE = 0.75f;
+	public static final float BONUS_TEXT_SCALE = 1f;
 
 	// --- Colours (ARGB, 0xAARRGGBB). Edited in the tool's Colours panel.
 	public static final int[] BRANCH_COLORS = {0xFFFF5555, 0xFF55FF55, 0xFF5599FF, 0xFFCCCCCC};
@@ -65,8 +66,8 @@ public final class PerkEquipLayout {
 	public static final int NODE_LOCKED_BORDER = 0xFF2A2A30;
 	public static final int NODE_LOCKED_INNER = 0xFF121215;
 	public static final int LINK_LOCKED = 0xFF3A3A42;
-	public static final int BONUS_TEXT = 0xFFFFFFFF;
-	public static final int BONUS_BG = 0xAA000000;
+	public static final int[] BONUS_TEXT = {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
+	public static final int[] BONUS_BG = {0xAAFF5555, 0xFF55FF55, 0xFF5599FF};
 	public static final int STATUS_POINTS = 0xFFDDDD88;
 	public static final int STATUS_TEXT = 0xFF9A9AA2;
 	public static final int MEDALLION_BORDER = 0xFF8A6D3B;

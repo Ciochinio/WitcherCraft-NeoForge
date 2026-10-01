@@ -10072,6 +10072,38 @@
         ]
       },
       "path": "~/World Map/Fast Travel"
+    },
+    {
+      "name": "WitcherLevelReset",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "witcher_level_reset",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WitcherLevelResetProcedure.java"
+        ],
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ]
+      },
+      "path": "~/Admin/Commands"
+    },
+    {
+      "name": "ResetWitcherLevel",
+      "type": "command",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "reset_witcher_level",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/command/ResetWitcherLevelCommand.java"
+        ]
+      },
+      "path": "~/Admin/Commands"
     }
   ],
   "variable_elements": [
@@ -10703,7 +10735,7 @@
       "name": "witchercraftPlayerLevel",
       "type": "number",
       "scope": "player_persistent",
-      "value": "0"
+      "value": "1"
     },
     {
       "name": "witchercraftMedallion",
@@ -10721,7 +10753,7 @@
       "name": "witchercraftPlayerExperienceRequirement",
       "type": "number",
       "scope": "player_persistent",
-      "value": "0.0"
+      "value": "25"
     },
     {
       "name": "witchercraftToxicity",
@@ -11484,7 +11516,9 @@
       "gui.witchercraft.shell.skills.tab_mutagens": "Mutagens",
       "gui.witchercraft.shell.skills.mutagen_instructions": "Drag a mutagen into a socket",
       "gui.witchercraft.shell.skills.points": "SP available: %s",
-      "gui.witchercraft.shell.skills.instructions": "R-click\u003dlearn  L-click learned\u003dhold"
+      "gui.witchercraft.shell.skills.instructions": "R-click\u003dlearn  L-click learned\u003dhold",
+      "gui.witchercraft.shell.skills.slot_locked": "Unlocks at level %s",
+      "gui.witchercraft.shell.skills.slot_level": "%s"
     }
   },
   "metadata": {

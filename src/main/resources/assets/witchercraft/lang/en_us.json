@@ -534,5 +534,7 @@
   "gui.witchercraft.shell.skills.tab_mutagens": "Mutagens",
   "gui.witchercraft.shell.skills.mutagen_instructions": "Drag a mutagen into a socket",
   "gui.witchercraft.shell.skills.points": "SP available: %s",
-  "gui.witchercraft.shell.skills.instructions": "R-click=learn  L-click learned=hold"
+  "gui.witchercraft.shell.skills.instructions": "R-click=learn  L-click learned=hold",
+  "gui.witchercraft.shell.skills.slot_locked": "Unlocks at level %s",
+  "gui.witchercraft.shell.skills.slot_level": "%s"
 }

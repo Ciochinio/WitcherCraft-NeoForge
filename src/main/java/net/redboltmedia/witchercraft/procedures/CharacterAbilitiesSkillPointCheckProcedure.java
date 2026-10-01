@@ -8,7 +8,7 @@ public class CharacterAbilitiesSkillPointCheckProcedure {
 	public static boolean execute(Entity entity) {
 		if (entity == null)
 			return false;
-		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerLevel - entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksLearned >= 1) {
+		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerLevel - 1 - entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksLearned >= 1) {
 			return true;
 		}
 		return false;

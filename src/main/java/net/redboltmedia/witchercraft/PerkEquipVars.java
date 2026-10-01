@@ -21,6 +21,18 @@ public final class PerkEquipVars {
 	public static final int PERK_SLOTS = 12;
 	public static final int MUTAGEN_GROUPS = 4;
 
+	// Witcher level each perk slot opens at, by slot index. Slots fill one
+	// mutagen group (column of 3) at a time. Mutagen sockets are never gated.
+	public static final int[] SLOT_UNLOCK_LEVEL = {1, 2, 4, 6, 8, 10, 13, 16, 19, 22, 25, 28};
+
+	public static int slotUnlockLevel(int idx) {
+		return idx >= 0 && idx < SLOT_UNLOCK_LEVEL.length ? SLOT_UNLOCK_LEVEL[idx] : Integer.MAX_VALUE;
+	}
+
+	public static boolean isSlotUnlocked(Player e, int idx) {
+		return e.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerLevel >= slotUnlockLevel(idx);
+	}
+
 	public static int getPerkSocket(Player e, int idx) {
 		WitchercraftModVariables.PlayerVariables v = e.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 		switch (idx) {

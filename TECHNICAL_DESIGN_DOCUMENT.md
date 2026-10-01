@@ -838,6 +838,33 @@ unchanged as the owner of the tree, equip grid and socket frames; what changed i
   `MutagenEffects.Type` entry (tag id, synergy branch colour, method reference). Adding an item to an
   existing type or level is a tag edit only.
 
+### 3.3d Witcher level, skill points, and level-gated perk slots
+
+- **Levelling is Blockly.** `CharacterExperienceCalculator` (trigger `player_xp_change`) owns the
+  curve. Its tunables are local variables set at the top of the procedure: `LevelCap` (60) and the
+  per-bracket increments `StepLevels1To10` (25), `StepLevels11To20` (50), `StepAfterLevel20` (10).
+  Each level-up adds the bracket of the NEW level to `witchercraftPlayerExperienceRequirement`. The
+  level-up body is a `controls_while` loop (XP >= requirement AND level < cap), so one large gain
+  grants every level it covers. Gains at the cap are ignored, and reaching the cap sets XP equal to
+  the requirement so the bar reads full. The `xp` / `poziom` chat lines are temporary debug output.
+- **Start state is the variable defaults.** `witchercraftPlayerLevel` defaults to 1 and
+  `witchercraftPlayerExperienceRequirement` to 25 in `witchercraft.mcreator`. The generator writes
+  these as field initialisers only (the NBT read still falls back to 0), so they apply to new players.
+  Existing saves were not migrated. `/resetwitcherlevel` (`ResetWitcherLevel` command calling the
+  `WitcherLevelReset` procedure) puts the caller back to level 1, 0 XP, requirement 25 for curve
+  testing. It does not touch learned or equipped perks. Keep its values in sync with the defaults.
+- **Skill points are `level - 1 - learned`.** The buy gate (`CharacterAbilitiesSkillPointCheck`,
+  called by every `<Perk>Effect`), the unused `CharacterAbilitiesSkillPointsAvailable`, and
+  `PerkPage`'s readout all use it. `PerkPage` clamps the readout at 0, because a level reset can
+  leave more perks learned than points.
+- **Slot gates are Java data.** `PerkEquipVars.SLOT_UNLOCK_LEVEL` (by slot index, so one mutagen
+  group fills before the next) is the only copy. `isSlotUnlocked` is checked server-side in
+  `PerkEquipGuiButtonMessage` before a place, and client-side in `PerkPage` (no target highlight,
+  click ignored while holding, lock tile + level number + "Unlocks at level %s" tooltip). The lock
+  tile is the placeholder `textures/screens/perk_slot_locked.png`. A perk already in a slot is still
+  drawn and removable even if the slot is below the player's level (only possible after a reset).
+  Mutagen sockets are never gated.
+
 ### 3.4 The tools: one per GUI, plus a navbar-only chrome editor
 
 Each GUI is authored by its **own** placer tool - the Skills page has `equip-grid-placer.html`
@@ -1072,7 +1099,7 @@ extra argument where the string is genuinely GUI-facing every session, like this
 **Former exception, now resolved:** `PerkPage`'s points-available text used to come from
 `CharacterAbilitiesSkillPointsAvailableProcedure`, a pre-formatted hardcoded-English `String`. It is now
 `gui.witchercraft.shell.skills.points` ("SP available: %s") with the number computed in `PerkPage`
-(`witchercraftPlayerLevel - witchercraftPerksLearned`, the same formula), and the instructions line has
+(`max(0, witchercraftPlayerLevel - 1 - witchercraftPerksLearned)`, see 3.3d), and the instructions line has
 its own key (`gui.witchercraft.shell.skills.instructions`). The procedure has no callers left; keep its
 formula in sync with `PerkPage` or delete it. Position and scale of both texts are `PerkTree.POINTS_*` /
 `HINT_*`, edited in `tree-node-placer.html`.

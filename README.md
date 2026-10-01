@@ -83,7 +83,7 @@ Six complete armor sets (Helmet, Chestplate, Leggings, Boots), each with a custo
 ### Skill Tree & Progression
 A multi-tab Skill Tree with **Combat**, **Signs**, **Alchemy**, and **General** tabs.
 
-> **Build decisions matter.** Maximum level is 30 — you earn 1 skill point per level. With 30+ perks available across all trees, it is impossible to unlock everything. Choose your playstyle carefully.
+> **Build decisions matter.** Maximum level is 60, and every level after the first gives 1 skill point, enough to eventually learn every perk. Only 12 can be equipped at once, and the equip slots open as you level, so what you slot defines your build.
 
 Perks are arranged in 3 tiers per tab. Tier 2 unlocks after 3 spent points, Tier 3 after 6.
 

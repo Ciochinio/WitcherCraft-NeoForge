@@ -94,8 +94,8 @@ Oils feed extra damage into that math when they match the target's category.
 #### Persistent Character Building
 
 You level up, earn skill points, and spend them across four tabs: Combat, Signs, Alchemy, and
-General. The cap and the one-point-per-level economy mean you'll never fill the whole tree, so
-where you spend it matters.
+General. A full run eventually learns every perk, but only twelve can be equipped at once, and
+the equip slots themselves open with your level, so what you slot is what matters.
 
 #### Witcher School Armor
 
@@ -124,7 +124,7 @@ and more. Each has a Bestiary entry with its lore, stats, and the oil it's weak 
 | Platform | Minecraft 1.21, NeoForge |
 | Type | Content and systems addition (not a total conversion) |
 | Core additions | Signs, Alchemy, Toxicity, custom combat, skill tree, School armor, Bestiary |
-| Progression cap | Level **30**, **1** skill point per level |
+| Progression cap | Level **60**, **1** skill point per level after the first |
 | Setting | The Witcher universe, inside the Minecraft world |
 
 ---
@@ -576,23 +576,35 @@ Minecraft one, and spending what you earn is where builds are made.
 WitcherCraft rides on Minecraft's own experience. Every point of vanilla XP you gain also feeds a
 separate WitcherCraft experience pool; fill the pool and you level up, and it resets for the next
 level. Only gains count: spending vanilla XP (enchanting, repairing, fast travel) or losing it on
-death never lowers your WitcherCraft progress. The bar you have to fill grows in brackets, so early
-levels come quickly and later ones take real time:
+death never lowers your WitcherCraft progress, and nothing else lowers your level either. You start
+at level 1 with a **25** XP bar. Each level-up adds to the next bar in brackets: early levels come
+quickly, the middle levels slow down, and past 20 the bar only creeps up, so the long tail to the
+cap stays reachable:
 
 | Levels | Added to the next level's requirement |
 |--------|---------------------------------------|
 | 1-10 | **+25** |
 | 11-20 | **+50** |
-| 21+ | **+100** |
+| 21+ | **+10** |
 
-The cap is level **30**.
+The cap is level **60**. One large XP gain can carry you through several levels at once. At the cap
+the bar stays full and further XP is ignored.
+
+| Reach level | 10 | 20 | 28 (last slot) | 30 | 40 | 50 | 60 |
+|-------------|----|----|----------------|----|----|----|----|
+| Total XP | ~1,100 | ~5,900 | ~12,200 | ~13,800 | ~22,800 | ~32,700 | ~43,700 |
+
+The last level costs about **1,140** XP, less than a vanilla 0-to-30 bar (1,395).
 
 ### Skill points
 
-Each level grants **1** skill point. The points you have to spend are simply your level minus the
-perks you've already learned, so there's no hidden bank - what you've earned is what you see. A
-full run to 30 yields **30** points against more than **30** perks, so you cannot buy everything.
-That's the point: your build is defined as much by what you skip as by what you take.
+Each level after the first grants **1** skill point: you start at level 1 with none. The points
+you have to spend are simply your level minus one, minus the perks you've already learned, so
+there's no hidden bank - what you've earned is what you see. A full run to 60 yields **59** points,
+one per perk, so every perk is eventually learnable and there is no respec. Your build is not what
+you learned but what you equip: twelve slots, opened by level (see below), against a growing pool
+of learned perks. Past level 28 every slot is open and levels stop adding power; they add options,
+more perks to swap in for a given fight.
 
 ### The skill tree
 
@@ -630,7 +642,12 @@ present their character panels. Each tab also has its own bindable key (unbound 
 in Controls) so you can jump straight to, say, Skills. **Skills** is
 the progression surface: the four-tab perk tree on the left (right-click a node to learn it,
 left-click a learned one to hold it for equipping), a twelve-slot equip grid on the right, and four
-mutagen sockets that hold real mutagen items (see Mutagens below). A fifth tab, Mutagens, swaps the
+mutagen sockets that hold real mutagen items (see Mutagens below). Equip slots open with your
+witcher level, one mutagen group (column of three) at a time, at levels **1, 2, 4, 6, 8, 10, 13,
+16, 19, 22, 25, 28**. A slot you haven't reached shows a placeholder lock tile with the level it
+opens at, and its tooltip says so; it can't take a perk. Mutagen sockets are never level-gated:
+only Lesser mutagens drop, and the higher levels are slow to craft, so the item economy already
+paces them. A fifth tab, Mutagens, swaps the
 tree for your inventory so you can drag mutagens into the sockets. Holding a perk, every slot
 lights as a valid target: drop onto an empty slot to equip, or onto an occupied one to swap - the
 displaced perk simply returns to the unequipped pool, so re-arranging a full grid never needs a
@@ -667,7 +684,8 @@ bonus for as long as it stays there. Equipped mutagens are kept through death.
   socket adds a further bonus. A Red mutagen under three Combat perks is the strongest Red setup.
 - **Stacking:** two mutagens of the same type in different sockets both apply.
 - **Readout:** next to each filled socket, the Skills page lists exactly what that mutagen gives you
-  right now (for example "+15 Increased Damage"), synergy and perk bonuses included.
+  right now (for example "+15 Increased Damage"), synergy and perk bonuses included, in that
+  mutagen's colour.
 
 | Type | Stat | Per mutagen level | Per matching perk |
 |------|------|-------------------|-------------------|

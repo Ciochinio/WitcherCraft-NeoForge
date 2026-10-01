@@ -24,7 +24,7 @@ import net.minecraft.core.SectionPos;
  * fixed MCreator packet shape can carry all of them (the screen is client-only
  * for selection; only these state changes are server-authoritative):
  *   0                              reserved / no-op
- *   1000000 + slotIdx*1000 + perkId   place perkId into perk slot slotIdx (0-11)
+ *   1000000 + slotIdx*1000 + perkId   place perkId into perk slot slotIdx (0-11), if the slot's level is reached
  *   2000000 + slotIdx                 clear perk slot slotIdx
  *   3000000 / 4000000                 retired (mutagen colour cycle, medallion click); ignored
  *   5000000 + perkId                  learn a tree node (prereqs + points enforced)
@@ -75,6 +75,8 @@ public record PerkEquipGuiButtonMessage(int buttonID, int x, int y, int z) imple
 			if (slot < 0 || slot >= PerkEquipVars.PERK_SLOTS)
 				return;
 			if (perkId <= 0)
+				return;
+			if (!PerkEquipVars.isSlotUnlocked(entity, slot)) // below the slot's witcher level
 				return;
 			// swap semantics: placing into an occupied slot overwrites the
 			// occupant, which returns to the unequipped pool automatically (equipped

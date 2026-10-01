@@ -148,7 +148,8 @@ public class PerkPage implements GuiPage {
 		// has its own). Wording is in the lang file; position and scale are
 		// PerkTree data (tree-node-placer), colours PerkEquipLayout.
 		WitchercraftModVariables.PlayerVariables vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-		String points = new java.text.DecimalFormat("##.##").format(vars.witchercraftPlayerLevel - vars.witchercraftPerksLearned);
+		// level 1 starts with 0 points; clamped so a level reset never shows negatives
+		String points = new java.text.DecimalFormat("##.##").format(Math.max(0, vars.witchercraftPlayerLevel - 1 - vars.witchercraftPerksLearned));
 		drawScaledText(g, Component.translatableWithFallback("gui.witchercraft.shell.skills.points", "SP available: %s", points),
 				PerkTree.POINTS_X, PerkTree.POINTS_Y, PerkTree.POINTS_SCALE, PerkEquipLayout.STATUS_POINTS);
 		Component hint = mutagensShown()
@@ -166,9 +167,15 @@ public class PerkPage implements GuiPage {
 			int sx = PerkEquipLayout.SLOT_X[i];
 			int sy = PerkEquipLayout.SLOT_Y[i];
 			int cur = PerkEquipVars.getPerkSocket(entity, i);
-			// while holding, EVERY slot is a legal target now (empty = place,
+			// a slot below its witcher level shows the lock glyph and the level it
+			// opens at (a perk already in it after a level reset still shows)
+			if (cur <= 0 && !PerkEquipVars.isSlotUnlocked(entity, i)) {
+				drawLockedSlot(g, sx, sy, PerkEquipVars.slotUnlockLevel(i));
+				continue;
+			}
+			// while holding, EVERY open slot is a legal target (empty = place,
 			// occupied = swap, evicting the occupant back to the pool).
-			boolean validTarget = heldPerk != 0;
+			boolean validTarget = heldPerk != 0 && PerkEquipVars.isSlotUnlocked(entity, i);
 			if (cur > 0) {
 				int c = PerkRegistry.tint(PerkRegistry.color(cur));
 				drawCell(g, sx, sy, PerkEquipLayout.SLOT_SIZE, validTarget ? PerkEquipLayout.TARGET_BORDER : c, withAlpha(c, 0x55));
@@ -215,6 +222,8 @@ public class PerkPage implements GuiPage {
 				int cur = PerkEquipVars.getPerkSocket(entity, si);
 				if (cur > 0)
 					pendingTooltip = perkTooltip(cur);
+				else if (!PerkEquipVars.isSlotUnlocked(entity, si))
+					pendingTooltip = List.of(Component.translatableWithFallback("gui.witchercraft.shell.skills.slot_locked", "Unlocks at level %s", PerkEquipVars.slotUnlockLevel(si)));
 			}
 		}
 	}
@@ -327,6 +336,24 @@ public class PerkPage implements GuiPage {
 			return;
 		}
 		g.blit(RenderPipelines.GUI_TEXTURED, id, ox + x + 1, oy + y + 1, 0, 0, ICON, ICON, ICON_SRC, ICON_SRC, ICON_SRC, ICON_SRC);
+	}
+
+	// Placeholder art for a perk slot below its witcher level (16x16, bare like
+	// the perk glyphs); the level it opens at is drawn over it as text.
+	private static final Identifier SLOT_LOCKED_ICON = Identifier.parse("witchercraft:textures/screens/perk_slot_locked.png");
+
+	private void drawLockedSlot(GuiGraphicsExtractor g, int x, int y, int level) {
+		drawCell(g, x, y, PerkEquipLayout.SLOT_SIZE, PerkEquipLayout.NODE_LOCKED_BORDER, PerkEquipLayout.NODE_LOCKED_INNER);
+		g.blit(RenderPipelines.GUI_TEXTURED, SLOT_LOCKED_ICON, ox + x + 1, oy + y + 1, 0, 0, ICON, ICON, ICON, ICON);
+		Component label = Component.translatableWithFallback("gui.witchercraft.shell.skills.slot_level", "%s", level);
+		// centre the visible glyphs: font.width counts a trailing 1px gap and digits
+		// are 7px tall, so either can land on a half pixel (the pose takes floats)
+		float tx = x + (PerkEquipLayout.SLOT_SIZE - (font.width(label) - 1)) / 2f;
+		float ty = y + (PerkEquipLayout.SLOT_SIZE - 7) / 2f;
+		g.pose().pushMatrix();
+		g.pose().translate(ox + tx, oy + ty);
+		g.text(font, label, 0, 0, PerkEquipLayout.STATUS_TEXT, true);
+		g.pose().popMatrix();
 	}
 
 	// ---- left panel: perk tree ----------------------------------------------
@@ -505,7 +532,9 @@ public class PerkPage implements GuiPage {
 			int si = hitSlot(lx, ly);
 			if (si >= 0) {
 				int cur = PerkEquipVars.getPerkSocket(entity, si);
-				if (heldPerk != 0) {
+				if (heldPerk != 0 && !PerkEquipVars.isSlotUnlocked(entity, si)) {
+					return true; // locked slot: keep holding, nothing to send
+				} else if (heldPerk != 0) {
 					// place, or swap: an occupied slot's perk returns to the pool
 					sendAction(1000000 + si * 1000 + heldPerk, entity);
 					heldPerk = 0;
@@ -565,8 +594,11 @@ public class PerkPage implements GuiPage {
 	 * BONUS_BG background hugging the text. Nothing for an empty socket.
 	 */
 	private void drawBonus(GuiGraphicsExtractor g, Player entity, int gi) {
-		if (mutagenType(gi) == null)
+		MutagenEffects.Type type = mutagenType(gi);
+		if (type == null)
 			return;
+		int textCol = PerkEquipLayout.BONUS_TEXT[type.ordinal()];
+		int bgCol = PerkEquipLayout.BONUS_BG[type.ordinal()];
 		List<Component> lines = MutagenEffects.bonusLines(entity, gi);
 		if (lines.isEmpty())
 			return;
@@ -579,14 +611,14 @@ public class PerkPage implements GuiPage {
 		// the background, in panel pixels: the widest line plus a padding all round
 		float blockW = textW * s, blockH = (lines.size() * BONUS_LINE_H - 2) * s;
 		float left = right ? bx + bw - blockW : bx;
-		fill(g, Math.round(left) - BONUS_PAD, by - BONUS_PAD, Math.round(left + blockW) + BONUS_PAD, Math.round(by + blockH) + BONUS_PAD, PerkEquipLayout.BONUS_BG);
+		fill(g, Math.round(left) - BONUS_PAD, by - BONUS_PAD, Math.round(left + blockW) + BONUS_PAD, Math.round(by + blockH) + BONUS_PAD, bgCol);
 		g.pose().pushMatrix();
 		g.pose().translate(ox + left, oy + by);
 		g.pose().scale(s, s);
 		for (int i = 0; i < lines.size(); i++) {
 			Component line = lines.get(i);
 			int lx = right ? textW - font.width(line) : 0;
-			g.text(font, line, lx, i * BONUS_LINE_H, PerkEquipLayout.BONUS_TEXT, false);
+			g.text(font, line, lx, i * BONUS_LINE_H, textCol, false);
 		}
 		g.pose().popMatrix();
 	}

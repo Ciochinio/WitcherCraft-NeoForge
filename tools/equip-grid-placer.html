@@ -184,8 +184,12 @@ const COLOR_DEFS = [
   ['NODE_LOCKED_BORDER','FF2A2A30','Locked node frame'],
   ['NODE_LOCKED_INNER','FF121215','Locked node background'],
   ['LINK_LOCKED','FF3A3A42','Tree link to a locked node'],
-  ['BONUS_TEXT','FFFFFFFF','Mutagen bonus text'],
-  ['BONUS_BG','AA000000','Mutagen bonus background'],
+  ['BONUS_TEXT[0]','FFFF5555','Mutagen bonus text, Red mutagen'],
+  ['BONUS_TEXT[1]','FF55FF55','Mutagen bonus text, Green mutagen'],
+  ['BONUS_TEXT[2]','FF5599FF','Mutagen bonus text, Blue mutagen'],
+  ['BONUS_BG[0]','AA000000','Mutagen bonus background, Red mutagen'],
+  ['BONUS_BG[1]','AA000000','Mutagen bonus background, Green mutagen'],
+  ['BONUS_BG[2]','AA000000','Mutagen bonus background, Blue mutagen'],
   ['STATUS_POINTS','FFDDDD88','Skill points text (bottom left)'],
   ['STATUS_TEXT','FF9A9AA2','Instructions text (bottom)'],
   ['MEDALLION_BORDER','FF8A6D3B','Medallion frame'],
@@ -415,7 +419,8 @@ public final class PerkEquipLayout {
 	public static final int MEDALLION_H = ${S.MEDALLION_H};
 
 	// What each mutagen socket gives ("+15 Increased Damage", one line per bonus,
-	// 10px apart at scale 1, BONUS_TEXT on a BONUS_BG background): a box per
+	// 10px apart at scale 1, BONUS_TEXT on a BONUS_BG background, both picked by
+	// the socketed mutagen's type: 0 red, 1 green, 2 blue): a box per
 	// socket, the text left- or right-aligned inside it (not clipped).
 	public static final int[] BONUS_X = ${arr(S.BONUS_X)};
 	public static final int[] BONUS_Y = ${arr(S.BONUS_Y)};
