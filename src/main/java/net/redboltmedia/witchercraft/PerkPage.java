@@ -39,25 +39,23 @@ import net.minecraft.world.item.ItemStack;
  * Mutagens, hides the tree so the screen can show the player inventory in its
  * place ({@link #mutagensShown}).
  *
- * The only structural change vs the old container screen: it draws through
- * origin-offset helpers (the shell hands it a content origin instead of the old
- * leftPos / topPos), and the perk recompute that used to fire from
- * PerkEquipGuiMenu.removed() now runs server-side after each equip change (see
- * PerkEquipGuiButtonMessage).
+ * Drawn at normal GUI scale, 1:1 in screen pixels: the 360x200 panel is
+ * centred in the region it is given ({@link #origin}) and every cell (tab, tree
+ * node, equip slot, socket) is a vanilla-sized 18x18 frame holding a 16x16 icon,
+ * so perk glyphs, mutagens and inventory items all line up. Draw helpers offset
+ * by the panel origin (ox, oy). The perk recompute runs server-side after each
+ * equip change (see PerkEquipGuiButtonMessage).
  */
 public class PerkPage implements GuiPage {
 
-	// Cell colours (from the old screen).
-	private static final int CELL_EMPTY_BORDER = 0xFF4A4A52;
-	private static final int CELL_EMPTY_INNER = 0xFF1B1B20;
-	private static final int CELL_VALID_BORDER = 0xFFFFDD55;
-	private static final int TEXT_DIM = 0xFF9A9AA2;
+	// Every colour comes from PerkEquipLayout (edited in equip-grid-placer's Colours panel).
 	private static final int TEXT_HELD = 0xFFFFFFFF;
 
 	// Sub-tabs (index i -> activeBranch i+1): the four perk branches
 	// (Combat/Alchemy/Signs/General = branch colours 1-4), then Mutagens, which
-	// shows the player inventory instead of a tree. Icons are placeholders drawn
-	// from vanilla item textures; swap a path to reskin a tab.
+	// shows the player inventory instead of a tree. Icons are 16x16 placeholder
+	// textures (copies of vanilla item art) meant to be painted over in place.
+	// Positions come from PerkTree (TAB_X / TAB_Y, placed in tree-node-placer).
 	public static final int TAB_MUTAGENS = 5;
 	private static final String[] TAB_KEYS = {
 			"gui.witchercraft.shell.skills.tab_combat", "gui.witchercraft.shell.skills.tab_alchemy",
@@ -65,18 +63,12 @@ public class PerkPage implements GuiPage {
 			"gui.witchercraft.shell.skills.tab_mutagens"};
 	private static final String[] TAB_FALLBACKS = {"Combat", "Alchemy", "Signs", "General", "Mutagens"};
 	private static final String[] TAB_ICONS = {
-			"minecraft:textures/item/iron_sword.png", "minecraft:textures/item/brewing_stand.png",
-			"minecraft:textures/item/lapis_lazuli.png", "minecraft:textures/item/cooked_beef.png",
-			"minecraft:textures/item/redstone.png"};
-	private static final int MUTAGENS_TAB_ACCENT = 0xFFB03030;
-	private static final int[] TAB_X = {8, 40, 72, 104, 136};
-	private static final int TAB_Y = 4, TAB_ICON = 12;
-	private static final int TAB_DIM = 0x99000000; // darkens the inactive tab icons
+			"witchercraft:textures/screens/skills_tab_combat.png", "witchercraft:textures/screens/skills_tab_alchemy.png",
+			"witchercraft:textures/screens/skills_tab_signs.png", "witchercraft:textures/screens/skills_tab_general.png",
+			"witchercraft:textures/screens/skills_tab_mutagens.png"};
 
-	// The area the Mutagens tab gives the player inventory (perk-local coords):
-	// the tree's half of the panel, between the tab row and the status row.
-	public static final int INVENTORY_AREA_X = 0, INVENTORY_AREA_Y = 20;
-	public static final int INVENTORY_AREA_W = 190, INVENTORY_AREA_H = PerkEquipLayout.PANEL_H - 20 - 16;
+	/** Every cell is a vanilla slot: an 18x18 frame around a 16x16 icon. */
+	public static final int CELL = 18, ICON = 16;
 
 	private final String pageId;
 
@@ -124,13 +116,12 @@ public class PerkPage implements GuiPage {
 	}
 
 	/**
-	 * Where the 360x230 perk layout lands in a w x h region (design coords), as
-	 * {originX, originY, scale}: uniform fit, centred. Perk-local (lx, ly) maps to
-	 * (originX + lx * scale, originY + ly * scale).
+	 * Top-left of the 360x200 panel centred in a w x h region (screen pixels, no
+	 * scaling). Never above the region's top; it overflows the bottom only when
+	 * the region is too short.
 	 */
-	public static float[] layout(int x, int y, int w, int h) {
-		float scale = fitScale(w, h);
-		return new float[]{x + (w - PerkEquipLayout.PANEL_W * scale) / 2f, y + (h - PerkEquipLayout.PANEL_H * scale) / 2f, scale};
+	public static int[] origin(int x, int y, int w, int h) {
+		return new int[]{x + (w - PerkEquipLayout.PANEL_W) / 2, y + Math.max(0, (h - PerkEquipLayout.PANEL_H) / 2)};
 	}
 
 	private MutagenEffects.Type mutagenType(int gi) {
@@ -147,16 +138,10 @@ public class PerkPage implements GuiPage {
 		if (entity == null)
 			return;
 
-		// map the 360x230 perk layout onto the content region (uniform scale,
-		// centred) so the Skills page fills the area below the navbar. Drawing is
-		// in perk-local coords via a nested pose transform (ox/oy stay 0).
-		float[] fit = layout(x, y, w, h);
-		float px = fit[0], py = fit[1], scale = fit[2];
-		this.ox = 0;
-		this.oy = 0;
-		g.pose().pushMatrix();
-		g.pose().translate(px, py);
-		g.pose().scale(scale, scale);
+		// the panel at 1:1 GUI scale, centred in the region; helpers offset by (ox, oy)
+		int[] o = origin(x, y, w, h);
+		this.ox = o[0];
+		this.oy = o[1];
 
 		drawTabs(g);
 		// status row: points-available text is not yet localized (a legacy
@@ -165,14 +150,14 @@ public class PerkPage implements GuiPage {
 		// to avoid the two overlapping regardless of locale/points-string length.
 		String pts = CharacterAbilitiesSkillPointsAvailableProcedure.execute(entity);
 		int statusY = PerkEquipLayout.PANEL_H - 14;
-		text(g, pts, 8, statusY, 0xFFDDDD88);
+		text(g, pts, 8, statusY, PerkEquipLayout.STATUS_POINTS);
 		int tailX = 8 + font.width(pts) + 10;
 		// no separate "Holding: X" readout - the node's selection ring and the
 		// lit-up valid-target slots already show what's held and where it can go.
 		if (mutagensShown())
-			textC(g, tt("gui.witchercraft.shell.skills.mutagen_instructions", "Drag a mutagen into a socket"), tailX, statusY, TEXT_DIM);
+			textC(g, tt("gui.witchercraft.shell.skills.mutagen_instructions", "Drag a mutagen into a socket"), tailX, statusY, PerkEquipLayout.STATUS_TEXT);
 		else
-			textC(g, tt("gui.witchercraft.shell.skills.instructions", "R-click=learn  L-click learned=hold"), tailX, statusY, TEXT_DIM);
+			textC(g, tt("gui.witchercraft.shell.skills.instructions", "R-click=learn  L-click learned=hold"), tailX, statusY, PerkEquipLayout.STATUS_TEXT);
 
 		// the Mutagens tab leaves the tree area to the inventory slots SkillsScreen draws
 		if (!mutagensShown())
@@ -189,10 +174,10 @@ public class PerkPage implements GuiPage {
 			boolean validTarget = heldPerk != 0;
 			if (cur > 0) {
 				int c = PerkRegistry.tint(PerkRegistry.color(cur));
-				drawCell(g, sx, sy, PerkEquipLayout.SLOT_SIZE, validTarget ? CELL_VALID_BORDER : c, withAlpha(c, 0x55));
-				drawPerkIcon(g, cur, sx, sy, PerkEquipLayout.SLOT_SIZE, ICON_EQUIPPED); // socketed = equipped
+				drawCell(g, sx, sy, PerkEquipLayout.SLOT_SIZE, validTarget ? PerkEquipLayout.TARGET_BORDER : c, withAlpha(c, 0x55));
+				drawPerkIcon(g, cur, sx, sy, ICON_EQUIPPED); // socketed = equipped
 			} else {
-				drawCell(g, sx, sy, PerkEquipLayout.SLOT_SIZE, validTarget ? CELL_VALID_BORDER : CELL_EMPTY_BORDER, CELL_EMPTY_INNER);
+				drawCell(g, sx, sy, PerkEquipLayout.SLOT_SIZE, validTarget ? PerkEquipLayout.TARGET_BORDER : PerkEquipLayout.CELL_BORDER, PerkEquipLayout.CELL_INNER);
 			}
 		}
 
@@ -204,29 +189,23 @@ public class PerkPage implements GuiPage {
 			MutagenEffects.Type type = mutagenType(gi);
 			if (type != null) {
 				int c = type.tint();
-				drawCell(g, sx, sy, PerkEquipLayout.SOCKET_SIZE, c, withAlpha(c, 0x55));
+				drawCell(g, sx, sy, PerkEquipLayout.SOCKET_SIZE, c, PerkEquipLayout.CELL_INNER);
 			} else {
-				drawCell(g, sx, sy, PerkEquipLayout.SOCKET_SIZE, CELL_EMPTY_BORDER, CELL_EMPTY_INNER);
+				drawCell(g, sx, sy, PerkEquipLayout.SOCKET_SIZE, PerkEquipLayout.CELL_BORDER, PerkEquipLayout.CELL_INNER);
 			}
 		}
 
-		// medallion + per-group synergy counts
+		// medallion + what each socketed mutagen gives
 		if (PerkEquipLayout.MEDALLION_ENABLED) {
-			drawRect(g, PerkEquipLayout.MEDALLION_X, PerkEquipLayout.MEDALLION_Y, PerkEquipLayout.MEDALLION_W, PerkEquipLayout.MEDALLION_H, 0xFF8A6D3B, 0xFF3A2E1C);
-			textC(g, tt("gui.witchercraft.shell.skills.medallion", "MED"), PerkEquipLayout.MEDALLION_X + PerkEquipLayout.MEDALLION_W / 2 - 8, PerkEquipLayout.MEDALLION_Y + PerkEquipLayout.MEDALLION_H / 2 - 4, 0xFFEEDDBB);
+			drawRect(g, PerkEquipLayout.MEDALLION_X, PerkEquipLayout.MEDALLION_Y, PerkEquipLayout.MEDALLION_W, PerkEquipLayout.MEDALLION_H, PerkEquipLayout.MEDALLION_BORDER, PerkEquipLayout.MEDALLION_INNER);
+			textC(g, tt("gui.witchercraft.shell.skills.medallion", "MED"), PerkEquipLayout.MEDALLION_X + PerkEquipLayout.MEDALLION_W / 2 - 8, PerkEquipLayout.MEDALLION_Y + PerkEquipLayout.MEDALLION_H / 2 - 4, PerkEquipLayout.MEDALLION_TEXT);
 		}
-		for (int gi = 0; gi < PerkEquipVars.MUTAGEN_GROUPS; gi++) {
-			int matches = groupMatchCount(gi);
-			MutagenEffects.Type type = mutagenType(gi);
-			int col = type != null ? type.tint() : TEXT_DIM;
-			text(g, "g" + (gi + 1) + ":" + matches, PerkEquipLayout.SOCKET_X[gi] + 2, PerkEquipLayout.SOCKET_Y[gi] + PerkEquipLayout.SOCKET_SIZE + 1, col);
-		}
+		for (int gi = 0; gi < PerkEquipVars.MUTAGEN_GROUPS; gi++)
+			drawBonus(g, entity, gi);
 
-		g.pose().popMatrix();
-
-		// tooltips - stored, not drawn here (the shell renders them in screen space).
-		// Hit-test in perk-local coords (map the mouse back through the fit scale).
-		int lx = (int) ((mouseX - px) / scale), ly = (int) ((mouseY - py) / scale);
+		// tooltips - stored, not drawn here (the screen renders them last).
+		// Hit-test in perk-local coords.
+		int lx = mouseX - ox, ly = mouseY - oy;
 		int np = hitNode(lx, ly);
 		int hoveredTab = hitTab(lx, ly);
 		if (hoveredTab > 0) {
@@ -313,7 +292,7 @@ public class PerkPage implements GuiPage {
 		return Component.translatableWithFallback(key, fallback);
 	}
 
-	// ---- perk icons (32x32 source, scaled to the target cell) ----------------
+	// ---- perk icons (32x32 source, drawn 16x16 inside an 18x18 cell) --------
 
 	// Each perk has three flat MCreator-visible textures/screens/<slug>_<state>
 	// glyphs. The coloured frame / selection highlight is drawn by the GUI, not
@@ -321,8 +300,7 @@ public class PerkPage implements GuiPage {
 	private static final int ICON_NOTLEARNED = 0, ICON_NOTEQUIPPED = 1, ICON_EQUIPPED = 2;
 	private static final String[] ICON_STATE = {"notlearned", "notequipped", "equipped"};
 
-	// Source glyphs are 32x32; cells are 24-27px, so each icon draws inside a
-	// nested pose scaled to the cell.
+	// Source glyphs are 32x32; they are squeezed into the 16x16 icon area.
 	private static final int ICON_SRC = 32;
 	private static final Map<String, Identifier> ICON_CACHE = new HashMap<>();
 
@@ -334,20 +312,15 @@ public class PerkPage implements GuiPage {
 		return ICON_CACHE.computeIfAbsent(key, k -> Identifier.parse("witchercraft:textures/screens/" + k + ".png"));
 	}
 
-	/** Draw a perk's glyph filling a size x size cell at (x, y). Falls back to
-	 *  the 3-letter label if the texture id can't be built (unknown perk). */
-	private void drawPerkIcon(GuiGraphicsExtractor g, int perkId, int x, int y, int size, int state) {
+	/** Draw a perk's glyph in the 16x16 icon area of the cell at (x, y). Falls back
+	 *  to the 3-letter label if the texture id can't be built (unknown perk). */
+	private void drawPerkIcon(GuiGraphicsExtractor g, int perkId, int x, int y, int state) {
 		Identifier id = perkIcon(perkId, state);
 		if (id == null) {
-			text(g, trim(PerkRegistry.name(perkId), 3), x + 3, y + size / 2 - 4, state == ICON_NOTLEARNED ? TEXT_DIM : TEXT_HELD);
+			text(g, trim(PerkRegistry.name(perkId), 3), x + 1, y + 5, state == ICON_NOTLEARNED ? PerkEquipLayout.STATUS_TEXT : TEXT_HELD);
 			return;
 		}
-		float s = size / (float) ICON_SRC;
-		g.pose().pushMatrix();
-		g.pose().translate((float) (ox + x), (float) (oy + y));
-		g.pose().scale(s, s);
-		g.blit(RenderPipelines.GUI_TEXTURED, id, 0, 0, 0, 0, ICON_SRC, ICON_SRC, ICON_SRC, ICON_SRC);
-		g.pose().popMatrix();
+		g.blit(RenderPipelines.GUI_TEXTURED, id, ox + x + 1, oy + y + 1, 0, 0, ICON, ICON, ICON_SRC, ICON_SRC, ICON_SRC, ICON_SRC);
 	}
 
 	// ---- left panel: perk tree ----------------------------------------------
@@ -355,34 +328,20 @@ public class PerkPage implements GuiPage {
 	private void drawTabs(GuiGraphicsExtractor g) {
 		for (int i = 0; i < TAB_ICONS.length; i++) {
 			boolean active = activeBranch == i + 1;
-			drawTexture(g, TAB_ICONS[i], TAB_X[i], TAB_Y, TAB_ICON);
-			if (active)
-				fill(g, TAB_X[i] - 1, TAB_Y + TAB_ICON + 1, TAB_X[i] + TAB_ICON + 1, TAB_Y + TAB_ICON + 2, tabAccent(i + 1));
-			else
-				fill(g, TAB_X[i], TAB_Y, TAB_X[i] + TAB_ICON, TAB_Y + TAB_ICON, TAB_DIM);
+			int tx = PerkTree.TAB_X[i], ty = PerkTree.TAB_Y;
+			// the active tab is marked by its frame colour alone
+			drawCell(g, tx, ty, CELL, active ? PerkEquipLayout.TAB_ACTIVE_BORDER[i] : PerkEquipLayout.TAB_BORDER, PerkEquipLayout.TAB_INNER);
+			g.blit(RenderPipelines.GUI_TEXTURED, Identifier.parse(TAB_ICONS[i]), ox + tx + 1, oy + ty + 1, 0, 0, ICON, ICON, ICON, ICON, active ? -1 : PerkEquipLayout.TAB_FADE);
 		}
-	}
-
-	private static int tabAccent(int tab) {
-		return tab == TAB_MUTAGENS ? MUTAGENS_TAB_ACCENT : PerkRegistry.tint(tab);
 	}
 
 	private int hitTab(int lx, int ly) {
 		for (int i = 0; i < TAB_ICONS.length; i++) {
-			if (lx >= TAB_X[i] - 2 && lx < TAB_X[i] + TAB_ICON + 2 && ly >= TAB_Y - 2 && ly < TAB_Y + TAB_ICON + 3)
+			int tx = PerkTree.TAB_X[i], ty = PerkTree.TAB_Y;
+			if (lx >= tx && lx < tx + CELL && ly >= ty && ly < ty + CELL)
 				return i + 1;
 		}
 		return -1;
-	}
-
-	/** A whole square texture (any source size, 16 for item textures) scaled into a size x size box. */
-	private void drawTexture(GuiGraphicsExtractor g, String texture, int x, int y, int size) {
-		float s = size / 16f;
-		g.pose().pushMatrix();
-		g.pose().translate((float) (ox + x), (float) (oy + y));
-		g.pose().scale(s, s);
-		g.blit(RenderPipelines.GUI_TEXTURED, Identifier.parse(texture), 0, 0, 0, 0, 16, 16, 16, 16);
-		g.pose().popMatrix();
 	}
 
 	private void drawTree(GuiGraphicsExtractor g, Player entity) {
@@ -391,7 +350,7 @@ public class PerkPage implements GuiPage {
 		for (PerkTree.Node n : nodes) {
 			boolean childLearned = PerkLearnedVars.isLearned(entity, n.perkId);
 			boolean childMet = prereqsMet(n, entity);
-			int col = childLearned ? withAlpha(tint, 0xCC) : (childMet ? withAlpha(tint, 0x77) : 0xFF3A3A42);
+			int col = childLearned ? withAlpha(tint, 0xCC) : (childMet ? withAlpha(tint, 0x77) : PerkEquipLayout.LINK_LOCKED);
 			for (int pre : n.prereqs) {
 				PerkTree.Node p = PerkTree.byId(pre);
 				if (p == null)
@@ -406,26 +365,26 @@ public class PerkPage implements GuiPage {
 			boolean met = prereqsMet(n, entity);
 			int t = PerkRegistry.tint(PerkRegistry.color(n.perkId));
 			if (heldPerk == n.perkId) // 1px selection ring (matches the slot frames)
-				drawRect(g, n.x - 1, n.y - 1, PerkTree.NODE_SIZE + 2, PerkTree.NODE_SIZE + 2, CELL_VALID_BORDER, CELL_VALID_BORDER);
+				drawRect(g, n.x - 1, n.y - 1, PerkTree.NODE_SIZE + 2, PerkTree.NODE_SIZE + 2, PerkEquipLayout.TARGET_BORDER, PerkEquipLayout.TARGET_BORDER);
 			int border, inner;
 			if (equipped) {
 				border = t;
 				inner = withAlpha(t, 0x99);
 			} else if (learned) {
 				border = t;
-				inner = CELL_EMPTY_INNER;
+				inner = PerkEquipLayout.CELL_INNER;
 			} else if (met) {
 				border = dim(t);
-				inner = 0xFF141417;
+				inner = PerkEquipLayout.NODE_AVAILABLE_INNER;
 			} else {
-				border = 0xFF2A2A30;
-				inner = 0xFF121215;
+				border = PerkEquipLayout.NODE_LOCKED_BORDER;
+				inner = PerkEquipLayout.NODE_LOCKED_INNER;
 			}
 			drawCell(g, n.x, n.y, PerkTree.NODE_SIZE, border, inner);
 			// three-state glyph: locked/available -> notlearned, learned but not
 			// slotted -> notequipped, slotted -> equipped.
 			int state = equipped ? ICON_EQUIPPED : (learned ? ICON_NOTEQUIPPED : ICON_NOTLEARNED);
-			drawPerkIcon(g, n.perkId, n.x, n.y, PerkTree.NODE_SIZE, state);
+			drawPerkIcon(g, n.perkId, n.x, n.y, state);
 		}
 	}
 
@@ -499,7 +458,11 @@ public class PerkPage implements GuiPage {
 	}
 
 	private void drawRect(GuiGraphicsExtractor g, int x, int y, int w, int h, int border, int inner) {
-		fill(g, x, y, x + w, y + h, border);
+		// 1px border as four edges, so a translucent inner never shows the border colour through
+		fill(g, x, y, x + w, y + 1, border);
+		fill(g, x, y + h - 1, x + w, y + h, border);
+		fill(g, x, y + 1, x + 1, y + h - 1, border);
+		fill(g, x + w - 1, y + 1, x + w, y + h - 1, border);
 		fill(g, x + 1, y + 1, x + w - 1, y + h - 1, inner);
 	}
 
@@ -510,9 +473,9 @@ public class PerkPage implements GuiPage {
 		Player entity = player();
 		if (entity == null)
 			return false;
-		float[] fit = layout(x, y, w, h);
-		int lx = (int) ((mouseX - fit[0]) / fit[2]);
-		int ly = (int) ((mouseY - fit[1]) / fit[2]);
+		int[] o = origin(x, y, w, h);
+		int lx = (int) mouseX - o[0];
+		int ly = (int) mouseY - o[1];
 		int nodePerk = hitNode(lx, ly);
 		if (button == 1) { // right-click a node = learn (server enforces prereqs + points)
 			if (nodePerk > 0) {
@@ -590,18 +553,39 @@ public class PerkPage implements GuiPage {
 
 	// ---- helpers -------------------------------------------------------------
 
-	/** Uniform scale to fit the 360x230 perk layout into a w x h content region. */
-	private static float fitScale(int w, int h) {
-		return Math.min((float) w / PerkEquipLayout.PANEL_W, (float) h / PerkEquipLayout.PANEL_H);
+	/**
+	 * Socket gi's bonus text ("+15 Increased Damage", one line per modifier) in its
+	 * BONUS_* box, left or right aligned, scaled by BONUS_TEXT_SCALE, on a
+	 * BONUS_BG background hugging the text. Nothing for an empty socket.
+	 */
+	private void drawBonus(GuiGraphicsExtractor g, Player entity, int gi) {
+		if (mutagenType(gi) == null)
+			return;
+		List<Component> lines = MutagenEffects.bonusLines(entity, gi);
+		if (lines.isEmpty())
+			return;
+		float s = PerkEquipLayout.BONUS_TEXT_SCALE;
+		int textW = 0;
+		for (Component line : lines)
+			textW = Math.max(textW, font.width(line));
+		int bx = PerkEquipLayout.BONUS_X[gi], by = PerkEquipLayout.BONUS_Y[gi], bw = PerkEquipLayout.BONUS_W[gi];
+		boolean right = PerkEquipLayout.BONUS_ALIGN_RIGHT[gi];
+		// the background, in panel pixels: the widest line plus a padding all round
+		float blockW = textW * s, blockH = (lines.size() * BONUS_LINE_H - 2) * s;
+		float left = right ? bx + bw - blockW : bx;
+		fill(g, Math.round(left) - BONUS_PAD, by - BONUS_PAD, Math.round(left + blockW) + BONUS_PAD, Math.round(by + blockH) + BONUS_PAD, PerkEquipLayout.BONUS_BG);
+		g.pose().pushMatrix();
+		g.pose().translate(ox + left, oy + by);
+		g.pose().scale(s, s);
+		for (int i = 0; i < lines.size(); i++) {
+			Component line = lines.get(i);
+			int lx = right ? textW - font.width(line) : 0;
+			g.text(font, line, lx, i * BONUS_LINE_H, PerkEquipLayout.BONUS_TEXT, false);
+		}
+		g.pose().popMatrix();
 	}
 
-	private int groupMatchCount(int gi) {
-		Player entity = player();
-		MutagenEffects.Type type = mutagenType(gi);
-		if (entity == null || type == null)
-			return 0;
-		return MutagenEffects.synergy(entity, gi, type);
-	}
+	private static final int BONUS_LINE_H = 10, BONUS_PAD = 2;
 
 	private static String trim(String s, int max) {
 		return s.length() <= max ? s : s.substring(0, max);

@@ -26,9 +26,9 @@ import net.minecraft.world.item.ItemStack;
  * returns nothing because the mutagens stay equipped. On the client they are a
  * plain container the menu sync fills.
  *
- * Slot positions are placeholders: {@link SkillsScreen} moves every slot onto
- * the scaled Skills layout (Slot.x / y are made writable by the access
- * transformer). The inventory slots are only active on the client while the
+ * Slot positions come from {@link PerkEquipLayout} (sockets) and {@link PerkTree} (inventory block) in panel-local GUI pixels
+ * (the item sits 1px inside each 18x18 cell frame); {@link SkillsScreen} sets
+ * leftPos / topPos to the panel origin. The inventory slots are only active on the client while the
  * Mutagens sub-tab is shown ({@link #inventoryShown}); the server keeps them
  * active so shift-click and the sync work on every sub-tab.
  *
@@ -44,6 +44,8 @@ public class SkillsMenu extends AbstractContainerMenu {
 	public static final int INVENTORY_START = MUTAGEN_SLOTS;
 	public static final int HOTBAR_START = INVENTORY_START + 27;
 	public static final int SLOT_END = HOTBAR_START + 9;
+	/** Extra gap between the third inventory row and the hotbar, like vanilla. */
+	public static final int HOTBAR_GAP = 4;
 
 	/** Client only: whether the Mutagens sub-tab (and so the inventory) is shown. */
 	public boolean inventoryShown = true;
@@ -61,18 +63,19 @@ public class SkillsMenu extends AbstractContainerMenu {
 	private SkillsMenu(int containerId, Inventory inventory, Container mutagens) {
 		super(TYPE.get(), containerId);
 		for (int i = 0; i < MUTAGEN_SLOTS; i++)
-			this.addSlot(new MutagenSlot(mutagens, i));
+			this.addSlot(new MutagenSlot(mutagens, i, PerkEquipLayout.SOCKET_X[i] + 1, PerkEquipLayout.SOCKET_Y[i] + 1));
+		int left = PerkTree.INVENTORY_X + 1, top = PerkTree.INVENTORY_Y + 1;
 		for (int row = 0; row < 3; row++)
 			for (int col = 0; col < 9; col++)
-				this.addSlot(new InventorySlot(inventory, col + (row + 1) * 9));
+				this.addSlot(new InventorySlot(inventory, col + (row + 1) * 9, left + col * 18, top + row * 18));
 		for (int col = 0; col < 9; col++)
-			this.addSlot(new InventorySlot(inventory, col));
+			this.addSlot(new InventorySlot(inventory, col, left + col * 18, top + 3 * 18 + HOTBAR_GAP));
 	}
 
 	/** One mutagen per socket; only mutagen items. */
 	private static class MutagenSlot extends Slot {
-		MutagenSlot(Container container, int index) {
-			super(container, index, 0, 0);
+		MutagenSlot(Container container, int index, int x, int y) {
+			super(container, index, x, y);
 		}
 
 		@Override
@@ -87,8 +90,8 @@ public class SkillsMenu extends AbstractContainerMenu {
 	}
 
 	private class InventorySlot extends Slot {
-		InventorySlot(Container container, int index) {
-			super(container, index, 0, 0);
+		InventorySlot(Container container, int index, int x, int y) {
+			super(container, index, x, y);
 		}
 
 		@Override

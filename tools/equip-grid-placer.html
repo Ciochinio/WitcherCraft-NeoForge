@@ -27,12 +27,15 @@
   .box { position: absolute; border: 2px solid var(--dim); background: #ffffff14;
          display:flex; align-items:center; justify-content:center; cursor: grab;
          font-size: 11px; color: var(--ink); user-select:none; text-shadow: 0 1px 2px #000; z-index:2; }
+  .box .icon { position:absolute; border: 1px dashed #ffffff40; pointer-events:none; }
   .box.sel { outline: 2px solid var(--accent); outline-offset: 1px; z-index: 6; }
   .box.slot.g0 { border-color: var(--red); }
   .box.slot.g1 { border-color: var(--green); }
   .box.slot.g2 { border-color: var(--blue); }
   .box.slot.g3 { border-color: var(--neutral); }
   .box.socket { border-style: dashed; border-color: var(--med); }
+  .box.bonus { border-color: var(--accent); border-style: dotted; background: #ffdd5510; font-size: 10px; padding: 0 3px; justify-content:flex-start; align-items:flex-start; white-space:nowrap; overflow:visible; }
+  .box.bonus.right { justify-content:flex-end; }
   .box.med { border-color: var(--med); background: #d8b36622; border-radius: 8px; }
   .box.med.off { opacity: .35; }
   .rz { position:absolute; right:-4px; bottom:-4px; width:12px; height:12px; background:var(--accent);
@@ -58,7 +61,7 @@
 <body>
 <header>
   <h1>Equip Grid Placer</h1>
-  <span class="hint">Drag boxes (resize the medallion by its corner handle). Output regenerates <code>PerkEquipLayout.java</code> live &rarr; copy &rarr; paste over the file. Coordinates are GUI-local (top-left origin), in Minecraft GUI pixels.</span>
+  <span class="hint">Drag boxes (resize the medallion by its corner handle). Output regenerates <code>PerkEquipLayout.java</code> live &rarr; copy &rarr; paste over the file. Coordinates are panel-local Minecraft GUI pixels: the Skills panel is drawn 1:1 at normal GUI scale. This tool owns the right side (equip grid, sockets, bonus labels, medallion) and every colour; the sub-tabs, tree nodes and Mutagens inventory are in <code>tree-node-placer.html</code>.</span>
 </header>
 
 <div class="wrap">
@@ -69,12 +72,11 @@
 
   <div class="side">
     <fieldset>
-      <legend>Panel & sizes</legend>
+      <legend>Panel</legend>
       <label>Panel W <input type="number" id="panelW"></label>
       <label>Panel H <input type="number" id="panelH"></label>
-      <label>Zoom <input type="number" id="zoom" step="0.5" min="1" max="6"></label><br>
-      <label>Slot size <input type="number" id="slotSize"></label>
-      <label>Socket size <input type="number" id="socketSize"></label>
+      <label>Zoom <input type="number" id="zoom" step="0.5" min="1" max="6"></label>
+      <div class="hint" style="color:var(--dim)">Every cell (tab, perk slot, mutagen socket, tree node) is a vanilla slot: an 18x18 frame with a 16x16 icon (dashed inner square). The size is fixed, not exported as a setting. The panel must fit the screen at the player's GUI scale, or it is outlined red in game.</div>
     </fieldset>
 
     <fieldset>
@@ -82,7 +84,22 @@
       <label><input type="checkbox" id="medOn"> Render medallion in-game</label><br>
       <label>Med W <input type="number" id="medW"></label>
       <label>Med H <input type="number" id="medH"></label>
-      <div class="hint" style="color:var(--dim)">The medallion is just the decorative centre piece today - it does nothing. Turn it off to hide it, or repurpose it as a rectangular button later (position/size are exported either way). Drag its corner handle to resize.</div>
+      <div class="hint" style="color:var(--dim)">The medallion is just the decorative centre piece today - it does nothing. Turn it off to hide it. Drag its corner handle to resize.</div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Bonus labels</legend>
+      <label>Width <input type="number" id="bonusW" min="8"></label>
+      <label><input type="checkbox" id="bonusRight"> Right-aligned</label><br>
+      <label>Text scale (all labels) <input type="number" id="bonusScale" step="0.05" min="0.25" max="2"></label>
+      <div class="hint" style="color:var(--dim)">Select a B1-B4 box (the bonus text for socket M1-M4, e.g. "+15 Increased Damage", one line per bonus, 10px apart). Text is aligned inside the box and is not clipped, so leave room for longer lines. Each label gets a background behind its text (colour below). A scale below 1 shrinks the text; values other than 0.5 / 1 can look slightly uneven with Minecraft's pixel font. Right-aligned text grows leftwards from the box's right edge.</div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Colours (ARGB)</legend>
+      <div class="hint" style="color:var(--dim);margin-bottom:6px">Every colour the Skills page draws. Type <code>#AARRGGBB</code> (AA = opacity, FF = solid) or pick an RGB colour (keeps the alpha). Exported into <code>PerkEquipLayout.java</code>.</div>
+      <div id="colors"></div>
+      <button id="colorsReset" style="margin-top:6px">Reset colours</button>
     </fieldset>
 
     <fieldset>
@@ -111,8 +128,9 @@
       <span class="legend-swatch" style="border-color:var(--blue)"></span>Group 3 (7-9)
       <span class="legend-swatch" style="border-color:var(--neutral)"></span>Group 4 (10-12)<br>
       <span class="legend-swatch" style="border-color:var(--med);border-style:dashed"></span>Mutagen sockets M1-M4
-      <span class="legend-swatch" style="border-color:var(--med);border-radius:6px"></span>Medallion
-      <div class="hint" style="color:var(--dim);margin-top:6px">Slot index fixes its mutagen group (1-3&rarr;g1, 4-6&rarr;g2, 7-9&rarr;g3, 10-12&rarr;g4), matching ApplyMutagenBonus. Socket Mn belongs to group n.</div>
+      <span class="legend-swatch" style="border-color:var(--med);border-radius:6px"></span>Medallion<br>
+      <span class="legend-swatch" style="border-color:var(--accent);border-style:dotted"></span>Bonus labels B1-B4 (what socket Mn gives)
+      <div class="hint" style="color:var(--dim);margin-top:6px">Slot index fixes its mutagen group (1-3&rarr;g1, 4-6&rarr;g2, 7-9&rarr;g3, 10-12&rarr;g4). Socket Mn belongs to group n and buffs from the perks in its group. The tree nodes are placed with tree-node-placer.html; keep them clear of the tab row.</div>
     </fieldset>
 
     <div class="row">
@@ -123,7 +141,7 @@
 
     <fieldset style="margin-top:12px">
       <legend>Import from Java</legend>
-      <div class="hint" style="color:var(--dim);margin-bottom:6px">Paste the current <code>PerkEquipLayout.java</code> to load its values into the editor - so you start from the checked-in file instead of the seed. Reads panel/slot/socket/medallion values (the debug palette block is carried through unchanged).</div>
+      <div class="hint" style="color:var(--dim);margin-bottom:6px">Paste the current <code>PerkEquipLayout.java</code> to load its values into the editor. An older file with bigger cells (SLOT_SIZE / SOCKET_SIZE above 18) is converted by shrinking each cell around its centre; a file without a tab row or inventory block keeps the seeded ones.</div>
       <textarea id="impArea" spellcheck="false" style="height:120px" placeholder="paste PerkEquipLayout.java here"></textarea>
       <div class="row" style="margin-top:6px"><button id="impDo">Import</button><span class="hint" style="color:var(--dim)" id="impInfo"></span></div>
     </fieldset>
@@ -131,51 +149,82 @@
 </div>
 
 <script>
+// Fixed vanilla slot geometry and the fixed inventory block.
+const CELL = 18, ICON = 16;
+
 // ---- seeded defaults: current PerkEquipLayout.java values ----------------
 const SEED = {
-  PANEL_W: 360, PANEL_H: 230,
-  SLOT_SIZE: 24, SOCKET_SIZE: 24,
-  SLOT_X: [196,196,196,224,224,224,300,300,300,328,328,328],
-  SLOT_Y: [30,62,94,30,62,94,30,62,94,30,62,94],
-  SOCKET_X: [196,224,300,328], SOCKET_Y: [130,130,130,130],
-  MEDALLION_ENABLED: true, MEDALLION_X: 256, MEDALLION_Y: 46, MEDALLION_W: 40, MEDALLION_H: 40,
+  PANEL_W: 360, PANEL_H: 200,
+  SLOT_X: [248, 248, 248, 246, 246, 246, 278, 278, 278, 278, 278, 278],
+  SLOT_Y: [2, 30, 57, 111, 138, 166, 2, 30, 57, 111, 138, 166],
+  SOCKET_X: [210, 208, 316, 316], SOCKET_Y: [30, 138, 30, 138],
+  MEDALLION_ENABLED: true, MEDALLION_X: 252, MEDALLION_Y: 83, MEDALLION_W: 40, MEDALLION_H: 20,
+  BONUS_X: [118, 116, 248, 248], BONUS_Y: [50, 158, 50, 158], BONUS_W: [110, 110, 110, 110],
+  BONUS_ALIGN_RIGHT: [true, true, true, true], BONUS_TEXT_SCALE: 0.75,
+  COLORS: {}, // filled from COLOR_DEFS below
 };
-// palette-section constants are carried through verbatim (dev-only, removed in Phase 2)
-const PALETTE_BLOCK =
-`	// --- Debug palette (left half): every perk as a clickable text row, two
-	// sub-columns, in PerkRegistry order. Row i -> column i / ROWS_PER_COL.
-	public static final int[] PALETTE_X = {8, 100};
-	public static final int PALETTE_Y0 = 20;
-	public static final int PALETTE_ROW_H = 9;
-	public static final int PALETTE_ROW_W = 88;
-	public static final int PALETTE_ROWS_PER_COL = 23;`;
+// [constant, default, description]; arrays are written as NAME[i]
+const COLOR_DEFS = [
+  ['BRANCH_COLORS[0]','FFFF5555','Combat (red): equipped perk frames, tree links, tooltip names, Red mutagen sockets'],
+  ['BRANCH_COLORS[1]','FF55FF55','Alchemy (green): same, Green mutagens'],
+  ['BRANCH_COLORS[2]','FF5599FF','Signs (blue): same, Blue mutagens'],
+  ['BRANCH_COLORS[3]','FFCCCCCC','General (neutral)'],
+  ['TAB_BORDER','FF4A4A52','Sub-tab frame (inactive)'],
+  ['TAB_INNER','FF1B1B20','Sub-tab background'],
+  ['TAB_ACTIVE_BORDER[0]','FFFF5555','Active Combat tab frame'],
+  ['TAB_ACTIVE_BORDER[1]','FF55FF55','Active Alchemy tab frame'],
+  ['TAB_ACTIVE_BORDER[2]','FF5599FF','Active Signs tab frame'],
+  ['TAB_ACTIVE_BORDER[3]','FFCCCCCC','Active General tab frame'],
+  ['TAB_ACTIVE_BORDER[4]','FFB03030','Active Mutagens tab frame'],
+  ['TAB_FADE','66FFFFFF','Inactive tab icon tint (alpha = how visible)'],
+  ['CELL_BORDER','FF4A4A52','Empty perk slot / socket frame'],
+  ['CELL_INNER','FF1B1B20','Cell background (empty slots, sockets, learned nodes)'],
+  ['TARGET_BORDER','FFFFDD55','Holding a perk: every slot frame + the held node ring'],
+  ['NODE_AVAILABLE_INNER','FF141417','Learnable node background'],
+  ['NODE_LOCKED_BORDER','FF2A2A30','Locked node frame'],
+  ['NODE_LOCKED_INNER','FF121215','Locked node background'],
+  ['LINK_LOCKED','FF3A3A42','Tree link to a locked node'],
+  ['BONUS_TEXT','FFFFFFFF','Mutagen bonus text'],
+  ['BONUS_BG','AA000000','Mutagen bonus background'],
+  ['STATUS_POINTS','FFDDDD88','Skill points text (bottom left)'],
+  ['STATUS_TEXT','FF9A9AA2','Instructions text (bottom)'],
+  ['MEDALLION_BORDER','FF8A6D3B','Medallion frame'],
+  ['MEDALLION_INNER','FF3A2E1C','Medallion background'],
+  ['MEDALLION_TEXT','FFEEDDBB','Medallion label'],
+];
+for (const [k, v] of COLOR_DEFS) SEED.COLORS[k] = v;
+const BONUS_H = 20; // preview height: two 10px lines
+const BONUS_SAMPLE = '+15 Increased Damage';
 
 const GROUP_STROKE = ['#ff5555','#55ff55','#5599ff','#cccccc'];
 let S = structuredClone(SEED);
 let zoom = 3;
-let selected = null; // {type:'slot'|'socket'|'med', idx}
+let selected = null; // {type:'slot'|'socket'|'med'|'bonus', idx}
 
 const stage = document.getElementById('stage');
 const out = document.getElementById('out');
 const $ = id => document.getElementById(id);
 const SVGNS = 'http://www.w3.org/2000/svg';
 
-function sizeOf(type){ return type==='slot'?S.SLOT_SIZE : type==='socket'?S.SOCKET_SIZE : null; }
-function dimsOf(type){ // [w,h]
+function dimsOf(type,i){ // [w,h]
   if(type==='med') return [S.MEDALLION_W, S.MEDALLION_H];
-  const s = sizeOf(type); return [s,s];
+  if(type==='bonus') return [S.BONUS_W[i], BONUS_H];
+  return [CELL, CELL];
 }
 function posOf(type,i){
   if(type==='slot') return [S.SLOT_X[i], S.SLOT_Y[i]];
   if(type==='socket') return [S.SOCKET_X[i], S.SOCKET_Y[i]];
+  if(type==='bonus') return [S.BONUS_X[i], S.BONUS_Y[i]];
   return [S.MEDALLION_X, S.MEDALLION_Y];
 }
 function setPos(type,i,x,y){
   if(type==='slot'){ S.SLOT_X[i]=x; S.SLOT_Y[i]=y; }
   else if(type==='socket'){ S.SOCKET_X[i]=x; S.SOCKET_Y[i]=y; }
+  else if(type==='bonus'){ S.BONUS_X[i]=x; S.BONUS_Y[i]=y; }
   else { S.MEDALLION_X=x; S.MEDALLION_Y=y; }
 }
-function centerOf(type,i){ const [x,y]=posOf(type,i); const [w,h]=dimsOf(type); return [x+w/2, y+h/2]; }
+function centerOf(type,i){ const [x,y]=posOf(type,i); const [w,h]=dimsOf(type,i); return [x+w/2, y+h/2]; }
+
 
 function build(){
   stage.style.width = S.PANEL_W*zoom+'px';
@@ -188,21 +237,31 @@ function build(){
   const boxes = [];
   for(let i=0;i<12;i++) boxes.push({type:'slot', idx:i, cls:'slot g'+Math.floor(i/3), label:(i+1)});
   for(let i=0;i<4;i++) boxes.push({type:'socket', idx:i, cls:'socket', label:'M'+(i+1)});
+  for(let i=0;i<4;i++) boxes.push({type:'bonus', idx:i, cls:'bonus'+(S.BONUS_ALIGN_RIGHT[i]?' right':''), label:'B'+(i+1)+' '+BONUS_SAMPLE});
   boxes.push({type:'med', idx:0, cls:'med'+(S.MEDALLION_ENABLED?'':' off'), label: S.MEDALLION_ENABLED?'MED':'MED (off)'});
   for(const b of boxes){
-    const [x,y] = posOf(b.type,b.idx); const [w,h] = dimsOf(b.type);
+    const [x,y] = posOf(b.type,b.idx); const [w,h] = dimsOf(b.type,b.idx);
     const el = document.createElement('div');
     el.className = 'box '+b.cls;
     el.textContent = b.label;
     el.style.left = x*zoom+'px'; el.style.top = y*zoom+'px';
     el.style.width = w*zoom+'px'; el.style.height = h*zoom+'px';
     el.dataset.type=b.type; el.dataset.idx=b.idx;
+    if(b.type!=='med' && b.type!=='bonus') iconArea(el);
     if(selected && selected.type===b.type && selected.idx===b.idx) el.classList.add('sel');
     if(b.type==='med'){ const hz=document.createElement('div'); hz.className='rz'; el.appendChild(hz); attachResize(el,hz); }
     stage.appendChild(el);
     attachDrag(el);
   }
   redrawConnectors(); renderOut(); updateSelInfo();
+}
+
+// the 16x16 icon area inside an 18x18 cell (1px in from the frame, minus the 2px box border)
+function iconArea(el){
+  const d=document.createElement('div'); d.className='icon';
+  d.style.left=(1*zoom-2)+'px'; d.style.top=(1*zoom-2)+'px';
+  d.style.width=ICON*zoom+'px'; d.style.height=ICON*zoom+'px';
+  el.appendChild(d);
 }
 
 function redrawConnectors(){
@@ -240,7 +299,7 @@ function attachDrag(el){
     stage.querySelectorAll('.box').forEach(b=>b.classList.remove('sel'));
     el.classList.add('sel'); updateSelInfo();
     const rect = stage.getBoundingClientRect();
-    const [ox,oy]=posOf(type,idx); const [w,h]=dimsOf(type);
+    const [ox,oy]=posOf(type,idx); const [w,h]=dimsOf(type,idx);
     const grabX = (e.clientX-rect.left)/zoom - ox;
     const grabY = (e.clientY-rect.top)/zoom - oy;
     el.setPointerCapture(e.pointerId);
@@ -250,8 +309,7 @@ function attachDrag(el){
       nx = Math.max(0, Math.min(S.PANEL_W - w, nx));
       ny = Math.max(0, Math.min(S.PANEL_H - h, ny));
       setPos(type,idx,nx,ny);
-      el.style.left=nx*zoom+'px'; el.style.top=ny*zoom+'px';
-      redrawConnectors(); renderOut(); updateSelInfo();
+      el.style.left=nx*zoom+'px'; el.style.top=ny*zoom+'px'; redrawConnectors(); renderOut(); updateSelInfo();
     };
     const up = ()=>{ el.releasePointerCapture(e.pointerId); el.removeEventListener('pointermove',move); el.removeEventListener('pointerup',up); };
     el.addEventListener('pointermove',move); el.addEventListener('pointerup',up);
@@ -282,22 +340,27 @@ function attachResize(el, handle){
 
 function updateSelInfo(){
   const si=$('selinfo');
+  const isBonus = selected && selected.type==='bonus';
+  $('bonusW').disabled = !isBonus; $('bonusRight').disabled = !isBonus;
+  if(isBonus){ $('bonusW').value=S.BONUS_W[selected.idx]; $('bonusRight').checked=S.BONUS_ALIGN_RIGHT[selected.idx]; }
   if(!selected){ si.innerHTML='Nothing selected. Click a box to select; drag to move. Arrow keys nudge (Shift = x5).'; return; }
   const [x,y]=posOf(selected.type,selected.idx);
   let name, extra='';
   if(selected.type==='slot') name='Slot '+(selected.idx+1)+' (group '+(Math.floor(selected.idx/3)+1)+')';
   else if(selected.type==='socket') name='Socket M'+(selected.idx+1);
+  else if(selected.type==='bonus') { name='Bonus label B'+(selected.idx+1)+' (socket M'+(selected.idx+1)+')'; extra=' &nbsp; w=<b>'+S.BONUS_W[selected.idx]+'</b> '+(S.BONUS_ALIGN_RIGHT[selected.idx]?'right':'left')+'-aligned'; }
   else { name='Medallion'; extra=' &nbsp; w=<b>'+S.MEDALLION_W+'</b> h=<b>'+S.MEDALLION_H+'</b>'; }
   si.innerHTML = 'Selected: <b>'+name+'</b> &nbsp; x=<b>'+x+'</b> y=<b>'+y+'</b>'+extra;
 }
 
 document.addEventListener('keydown', e=>{
   if(!selected) return;
+  if(e.target.tagName==='INPUT' || e.target.tagName==='TEXTAREA') return;
   const d = {ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];
   if(!d) return;
   e.preventDefault();
   const m = e.shiftKey?5:1;
-  let [x,y]=posOf(selected.type,selected.idx); const [w,h]=dimsOf(selected.type);
+  let [x,y]=posOf(selected.type,selected.idx); const [w,h]=dimsOf(selected.type,selected.idx);
   x=Math.max(0,Math.min(S.PANEL_W-w, x+d[0]*m));
   y=Math.max(0,Math.min(S.PANEL_H-h, y+d[1]*m));
   setPos(selected.type,selected.idx,x,y); build();
@@ -309,12 +372,14 @@ function renderOut(){
 `package net.redboltmedia.witchercraft;
 
 /**
- * Data-driven geometry for the perk equip panel.
+ * Data-driven geometry and colours for the Skills panel: the right side (perk
+ * equip grid, mutagen sockets, bonus labels, medallion) and every colour. The
+ * sub-tabs, tree and Mutagens inventory block are in PerkTree.
  *
- * All coordinates are GUI-LOCAL (relative to the screen's top-left), in the
- * same space MCreator's extractLabels() uses, so they can be passed straight to
- * guiGraphics.text / drawing calls. When blitting in extractBackground(), add
- * leftPos / topPos yourself.
+ * All coordinates are PANEL-LOCAL Minecraft GUI pixels: the 360x200 panel is
+ * drawn 1:1 at normal GUI scale, centred below the navbar (PerkPage.origin),
+ * and SkillsMenu places its real slots from these same values. Every cell is a
+ * vanilla slot: an 18x18 frame (x, y = its top-left) around a 16x16 icon.
  *
  * Generated by tools/equip-grid-placer.html - paste this over the file wholesale.
  * Keep it a dumb data holder (no logic) so the tool can overwrite it.
@@ -323,14 +388,13 @@ public final class PerkEquipLayout {
 	private PerkEquipLayout() {
 	}
 
-	// Panel size (drives centering via leftPos/topPos in the Screen).
-	// Left half = debug perk palette (interim source, retired when the real
-	// left tree lands in Phase 2). Right half = the equip grid.
+	// Panel size (centred in the content region below the navbar).
 	public static final int PANEL_W = ${S.PANEL_W};
 	public static final int PANEL_H = ${S.PANEL_H};
 
-	public static final int SLOT_SIZE = ${S.SLOT_SIZE};
-	public static final int SOCKET_SIZE = ${S.SOCKET_SIZE};
+	// Fixed: every cell is a vanilla slot (18x18 frame, 16x16 icon).
+	public static final int SLOT_SIZE = ${CELL};
+	public static final int SOCKET_SIZE = ${CELL};
 
 	// --- Equip grid (right half): 12 perk slots, grouped 0-2 / 3-5 / 6-8 /
 	// 9-11 into the 4 mutagen groups. Two columns left of the central
@@ -338,7 +402,7 @@ public final class PerkEquipLayout {
 	public static final int[] SLOT_X = ${arr(S.SLOT_X)};
 	public static final int[] SLOT_Y = ${arr(S.SLOT_Y)};
 
-	// 4 mutagen sockets, one under each column.
+	// 4 mutagen sockets (real item slots), socket i next to perk group i.
 	public static final int[] SOCKET_X = ${arr(S.SOCKET_X)};
 	public static final int[] SOCKET_Y = ${arr(S.SOCKET_Y)};
 
@@ -350,25 +414,47 @@ public final class PerkEquipLayout {
 	public static final int MEDALLION_W = ${S.MEDALLION_W};
 	public static final int MEDALLION_H = ${S.MEDALLION_H};
 
-${PALETTE_BLOCK}
+	// What each mutagen socket gives ("+15 Increased Damage", one line per bonus,
+	// 10px apart at scale 1, BONUS_TEXT on a BONUS_BG background): a box per
+	// socket, the text left- or right-aligned inside it (not clipped).
+	public static final int[] BONUS_X = ${arr(S.BONUS_X)};
+	public static final int[] BONUS_Y = ${arr(S.BONUS_Y)};
+	public static final int[] BONUS_W = ${arr(S.BONUS_W)};
+	public static final boolean[] BONUS_ALIGN_RIGHT = ${arr(S.BONUS_ALIGN_RIGHT)};
+	public static final float BONUS_TEXT_SCALE = ${S.BONUS_TEXT_SCALE}f;
+
+	// --- Colours (ARGB, 0xAARRGGBB). Edited in the tool's Colours panel.
+${colorJava()}
 
 	/** Which mutagen group (0-3) a perk slot index (0-11) belongs to. */
 	public static int groupOfSlot(int slotIndex) {
 		return slotIndex / 3;
 	}
-
-	/** Top-left of palette row for the given PerkRegistry index. */
-	public static int paletteColX(int registryIndex) {
-		return PALETTE_X[registryIndex / PALETTE_ROWS_PER_COL];
-	}
-
-	public static int paletteRowY(int registryIndex) {
-		return PALETTE_Y0 + (registryIndex % PALETTE_ROWS_PER_COL) * PALETTE_ROW_H;
-	}
 }
 `;
   out.value = j;
 }
+
+function buildColors(){
+  const box=$('colors'); box.innerHTML='';
+  for(const [k,,desc] of COLOR_DEFS){
+    const row=document.createElement('div'); row.className='row'; row.style.marginBottom='3px';
+    const v=S.COLORS[k];
+    row.innerHTML='<input type="color" style="width:30px;height:22px;padding:0;border:none;background:none" value="#'+v.slice(2)+'">'
+      +'<input type="text" style="width:96px;background:#0e0e13;border:1px solid var(--line);color:var(--ink);padding:2px 4px;border-radius:4px;font:inherit" value="#'+v+'">'
+      +'<span style="color:var(--ink)">'+k+'</span><span style="color:var(--dim)">'+desc+'</span>';
+    const [pick,txt]=row.querySelectorAll('input');
+    pick.addEventListener('input',()=>{ S.COLORS[k]=S.COLORS[k].slice(0,2)+pick.value.slice(1).toUpperCase(); txt.value='#'+S.COLORS[k]; renderOut(); });
+    txt.addEventListener('input',()=>{ const m=txt.value.trim().replace('#','').toUpperCase(); if(/^[0-9A-F]{8}$/.test(m)){ S.COLORS[k]=m; pick.value='#'+m.slice(2); txt.style.borderColor=''; renderOut(); } else txt.style.borderColor='#ff5555'; });
+    box.appendChild(row);
+  }
+}
+function colorJava(){
+  const groups={}, order=[];
+  for(const [k] of COLOR_DEFS){ const m=k.match(/^(\w+)\[(\d+)\]$/); const name=m?m[1]:k; if(!(name in groups)){ groups[name]=[]; order.push(name); } groups[name].push({arr:!!m, v:'0x'+S.COLORS[k]}); }
+  return order.map(n=>{ const g=groups[n]; return g[0].arr ? '\tpublic static final int[] '+n+' = {'+g.map(e=>e.v).join(', ')+'};' : '\tpublic static final int '+n+' = '+g[0].v+';'; }).join('\n');
+}
+$('colorsReset').addEventListener('click',()=>{ S.COLORS=structuredClone(SEED.COLORS); buildColors(); renderOut(); });
 
 // ---- controls ----
 function bindNum(id, key, rebuild=true){
@@ -376,11 +462,14 @@ function bindNum(id, key, rebuild=true){
   el.addEventListener('input', ()=>{ const v=parseInt(el.value,10); if(!isNaN(v)){ S[key]=v; if(rebuild) build(); else renderOut(); } });
 }
 bindNum('panelW','PANEL_W'); bindNum('panelH','PANEL_H');
-bindNum('slotSize','SLOT_SIZE'); bindNum('socketSize','SOCKET_SIZE');
 bindNum('medW','MEDALLION_W'); bindNum('medH','MEDALLION_H');
 $('medOn').checked = S.MEDALLION_ENABLED;
 $('medOn').addEventListener('change', ()=>{ S.MEDALLION_ENABLED=$('medOn').checked; build(); });
 $('showConn').addEventListener('change', redrawConnectors);
+$('bonusW').addEventListener('input', ()=>{ if(!selected||selected.type!=='bonus') return; const v=parseInt($('bonusW').value,10); if(v>=8){ S.BONUS_W[selected.idx]=v; build(); } });
+$('bonusScale').value=S.BONUS_TEXT_SCALE;
+$('bonusScale').addEventListener('input',()=>{ const v=parseFloat($('bonusScale').value); if(v>0){ S.BONUS_TEXT_SCALE=v; renderOut(); } });
+$('bonusRight').addEventListener('change', ()=>{ if(!selected||selected.type!=='bonus') return; S.BONUS_ALIGN_RIGHT[selected.idx]=$('bonusRight').checked; build(); });
 $('zoom').value = zoom;
 $('zoom').addEventListener('input', ()=>{ const v=parseFloat($('zoom').value); if(v>=1){ zoom=v; build(); } });
 $('gridStep').addEventListener('input', build);
@@ -393,8 +482,10 @@ $('copyBtn').addEventListener('click', async ()=>{
 function flash(btn,msg){ const t=btn.textContent; btn.textContent=msg; setTimeout(()=>btn.textContent=t,1200); }
 
 function syncEquipInputs(){
-  ['panelW:PANEL_W','panelH:PANEL_H','slotSize:SLOT_SIZE','socketSize:SOCKET_SIZE','medW:MEDALLION_W','medH:MEDALLION_H'].forEach(p=>{const[a,b]=p.split(':');$(a).value=S[b];});
+  ['panelW:PANEL_W','panelH:PANEL_H','medW:MEDALLION_W','medH:MEDALLION_H'].forEach(p=>{const[a,b]=p.split(':');$(a).value=S[b];});
   $('medOn').checked=S.MEDALLION_ENABLED;
+  $('bonusScale').value=S.BONUS_TEXT_SCALE;
+  buildColors();
 }
 $('resetBtn').addEventListener('click', ()=>{ S=structuredClone(SEED); zoom=3; $('zoom').value=3;
   syncEquipInputs(); selected=null; build(); });
@@ -405,15 +496,28 @@ function parseEquipJava(txt){
   const intOf=n=>{const m=txt.match(new RegExp('\\bint\\s+'+n+'\\s*=\\s*(-?\\d+)\\s*;'));return m?parseInt(m[1],10):undefined;};
   const boolOf=n=>{const m=txt.match(new RegExp('\\bboolean\\s+'+n+'\\s*=\\s*(true|false)\\s*;'));return m?m[1]==='true':undefined;};
   const arrOf=n=>{const m=txt.match(new RegExp('\\bint\\[\\]\\s+'+n+'\\s*=\\s*\\{([^}]*)\\}'));return m?m[1].split(',').map(s=>parseInt(s.trim(),10)).filter(v=>!isNaN(v)):undefined;};
-  ['PANEL_W','PANEL_H','SLOT_SIZE','SOCKET_SIZE','MEDALLION_X','MEDALLION_Y','MEDALLION_W','MEDALLION_H'].forEach(k=>{const v=intOf(k);if(v!==undefined)S2[k]=v;});
+  ['PANEL_W','PANEL_H','MEDALLION_X','MEDALLION_Y','MEDALLION_W','MEDALLION_H'].forEach(k=>{const v=intOf(k);if(v!==undefined)S2[k]=v;});
   const me=boolOf('MEDALLION_ENABLED'); if(me!==undefined)S2.MEDALLION_ENABLED=me;
-  ['SLOT_X','SLOT_Y','SOCKET_X','SOCKET_Y'].forEach(k=>{const v=arrOf(k);if(v&&v.length)S2[k]=v;});
-  return S2;
+  const boolArrOf=n=>{const m=txt.match(new RegExp('\\bboolean\\[\\]\\s+'+n+'\\s*=\\s*\\{([^}]*)\\}'));return m?m[1].split(',').map(s=>s.trim()==='true'):undefined;};
+  const fm=txt.match(/\bfloat\s+BONUS_TEXT_SCALE\s*=\s*([0-9.]+)f?\s*;/); if(fm) S2.BONUS_TEXT_SCALE=parseFloat(fm[1]);
+  const hexOf=n=>{const m=txt.match(new RegExp('\\bint\\s+'+n+'\\s*=\\s*0x([0-9A-Fa-f]{8})\\s*;'));return m?m[1].toUpperCase():undefined;};
+  const hexArrOf=n=>{const m=txt.match(new RegExp('\\bint\\[\\]\\s+'+n+'\\s*=\\s*\\{([^}]*)\\}'));return m?m[1].split(',').map(s=>s.trim().replace(/^0x/i,'').toUpperCase()):undefined;};
+  for(const [k] of COLOR_DEFS){ const m=k.match(/^(\w+)\[(\d+)\]$/); const v=m?(hexArrOf(m[1])||[])[+m[2]]:hexOf(k); if(v&&/^[0-9A-F]{8}$/.test(v)) S2.COLORS[k]=v; }
+  const bar=boolArrOf('BONUS_ALIGN_RIGHT'); if(bar&&bar.length===4) S2.BONUS_ALIGN_RIGHT=bar;
+  ['SLOT_X','SLOT_Y','SOCKET_X','SOCKET_Y','BONUS_X','BONUS_Y','BONUS_W'].forEach(k=>{const v=arrOf(k);if(v&&v.length)S2[k]=v;});
+  // older files had bigger cells: shrink each to 18 around its centre
+  const slotSize=intOf('SLOT_SIZE'), socketSize=intOf('SOCKET_SIZE');
+  const shift=(size)=> size!==undefined && size>CELL ? Math.floor((size-CELL)/2) : 0;
+  const ds=shift(slotSize), dk=shift(socketSize);
+  if(ds){ S2.SLOT_X=S2.SLOT_X.map(v=>v+ds); S2.SLOT_Y=S2.SLOT_Y.map(v=>v+ds); }
+  if(dk){ S2.SOCKET_X=S2.SOCKET_X.map(v=>v+dk); S2.SOCKET_Y=S2.SOCKET_Y.map(v=>v+dk); }
+  return {S2, converted: ds||dk};
 }
 $('impDo').addEventListener('click', ()=>{
   const t=$('impArea').value;
   if(!t.trim()){ $('impInfo').textContent='Paste some Java first.'; return; }
-  try{ S=parseEquipJava(t); syncEquipInputs(); selected=null; build(); $('impInfo').textContent='Imported.'; }
+  try{ const r=parseEquipJava(t); S=r.S2; syncEquipInputs(); selected=null; build();
+    $('impInfo').textContent= r.converted ? 'Imported (cells shrunk to 18 around their centres).' : 'Imported.'; }
   catch(e){ $('impInfo').textContent='Parse error: '+e.message; }
 });
 
@@ -429,6 +533,7 @@ $('bgFile').addEventListener('change', e=>{
 $('clearBg').addEventListener('click', ()=>{ const img=document.getElementById('bg'); if(img) img.remove(); });
 $('bgOpacity').addEventListener('input', ()=>{ const img=document.getElementById('bg'); if(img) img.style.opacity=(+$('bgOpacity').value/100); });
 
+buildColors();
 build();
 </script>
 </body>

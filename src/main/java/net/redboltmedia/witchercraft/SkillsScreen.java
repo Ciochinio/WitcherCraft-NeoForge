@@ -22,16 +22,16 @@ import net.minecraft.world.inventory.Slot;
 
 /**
  * The Skills tab. A container screen for {@link SkillsMenu} that draws the shell
- * chrome ({@link ShellChrome}) and the perk page ({@link PerkPage}: tree, equip
- * grid, socket frames) exactly as the shell did, plus the menu's real slots.
+ * chrome ({@link ShellChrome}: letterboxed background and navbar, scaled with
+ * the design canvas) and, at normal GUI scale, the perk panel ({@link PerkPage}:
+ * tabs, tree, equip grid, socket frames) plus the menu's real slots.
  *
- * The perk page scales with the design canvas and its own fit scale, so the
- * slots follow it: on every resize each mutagen slot is moved to the centre of
- * its socket frame, and the inventory is centred in the tree area the Mutagens
- * sub-tab leaves empty (Slot.x / y are writable through the access transformer).
- * The slots themselves stay at normal GUI scale, so vanilla handles hover,
- * clicks, shift-click, drag-splitting and the carried item. leftPos / topPos are
- * 0, so slot positions are screen coordinates.
+ * The 360x200 panel is drawn 1:1 in GUI pixels and centred in the content
+ * region below the navbar, like Alchemy's slot block. leftPos / topPos are the
+ * panel origin, and every slot position comes from {@link PerkEquipLayout}, so
+ * each item sits exactly in its 18x18 frame and vanilla handles hover, clicks,
+ * shift-click, drag-splitting and the carried item. The panel is outlined red
+ * when it does not fit the content region (GUI scale too big for the window).
  *
  * Clicks go to the navbar first, then to a slot under the cursor, then to the
  * perk page. The inventory slots are only active while the Mutagens sub-tab is
@@ -42,14 +42,14 @@ import net.minecraft.world.inventory.Slot;
  */
 public class SkillsScreen extends AbstractContainerScreen<SkillsMenu> {
 	private static final String TAB_ID = "skills";
-	private static final int SLOT = 18; // vanilla slot pitch
-	private static final int HOTBAR_GAP = 4;
+	private static final int MISFIT_COLOR = 0xFFFF3030;
 
 	private final PerkPage page;
 	private boolean swallowRelease;
+	private boolean fits;
 
 	public SkillsScreen(SkillsMenu menu, Inventory inventory, Component title) {
-		super(menu, inventory, title);
+		super(menu, inventory, title, PerkEquipLayout.PANEL_W, PerkEquipLayout.PANEL_H);
 		this.page = (PerkPage) WitcherGuiPages.forId(TAB_ID);
 		this.page.setMutagenSource(gi -> menu.getSlot(gi).getItem());
 		menu.inventoryShown = page.mutagensShown();
@@ -68,42 +68,27 @@ public class SkillsScreen extends AbstractContainerScreen<SkillsMenu> {
 	@Override
 	protected void init() {
 		super.init();
-		this.leftPos = 0;
-		this.topPos = 0;
-		placeSlots();
+		int cx = contentX(), cy = contentY(), cw = contentW(), ch = contentH();
+		int[] origin = PerkPage.origin(cx, cy, cw, ch);
+		this.leftPos = origin[0];
+		this.topPos = origin[1];
+		this.fits = this.imageWidth <= cw && this.imageHeight <= ch;
 	}
 
-	/** {originX, originY, scale} mapping perk-local coords to screen coords. */
-	private float[] perkToScreen() {
-		float s = ShellChrome.layoutScale(this.width, this.height);
-		float[] fit = PerkPage.layout(WitcherGuiLayout.contentX(), WitcherGuiLayout.contentY(), WitcherGuiLayout.contentW(), WitcherGuiLayout.contentH());
-		return new float[]{ShellChrome.offsetX(this.width, s) + fit[0] * s, ShellChrome.offsetY(this.height, s) + fit[1] * s, fit[2] * s};
+	private int contentX() {
+		return ShellChrome.contentScreenX(this.width, this.height);
 	}
 
-	private void placeSlots() {
-		float[] t = perkToScreen();
+	private int contentY() {
+		return ShellChrome.contentScreenY(this.width, this.height);
+	}
 
-		// each mutagen slot centred on its socket frame
-		for (int gi = 0; gi < SkillsMenu.MUTAGEN_SLOTS; gi++) {
-			Slot slot = this.menu.getSlot(gi);
-			float cx = t[0] + (PerkEquipLayout.SOCKET_X[gi] + PerkEquipLayout.SOCKET_SIZE / 2f) * t[2];
-			float cy = t[1] + (PerkEquipLayout.SOCKET_Y[gi] + PerkEquipLayout.SOCKET_SIZE / 2f) * t[2];
-			slot.x = Math.round(cx) - 8;
-			slot.y = Math.round(cy) - 8;
-		}
+	private int contentW() {
+		return ShellChrome.contentScreenW(this.width, this.height);
+	}
 
-		// the inventory (3 rows, a gap, the hotbar) centred in the tree area
-		int gridW = 9 * SLOT, gridH = 4 * SLOT + HOTBAR_GAP;
-		float areaX = t[0] + PerkPage.INVENTORY_AREA_X * t[2], areaY = t[1] + PerkPage.INVENTORY_AREA_Y * t[2];
-		float areaW = PerkPage.INVENTORY_AREA_W * t[2], areaH = PerkPage.INVENTORY_AREA_H * t[2];
-		int left = Math.round(areaX + (areaW - gridW) / 2f) + 1;
-		int top = Math.round(areaY + (areaH - gridH) / 2f) + 1;
-		for (int i = 0; i < 36; i++) {
-			Slot slot = this.menu.getSlot(SkillsMenu.INVENTORY_START + i);
-			int row = i / 9, col = i % 9;
-			slot.x = left + col * SLOT;
-			slot.y = top + row * SLOT + (row == 3 ? HOTBAR_GAP : 0);
-		}
+	private int contentH() {
+		return ShellChrome.contentScreenH(this.width, this.height);
 	}
 
 	// ---- rendering -----------------------------------------------------------------
@@ -113,13 +98,14 @@ public class SkillsScreen extends AbstractContainerScreen<SkillsMenu> {
 		this.menu.inventoryShown = page.mutagensShown();
 
 		ShellChrome.drawBackground(g, this.width, this.height, TAB_ID);
-		float s = ShellChrome.layoutScale(this.width, this.height);
-		int dmx = ShellChrome.toDesignX(mouseX, ShellChrome.offsetX(this.width, s), s);
-		int dmy = ShellChrome.toDesignY(mouseY, ShellChrome.offsetY(this.height, s), s);
 		ShellChrome.pushDesignTransform(g, this.width, this.height);
-		page.render(g, WitcherGuiLayout.contentX(), WitcherGuiLayout.contentY(), WitcherGuiLayout.contentW(), WitcherGuiLayout.contentH(), dmx, dmy, partial);
 		ShellChrome.drawNavbar(g, this.font, TAB_ID);
 		g.pose().popMatrix();
+
+		// the perk panel at 1:1 GUI scale (same origin as leftPos / topPos)
+		page.render(g, contentX(), contentY(), contentW(), contentH(), mouseX, mouseY, partial);
+		if (!fits)
+			outline(g, leftPos, topPos, imageWidth, imageHeight, MISFIT_COLOR);
 
 		// inventory slot frames (the socket frames are part of the perk page)
 		if (this.menu.inventoryShown) {
@@ -127,7 +113,7 @@ public class SkillsScreen extends AbstractContainerScreen<SkillsMenu> {
 			int size = AlchemyLayout.SLOT_TEX_SIZE;
 			for (int i = SkillsMenu.INVENTORY_START; i < SkillsMenu.SLOT_END; i++) {
 				Slot slot = this.menu.getSlot(i);
-				g.blit(RenderPipelines.GUI_TEXTURED, frame, slot.x - 1, slot.y - 1, 0, 0, size, size, size, size);
+				g.blit(RenderPipelines.GUI_TEXTURED, frame, leftPos + slot.x - 1, topPos + slot.y - 1, 0, 0, size, size, size, size);
 			}
 		}
 	}
@@ -147,14 +133,21 @@ public class SkillsScreen extends AbstractContainerScreen<SkillsMenu> {
 		// no vanilla title/inventory labels
 	}
 
+	private static void outline(GuiGraphicsExtractor g, int x, int y, int w, int h, int color) {
+		g.fill(x, y, x + w, y + 1, color);
+		g.fill(x, y + h - 1, x + w, y + h, color);
+		g.fill(x, y, x + 1, y + h, color);
+		g.fill(x + w - 1, y, x + w, y + h, color);
+	}
+
 	// ---- input -----------------------------------------------------------------------
 
 	@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-		float s = ShellChrome.layoutScale(this.width, this.height);
-		int dmx = ShellChrome.toDesignX(event.x(), ShellChrome.offsetX(this.width, s), s);
-		int dmy = ShellChrome.toDesignY(event.y(), ShellChrome.offsetY(this.height, s), s);
 		if (event.button() == 0) {
+			float s = ShellChrome.layoutScale(this.width, this.height);
+			int dmx = ShellChrome.toDesignX(event.x(), ShellChrome.offsetX(this.width, s), s);
+			int dmy = ShellChrome.toDesignY(event.y(), ShellChrome.offsetY(this.height, s), s);
 			String pid = ShellChrome.navTabAt(dmx, dmy);
 			if (pid != null) {
 				swallowRelease = true;
@@ -164,7 +157,7 @@ public class SkillsScreen extends AbstractContainerScreen<SkillsMenu> {
 			}
 		}
 		if (slotAt(event.x(), event.y()) == null
-				&& page.mouseClicked(WitcherGuiLayout.contentX(), WitcherGuiLayout.contentY(), WitcherGuiLayout.contentW(), WitcherGuiLayout.contentH(), dmx, dmy, event.button(), doubleClick)) {
+				&& page.mouseClicked(contentX(), contentY(), contentW(), contentH(), event.x(), event.y(), event.button(), doubleClick)) {
 			swallowRelease = true;
 			this.menu.inventoryShown = page.mutagensShown();
 			return true;
@@ -199,7 +192,8 @@ public class SkillsScreen extends AbstractContainerScreen<SkillsMenu> {
 	/** The active slot under a screen point, or null (same bounds as vanilla's hover test). */
 	private Slot slotAt(double mx, double my) {
 		for (Slot slot : this.menu.slots) {
-			if (slot.isActive() && mx >= slot.x - 1 && mx < slot.x + 17 && my >= slot.y - 1 && my < slot.y + 17)
+			int x = leftPos + slot.x, y = topPos + slot.y;
+			if (slot.isActive() && mx >= x - 1 && mx < x + 17 && my >= y - 1 && my < y + 17)
 				return slot;
 		}
 		return null;

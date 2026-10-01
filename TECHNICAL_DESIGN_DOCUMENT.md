@@ -755,24 +755,57 @@ unchanged as the owner of the tree, equip grid and socket frames; what changed i
   `MutagenEffects` (item queries + applying effects). `PerkPage` stays registered in
   `WitcherGuiPages.CUSTOM` as a singleton so its sub-tab and held-perk state survive reopening;
   `SkillsScreen` fetches it from there.
-- **Slots on a scaled layout.** Unlike Alchemy's fixed block, the sockets live inside the perk page's
-  double scale (design canvas, then `PerkPage.layout` fit). `Slot.x` / `Slot.y` are vanilla `final`, so
-  `META-INF/accesstransformer.cfg` (user code block) makes them `public` non-final, and
-  `SkillsScreen.placeSlots` (run from `init`, so on every resize) moves each mutagen slot to the centre
-  of its socket frame and centres the 9x4 inventory in `PerkPage.INVENTORY_AREA_*`. `leftPos` /
-  `topPos` are 0, so slot coordinates are screen coordinates. The slots stay at normal GUI scale (16px
-  items) while the frames scale; on very large or small layouts the item is centred in a frame of a
-  different size. `hasClickedOutside` always returns false: the whole screen is the tab.
+- **The panel is 1:1 GUI pixels, every cell a vanilla slot.** Only the chrome (background, navbar)
+  scales with the design canvas. The 360x200 perk panel is drawn unscaled, centred in the content
+  region (`PerkPage.origin`), and `SkillsScreen` uses that origin as `leftPos` / `topPos`. Every cell
+  (sub-tab, tree node, equip slot, mutagen socket) is an 18x18 frame around a 16x16 icon:
+  `PerkEquipLayout.SLOT_SIZE` / `SOCKET_SIZE`, `PerkTree.NODE_SIZE` and `PerkPage.CELL` are all 18 and
+  the tools do not let them change. Perk glyphs (32x32 sources) are blitted squeezed to 16x16 with the
+  `srcWidth/srcHeight` overload, so no pose scaling remains in `PerkPage`. `SkillsMenu` builds its slots
+  straight from the layout data (socket + 1px from `PerkEquipLayout`, and the inventory block at `PerkTree.INVENTORY_X/Y` + 1px with
+  the hotbar `HOTBAR_GAP` lower), so items sit exactly in their frames with no runtime repositioning.
+  Like Alchemy, the panel's size relative to the background follows the GUI scale setting, and it is
+  outlined red when it does not fit the content region. The content region is about 88% of the
+  screen height, so 200px needs a screen at least ~228 GUI px tall (GUI scale 4: a window ~912 real
+  px tall, which a windowed 1080p game clears; 230px did not, hence the cut from 230 to 200). `hasClickedOutside` always returns false: the
+  whole screen is the tab. (An earlier version scaled the panel and moved `Slot.x/y` through an access
+  transformer; both are gone.)
+- **Cell frames.** `PerkPage.drawRect` draws the 1px border as four edges and then the inner fill, so a
+  translucent inner never shows the border colour through (that bug made filled sockets solid green).
+  A socket is a type-coloured border on the dark inner, with the mutagen item on top.
+- **Colours.** Every colour the page draws is an ARGB constant in `PerkEquipLayout` (branch colours,
+  tab frames and fade, cell frames and backgrounds, drop-target highlight, node states, locked links,
+  bonus text and background, status text, medallion), edited in `equip-grid-placer.html`'s Colours
+  panel. `PerkRegistry.tint` returns `BRANCH_COLORS`, so the branch colours also drive tooltip names,
+  tree links and mutagen type tints.
+- **Sub-tab icons.** `textures/screens/skills_tab_{combat,alchemy,signs,general,mutagens}.png`, 16x16
+  placeholder copies of vanilla item art meant to be painted over in place. Inactive tabs blit with a
+  `TAB_FADE` colour (faded); the active one is full brightness and marked only by its `TAB_ACTIVE_BORDER` frame (no underline).
 - **The Mutagens sub-tab.** `PerkPage` has five sub-tabs; the fifth (`TAB_MUTAGENS`) skips the tree.
   `SkillsMenu.inventoryShown` (client field, true on the server) drives `isActive()` of the inventory
   slots; `SkillsScreen` syncs it from `PerkPage.mutagensShown()` every frame and after each page click.
+  The tab row (`TAB_X[]`, `TAB_Y`) and the inventory block (`INVENTORY_X/Y`, fixed 162x76) are
+  `PerkTree` data, placed with `tools/tree-node-placer.html` (its Mutagens tab shows the block):
+  that tool owns the left side, `equip-grid-placer.html` the right side.
   Click order: navbar, then an active slot under the cursor (vanilla), then the perk page; a click the
   page consumes swallows its release.
 - **Socket frames read the slots.** `PerkPage.setMutagenSource` points at the client menu's socket slots,
-  so frame tint, the connector lines and the `gN:<synergy>` labels follow the synced slot contents. The
+  so frame tint and the connector lines follow the synced slot contents. The
   colour-cycle action (`3000000 + group`) and the medallion click stub (`4000000`,
   `MutagenMedallionClickProcedure`, moved to `trash/`) are retired; `PerkEquipGuiButtonMessage` ignores
   both ids.
+- **Bonus readout.** Next to each filled socket, `PerkPage.drawBonus` prints what that socket actually
+  gives ("+15 Increased Damage", one line per modifier, `+N%` for the multiply operations) in
+  `BONUS_TEXT` on a `BONUS_BG` background that hugs the text (2px padding), scaled by
+  `BONUS_TEXT_SCALE` (a pose scale; 0.75 by default, so the pixel font is slightly uneven at some GUI
+  scales), inside the `PerkEquipLayout.BONUS_X/Y/W` box, left- or right-aligned per
+  `BONUS_ALIGN_RIGHT` (placed with `equip-grid-placer.html`). The lines come from
+  `MutagenEffects.bonusLines`, which reads the player's live modifiers with the
+  `witchercraft:mutagen_slot<N>/` prefix. Every attribute a mutagen touches today syncs to the client
+  (the mod's attributes are all `setSyncable(true)`; vanilla Max Health syncs), and the attribute
+  sync carries modifier ids, so no packet is needed and the readout always matches the Blockly effect
+  (level, synergy, perk buffs). A non-syncable attribute, or an effect that is not an attribute
+  modifier, does not appear. Hovering a socket shows only the vanilla item tooltip.
 - **Storage.** `MutagenSlots.DATA` is a player attachment (`copyOnDeath`, a mutable 4-stack list,
   serialised with `ItemStack.OPTIONAL_CODEC`). It is NOT synced as an attachment: only the open menu
   shows the contents, and nothing else on the client needs them. The server menu wraps it in a
@@ -826,13 +859,12 @@ The old `PerkEquipGuiScreen` was an `AbstractContainerScreen` drawing through MC
 `extractLabels`. `PerkPage` is the same rendering + input, with two structural changes and nothing
 else:
 
-- **Fit-scaled into the content region.** The shell hands `PerkPage` the below-navbar content rect; it
-  maps its fixed 360x230 `PerkEquipLayout` space onto that rect with a uniform, centred `pose()` scale
-  (a nested transform inside the shell's design->screen one), so Skills fills the area below the
-  navbar. Draw calls stay in perk-local coords (the ported body is nearly identical to the original)
-  and still use the tool-generated `PerkEquipLayout` + `PerkTree` verbatim. **Both perk tools keep
-  working unchanged** - their 360x230 canvas now simply *is* the content region, scaled up. Input and
-  the hovered-node tooltip map the mouse back through the same fit scale.
+- **Placed in the content region.** Originally `PerkPage` fit-scaled its 360x230 space onto the
+  below-navbar rect. Since the mutagen-item rework it is drawn 1:1 at normal GUI scale instead, centred
+  in that rect, so every cell is a vanilla 18x18 slot (see 3.3c). Draw calls stay in panel-local coords
+  offset by the origin and use the tool-generated `PerkEquipLayout` + `PerkTree` verbatim. Both perk
+  tools work in those same panel-local GUI pixels; each imports an older file with bigger cells by
+  shrinking every cell around its centre.
 - **The recompute moved.** The perk-effect recompute used to fire from `PerkEquipGuiMenu.removed()`
   when the container closed. With no container, it now runs server-side after every state-changing
   action inside `PerkEquipGuiButtonMessage.handleButtonAction` (`buttonID != 0` ->

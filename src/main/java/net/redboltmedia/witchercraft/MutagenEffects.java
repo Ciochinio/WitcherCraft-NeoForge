@@ -12,6 +12,7 @@ import net.redboltmedia.witchercraft.procedures.MutagenRedEffectProcedure;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
@@ -178,6 +179,38 @@ public final class MutagenEffects {
 		if (player.isAlive())
 			player.setHealth(Math.min(health, player.getMaxHealth()));
 	}
+
+	// ---- reading what a socket gives (both sides) -----------------------------------------
+
+	/**
+	 * What socket {@code slot} currently gives, one line per modifier it applied,
+	 * e.g. "+15 Increased Damage" or "+10% Sign Intensity". Read from the player's
+	 * live attribute modifiers (the {@code mutagen_slot<N>/} ids), which sync to the
+	 * client, so this shows whatever the effect procedure did - level, synergy and
+	 * perk buffs included - without a packet. Effects that are not attribute
+	 * modifiers do not appear.
+	 */
+	public static List<Component> bonusLines(Player player, int slot) {
+		String prefix = ID_PREFIX + "slot" + (slot + 1) + "/";
+		List<Component> lines = new ArrayList<>();
+		for (Holder<Attribute> attribute : BuiltInRegistries.ATTRIBUTE.listElements().toList()) {
+			AttributeInstance instance = player.getAttributes().getInstance(attribute);
+			if (instance == null)
+				continue;
+			for (AttributeModifier modifier : instance.getModifiers()) {
+				Identifier id = modifier.id();
+				if (!id.getNamespace().equals(WitchercraftMod.MODID) || !id.getPath().startsWith(prefix))
+					continue;
+				boolean percent = modifier.operation() != AttributeModifier.Operation.ADD_VALUE;
+				double amount = percent ? modifier.amount() * 100 : modifier.amount();
+				String value = (amount >= 0 ? "+" : "") + NUMBER.format(amount) + (percent ? "%" : "");
+				lines.add(Component.literal(value + " ").append(Component.translatable(attribute.value().getDescriptionId())));
+			}
+		}
+		return lines;
+	}
+
+	private static final java.text.DecimalFormat NUMBER = new java.text.DecimalFormat("0.##");
 
 	private static boolean isOwned(Identifier id) {
 		return id.getNamespace().equals(WitchercraftMod.MODID) && id.getPath().startsWith(ID_PREFIX);

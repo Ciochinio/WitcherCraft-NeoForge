@@ -24,7 +24,16 @@ public final class PerkTree {
 	private PerkTree() {
 	}
 
-	public static final int NODE_SIZE = 24;
+	public static final int NODE_SIZE = 18; // fixed: a vanilla slot (18x18 frame, 16x16 icon)
+
+	// Sub-tab row: Combat, Alchemy, Signs, General, Mutagens (one shared y).
+	public static final int[] TAB_X = {4, 38, 72, 106, 140};
+	public static final int TAB_Y = 0;
+
+	// Mutagens tab: top-left of the inventory block's first slot frame. Three
+	// rows of 9 at an 18px pitch, then the hotbar 4px lower (162x76 in all).
+	public static final int INVENTORY_X = 0;
+	public static final int INVENTORY_Y = 24;
 
 	public static final class Node {
 		public final int perkId;
@@ -48,21 +57,21 @@ public final class PerkTree {
 	}
 
 	public static final Node[] NODES = {
-			new Node(101, 32, 6),
-			new Node(102, 36, 132, 114, 105), // requires SunderArmor, CrushingBlows
-			new Node(103, 90, 8),
-			new Node(104, 4, 26, 101), // requires AnatomicalKnowledge
-			new Node(105, 32, 44, 101, 104), // requires AnatomicalKnowledge, CripplingStrikes
-			new Node(106, 120, 28, 103), // requires CripplingShot
-			new Node(107, 92, 176, 113, 115), // requires StrengthTraining, Undying
-			new Node(108, 64, 64, 105, 109), // requires CrushingBlows, FloodOfAnger
-			new Node(109, 92, 58, 106, 103), // requires DeadlyPrecision, CripplingShot
-			new Node(110, 36, 178, 113, 102), // requires StrengthTraining, ColdBlood
-			new Node(111, 64, 90, 108), // requires FleetFooted
-			new Node(112, 124, 92, 106), // requires DeadlyPrecision
-			new Node(113, 64, 152, 102, 115, 114), // requires ColdBlood, Undying, SunderArmor
-			new Node(114, 64, 116, 111), // requires PreciseBlows
-			new Node(115, 92, 132, 109, 112, 114), // requires FloodOfAnger, RazorFocus, SunderArmor
+			new Node(101, 8, 24),
+			new Node(102, 66, 24),
+			new Node(103, 124, 24),
+			new Node(104, 8, 56),
+			new Node(105, 66, 56),
+			new Node(106, 124, 56),
+			new Node(107, 8, 88),
+			new Node(108, 66, 88),
+			new Node(109, 124, 88),
+			new Node(110, 8, 120),
+			new Node(111, 66, 120),
+			new Node(112, 124, 120),
+			new Node(113, 8, 152),
+			new Node(114, 66, 152),
+			new Node(115, 124, 152),
 			new Node(201, 8, 24),
 			new Node(202, 66, 24),
 			new Node(203, 124, 24),

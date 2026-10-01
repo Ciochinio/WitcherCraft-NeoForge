@@ -36,6 +36,11 @@
   .node.b3 { border-color:var(--blue); } .node.b4 { border-color:var(--neutral); }
   .node.src { outline:2px solid var(--accent); outline-offset:1px; z-index:6; }
   .node .id { font-size:8px; color:var(--dim); }
+  .lbox { position:absolute; border:2px solid #c070ff; background:#c070ff18; z-index:3; cursor:grab; user-select:none;
+          display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--ink); text-shadow:0 1px 2px #000; }
+  .lbox.inv { border-color:#66cccc; background:#66cccc10; align-items:flex-end; }
+  .lbox .cell { position:absolute; border:1px dashed #ffffff40; pointer-events:none; }
+  .tab.b5.active { border-color:#b03030; }
   .del { pointer-events:all; cursor:pointer; }
   fieldset { border: 1px solid var(--line); border-radius: 6px; margin: 0 0 12px; padding: 10px 12px; }
   legend { color: var(--dim); padding: 0 6px; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
@@ -53,7 +58,7 @@
 <body>
 <header>
   <h1>Tree Node Placer</h1>
-  <span class="hint">Drag nodes to lay out each branch. Turn on <b>Link mode</b> to draw prerequisites (click a parent, then a child). Output regenerates <code>PerkTree.java</code> &rarr; copy &rarr; paste over the file.</span>
+  <span class="hint">Drag nodes to lay out each branch. Turn on <b>Link mode</b> to draw prerequisites (click a parent, then a child). The purple T1-T5 boxes are the sub-tab row (drag any one: x is per tab, the row height is shared) and the <b>Mutagens</b> tab shows the inventory block (drag it). Output regenerates <code>PerkTree.java</code> &rarr; copy &rarr; paste over the file.</span>
 </header>
 
 <div class="wrap">
@@ -71,10 +76,10 @@
     </fieldset>
     <fieldset>
       <legend>Canvas</legend>
-      <label>Node size <input type="number" id="nodeSize"></label>
       <label>Zoom <input type="number" id="zoom" step="0.5" min="1" max="6"></label>
       <label><input type="checkbox" id="snapOn" checked> Snap</label>
       <label>Grid <input type="number" id="gridStep" value="2" min="1"></label>
+      <div class="hint" style="color:var(--dim)">Nodes are fixed vanilla slots: an 18x18 frame with a 16x16 icon (the Skills panel is drawn 1:1 at normal GUI scale). Keep nodes clear of the sub-tab row (T1-T5) at the top.</div>
     </fieldset>
     <fieldset>
       <legend>Background</legend>
@@ -84,7 +89,7 @@
         <label>Opacity <input type="number" id="bgOpacity" value="100" min="0" max="100" step="5"></label>
         <input type="file" id="bgFile" accept="image/*" style="display:none">
       </div>
-      <div class="hint" style="color:var(--dim)">Guide only - never exported. The full frame is shown; faint dashed boxes on the right are the equip grid (read-only reference) so you can align both sides.</div>
+      <div class="hint" style="color:var(--dim)">Guide only - never exported. The full frame is shown; faint dashed boxes are the sub-tab row and the equip grid (read-only reference, from PerkEquipLayout) so you can align both sides.</div>
     </fieldset>
     <div class="row">
       <button class="primary" id="copyBtn">Copy PerkTree.java</button>
@@ -94,7 +99,7 @@
 
     <fieldset style="margin-top:12px">
       <legend>Import from Java</legend>
-      <div style="color:var(--dim);margin-bottom:6px">Paste the current <code>PerkTree.java</code> to load its node positions + prerequisites into the editor. Unknown perk ids are ignored; any perk missing from the paste keeps its default-grid position.</div>
+      <div style="color:var(--dim);margin-bottom:6px">Paste the current <code>PerkTree.java</code> to load its node positions + prerequisites into the editor. Unknown perk ids are ignored; any perk missing from the paste keeps its default-grid position. An older file with bigger nodes (NODE_SIZE above 18) is converted by shrinking each node around its centre.</div>
       <textarea id="impArea" spellcheck="false" style="height:120px" placeholder="paste PerkTree.java here"></textarea>
       <div class="row" style="margin-top:6px"><button id="impDo">Import</button><span style="color:var(--dim)" id="impInfo"></span></div>
     </fieldset>
@@ -116,14 +121,21 @@ const PERKS = [
 ];
 const NAME = {}; PERKS.forEach(([id,n])=>NAME[id]=n);
 const IDS = PERKS.map(p=>p[0]);
-const FRAME_W = 360, PANEL_H = 230;   // FULL frame (matches PerkEquipLayout PANEL_W/H) so you see both sides
+const FRAME_W = 360, PANEL_H = 200;   // FULL frame (matches PerkEquipLayout PANEL_W/H) so you see both sides
 const STROKE = {1:'#ff5555',2:'#55ff55',3:'#5599ff',4:'#cccccc'};
-// equip grid, shown as faint read-only reference (current PerkEquipLayout defaults)
+// equip grid, shown as faint read-only reference (current PerkEquipLayout values;
+// update by hand if you move them in equip-grid-placer.html)
+const CELL = 18; // fixed: every node is a vanilla slot (18x18 frame, 16x16 icon)
 const EQUIP = {
-  SLOT_X:[196,196,196,224,224,224,300,300,300,328,328,328], SLOT_Y:[30,62,94,30,62,94,30,62,94,30,62,94], SLOT:24,
-  SOCKET_X:[196,224,300,328], SOCKET_Y:[130,130,130,130], SOCKET:24,
-  MED_ON:true, MED_X:256, MED_Y:46, MED_W:40, MED_H:40
+  SLOT_X:[248,248,248,246,246,246,278,278,278,278,278,278], SLOT_Y:[2,30,57,111,138,166,2,30,57,111,138,166],
+  SOCKET_X:[210,208,316,316], SOCKET_Y:[30,138,30,138],
+  MED_ON:true, MED_X:252, MED_Y:83, MED_W:40, MED_H:20
 };
+// left-side layout owned by this tool (exported into PerkTree.java)
+const LAYOUT_SEED = { TAB_X:[5,37,69,101,133], TAB_Y:1, INVENTORY_X:14, INVENTORY_Y:65 };
+let L = structuredClone(LAYOUT_SEED);
+const INV_W = 9*18, INV_H = 4*18+4; // 3 rows + 4px gap + hotbar
+const TAB_NAMES = ['Combat','Alchemy','Signs','General','Mutagens'];
 const branchOf = id => Math.floor(id/100);
 
 const $ = id => document.getElementById(id);
@@ -131,7 +143,8 @@ const SVGNS='http://www.w3.org/2000/svg';
 const stage = $('stage'), out = $('out');
 
 let nodes = {};           // id -> {x,y,prereqs:[]}
-let nodeSize = 24, zoom = 3, activeBranch = 1, linkMode = false, linkSource = null, selected = null;
+const nodeSize = CELL;
+let zoom = 3, activeBranch = 1, linkMode = false, linkSource = null, selected = null;
 
 function defaultGrid(){
   const n = {};
@@ -151,7 +164,7 @@ function build(){
   stage.style.height = PANEL_H*zoom+'px';
   stage.style.backgroundSize = (+$('gridStep').value||2)*zoom+'px '+(+$('gridStep').value||2)*zoom+'px';
   const bg = $('bg');
-  stage.querySelectorAll('.node,.ref').forEach(e=>e.remove());
+  stage.querySelectorAll('.node,.ref,.lbox').forEach(e=>e.remove());
   let svg = $('edges'); if(!svg){ svg=document.createElementNS(SVGNS,'svg'); svg.id='edges'; if(bg) bg.after(svg); else stage.prepend(svg); }
   drawRefs();
   // nodes for the active branch
@@ -167,14 +180,46 @@ function build(){
     stage.appendChild(el);
     attachNode(el);
   }
+  for(let i=0;i<5;i++) layoutBox('T'+(i+1), CELL, CELL, ()=>[L.TAB_X[i], L.TAB_Y], (x,y)=>{ L.TAB_X[i]=x; L.TAB_Y=y; }, '', 'Tab T'+(i+1)+' ('+TAB_NAMES[i]+'), y shared by all tabs');
+  if(activeBranch===5) layoutBox('inventory (Mutagens tab)', INV_W, INV_H, ()=>[L.INVENTORY_X, L.INVENTORY_Y], (x,y)=>{ L.INVENTORY_X=x; L.INVENTORY_Y=y; }, 'inv', 'Inventory block');
   redrawEdges(); renderOut(); updateInfo(); syncTabs();
+}
+
+// a draggable layout box (sub-tab or inventory block)
+function layoutBox(label, w, h, get, set, cls, name){
+  const [x,y]=get();
+  const el=document.createElement('div'); el.className='lbox '+cls; el.textContent=label;
+  el.style.left=x*zoom+'px'; el.style.top=y*zoom+'px'; el.style.width=w*zoom+'px'; el.style.height=h*zoom+'px';
+  if(cls==='inv'){
+    for(let r=0;r<4;r++) for(let c=0;c<9;c++){ const d=document.createElement('div'); d.className='cell';
+      d.style.left=(c*18*zoom-2)+'px'; d.style.top=((r*18+(r===3?4:0))*zoom-2)+'px'; d.style.width=d.style.height=CELL*zoom+'px'; el.appendChild(d); }
+  } else {
+    const d=document.createElement('div'); d.className='cell'; d.style.left=d.style.top=(zoom-2)+'px'; d.style.width=d.style.height=16*zoom+'px'; el.appendChild(d);
+  }
+  el.addEventListener('pointerdown', e=>{
+    e.preventDefault(); selected=null;
+    const rect=stage.getBoundingClientRect(), [ox,oy]=get();
+    const gx=(e.clientX-rect.left)/zoom-ox, gy=(e.clientY-rect.top)/zoom-oy;
+    el.setPointerCapture(e.pointerId);
+    const move=ev=>{
+      const step=$('snapOn').checked?(+$('gridStep').value||1):1;
+      let nx=Math.round(((ev.clientX-rect.left)/zoom-gx)/step)*step, ny=Math.round(((ev.clientY-rect.top)/zoom-gy)/step)*step;
+      nx=Math.max(0,Math.min(FRAME_W-w,nx)); ny=Math.max(0,Math.min(PANEL_H-h,ny));
+      set(nx,ny); el.style.left=nx*zoom+'px'; el.style.top=ny*zoom+'px';
+      stage.querySelectorAll('.lbox').forEach((b,i)=>{ if(i<5){ b.style.left=L.TAB_X[i]*zoom+'px'; b.style.top=L.TAB_Y*zoom+'px'; } });
+      renderOut(); $('selinfo').innerHTML='<b>'+name+'</b> &nbsp; x='+nx+' y='+ny;
+    };
+    const up=()=>{ el.releasePointerCapture(e.pointerId); el.removeEventListener('pointermove',move); el.removeEventListener('pointerup',up); };
+    el.addEventListener('pointermove',move); el.addEventListener('pointerup',up);
+  });
+  stage.appendChild(el);
 }
 function drawRefs(){
   const add=(x,y,w,h,label)=>{ const d=document.createElement('div'); d.className='ref';
     d.style.left=x*zoom+'px'; d.style.top=y*zoom+'px'; d.style.width=w*zoom+'px'; d.style.height=h*zoom+'px';
     if(label) d.textContent=label; stage.appendChild(d); };
-  for(let i=0;i<12;i++) add(EQUIP.SLOT_X[i], EQUIP.SLOT_Y[i], EQUIP.SLOT, EQUIP.SLOT);
-  for(let i=0;i<4;i++) add(EQUIP.SOCKET_X[i], EQUIP.SOCKET_Y[i], EQUIP.SOCKET, EQUIP.SOCKET);
+  for(let i=0;i<12;i++) add(EQUIP.SLOT_X[i], EQUIP.SLOT_Y[i], CELL, CELL);
+  for(let i=0;i<4;i++) add(EQUIP.SOCKET_X[i], EQUIP.SOCKET_Y[i], CELL, CELL);
   if(EQUIP.MED_ON) add(EQUIP.MED_X, EQUIP.MED_Y, EQUIP.MED_W, EQUIP.MED_H, 'MED');
 }
 
@@ -294,13 +339,33 @@ import java.util.List;
  * Perk-tree topology: node positions (GUI-local, left half of the equip screen)
  * and per-node prerequisites. A node's branch is its colour = perkId / 100.
  *
- * Generated by tools/tree-node-placer.html - paste this over the file wholesale.
+ * {@code prereqs} is an OR group, not AND: zero entries = always learnable, one
+ * or more = learning ANY single listed perk unlocks this node (multiple parents
+ * are alternative unlock paths converging on one node, not a requirement to
+ * learn them all). Enforced identically client-side (PerkPage, for render state)
+ * and server-side (PerkEquipGuiButtonMessage, for the actual learn action) - see
+ * TECHNICAL_DESIGN_DOCUMENT.md 3.10 "Adding a new perk".
+ *
+ * Editable two ways: by hand (plain Java array literals, \`new Node(id, x, y,
+ * prereqId...)\` - no tool required for a quick tweak), or generated wholesale by
+ * tools/tree-node-placer.html (drag-position nodes, click-link to draw/delete
+ * prerequisite arrows, live-exports a complete file to paste over this one).
+ * Both are equally valid; the tool is just a visual aid for large layout passes.
  */
 public final class PerkTree {
 	private PerkTree() {
 	}
 
-	public static final int NODE_SIZE = ${nodeSize};
+	public static final int NODE_SIZE = ${nodeSize}; // fixed: a vanilla slot (18x18 frame, 16x16 icon)
+
+	// Sub-tab row: Combat, Alchemy, Signs, General, Mutagens (one shared y).
+	public static final int[] TAB_X = {${L.TAB_X.join(', ')}};
+	public static final int TAB_Y = ${L.TAB_Y};
+
+	// Mutagens tab: top-left of the inventory block's first slot frame. Three
+	// rows of 9 at an 18px pitch, then the hotbar 4px lower (162x76 in all).
+	public static final int INVENTORY_X = ${L.INVENTORY_X};
+	public static final int INVENTORY_Y = ${L.INVENTORY_Y};
 
 	public static final class Node {
 		public final int perkId;
@@ -348,38 +413,43 @@ ${body}	};
 // ---- controls ----
 function syncTabs(){ document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', +t.dataset.b===activeBranch)); }
 (function buildTabs(){
-  const names={1:'Combat',2:'Alchemy',3:'Signs',4:'General'}; const tabs=$('tabs');
-  for(let b=1;b<=4;b++){ const t=document.createElement('div'); t.className='tab b'+b; t.dataset.b=b; t.textContent=names[b];
+  const names={1:'Combat',2:'Alchemy',3:'Signs',4:'General',5:'Mutagens'}; const tabs=$('tabs');
+  for(let b=1;b<=5;b++){ const t=document.createElement('div'); t.className='tab b'+b; t.dataset.b=b; t.textContent=names[b];
     t.onclick=()=>{ activeBranch=b; linkSource=null; selected=null; build(); }; tabs.appendChild(t); }
 })();
-$('nodeSize').value=nodeSize; $('nodeSize').addEventListener('input',()=>{ const v=parseInt($('nodeSize').value,10); if(v>=8){ nodeSize=v; build(); } });
 $('zoom').value=zoom; $('zoom').addEventListener('input',()=>{ const v=parseFloat($('zoom').value); if(v>=1){ zoom=v; build(); } });
 $('gridStep').addEventListener('input',build);
 $('linkMode').addEventListener('change',()=>{ linkMode=$('linkMode').checked; linkSource=null; build(); });
 $('copyBtn').addEventListener('click',async()=>{ out.select(); try{ await navigator.clipboard.writeText(out.value);}catch{document.execCommand('copy');}
   const b=$('copyBtn'), t=b.textContent; b.textContent='Copied!'; setTimeout(()=>b.textContent=t,1200); });
-$('resetBtn').addEventListener('click',()=>{ if(confirm('Reset ALL branches to the default grid and clear prerequisites?')){ nodes=defaultGrid(); linkSource=null; selected=null; build(); } });
+$('resetBtn').addEventListener('click',()=>{ if(confirm('Reset ALL branches to the default grid and clear prerequisites?')){ nodes=defaultGrid(); L=structuredClone(LAYOUT_SEED); linkSource=null; selected=null; build(); } });
 
 // ---- import from Java ----
 function parseTreeJava(txt){
   const n=defaultGrid();
   const ns=txt.match(/\bint\s+NODE_SIZE\s*=\s*(\d+)\s*;/);
   const size=ns?parseInt(ns[1],10):nodeSize;
+  // older files had bigger nodes: shrink each to 18 around its centre
+  const shift=size>CELL?Math.floor((size-CELL)/2):0;
   let count=0;
   for(const m of [...txt.matchAll(/new\s+Node\(([^)]*)\)/g)]){
     const nums=m[1].split(',').map(s=>parseInt(s.trim(),10)).filter(v=>!isNaN(v));
     if(nums.length<3) continue;
     const id=nums[0]; if(!(id in NAME)) continue;
-    n[id]={x:nums[1], y:nums[2], prereqs:nums.slice(3)};
+    n[id]={x:nums[1]+shift, y:nums[2]+shift, prereqs:nums.slice(3)};
     count++;
   }
-  return {nodes:n, size, count};
+  const L2=structuredClone(LAYOUT_SEED);
+  const intOf=k=>{const m=txt.match(new RegExp('\\bint\\s+'+k+'\\s*=\\s*(-?\\d+)\\s*;'));return m?parseInt(m[1],10):undefined;};
+  for(const k of ['TAB_Y','INVENTORY_X','INVENTORY_Y']){ const v=intOf(k); if(v!==undefined) L2[k]=v; }
+  const tm=txt.match(/\bint\[\]\s+TAB_X\s*=\s*\{([^}]*)\}/); if(tm){ const a=tm[1].split(',').map(s=>parseInt(s.trim(),10)); if(a.length===5&&a.every(v=>!isNaN(v))) L2.TAB_X=a; }
+  return {nodes:n, count, converted:shift>0, layout:L2};
 }
 $('impDo').addEventListener('click',()=>{
   const t=$('impArea').value;
   if(!t.trim()){ $('impInfo').textContent='Paste some Java first.'; return; }
-  try{ const r=parseTreeJava(t); nodes=r.nodes; nodeSize=r.size; $('nodeSize').value=nodeSize;
-    linkSource=null; selected=null; build(); $('impInfo').textContent='Imported '+r.count+' nodes.'; }
+  try{ const r=parseTreeJava(t); nodes=r.nodes; L=r.layout;
+    linkSource=null; selected=null; build(); $('impInfo').textContent='Imported '+r.count+' nodes'+(r.converted?' (shrunk to 18 around their centres).':'.'); }
   catch(e){ $('impInfo').textContent='Parse error: '+e.message; }
 });
 $('loadBg').addEventListener('click',()=>$('bgFile').click());

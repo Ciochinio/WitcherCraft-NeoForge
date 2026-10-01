@@ -99,17 +99,9 @@ public final class PerkRegistry {
 
 	/** ARGB text tint for a color bucket. */
 	public static int tint(int colorBucket) {
-		switch (colorBucket) {
-			case COLOR_RED:
-				return 0xFFFF5555;
-			case COLOR_GREEN:
-				return 0xFF55FF55;
-			case COLOR_BLUE:
-				return 0xFF5599FF;
-			case COLOR_NEUTRAL:
-				return 0xFFCCCCCC;
-			default:
-				return 0xFF777777;
-		}
+		// branch colours are edited in equip-grid-placer's Colours panel (PerkEquipLayout.BRANCH_COLORS)
+		if (colorBucket >= COLOR_RED && colorBucket <= COLOR_NEUTRAL)
+			return PerkEquipLayout.BRANCH_COLORS[colorBucket - 1];
+		return 0xFF777777;
 	}
 }

@@ -650,7 +650,9 @@ original skill screens (the equipped-state glyph is a placeholder for now); the 
 and the selection highlight are drawn by the GUI around the glyph, not baked into it. The navbar
 icons, the Skills sub-tab icons (an iron sword, a brewing stand, lapis lazuli, cooked beef, and
 redstone for Mutagens), the background, and the slot/socket frames are still placeholders, so the
-layout can be dialled in before the rest of the art exists.
+layout can be dialled in before the rest of the art exists. Every cell on the Skills page - sub-tabs,
+tree nodes, equip slots, and mutagen sockets - is the size of a normal Minecraft inventory slot, and
+the page is drawn at your GUI scale, so perk icons, mutagens, and inventory items all line up.
 
 ### Mutagens
 
@@ -664,6 +666,8 @@ bonus for as long as it stays there. Equipped mutagens are kept through death.
 - **Synergy:** every equipped perk of the mutagen's branch colour in the three perk slots above its
   socket adds a further bonus. A Red mutagen under three Combat perks is the strongest Red setup.
 - **Stacking:** two mutagens of the same type in different sockets both apply.
+- **Readout:** next to each filled socket, the Skills page lists exactly what that mutagen gives you
+  right now (for example "+15 Increased Damage"), synergy and perk bonuses included.
 
 | Type | Stat | Per mutagen level | Per matching perk |
 |------|------|-------------------|-------------------|
