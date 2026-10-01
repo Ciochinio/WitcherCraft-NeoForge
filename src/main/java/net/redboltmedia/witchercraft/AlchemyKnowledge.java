@@ -57,7 +57,7 @@ public final class AlchemyKnowledge {
 
 	/** Server config {@code alchemy.recipeKnowledge}: how much of the recipe list players see. */
 	public enum Mode {
-		/** Known recipes only; learned from starters, formulas, and successful brews. */
+		/** Known recipes only; learned from starters, manuscripts, and successful brews. */
 		DISCOVERY,
 		/** Like DISCOVERY, plus every unknown recipe as a locked entry (result icon and name only). */
 		SHOW_LOCKED,

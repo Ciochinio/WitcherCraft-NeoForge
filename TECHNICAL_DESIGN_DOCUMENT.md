@@ -2222,7 +2222,7 @@ still apply. Closing the map while a journey is being prepared cancels that jour
 ## 6. Alchemy recipes
 
 Alchemy crafting is being rebuilt (see `ALCHEMY_REDESIGN_PLAN.md`). This section covers the recipe
-system (slice 1), recipe knowledge and the recipe book (slice 3, 6.9), and formulas (slice 4, 6.10).
+system (slice 1), recipe knowledge and the recipe book (slice 3, 6.9), and manuscripts (slice 4, 6.10).
 The Alchemy tab's screen is
 described in 3.3b.
 
@@ -2245,15 +2245,24 @@ All hand-written locked code elements in `~/Alchemy`, never regenerated:
   per-player known recipes, their sync, filling the grid from the book, and the dev command (6.9).
 - **`AlchemyRecipeBook`**, **`AlchemyRecipeTooltip`**, **`AlchemyToast`** - client: the book panel, its
   hover tooltip, and the "New recipe learned" toast (6.9).
-- **`AlchemyFormulas`** - the formula data component, the `alchemy_formulas_enabled` loot condition,
-  formula naming, and reading (6.10). The `Formula` item element (`~/Items`) has locked code; its
-  `item/FormulaItem` only delegates here.
+- **`AlchemyManuscripts`** - the manuscript data component, the `alchemy_manuscripts_enabled` loot condition,
+  manuscript naming, and reading (6.10). The `Manuscript` item element (`~/Items`) has locked code; its
+  `item/ManuscriptItem` only delegates here.
 
 Recipes are data: `data/<namespace>/recipe/**.json` with `"type": "witchercraft:alchemy"`. The ported
 set lives in `data/witchercraft/recipe/alchemy/`. The `witchercraft:alcohol` item tag
 (`data/witchercraft/tags/item/alcohol.json`) is the potion base, and the `witchercraft:alchemy_base`
 item tag (`alchemy_base.json`) lists everything the base slot accepts. Datapacks can add, override, or
 remove recipes like any vanilla recipe.
+
+**The old system is retired** (slice 6, 2026-10-01): the `AlchemyGui` container GUI, `AlchemyGuiOpen`,
+`AlchemyMenuBrewButton`, `CraftPotion`/`CraftOil`/`CraftBomb` and the 27 per-recipe `Craft*`
+procedures (33 elements, 68 files) were moved to `trash/`, mirroring their paths, and removed from
+`witchercraft.mcreator` with their `gui.witchercraft.alchemy_gui.*` lang keys. The `ALCHEMY_GUI` lines
+in `WitchercraftModMenus` and `WitchercraftModScreens` were removed by hand; MCreator regenerates the
+same result. The locked `PauseMenuGui` definition still names `AlchemyGuiOpen` as its Alchemy button's
+`onClick`, like the retired Meditation and Skill Tree buttons; its Java does not use it. All alchemy
+items stay, including the six substances, which remain placeholder ingredients until slice 5.
 
 ### 6.2 Recipe format and matching contract
 
@@ -2272,7 +2281,7 @@ remove recipes like any vanilla recipe.
 - `ingredients` holds 1 to 5 entries. A repeated entry needs a separate slot for each copy.
 - `result` is an item id or `{id, count}` (count 1 to 99).
 - `starter` is optional and defaults to false.
-- `formula` is optional and defaults to true. `"formula": false` keeps the recipe out of every formula
+- `manuscript` is optional and defaults to true. `"manuscript": false` keeps the recipe out of every manuscript
   source (6.10). Starter recipes are always kept out, whatever this says.
 - Matching is **shapeless and exact**. The base must match the base slot. The filled ingredient slots
   must pair one-to-one with the recipe's ingredients, with nothing missing and nothing extra.
@@ -2393,7 +2402,7 @@ knowledge is purely per-player, so an attachment travels with the player file an
 copy-on-death for free. The two patterns are not an inconsistency.
 
 **The effective known set.** Every "does the player know it" question (sync, fill, the command,
-formulas in slice 4) goes through `AlchemyKnowledge.effectiveKnown`: every loaded recipe in
+manuscripts in slice 4) goes through `AlchemyKnowledge.effectiveKnown`: every loaded recipe in
 `ALL_KNOWN` mode, otherwise the recorded set intersected with the loaded recipe ids. Recorded ids
 that no longer exist (renamed or removed recipes, datapack changes) are skipped silently, never
 deleted, so they come back if the recipe does. Recording happens in every mode, so leaving
@@ -2409,7 +2418,7 @@ know it before, sends it to the client with the toast flag. A successful brew ca
 not know. `AlchemyKnownSyncMessage(replace, announce, entries)` carries full recipes (id plus
 `AlchemyRecipe.STREAM_CODEC`) of known recipes only: the whole set with `replace` on login (after
 starters), after `/reload`, after a config reload and after dev commands, or single entries when a
-recipe is learned. `AlchemyClientIndex` keeps them next to the index. Locked entries and formula
+recipe is learned. `AlchemyClientIndex` keeps them next to the index. Locked entries and manuscript
 names come from the index's id to result list, which is not secret.
 
 **Knowledge mode.** `WorldMapServerConfig`, section `alchemy`, option `recipeKnowledge`
@@ -2443,57 +2452,57 @@ such key shows no description; locked entries never show one. Like every string,
 
 **Dev command** (`AlchemyCommands`, gamemaster level): `/witchercraft alchemy learn|forget (all|<id>)
 [<players>]`, `reset [<players>]` (a new player again: clear, then grant starters), and
-`list [<player>]`. `forget all` keeps the starters-granted flag. `formula <id> [<players>]` gives a
-formula (6.10) and works in every knowledge mode.
+`list [<player>]`. `forget all` keeps the starters-granted flag. `manuscript <id> [<players>]` gives a
+manuscript (6.10) and works in every knowledge mode.
 
-### 6.10 Formulas (slice 4)
+### 6.10 Manuscripts (slice 4)
 
-**Item.** One generic item, `witchercraft:formula` (MCreator item element `Formula` in `~/Items`,
-`locked_code: true`, the project's first locked item). Locking keeps `item/FormulaItem.java`,
-`items/formula.json` and `models/item/formula.json` from being regenerated, so those three files are
+**Item.** One generic item, `witchercraft:manuscript` (MCreator item element `Manuscript` in `~/Items`,
+`locked_code: true`, the project's first locked item). Locking keeps `item/ManuscriptItem.java`,
+`items/manuscript.json` and `models/item/manuscript.json` from being regenerated, so those three files are
 hand-maintained; the registration lines in `WitchercraftModItems` and `WitchercraftModTabs` are still
-generated from the element. The texture `textures/item/formula.png` is a renamed copy of vanilla
+generated from the element. The texture `textures/item/manuscript.png` is a renamed copy of vanilla
 paper, to be repainted.
 
-**Data component.** `witchercraft:formula_recipe` (`AlchemyFormulas.RECIPE`, an `Identifier`,
+**Data component.** `witchercraft:manuscript_recipe` (`AlchemyManuscripts.RECIPE`, an `Identifier`,
 persistent and network-synced; a `DeferredRegister.DataComponents` attached by
-`AlchemyFormulas.register` in the "mod init" user code block). In JSON:
-`"components": {"witchercraft:formula_recipe": "witchercraft:alchemy/swallow"}`. A formula without it
+`AlchemyManuscripts.register` in the "mod init" user code block). In JSON:
+`"components": {"witchercraft:manuscript_recipe": "witchercraft:alchemy/swallow"}`. A manuscript without it
 (the creative tab's) does nothing.
 
-**Name on both sides.** `FormulaItem.getName` returns "Formula: <result>"
-(`item.witchercraft.formula.named`). On the server thread (`ServerLifecycleHooks.getCurrentServer()`
+**Name on both sides.** `ManuscriptItem.getName` returns "Manuscript: <result>"
+(`item.witchercraft.manuscript.named`). On the server thread (`ServerLifecycleHooks.getCurrentServer()`
 and `isSameThread()`: death messages, command feedback) the result comes from `AlchemyRecipes.byId`;
 on any other thread (client rendering, tooltips, creative search) from `AlchemyClientIndex.resultOf`,
 which every player has for every recipe. An id neither side knows falls back to the plain item name.
 The tooltip adds "Use to learn this recipe." or, if the client's known set has it, "You already know
 this recipe."
 
-**Reading** (`AlchemyFormulas.read`, from `use`). Server: no component or an unloaded recipe passes;
+**Reading** (`AlchemyManuscripts.read`, from `use`). Server: no component or an unloaded recipe passes;
 a recipe in the effective known set (so every recipe in `ALL_KNOWN`) shows an action-bar message and
-the formula is kept; otherwise `AlchemyKnowledge.learn(player, id, true)` (toast and sync), the
+the manuscript is kept; otherwise `AlchemyKnowledge.learn(player, id, true)` (toast and sync), the
 item-used stat, and `consume(1)` (kept in creative, like the knowledge book). The client predicts
 from its own index and known set so the arm only swings on a real read; the server decides.
 
-**Gate.** Loot condition `witchercraft:alchemy_formulas_enabled` (`AlchemyFormulas.EnabledCondition`)
-is true unless the knowledge mode is `ALL_KNOWN`. Every formula source uses it.
+**Gate.** Loot condition `witchercraft:alchemy_manuscripts_enabled` (`AlchemyManuscripts.EnabledCondition`)
+is true unless the knowledge mode is `ALL_KNOWN`. Every manuscript source uses it.
 
-**Which recipe: `witchercraft:random_formula`.** Every source picks its recipe with this loot
-function (`AlchemyFormulas.RandomFormulaFunction`): it replaces the stack with a formula for a
-uniformly random recipe from `AlchemyFormulas.droppable`, which is every loaded recipe that is not a
-starter, not `"formula": false`, and in the function's optional `categories` list (all categories
+**Which recipe: `witchercraft:random_manuscript`.** Every source picks its recipe with this loot
+function (`AlchemyManuscripts.RandomManuscriptFunction`): it replaces the stack with a manuscript for a
+uniformly random recipe from `AlchemyManuscripts.droppable`, which is every loaded recipe that is not a
+starter, not `"manuscript": false`, and in the function's optional `categories` list (all categories
 when omitted). So there is no per-recipe list anywhere: a new recipe file becomes findable on the
 next `/reload`. With nothing to pick (a category with no recipes yet) the function returns an empty
 stack; vanilla leaves it out of chests and turns the trade into "no offer", so the villager shows
-other trades instead. Mutagen recipes are starters (every player knows them), so no formula ever
+other trades instead. Mutagen recipes are starters (every player knows them), so no manuscript ever
 teaches one.
 
 **Loot.** One NeoForge built-in `neoforge:add_table` loot modifier,
-`data/witchercraft/loot_modifiers/formula_chests.json`. In 26.1 NeoForge loads that folder directly;
+`data/witchercraft/loot_modifiers/manuscript_chests.json`. In 26.1 NeoForge loads that folder directly;
 there is no `global_loot_modifiers.json` list. Its conditions are a `minecraft:any_of` of
-`neoforge:loot_table_id` terms (the vanilla chests) and `witchercraft:alchemy_formulas_enabled`. It
-rolls `data/witchercraft/loot_table/chests/formula.json`: one pool with a `minecraft:random_chance`
-condition (**0.25**) and one formula entry with `witchercraft:random_formula`. Chests: simple
+`neoforge:loot_table_id` terms (the vanilla chests) and `witchercraft:alchemy_manuscripts_enabled`. It
+rolls `data/witchercraft/loot_table/chests/manuscript.json`: one pool with a `minecraft:random_chance`
+condition (**0.25**) and one manuscript entry with `witchercraft:random_manuscript`. Chests: simple
 dungeon, abandoned mineshaft, village temple, desert pyramid, jungle temple, shipwreck supply,
 pillager outpost, stronghold library, woodland mansion, ancient city. The gate is checked on every
 roll.
@@ -2501,31 +2510,31 @@ roll.
 **Trades.** 26.1 villager trades are data: a `villager_trade` registry entry
 (`data/witchercraft/villager_trade/<name>.json`) added to a trade tag
 (`data/minecraft/tags/villager_trade/<profession>/level_<n>.json`, or `wandering_trader/<pool>.json`,
-with `"replace": false`). The formula trades give `witchercraft:formula` and set the recipe with
-`witchercraft:random_formula` in `given_item_modifiers`, so each villager rolls its formula once, when
+with `"replace": false`). The manuscript trades give `witchercraft:manuscript` and set the recipe with
+`witchercraft:random_manuscript` in `given_item_modifiers`, so each villager rolls its manuscript once, when
 its offers are generated, and keeps selling that one. The tag feeds a vanilla `trade_set`, which
 picks its `amount` of trades at random from the tag, so an added trade competes with the vanilla
 ones rather than being appended. The gate is the trade's `merchant_predicate`, which vanilla also
 evaluates **only when offers are generated** (new profession or level). Offers made before a switch
-to `ALL_KNOWN` stay; reading such a formula then just says it is known.
+to `ALL_KNOWN` stay; reading such a manuscript then just says it is known.
 
 | File | Tag | Categories | Price | Uses |
 |------|-----|------------|-------|------|
-| `formula_cleric_apprentice.json` | `cleric/level_2` | potion, oil, bomb | 10 emeralds | 3 |
-| `formula_cleric_journeyman.json` | `cleric/level_3` | decoction | 16 emeralds | 3 |
-| `formula_wandering_trader.json` | `wandering_trader/uncommon` | potion, oil, bomb, decoction | 8 emeralds | 1 |
+| `manuscript_cleric_apprentice.json` | `cleric/level_2` | potion, oil, bomb | 10 emeralds | 3 |
+| `manuscript_cleric_journeyman.json` | `cleric/level_3` | decoction | 16 emeralds | 3 |
+| `manuscript_wandering_trader.json` | `wandering_trader/uncommon` | potion, oil, bomb, decoction | 8 emeralds | 1 |
 
 Odds (vanilla picks 2 trades per set): an Apprentice cleric offers it about 2 times in 3, a
 Journeyman cleric likewise once decoction recipes exist (never before), and a wandering trader about
 1 time in 8 (2 picks from 16 uncommon trades).
 
-Verified on a dev server: 60 rolls of `chests/formula` gave 16 formulas (27%) over 11 different
-recipes with no starter or mutagen; stronghold library rolls include formulas; 7 of 8 Apprentice
-clerics offered a potion, oil or bomb formula at 10 emeralds; no Journeyman cleric offered one (no
+Verified on a dev server: 60 rolls of `chests/manuscript` gave 16 manuscripts (27%) over 11 different
+recipes with no starter or mutagen; stronghold library rolls include manuscripts; 7 of 8 Apprentice
+clerics offered a potion, oil or bomb manuscript at 10 emeralds; no Journeyman cleric offered one (no
 decoction recipes yet); 1 of 10 wandering traders offered one at 8 emeralds; with `ALL_KNOWN`, 30
 dungeon rolls gave none.
 
-### 6.11 Changing formula sources (how-to)
+### 6.11 Changing manuscript sources (how-to)
 
 Everything below is data. Edit the file, then run `/reload` in a world (or restart). Loot changes
 apply to chests generated or opened for the first time afterwards; trade changes apply to villagers
@@ -2533,14 +2542,14 @@ whose offers are generated afterwards (new villagers, or one that levels up). Va
 file as JSON; a broken file is logged at load and that source silently stops working.
 
 **Let a recipe drop, or not.** Nothing to do for a new recipe: every non-starter recipe can drop.
-To keep one out, add `"formula": false` to its recipe JSON. To make it known from the start instead,
+To keep one out, add `"manuscript": false` to its recipe JSON. To make it known from the start instead,
 add `"starter": true` (players who already got their starters need `/witchercraft alchemy reset` or
 `learn`, because starters are granted once).
 
-**Change how often chests hold a formula.** `data/witchercraft/loot_table/chests/formula.json`,
-`"chance"` (0.25 = 25%). For two formulas at once, set `"rolls"` to 2.
+**Change how often chests hold a manuscript.** `data/witchercraft/loot_table/chests/manuscript.json`,
+`"chance"` (0.25 = 25%). For two manuscripts at once, set `"rolls"` to 2.
 
-**Add or remove a chest.** `data/witchercraft/loot_modifiers/formula_chests.json`: add or remove a
+**Add or remove a chest.** `data/witchercraft/loot_modifiers/manuscript_chests.json`: add or remove a
 term in `"terms"`:
 
 ```json
@@ -2548,11 +2557,11 @@ term in `"terms"`:
 ```
 
 Any loot table id works, including other mods' chests. For a chest that should use a different
-chance or categories, copy both files under new names (for example `formula_chests_rare.json`
-pointing at a new `chests/formula_rare.json`) and give the new table its own chance and
-`"categories"`. Keep the `witchercraft:alchemy_formulas_enabled` condition in every modifier.
+chance or categories, copy both files under new names (for example `manuscript_chests_rare.json`
+pointing at a new `chests/manuscript_rare.json`) and give the new table its own chance and
+`"categories"`. Keep the `witchercraft:alchemy_manuscripts_enabled` condition in every modifier.
 
-**Limit a source to some families.** Add `"categories"` to the `witchercraft:random_formula` function
+**Limit a source to some families.** Add `"categories"` to the `witchercraft:random_manuscript` function
 (in a loot table entry's `functions`, or a trade's `given_item_modifiers`):
 `["potion", "oil", "bomb", "decoction", "mutagen", "white_gull"]`, any subset. Omitted means all.
 
@@ -2570,19 +2579,19 @@ its id (`witchercraft:<file name>`) to a tag file as above (create the tag file 
 `"replace": false` if it does not exist yet). Keep the `merchant_predicate`.
 
 **Make a trade always appear.** A trade set picks only `amount` trades from its tag. To guarantee
-the formula trade, override the vanilla trade set: copy
+the manuscript trade, override the vanilla trade set: copy
 `data/minecraft/trade_set/<profession>/level_<n>.json` from the Minecraft jar into
 `src/main/resources/data/minecraft/trade_set/...` and raise `"amount"` by one. This replaces a
-vanilla file, so the villager then has one more trade than vanilla, not a guaranteed formula slot.
+vanilla file, so the villager then has one more trade than vanilla, not a guaranteed manuscript slot.
 
-**A fixed formula instead of a random one.** In a trade, drop `given_item_modifiers` and set the
+**A fixed manuscript instead of a random one.** In a trade, drop `given_item_modifiers` and set the
 component in `gives`:
-`"components": {"witchercraft:formula_recipe": "witchercraft:alchemy/swallow"}`. In a loot table,
-use `minecraft:set_components` with the same component instead of `witchercraft:random_formula`. One
+`"components": {"witchercraft:manuscript_recipe": "witchercraft:alchemy/swallow"}`. In a loot table,
+use `minecraft:set_components` with the same component instead of `witchercraft:random_manuscript`. One
 item holds one recipe; a JSON object with the key twice keeps only the last.
 
 **Turn a source off.** Delete the trade id from its tag (trades), or the modifier file (chests). To
-stop all formulas, the server option `alchemy.recipeKnowledge = "ALL_KNOWN"` already does it.
+stop all manuscripts, the server option `alchemy.recipeKnowledge = "ALL_KNOWN"` already does it.
 
 **From a datapack.** All of these files can be overridden by a datapack at the same path, so server
 owners can change chances, chests and prices without touching the mod.

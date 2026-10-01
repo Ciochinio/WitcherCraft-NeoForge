@@ -25,7 +25,6 @@ import java.util.Map;
 public class WitchercraftModMenus {
 	public static final DeferredRegister<MenuType<?>> REGISTRY = DeferredRegister.create(Registries.MENU, WitchercraftMod.MODID);
 	public static final DeferredHolder<MenuType<?>, MenuType<PauseMenuGuiMenu>> PAUSE_MENU_GUI = REGISTRY.register("pause_menu_gui", () -> IMenuTypeExtension.create(PauseMenuGuiMenu::new));
-	public static final DeferredHolder<MenuType<?>, MenuType<AlchemyGuiMenu>> ALCHEMY_GUI = REGISTRY.register("alchemy_gui", () -> IMenuTypeExtension.create(AlchemyGuiMenu::new));
 	public static final DeferredHolder<MenuType<?>, MenuType<GlossaryMenuGuiMenu>> GLOSSARY_MENU_GUI = REGISTRY.register("glossary_menu_gui", () -> IMenuTypeExtension.create(GlossaryMenuGuiMenu::new));
 	public static final DeferredHolder<MenuType<?>, MenuType<BestiaryMenuGuiMenu>> BESTIARY_MENU_GUI = REGISTRY.register("bestiary_menu_gui", () -> IMenuTypeExtension.create(BestiaryMenuGuiMenu::new));
 	public static final DeferredHolder<MenuType<?>, MenuType<CharacterGuiMenu>> CHARACTER_GUI = REGISTRY.register("character_gui", () -> IMenuTypeExtension.create(CharacterGuiMenu::new));

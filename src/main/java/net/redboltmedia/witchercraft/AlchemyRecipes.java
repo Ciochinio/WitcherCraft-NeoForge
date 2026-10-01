@@ -240,7 +240,7 @@ public final class AlchemyRecipes {
 	/**
 	 * Send a player the recipe index: the ingredient allowlist, every recipe's id,
 	 * category and result item (never its base or ingredients), and the knowledge
-	 * mode. Enough for slot placement, locked book entries, and formula names.
+	 * mode. Enough for slot placement, locked book entries, and manuscript names.
 	 */
 	public static void sendIndex(ServerPlayer player) {
 		Index index = index(player.level().getServer());

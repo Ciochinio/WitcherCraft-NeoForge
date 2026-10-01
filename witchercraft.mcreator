@@ -316,14 +316,14 @@
       "path": "~/Alchemy"
     },
     {
-      "name": "AlchemyFormulas",
+      "name": "AlchemyManuscripts",
       "type": "code",
       "compiles": true,
       "locked_code": true,
-      "registry_name": "alchemy_formulas",
+      "registry_name": "alchemy_manuscripts",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/AlchemyFormulas.java"
+          "src/main/java/net/redboltmedia/witchercraft/AlchemyManuscripts.java"
         ]
       },
       "path": "~/Alchemy"
@@ -1246,56 +1246,6 @@
       "path": "~/World Map/Terrain"
     },
     {
-      "name": "AlchemyGui",
-      "type": "gui",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "alchemy_gui",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/network/AlchemyGuiButtonMessage.java",
-          "src/main/java/net/redboltmedia/witchercraft/client/gui/AlchemyGuiScreen.java",
-          "src/main/java/net/redboltmedia/witchercraft/world/inventory/AlchemyGuiMenu.java"
-        ]
-      },
-      "path": "~/Alchemy/AlchemyMenu"
-    },
-    {
-      "name": "AlchemyGuiOpen",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "alchemy_gui_open",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/AlchemyGuiOpenProcedure.java"
-        ],
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "x",
-            "type": "number"
-          },
-          {
-            "name": "y",
-            "type": "number"
-          },
-          {
-            "name": "z",
-            "type": "number"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ]
-      },
-      "path": "~/Alchemy/AlchemyMenu"
-    },
-    {
       "name": "PauseMenuGuiBlind",
       "type": "procedure",
       "compiles": true,
@@ -1348,82 +1298,6 @@
         ]
       },
       "path": "~/Pause Menu"
-    },
-    {
-      "name": "CraftPotion",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "craft_potion",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CraftPotionProcedure.java"
-        ],
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ]
-      },
-      "path": "~/Alchemy/AlchemyMenu"
-    },
-    {
-      "name": "CraftOil",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "craft_oil",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CraftOilProcedure.java"
-        ],
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ]
-      },
-      "path": "~/Alchemy/AlchemyMenu"
-    },
-    {
-      "name": "CraftBomb",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "craft_bomb",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CraftBombProcedure.java"
-        ],
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ]
-      },
-      "path": "~/Alchemy/AlchemyMenu"
-    },
-    {
-      "name": "AlchemyMenuBrewButton",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "alchemy_menu_brew_button",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/AlchemyMenuBrewButtonProcedure.java"
-        ],
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ]
-      },
-      "path": "~/Alchemy/AlchemyMenu"
     },
     {
       "name": "WhiteHoney",
@@ -1931,16 +1805,16 @@
       "path": "~/Items"
     },
     {
-      "name": "Formula",
+      "name": "Manuscript",
       "type": "item",
       "compiles": true,
       "locked_code": true,
-      "registry_name": "formula",
+      "registry_name": "manuscript",
       "metadata": {
         "files": [
-          "src/main/resources/assets/witchercraft/items/formula.json",
-          "src/main/java/net/redboltmedia/witchercraft/item/FormulaItem.java",
-          "src/main/resources/assets/witchercraft/models/item/formula.json"
+          "src/main/resources/assets/witchercraft/items/manuscript.json",
+          "src/main/java/net/redboltmedia/witchercraft/item/ManuscriptItem.java",
+          "src/main/resources/assets/witchercraft/models/item/manuscript.json"
         ]
       },
       "path": "~/Items"
@@ -6120,519 +5994,6 @@
         ]
       },
       "path": "~/Admin"
-    },
-    {
-      "name": "CraftPotionSwallow",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "craft_potion_swallow",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CraftPotionSwallowProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Potions/Swallow"
-    },
-    {
-      "name": "CraftPotionPetrisPhilter",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "craft_potion_petris_philter",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CraftPotionPetrisPhilterProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Potions/PetrisPhilter"
-    },
-    {
-      "name": "CraftPotionWhiteHoney",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "craft_potion_white_honey",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CraftPotionWhiteHoneyProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Potions/WhiteHoney"
-    },
-    {
-      "name": "CraftPotionKillerWhale",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "craft_potion_killer_whale",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CraftPotionKillerWhaleProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Potions/KillerWhale"
-    },
-    {
-      "name": "CraftPotionWhiteRaffardsDecoction",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "craft_potion_white_raffards_decoction",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CraftPotionWhiteRaffardsDecoctionProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Potions/WhiteRaffardsDecoction"
-    },
-    {
-      "name": "CraftPotionThunderbolt",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "craft_potion_thunderbolt",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CraftPotionThunderboltProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Potions/Thunderbolt"
-    },
-    {
-      "name": "CraftPotionFullMoon",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "craft_potion_full_moon",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CraftPotionFullMoonProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Potions/FullMoon"
-    },
-    {
-      "name": "CraftPotionBlizzard",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "craft_potion_blizzard",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CraftPotionBlizzardProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Potions/Blizzard"
-    },
-    {
-      "name": "CraftPotionGoldenOriole",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "craft_potion_golden_oriole",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CraftPotionGoldenOrioleProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Potions/GoldenOriole"
-    },
-    {
-      "name": "CraftPotionCat",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "craft_potion_cat",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CraftPotionCatProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Potions/Cat"
-    },
-    {
-      "name": "CraftPotionTawnyOwl",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "craft_potion_tawny_owl",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CraftPotionTawnyOwlProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Potions/TawnyOwl"
-    },
-    {
-      "name": "CraftOilInsectoid",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "craft_oil_insectoid",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CraftOilInsectoidProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Oils/InsectoidOil"
-    },
-    {
-      "name": "CraftOilNecrophage",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "craft_oil_necrophage",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CraftOilNecrophageProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Oils/NecrophageOil"
-    },
-    {
-      "name": "CraftOilVampire",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "craft_oil_vampire",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CraftOilVampireProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Oils/VampireOil"
-    },
-    {
-      "name": "CraftOilHangedMansVenom",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "craft_oil_hanged_mans_venom",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CraftOilHangedMansVenomProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Oils/HangedMansVenom"
-    },
-    {
-      "name": "CraftOilSpecter",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "craft_oil_specter",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CraftOilSpecterProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Oils/SpecterOil"
-    },
-    {
-      "name": "CraftOilOgroid",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "craft_oil_ogroid",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CraftOilOgroidProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Oils/OgroidOil"
-    },
-    {
-      "name": "CraftOilBeast",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "craft_oil_beast",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CraftOilBeastProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Oils/BeastOil"
-    },
-    {
-      "name": "CraftOilDraconid",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "craft_oil_draconid",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CraftOilDraconidProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Oils/DraconidOil"
-    },
-    {
-      "name": "CraftOilRelict",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "craft_oil_relict",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CraftOilRelictProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Oils/RelictOil"
-    },
-    {
-      "name": "CraftOilCursed",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "craft_oil_cursed",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CraftOilCursedProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Oils/CursedOil"
-    },
-    {
-      "name": "CraftBombSamum",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "craft_bomb_samum",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CraftBombSamumProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Bombs/Samum"
-    },
-    {
-      "name": "CraftBombDevilsPuffball",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "craft_bomb_devils_puffball",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CraftBombDevilsPuffballProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Bombs/DevilsPuffball"
-    },
-    {
-      "name": "CraftBombDimeritium",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "craft_bomb_dimeritium",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CraftBombDimeritiumProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Bombs/DimeritiumBomb"
-    },
-    {
-      "name": "CraftBombGrapeshot",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "craft_bomb_grapeshot",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CraftBombGrapeshotProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Bombs/Grapeshot"
-    },
-    {
-      "name": "CraftBombDancingStar",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "craft_bomb_dancing_star",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CraftBombDancingStarProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Bombs/DancingStar"
-    },
-    {
-      "name": "CraftBombNorthernWind",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "craft_bomb_northern_wind",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CraftBombNorthernWindProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Bombs/NorthernWind"
     },
     {
       "name": "InsectoidOilHit",
@@ -11467,7 +10828,6 @@
       "item.witchercraft.hanged_mans_venom": "Hanged Mans Venom",
       "gui.witchercraft.rotfiend_gui.label_rotfiend": "Rotfiend",
       "item.witchercraft.necrophage_oil": "Necrophage Oil",
-      "gui.witchercraft.alchemy_gui.button_bombs": " Bombs ",
       "effect.witchercraft.killer_whale_effect": "Killer Whale ",
       "item.witchercraft.devils_puffball": "Devils Puffball",
       "key.witchercraft.sign_cast_keybind": "Sign Cast Keybind",
@@ -11479,7 +10839,7 @@
       "subtitles.alchemy_brew": "Alchemy brews",
       "subtitles.alchemy_fail": "Alchemy fizzles",
       "item.witchercraft.placeholder_alcohol": "Alcohol (Placeholder)",
-      "item.witchercraft.formula": "Formula",
+      "item.witchercraft.manuscript": "Manuscript",
       "gui.witchercraft.alchemy.brew": "Brew",
       "gui.witchercraft.alchemy.show_recipes": "Show recipes",
       "gui.witchercraft.alchemy.hide_recipes": "Hide recipes",
@@ -11522,7 +10882,6 @@
       "item.witchercraft.saltpeter": "Saltpeter",
       "item.witchercraft.viper_armor_leggings": "Viper Armor Leggings",
       "item.witchercraft.manticore_armor_chestplate": "Manticore Armor Chestplate",
-      "gui.witchercraft.alchemy_gui.button_potions": "Potions",
       "effect.witchercraft.igni_sign": "Igni Sign",
       "effect.witchercraft.tawny_owl_effect": "Tawny Owl",
       "item.witchercraft.griffin_armor_helmet": "Griffin Armor Helmet",
@@ -11577,14 +10936,12 @@
       "item.witchercraft.manticore_armor_helmet": "Manticore Armor Helmet",
       "item.witchercraft.viper_armor_boots": "Viper Armor Boots",
       "item.witchercraft.dimeritium_bomb": "Dimeritium Bomb",
-      "gui.witchercraft.alchemy_gui.button_back": "Back",
       "gui.witchercraft.drowner_gui.label_type_hostal": "Type: Hostile",
       "key.witchercraft.sign_gui_keybind": "Sign Gui Keybind",
       "gui.witchercraft.character_gui.label_attack_speed": "Attack Speed",
       "item.witchercraft.quebrith": "Quebrith",
       "gui.witchercraft.graveir_gui.label_atack_damage_5": "Atack Damage: 4",
       "gui.witchercraft.glossary_menu_gui.button_back": "Back",
-      "gui.witchercraft.alchemy_gui.button_oils": " Oils  ",
       "item.witchercraft.feline_armor_leggings": "Feline Armor Leggings",
       "gui.witchercraft.foglet_gui.label_health_20": "Health: 30",
       "item.witchercraft.viper_armor_chestplate": "Viper Armor Chestplate",
@@ -11607,7 +10964,6 @@
       "item.witchercraft.full_moon": "Full Moon",
       "item.witchercraft.insectoid_oil": "Insectoid Oil",
       "item.witchercraft.grapeshot": "Grapeshot",
-      "gui.witchercraft.alchemy_gui.button_brew": "Brew",
       "effect.witchercraft.dev_log": "Dev Log",
       "gui.witchercraft.character_gui.label_passivehealthregen": "HealthRegen",
       "gui.witchercraft.character_gui.label_staminaregen": "StaminaRegen",
@@ -11887,11 +11243,11 @@
       "commands.witchercraft.alchemy.reset": "Reset the alchemy knowledge of %s player(s) to a new player",
       "commands.witchercraft.alchemy.list": "%s knows %s of %s alchemy recipes (mode %s): %s",
       "alchemy.recipe.witchercraft.alchemy.swallow.description": "Increases health regeneration.",
-      "item.witchercraft.formula.named": "Formula: %s",
-      "item.witchercraft.formula.tooltip.use": "Use to learn this recipe.",
-      "item.witchercraft.formula.tooltip.known": "You already know this recipe.",
-      "item.witchercraft.formula.already_known": "You already know this recipe.",
-      "commands.witchercraft.alchemy.formula": "Gave a formula for %s to %s player(s)"
+      "item.witchercraft.manuscript.named": "Manuscript: %s",
+      "item.witchercraft.manuscript.tooltip.use": "Use to learn this recipe.",
+      "item.witchercraft.manuscript.tooltip.known": "You already know this recipe.",
+      "item.witchercraft.manuscript.already_known": "You already know this recipe.",
+      "commands.witchercraft.alchemy.manuscript": "Gave a manuscript for %s to %s player(s)"
     }
   },
   "metadata": {

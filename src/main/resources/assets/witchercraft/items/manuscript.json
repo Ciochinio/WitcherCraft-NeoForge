@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "witchercraft:item/formula"
+    "model": "witchercraft:item/manuscript"
   }
 }

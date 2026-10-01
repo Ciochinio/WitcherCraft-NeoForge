@@ -335,19 +335,19 @@ You learn a recipe by:
   once it has its recipe.)
 - **Brewing it.** Since wrong guesses cost nothing, experimenting is a real way to learn: the
   first time a brew succeeds, the recipe goes into your book with a "New recipe learned" popup.
-- **Reading a formula.** A formula is a single page named after what it teaches ("Formula:
-  Swallow"). Right-click it to learn the recipe, with the same popup; the formula is used up. If you
-  already know the recipe, it says so and you keep the formula, so it can go to a friend. Every
-  formula is equally likely; there are no rare ones. Where to find them:
-  - **Chests:** a **25%** chance of one formula in dungeons, mineshafts, village temples, desert
+- **Reading a manuscript.** A manuscript is a single page named after what it teaches ("Manuscript:
+  Swallow"). Right-click it to learn the recipe, with the same popup; the manuscript is used up. If you
+  already know the recipe, it says so and you keep the manuscript, so it can go to a friend. Every
+  manuscript is equally likely; there are no rare ones. Where to find them:
+  - **Chests:** a **25%** chance of one manuscript in dungeons, mineshafts, village temples, desert
     pyramids, jungle temples, shipwreck supply chests, pillager outposts, stronghold libraries,
     woodland mansions, and ancient cities.
-  - **Clerics:** an Apprentice (level 2) may sell a potion, oil, or bomb formula for **10** emeralds;
-    a Journeyman (level 3) may sell a decoction formula for **16** emeralds. Each trade has **3**
-    uses, and a villager keeps offering the same formula.
-  - **Wandering traders:** occasionally sell any formula for **8** emeralds, once.
+  - **Clerics:** an Apprentice (level 2) may sell a potion, oil, or bomb manuscript for **10** emeralds;
+    a Journeyman (level 3) may sell a decoction manuscript for **16** emeralds. Each trade has **3**
+    uses, and a villager keeps offering the same manuscript.
+  - **Wandering traders:** occasionally sell any manuscript for **8** emeralds, once.
 
-  Starter recipes and mutagen recipes never come as formulas.
+  Starter recipes and mutagen recipes never come as manuscripts.
 
 Known recipes survive death and relogging.
 
@@ -358,7 +358,7 @@ players see, and can be changed while the server runs:
 |---------|-------------------|
 | **Discovery** (default) | Only recipes you know |
 | **Show locked** | Recipes you know, plus every other recipe as a locked entry: just its result's icon and name, not its ingredients |
-| **All known** | Every recipe, from the start. Your real progress is kept, so switching back restores it. Formulas stop appearing in chests and new trades |
+| **All known** | Every recipe, from the start. Your real progress is kept, so switching back restores it. Manuscripts stop appearing in chests and new trades |
 
 ### Potions
 

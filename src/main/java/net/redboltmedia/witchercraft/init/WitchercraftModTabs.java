@@ -50,7 +50,7 @@ public class WitchercraftModTabs {
 				tabData.accept(WitchercraftModItems.SALTPETER.get());
 				tabData.accept(WitchercraftModItems.TALLOW.get());
 				tabData.accept(WitchercraftModItems.PLACEHOLDER_ALCOHOL.get());
-				tabData.accept(WitchercraftModItems.FORMULA.get());
+				tabData.accept(WitchercraftModItems.MANUSCRIPT.get());
 				tabData.accept(WitchercraftModItems.RELICT_OIL.get());
 				tabData.accept(WitchercraftModItems.CURSED_OIL.get());
 				tabData.accept(WitchercraftModItems.VAMPIRE_OIL.get());

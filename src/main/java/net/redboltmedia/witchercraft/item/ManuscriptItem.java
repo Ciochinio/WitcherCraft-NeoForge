@@ -12,23 +12,23 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 
-import net.redboltmedia.witchercraft.AlchemyFormulas;
+import net.redboltmedia.witchercraft.AlchemyManuscripts;
 
 /**
- * The generic alchemy formula. Its stack names the recipe it teaches; all
- * behaviour lives in {@link AlchemyFormulas}.
+ * The generic alchemy manuscript. Its stack names the recipe it teaches; all
+ * behaviour lives in {@link AlchemyManuscripts}.
  *
- * HAND-MAINTAINED: the Formula item element has locked code, so MCreator does
+ * HAND-MAINTAINED: the Manuscript item element has locked code, so MCreator does
  * not regenerate this class or its model files.
  */
-public class FormulaItem extends Item {
-	public FormulaItem(Item.Properties properties) {
+public class ManuscriptItem extends Item {
+	public ManuscriptItem(Item.Properties properties) {
 		super(properties);
 	}
 
 	@Override
 	public Component getName(ItemStack itemStack) {
-		Component name = AlchemyFormulas.name(itemStack);
+		Component name = AlchemyManuscripts.name(itemStack);
 		return name != null ? name : super.getName(itemStack);
 	}
 
@@ -36,11 +36,11 @@ public class FormulaItem extends Item {
 	@SuppressWarnings("deprecation")
 	public void appendHoverText(ItemStack itemStack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag flag) {
 		super.appendHoverText(itemStack, context, display, builder, flag);
-		AlchemyFormulas.tooltip(itemStack, builder);
+		AlchemyManuscripts.tooltip(itemStack, builder);
 	}
 
 	@Override
 	public InteractionResult use(Level world, Player entity, InteractionHand hand) {
-		return AlchemyFormulas.read(world, entity, hand);
+		return AlchemyManuscripts.read(world, entity, hand);
 	}
 }

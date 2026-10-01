@@ -17,7 +17,7 @@ import net.minecraft.world.item.ItemStack;
  * The "New recipe learned" toast, in the style of vanilla's recipe unlock toast
  * (same background sprite, 5 seconds). Recipes learned while it is showing join
  * it and cycle, instead of stacking more toasts. Shown in the Alchemy tab and,
- * for formulas (slice 4), anywhere else.
+ * for manuscripts (slice 4), anywhere else.
  *
  * Client only. HAND-MAINTAINED: locked code element.
  */

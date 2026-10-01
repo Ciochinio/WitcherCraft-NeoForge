@@ -3,12 +3,12 @@
   "_type": "item",
   "definition": {
     "renderType": 0,
-    "texture": "formula",
+    "texture": "manuscript",
     "customModelName": "Normal",
     "customProperties": {},
     "states": [],
     "animations": [],
-    "name": "Formula",
+    "name": "Manuscript",
     "rarity": "COMMON",
     "creativeTabs": [
       "CUSTOM:WitcherCraft"

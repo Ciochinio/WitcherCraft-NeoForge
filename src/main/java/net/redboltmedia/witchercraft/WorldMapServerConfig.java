@@ -115,7 +115,7 @@ public final class WorldMapServerConfig {
 		builder.pop();
 		builder.comment("Per-world rules for alchemy.")
 			.translation("witchercraft.configuration.alchemy").push("alchemy");
-		ALCHEMY_RECIPE_KNOWLEDGE = alchemyOption(builder, "recipe_knowledge", "How much of the alchemy recipe list players see. DISCOVERY: known recipes only, learned from starters, formulas, and successful brews. SHOW_LOCKED: also every unknown recipe as a locked entry showing only its result. ALL_KNOWN: every recipe from the start; players' real progress is kept for switching back.")
+		ALCHEMY_RECIPE_KNOWLEDGE = alchemyOption(builder, "recipe_knowledge", "How much of the alchemy recipe list players see. DISCOVERY: known recipes only, learned from starters, manuscripts, and successful brews. SHOW_LOCKED: also every unknown recipe as a locked entry showing only its result. ALL_KNOWN: every recipe from the start; players' real progress is kept for switching back.")
 			.defineEnum("recipeKnowledge", DEFAULT_ALCHEMY_RECIPE_KNOWLEDGE);
 		builder.pop();
 		SPEC = builder.build();

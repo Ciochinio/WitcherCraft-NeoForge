@@ -13,10 +13,10 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "witchercraft:formula",
+          "name": "witchercraft:manuscript",
           "functions": [
             {
-              "function": "witchercraft:random_formula"
+              "function": "witchercraft:random_manuscript"
             }
           ]
         }

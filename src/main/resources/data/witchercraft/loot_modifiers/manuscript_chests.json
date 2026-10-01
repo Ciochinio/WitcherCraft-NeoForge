@@ -47,8 +47,8 @@
       ]
     },
     {
-      "condition": "witchercraft:alchemy_formulas_enabled"
+      "condition": "witchercraft:alchemy_manuscripts_enabled"
     }
   ],
-  "table": "witchercraft:chests/formula"
+  "table": "witchercraft:chests/manuscript"
 }

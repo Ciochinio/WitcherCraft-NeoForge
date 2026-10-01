@@ -22,8 +22,8 @@ import net.minecraft.world.item.Item;
  * - the ingredient allowlist (item ids), so the client predicts slot placement
  *   exactly like the server;
  * - every recipe's id, category and result item, but never its base or
- *   ingredients. Enough for locked book entries and formula names, and not
- *   secret: a formula's name reveals its result anyway;
+ *   ingredients. Enough for locked book entries and manuscript names, and not
+ *   secret: a manuscript's name reveals its result anyway;
  * - the knowledge mode, so the book knows whether to show locked entries.
  *
  * Sent by {@link AlchemyRecipes#sendIndex} on login, after /reload, and after a

@@ -56,7 +56,7 @@ public record PauseMenuGuiButtonMessage(int buttonID, int x, int y, int z) imple
 		}
 		// buttonID 2 ("Alchemy") retired in the alchemy redesign (slice 2): the client no
 		// longer sends it; the Alchemy tab opens through WitcherGuiPages.open. The old
-		// AlchemyGui elements are removed in slice 6.
+		// AlchemyGui elements were moved to trash/ in slice 6.
 		if (buttonID == 3) {
 
 			GlossaryMenuGuiOpenProcedure.execute(world, x, y, z, entity);
