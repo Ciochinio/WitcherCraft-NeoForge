@@ -911,6 +911,15 @@ else:
   action inside `PerkEquipGuiButtonMessage.handleButtonAction` (`buttonID != 0` ->
   `RecomputeEquippedPerksProcedure.execute`). This is strictly more robust: the recompute follows the
   authoritative change, not the screen lifecycle.
+- **Login and respawn also recompute.** Perk and mutagen attribute modifiers are transient (not saved),
+  so a fresh player entity has none until a recompute. `RecomputeEquippedPerksOnLogin` (trigger
+  `player_log_in`) and `RecomputeEquippedPerksOnRespawn` (trigger `player_respawn`) run
+  `RecomputeEquippedPerks`. Vanilla loads saved Health before any of this and clamps it to the bare max
+  (20), so `SaveHealthOnLogout` (trigger `player_log_out`, which NeoForge fires before the player is
+  saved) stores health in the persistent var `witchercraftSavedHealth`, and the login procedure restores
+  `min(saved, max health)` after the recompute when the saved value is above 0 (0 = new player or logged
+  out dead). After a death respawn (`endconquered` false) health is set to the new max; leaving the End
+  keeps the current health.
 
 `PerkEquipGuiButtonMessage` is self-registering (`@EventBusSubscriber` + `registerMessage`), so it
 survived the retirement intact even though its old owning element is gone - the page keeps sending

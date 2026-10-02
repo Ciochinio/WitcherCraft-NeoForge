@@ -13,9 +13,9 @@ import net.minecraft.world.entity.Entity;
 import javax.annotation.Nullable;
 
 @EventBusSubscriber
-public class RecomputeEquippedPerksOnLoginProcedure {
+public class SaveHealthOnLogoutProcedure {
 	@SubscribeEvent
-	public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+	public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
 		execute(event, event.getEntity());
 	}
 
@@ -26,10 +26,10 @@ public class RecomputeEquippedPerksOnLoginProcedure {
 	private static void execute(@Nullable Event event, Entity entity) {
 		if (entity == null)
 			return;
-		RecomputeEquippedPerksProcedure.execute(entity);
-		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftSavedHealth > 0) {
-			if (entity instanceof LivingEntity _entity)
-				_entity.setHealth((float) Math.min(entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftSavedHealth, entity instanceof LivingEntity _livEnt ? _livEnt.getMaxHealth() : -1));
+		{
+			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+			_vars.witchercraftSavedHealth = entity instanceof LivingEntity _livEnt ? _livEnt.getHealth() : -1;
+			_vars.markSyncDirty();
 		}
 	}
 }

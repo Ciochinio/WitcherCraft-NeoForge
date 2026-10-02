@@ -183,6 +183,7 @@ public class WitchercraftModVariables {
 		clone.witchercraftMedallion = original.witchercraftMedallion;
 		clone.witchercraftPlayerExperience = original.witchercraftPlayerExperience;
 		clone.witchercraftPlayerExperienceRequirement = original.witchercraftPlayerExperienceRequirement;
+		clone.witchercraftSavedHealth = original.witchercraftSavedHealth;
 		clone.witchercraftPerksCombatSkillPointsUsed = original.witchercraftPerksCombatSkillPointsUsed;
 		clone.witchercraftPerksAlchemySkillPointsUsed = original.witchercraftPerksAlchemySkillPointsUsed;
 		clone.witchercraftPerksSignsSkillPointsUsed = original.witchercraftPerksSignsSkillPointsUsed;
@@ -313,6 +314,7 @@ public class WitchercraftModVariables {
 		public double witchercraftMedallion = 0;
 		public double witchercraftPlayerExperience = 0;
 		public double witchercraftPlayerExperienceRequirement = 25;
+		public double witchercraftSavedHealth = 0;
 		public double witchercraftToxicity = 0;
 		public double witchercraftPerksCombatSkillPointsUsed = 0;
 		public double witchercraftPerksAlchemySkillPointsUsed = 0;
@@ -439,6 +441,7 @@ public class WitchercraftModVariables {
 			output.putDouble("witchercraftMedallion", witchercraftMedallion);
 			output.putDouble("witchercraftPlayerExperience", witchercraftPlayerExperience);
 			output.putDouble("witchercraftPlayerExperienceRequirement", witchercraftPlayerExperienceRequirement);
+			output.putDouble("witchercraftSavedHealth", witchercraftSavedHealth);
 			output.putDouble("witchercraftToxicity", witchercraftToxicity);
 			output.putDouble("witchercraftPerksCombatSkillPointsUsed", witchercraftPerksCombatSkillPointsUsed);
 			output.putDouble("witchercraftPerksAlchemySkillPointsUsed", witchercraftPerksAlchemySkillPointsUsed);
@@ -566,6 +569,7 @@ public class WitchercraftModVariables {
 			witchercraftMedallion = input.getDoubleOr("witchercraftMedallion", 0);
 			witchercraftPlayerExperience = input.getDoubleOr("witchercraftPlayerExperience", 0);
 			witchercraftPlayerExperienceRequirement = input.getDoubleOr("witchercraftPlayerExperienceRequirement", 0);
+			witchercraftSavedHealth = input.getDoubleOr("witchercraftSavedHealth", 0);
 			witchercraftToxicity = input.getDoubleOr("witchercraftToxicity", 0);
 			witchercraftPerksCombatSkillPointsUsed = input.getDoubleOr("witchercraftPerksCombatSkillPointsUsed", 0);
 			witchercraftPerksAlchemySkillPointsUsed = input.getDoubleOr("witchercraftPerksAlchemySkillPointsUsed", 0);

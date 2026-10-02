@@ -5933,6 +5933,48 @@
       "path": "~/Character Abilities/Perk Calc"
     },
     {
+      "name": "RecomputeEquippedPerksOnRespawn",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "recompute_equipped_perks_on_respawn",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "endconquered",
+            "type": "logic"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/RecomputeEquippedPerksOnRespawnProcedure.java"
+        ]
+      },
+      "path": "~/Character Abilities/Perk Calc"
+    },
+    {
+      "name": "SaveHealthOnLogout",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "save_health_on_logout",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/SaveHealthOnLogoutProcedure.java"
+        ]
+      },
+      "path": "~/Character Abilities/Perk Calc"
+    },
+    {
       "name": "ApplyMutagenBonus",
       "type": "procedure",
       "compiles": true,
@@ -10815,6 +10857,12 @@
       "type": "number",
       "scope": "player_persistent",
       "value": "25"
+    },
+    {
+      "name": "witchercraftSavedHealth",
+      "type": "number",
+      "scope": "player_persistent",
+      "value": "0"
     },
     {
       "name": "witchercraftToxicity",
