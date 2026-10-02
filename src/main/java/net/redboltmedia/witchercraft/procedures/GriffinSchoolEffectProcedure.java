@@ -8,13 +8,21 @@ public class GriffinSchoolEffectProcedure {
 	public static void execute(Entity entity) {
 		if (entity == null)
 			return;
-		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
-			{
-				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-				_vars.witchercraftPerksGriffinSchool = true;
-				_vars.markSyncDirty();
+		PerkDefineProcedure.execute(404, "GriffinSchool", entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksGriffinSchool);
+		if (PerkLearnRequestedProcedure.execute(entity, 404)) {
+			if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
+				{
+					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+					_vars.witchercraftPerksGriffinSchool = true;
+					_vars.markSyncDirty();
+				}
+				CharacterAbilitiesSkillPointUsedProcedure.execute(entity);
 			}
-			CharacterAbilitiesSkillPointUsedProcedure.execute(entity);
+		}
+		{
+			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+			_vars.witchercraftEquippedPerkGriffinSchool = PerkSocketedProcedure.execute(entity, 404);
+			_vars.markSyncDirty();
 		}
 	}
 }

@@ -8,13 +8,21 @@ public class PreciseBlowsEffectProcedure {
 	public static void execute(Entity entity) {
 		if (entity == null)
 			return;
-		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
+		PerkDefineProcedure.execute(111, "PreciseBlows", entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksPreciseBlows);
+		if (PerkLearnRequestedProcedure.execute(entity, 111)) {
+			if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 					_vars.witchercraftPerksPreciseBlows = true;
 					_vars.markSyncDirty();
 				}
 				CharacterAbilitiesCombatSkillPointsUsedProcedure.execute(entity);
+			}
+		}
+		{
+			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+			_vars.witchercraftEquippedPerkPreciseBlows = PerkSocketedProcedure.execute(entity, 111);
+			_vars.markSyncDirty();
 		}
 	}
 }

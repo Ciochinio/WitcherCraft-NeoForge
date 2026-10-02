@@ -8,13 +8,21 @@ public class IgniIntensityEffectProcedure {
 	public static void execute(Entity entity) {
 		if (entity == null)
 			return;
-		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
+		PerkDefineProcedure.execute(308, "IgniIntensity", entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksIgniIntensity);
+		if (PerkLearnRequestedProcedure.execute(entity, 308)) {
+			if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 					_vars.witchercraftPerksIgniIntensity = true;
 					_vars.markSyncDirty();
 				}
 				CharacterAbilitiesSignsSkillPointsUsedProcedure.execute(entity);
+			}
+		}
+		{
+			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+			_vars.witchercraftEquippedPerkIgniIntensity = PerkSocketedProcedure.execute(entity, 308);
+			_vars.markSyncDirty();
 		}
 	}
 }

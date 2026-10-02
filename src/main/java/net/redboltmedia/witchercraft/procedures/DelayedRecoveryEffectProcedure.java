@@ -8,13 +8,21 @@ public class DelayedRecoveryEffectProcedure {
 	public static void execute(Entity entity) {
 		if (entity == null)
 			return;
-		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
+		PerkDefineProcedure.execute(202, "DelayedRecovery", entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksDelayedRecovery);
+		if (PerkLearnRequestedProcedure.execute(entity, 202)) {
+			if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 					_vars.witchercraftPerksDelayedRecovery = true;
 					_vars.markSyncDirty();
 				}
 				CharacterAbilitiesAlchemySkillPointsUsedProcedure.execute(entity);
+			}
+		}
+		{
+			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+			_vars.witchercraftEquippedPerkDelayedRecovery = PerkSocketedProcedure.execute(entity, 202);
+			_vars.markSyncDirty();
 		}
 	}
 }

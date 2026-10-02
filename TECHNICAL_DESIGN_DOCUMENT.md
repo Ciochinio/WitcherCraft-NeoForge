@@ -921,7 +921,7 @@ Removed: `PerkEquipGuiScreen`, `PerkEquipGuiMenu`, `PerkEquipGuiOpenProcedure`,
 in `witchercraft.mcreator`, the `PERK_EQUIP_GUI` menu holder + screen registration, and the
 `DEBUG_RECOMPUTE_PERKS_KEYBIND` (the old **P** "Open Perk Equip Screen" mapping, whose key the shell
 now reuses). Kept and still registered: `PerkEquipGuiButtonMessage`, `PerkEquipLayout`, `PerkTree`,
-`PerkRegistry`, `PerkEquipVars`, `PerkLearnedVars`, `RecomputeEquippedPerksProcedure`.
+`PerkRegistry`, `PerkEquipVars`, `PerkLearnedVars`, `RecomputeEquippedPerksProcedure`. (`PerkLearnedVars` was later replaced by `PerkCatalog`, see 3.10.)
 
 `PerkEquipGuiButtonMessage` is now an **orphaned** file - a real, compiled, self-registering class
 that no MCreator element owns. That is intentional and matches the existing perk helper classes; it
@@ -1028,53 +1028,103 @@ If yes, it needs its own `CustomPacketPayload` + `@EventBusSubscriber` handler (
 though that "compiles and looks like it should work." If no (it's just displaying something), calling
 the procedure directly is fine and is exactly what `PerkPage` already does.
 
-### 3.10 Adding a new perk
+### 3.10 Perk tree: slots, perk procedures, and adding a perk
 
-A perk touches several files that must stay in sync. In order:
+Adding, moving, hiding or removing a perk needs no hand-written Java. The tree owns **slots**; Blockly
+owns **perks**. (Rework of 2026-10-02. Before it, perk ids and names were hardcoded in `PerkRegistry`,
+`PerkLearnedVars` and a dispatch switch in `PerkEquipGuiButtonMessage.tryLearn`, which are now gone.)
 
-1. **Branch + ID** (`PerkRegistry.IDS` / `NAMES`). Pick the branch (Combat=red 100s, Alchemy=green
-   200s, Signs=blue 300s, General=neutral 400s) and a free ID in that range. Append to both arrays at
-   the same index - `IDS[i]` and `NAMES[i]` must line up. `NAMES[i]` is PascalCase (e.g.
-   `"CripplingShot"`) - it is the single source the slug, icon folder, and lang keys all derive from
-   (`slug = name.toLowerCase()`), so get it right here once rather than fixing it in four places later.
-2. **Learned + equipped vars** - `witchercraftPerks<Name>` and `witchercraftEquippedPerk<X>`
-   (player-persistent booleans), same pattern as every existing perk.
-3. **Tree node** (`PerkTree.NODES`) - `new Node(id, x, y, prereqId...)`. Position it by hand or with
-   `tools/tree-node-placer.html`. **Prereqs are an OR group**: zero = always learnable, one or more =
-   learning ANY one of them unlocks this node (several parents are alternative unlock paths, not a
-   requirement to learn every one) - enforced identically in `PerkPage.prereqsMet` (client, render
-   state) and `PerkEquipGuiButtonMessage.prereqsMet` (server, the actual learn gate). Keep both in sync
-   by hand if you ever change this rule; it is intentionally duplicated rather than shared, the same way
-   the rest of the equip screen keeps client-render and server-authority logic separate.
-4. **Icon** - three flat, MCreator-visible 32x32 glyphs under `assets/witchercraft/textures/screens/`:
-   `<slug>_notlearned.png` (locked or available), `<slug>_notequipped.png` (learned but not slotted), `<slug>_equipped.png`
-   (slotted). Bare glyph only - no baked-in frame or background; the coloured cell border and selection
-   ring are drawn by `PerkPage` around whatever the icon is. Missing files fall back to a 3-letter text
-   abbreviation, so a half-finished icon set degrades visibly rather than crashing.
-5. **Buy procedure wiring** - a `<Name>Effect` procedure (sets the learned flag + spends the point,
-   mirror an existing perk) and a `<Name>Show` procedure (visibility gate, only used by the 4 retired
-   tab GUIs now - kept for parity, not load-bearing for the tree). Add a `case <id>:
-   <Name>EffectProcedure.execute(entity); break;` line to the big switch in
-   `PerkEquipGuiButtonMessage.tryLearn` - this is the one place that actually dispatches a tree
-   right-click to the perk's buy logic.
-6. **Apply the buff, gated on EQUIPPED, not learned** - a static flat stat goes in `PerkModifiers`
-   (applied on menu close); a triggered/conditional effect goes in its own event procedure or
-   `PerkModifiersConditional`, gated on `witchercraftEquippedPerk<Name>` (+ its condition, if any).
-7. **Lang keys** - `perk.witchercraft.<slug>.name` and `perk.witchercraft.<slug>.desc` in
-   `en_us.json` (see 3.11 - both are required, this is not optional polish). The tooltip is built purely
-   from these two keys (`PerkRegistry.nameKey` / `descKey`) plus the branch tint colour - nothing else to
-   wire for the hover tooltip to work. Description length is not constrained: `PerkPage.wrapToWidth`
-   greedy word-wraps the resolved text to `TOOLTIP_WRAP_WIDTH` (200px) at tooltip render time, since
-   Minecraft's `List<Component>` tooltip is one line per list entry with no wrapping of its own.
-8. **GDD** - add the perk to Section 12's table and describe its effect/values in the relevant branch
-   section, per the project's "keep the GDD current" rule.
+**Slots - `PerkTree.NODES`, edited with `tools/tree-node-placer.html`.** A node is a slot id, a position,
+its prerequisites and a hidden flag: `new Node(id, x, y, prereqId...)`, with `.hidden()` appended to
+hide it. The id is range-encoded, so its branch is `id / 100` (Combat=red 1xx, Alchemy=green 2xx,
+Signs=blue 3xx, General=neutral 4xx), which also drives tint and mutagen synergy. Ids must stay below
+1000 (the place packet encodes `slot * 1000 + perkId`). The tool adds a slot with the next free id of
+the branch, hides or shows it, deletes it, draws prerequisites, and exports the whole file; it
+round-trips (import the file, export, identical text). The tool does not know perk names; it shows ids.
+
+- **Prerequisites are an OR group**: any one learned visible prerequisite unlocks the node, and a node
+  with no visible prerequisites is a root. One implementation, `PerkTree.prereqsMet`, used by both
+  `PerkPage` (render state) and `PerkEquipGuiButtonMessage` (the server's learn gate).
+- **Hidden** means "not in the tree": `PerkTree.byId` and `forColor` skip it, so it is not drawn, not
+  learnable, and skipped as a prerequisite. `PerkEquipVars.getPerkSocket` reads a hidden perk as 0, so a
+  hidden perk that was already socketed stops counting everywhere (equipped var, synergy, connectors)
+  without its saved socket value being rewritten. Showing it again restores it. Learned flags are kept.
+- A visible slot that no perk procedure claims draws its id in place of an icon, has a
+  "Slot N: no perk" tooltip, and cannot be learned.
+
+**Perks - one Blockly procedure each, listed in `AllPerks`.** The procedure is the perk's
+`<Name>Effect` element (the old buy procedure, rewritten; the name is historical) and has exactly
+three parts:
+
+1. `PerkDefine(perkId, perkName, learned)` - the slot id it fills, its name, and its learned var.
+   `perkName` is PascalCase (`"CripplingShot"`); lowercased it is the slug for the icon files and lang
+   keys (`PerkRegistry.slug`), and `PerkRegistry.fallbackName` spaces it for a missing lang key.
+2. `if PerkLearnRequested(perkId)` - the learn body, unchanged from the old buy procedure:
+   `if CharacterAbilitiesSkillPointCheck` then set `witchercraftPerks<Name>` true and call the branch
+   spend procedure (`CharacterAbilities{Combat,Alchemy,Signs}SkillPointsUsed`, or
+   `CharacterAbilitiesSkillPointUsed` for General).
+3. `set witchercraftEquippedPerk<Name> = PerkSocketed(perkId)`.
+
+`PerkDefine`, `PerkLearnRequested` and `PerkSocketed` are locked procedures (hand-written Java, custom
+dependencies `perkId` number / `perkName` string / `learned` logic, passed with the call block's inputs)
+that forward to `PerkCatalog`. `AllPerks` calls every perk procedure, and `RecomputeEquippedPerks` is
+`AllPerks` -> `PerkModifiers` -> `ApplyMutagenBonus`. MCreator takes a procedure's parameter order
+from its `metadata.dependencies` in `witchercraft.mcreator` (only `world`, `x`, `y`, `z` are moved to
+the front), and the three helpers' Java signatures follow that order. Their Blockly is an empty stub,
+so do not open and save them in MCreator: a save re-derives the dependencies from the stub (none) and
+every perk procedure's call would then generate without arguments. If it happens, restore the three
+`metadata.dependencies` lists from git.
+
+**How Java reads the perks - `PerkCatalog`.** Running `AllPerks` for a player is a *scan*: each
+`PerkDefine` reports its id, name and learned flag into a per-thread collector (per-thread so the
+client and the integrated server never mix scans). Names are cached globally. Uses:
+
+- **Client render.** `PerkPage.render` calls `PerkCatalog.refreshClient(player)` once per frame and
+  reads learned state with `isLearnedClient`. A scan also executes each perk's equip line on the client
+  copy of the vars, which is the same derived value the server computes, so it is harmless. That is
+  also the rule it imposes: **a perk procedure must do nothing but these three parts.** No attribute
+  changes, sounds, messages or other side effects, because it runs every frame on the client and on
+  every recompute on the server. Effects go in their own procedures that read the equipped var.
+- **Server learn.** `PerkEquipGuiButtonMessage.tryLearn` takes a visible node, scans, rejects an
+  unclaimed or already-learned id, checks `prereqsMet`, then `PerkCatalog.learn` runs `AllPerks` with
+  that id flagged so only that perk's `PerkLearnRequested` is true. The skill-point check and spend stay
+  in the perk's own Blockly.
+
+**Adding a perk:**
+
+1. **Slot** - in `tree-node-placer.html`, import the current `PerkTree.java`, open the branch tab,
+   **Add slot** (or reuse a free or hidden slot), position it, link its prerequisites, and paste the
+   export over `PerkTree.java`. Note the id.
+2. **Variables** - add player-persistent booleans `witchercraftPerks<Name>` (learned) and
+   `witchercraftEquippedPerk<Name>` (equipped) in MCreator.
+3. **Perk procedure** - duplicate an existing `<Name>Effect` in the same branch (so the spend call is
+   already the right branch), then change the id in all three places, the name text, and both
+   variables. Keep it `no_ext_trigger`.
+4. **List it** - add one call block for it to `AllPerks`.
+5. **Effect** - apply the buff gated on `witchercraftEquippedPerk<Name>`, never on learned: a flat stat
+   in `PerkModifiers`, a conditional one in `PerkModifiersConditional` or its own event procedure.
+6. **Icons** - three flat 32x32 glyphs in `assets/witchercraft/textures/screens/`:
+   `<slug>_notlearned.png` (locked or available), `<slug>_notequipped.png` (learned, not slotted),
+   `<slug>_equipped.png` (slotted), where `<slug>` is the lowercased `perkName`. Bare glyphs; `PerkPage`
+   draws the frame. A missing file shows Minecraft's missing-texture pattern.
+7. **Lang** - `perk.witchercraft.<slug>.name` and `.desc` in MCreator's Localization (both
+   `language_map` and `en_us.json`, see 3.11). The tooltip is built from these two keys and the branch
+   tint; descriptions are word-wrapped at render time (`TOOLTIP_WRAP_WIDTH`, 200px).
+8. **GDD** - add the perk to Section 12's table and describe its values in its branch section.
+
+**Moving a perk.** To move it within the tree, drag its slot in the tool; the id does not change. To
+put it in a different slot (for example another branch), change the number in its `PerkDefine`,
+`PerkLearnRequested` and `PerkSocketed` blocks, and the spend call if the branch changed. The learned
+flag survives because it is a variable, but the socket vars store ids, so a player who had it slotted
+must slot it again. **Removing a perk** - hide its slot in the tool. The Blockly can stay, or be
+deleted later together with its `AllPerks` line and variables.
 
 ### 3.11 Localization
 
 **Every GUI-facing string must go through the lang file, no exceptions for "it's just a placeholder."**
 Use `Component.translatable(key, args...)` and add the key to `en_us.json`, not `Component.literal("...")`
 with the text baked into Java. This is cheap to do at write time and expensive to retrofit later (see the
-perk tooltip rewrite in 3.10, which had to reverse-engineer descriptions out of four old screens' lang
+perk tooltip rewrite, which had to reverse-engineer descriptions out of four old screens' lang
 files because they were never centralised against the new tree). That retrofit is now done: every perk
 has real `perk.witchercraft.<slug>.name` and `.desc` keys (see below), so the tooltip no longer relies on
 the Java fallback for its text.
@@ -1129,11 +1179,11 @@ done in both `en_us.json` and `witchercraft.mcreator`'s `language_map`, or MCrea
 
 **Retired GUI display plumbing gets trashed with its GUI.** The old per-perk tab GUIs each had a
 `<Perk>ShowProcedure` (returns whether a perk node should render as available) driving their visibility.
-The shell's `PerkPage` reads `PerkLearnedVars` / `PerkEquipVars` directly instead, so all 45 per-perk
+The shell's `PerkPage` reads `PerkCatalog` / `PerkEquipVars` directly instead, so all 45 per-perk
 `*Show` procedures were dead (zero references, verified by grep) and were moved to `trash/` (Java +
 `elements/*.mod.json`) with their `mod_elements` entries removed from `witchercraft.mcreator`. The two
 non-perk `*Show` procedures - `MedallionShow` and `QuenHudShow` - are still read by `WitcherHud` and stay.
-The live `<Perk>Effect` procedures (the actual gameplay) are untouched.
+The live `<Perk>Effect` procedures were kept; they are now the perk procedures of 3.10.
 
 ---
 

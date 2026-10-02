@@ -8,13 +8,21 @@ public class DeadlyPrecisionEffectProcedure {
 	public static void execute(Entity entity) {
 		if (entity == null)
 			return;
-		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
+		PerkDefineProcedure.execute(106, "DeadlyPrecision", entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksDeadlyPrecision);
+		if (PerkLearnRequestedProcedure.execute(entity, 106)) {
+			if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 					_vars.witchercraftPerksDeadlyPrecision = true;
 					_vars.markSyncDirty();
 				}
 				CharacterAbilitiesCombatSkillPointsUsedProcedure.execute(entity);
+			}
+		}
+		{
+			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+			_vars.witchercraftEquippedPerkDeadlyPrecision = PerkSocketedProcedure.execute(entity, 106);
+			_vars.markSyncDirty();
 		}
 	}
 }

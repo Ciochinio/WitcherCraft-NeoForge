@@ -8,13 +8,21 @@ public class CatSchoolEffectProcedure {
 	public static void execute(Entity entity) {
 		if (entity == null)
 			return;
-		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
-			{
-				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-				_vars.witchercraftPerksCatSchool = true;
-				_vars.markSyncDirty();
+		PerkDefineProcedure.execute(402, "CatSchool", entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksCatSchool);
+		if (PerkLearnRequestedProcedure.execute(entity, 402)) {
+			if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
+				{
+					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+					_vars.witchercraftPerksCatSchool = true;
+					_vars.markSyncDirty();
+				}
+				CharacterAbilitiesSkillPointUsedProcedure.execute(entity);
 			}
-			CharacterAbilitiesSkillPointUsedProcedure.execute(entity);
+		}
+		{
+			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+			_vars.witchercraftEquippedPerkCatSchool = PerkSocketedProcedure.execute(entity, 402);
+			_vars.markSyncDirty();
 		}
 	}
 }

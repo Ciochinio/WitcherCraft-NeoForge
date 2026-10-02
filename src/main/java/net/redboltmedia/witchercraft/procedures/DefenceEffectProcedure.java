@@ -8,13 +8,21 @@ public class DefenceEffectProcedure {
 	public static void execute(Entity entity) {
 		if (entity == null)
 			return;
-		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
+		PerkDefineProcedure.execute(107, "Defence", entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksDefence);
+		if (PerkLearnRequestedProcedure.execute(entity, 107)) {
+			if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 					_vars.witchercraftPerksDefence = true;
 					_vars.markSyncDirty();
 				}
 				CharacterAbilitiesCombatSkillPointsUsedProcedure.execute(entity);
+			}
+		}
+		{
+			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+			_vars.witchercraftEquippedPerkDefence = PerkSocketedProcedure.execute(entity, 107);
+			_vars.markSyncDirty();
 		}
 	}
 }

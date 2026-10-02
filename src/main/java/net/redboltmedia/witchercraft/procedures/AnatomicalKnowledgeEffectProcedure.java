@@ -8,13 +8,21 @@ public class AnatomicalKnowledgeEffectProcedure {
 	public static void execute(Entity entity) {
 		if (entity == null)
 			return;
-		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
+		PerkDefineProcedure.execute(101, "AnatomicalKnowledge", entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksAnatomicalKnowledge);
+		if (PerkLearnRequestedProcedure.execute(entity, 101)) {
+			if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 					_vars.witchercraftPerksAnatomicalKnowledge = true;
 					_vars.markSyncDirty();
 				}
 				CharacterAbilitiesCombatSkillPointsUsedProcedure.execute(entity);
+			}
+		}
+		{
+			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+			_vars.witchercraftEquippedPerkAnatomicalKnowledge = PerkSocketedProcedure.execute(entity, 101);
+			_vars.markSyncDirty();
 		}
 	}
 }

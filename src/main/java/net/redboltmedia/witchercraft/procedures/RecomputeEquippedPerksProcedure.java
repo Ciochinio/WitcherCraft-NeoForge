@@ -6,10 +6,7 @@ public class RecomputeEquippedPerksProcedure {
 	public static void execute(Entity entity) {
 		if (entity == null)
 			return;
-		RecomputeEquippedPerksCombatProcedure.execute(entity);
-		RecomputeEquippedPerksAlchemyProcedure.execute(entity);
-		RecomputeEquippedPerksSignsProcedure.execute(entity);
-		RecomputeEquippedPerksGeneralProcedure.execute(entity);
+		AllPerksProcedure.execute(entity);
 		PerkModifiersProcedure.execute(entity);
 		ApplyMutagenBonusProcedure.execute(entity);
 	}

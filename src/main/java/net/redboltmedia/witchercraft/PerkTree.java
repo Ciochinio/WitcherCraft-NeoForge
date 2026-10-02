@@ -2,23 +2,32 @@ package net.redboltmedia.witchercraft;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.IntPredicate;
 
 /**
- * Perk-tree topology: node positions (GUI-local, left half of the equip screen)
- * and per-node prerequisites. A node's branch is its colour = perkId / 100.
+ * Perk-tree topology: the slots of the tree. Each node is a slot id with a
+ * position (GUI-local, left half of the equip screen), its prerequisites and a
+ * hidden flag. A node's branch is its colour = perkId / 100. Which perk fills a
+ * slot is not decided here: a perk's Blockly procedure claims the id with
+ * PerkDefine (see PerkCatalog). A slot no perk claims shows its id and cannot
+ * be learned.
+ *
+ * Hidden nodes ({@code .hidden()}) act as if they were not in the tree: not
+ * drawn, not learnable, never counted as socketed, and ignored as prerequisites
+ * (a node whose prerequisites are all hidden is a root).
  *
  * {@code prereqs} is an OR group, not AND: zero entries = always learnable, one
  * or more = learning ANY single listed perk unlocks this node (multiple parents
  * are alternative unlock paths converging on one node, not a requirement to
  * learn them all). Enforced identically client-side (PerkPage, for render state)
  * and server-side (PerkEquipGuiButtonMessage, for the actual learn action) - see
- * TECHNICAL_DESIGN_DOCUMENT.md 3.10 "Adding a new perk".
+ * TECHNICAL_DESIGN_DOCUMENT.md 3.10.
  *
  * Editable two ways: by hand (plain Java array literals, `new Node(id, x, y,
- * prereqId...)` - no tool required for a quick tweak), or generated wholesale by
- * tools/tree-node-placer.html (drag-position nodes, click-link to draw/delete
- * prerequisite arrows, live-exports a complete file to paste over this one).
- * Both are equally valid; the tool is just a visual aid for large layout passes.
+ * prereqId...)`, with `.hidden()` appended to hide a slot - no tool required for
+ * a quick tweak), or generated wholesale by tools/tree-node-placer.html (add,
+ * hide and position slots, click-link to draw/delete prerequisite arrows,
+ * live-exports a complete file to paste over this one). Both are equally valid.
  */
 public final class PerkTree {
 	private PerkTree() {
@@ -48,12 +57,18 @@ public final class PerkTree {
 		public final int perkId;
 		public final int x, y;
 		public final int[] prereqs;
+		public boolean hidden;
 
 		Node(int perkId, int x, int y, int... prereqs) {
 			this.perkId = perkId;
 			this.x = x;
 			this.y = y;
 			this.prereqs = prereqs;
+		}
+
+		Node hidden() {
+			this.hidden = true;
+			return this;
 		}
 
 		public int cx() {
@@ -113,19 +128,37 @@ public final class PerkTree {
 			new Node(406, 124, 56),
 	};
 
+	/** The visible node with this id, or null (no such slot, or hidden). */
 	public static Node byId(int perkId) {
 		for (Node n : NODES)
-			if (n.perkId == perkId)
+			if (n.perkId == perkId && !n.hidden)
 				return n;
 		return null;
 	}
 
-	/** nodes belonging to a branch colour (1 red / 2 green / 3 blue / 4 neutral). */
+	/** Visible nodes belonging to a branch colour (1 red / 2 green / 3 blue / 4 neutral). */
 	public static List<Node> forColor(int color) {
 		List<Node> out = new ArrayList<>();
 		for (Node n : NODES)
-			if (n.perkId / 100 == color)
+			if (n.perkId / 100 == color && !n.hidden)
 				out.add(n);
 		return out;
+	}
+
+	/**
+	 * Prerequisites are an OR group: met if any visible prerequisite is learned,
+	 * or if the node has no visible prerequisites. Shared by PerkPage (render
+	 * state) and PerkEquipGuiButtonMessage (the server's learn check).
+	 */
+	public static boolean prereqsMet(Node n, IntPredicate learned) {
+		boolean any = false;
+		for (int pre : n.prereqs) {
+			if (byId(pre) == null)
+				continue;
+			any = true;
+			if (learned.test(pre))
+				return true;
+		}
+		return !any;
 	}
 }

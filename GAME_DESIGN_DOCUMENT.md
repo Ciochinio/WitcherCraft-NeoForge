@@ -654,7 +654,9 @@ displaced perk simply returns to the unequipped pool, so re-arranging a full gri
 manual unequip first. When a node has more than one connecting line to earlier perks, learning any
 ONE of them is enough - multiple parents are alternative routes into that node, not a checklist you
 have to clear in full, so a tree can branch and re-converge without gating a node behind everything
-that feeds into it. Hovering a node or a slotted perk shows its name (in its branch's colour) and a
+that feeds into it. A perk pulled from the tree during balancing (hidden) is simply absent: it can't
+be learned or slotted, it stops working if it was already slotted, and nodes that hung off it no
+longer need it. Hovering a node or a slotted perk shows its name (in its branch's colour) and a
 one-line description; whether it's locked, available, or equipped is left to the art alone. The **Map**
 tab holds the world map, described under World Map in section 9. The remaining unfinished tabs use
 placeholders until those systems get their own screens.

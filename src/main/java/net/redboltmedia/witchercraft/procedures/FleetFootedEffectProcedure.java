@@ -8,13 +8,21 @@ public class FleetFootedEffectProcedure {
 	public static void execute(Entity entity) {
 		if (entity == null)
 			return;
-		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
-			{
-				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-				_vars.witchercraftPerksFleetFooted = true;
-				_vars.markSyncDirty();
+		PerkDefineProcedure.execute(108, "FleetFooted", entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksFleetFooted);
+		if (PerkLearnRequestedProcedure.execute(entity, 108)) {
+			if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
+				{
+					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+					_vars.witchercraftPerksFleetFooted = true;
+					_vars.markSyncDirty();
+				}
+				CharacterAbilitiesCombatSkillPointsUsedProcedure.execute(entity);
 			}
-			CharacterAbilitiesCombatSkillPointsUsedProcedure.execute(entity);
+		}
+		{
+			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+			_vars.witchercraftEquippedPerkFleetFooted = PerkSocketedProcedure.execute(entity, 108);
+			_vars.markSyncDirty();
 		}
 	}
 }

@@ -137,6 +137,8 @@ public class PerkPage implements GuiPage {
 		Player entity = player();
 		if (entity == null)
 			return;
+		// which perks exist and which are learned: one AllPerks scan per frame (PerkCatalog)
+		PerkCatalog.refreshClient(entity);
 
 		// the panel at 1:1 GUI scale, centred in the region; helpers offset by (ox, oy)
 		int[] o = origin(x, y, w, h);
@@ -246,6 +248,8 @@ public class PerkPage implements GuiPage {
 	// as it needs - the learned/available/locked state is dropped here since the
 	// icon art (3 glyph states) and the cell border colour already convey it.
 	private List<Component> perkTooltip(int perkId) {
+		if (PerkRegistry.name(perkId).isEmpty()) // a tree slot no perk procedure claims yet
+			return List.of(Component.literal("Slot " + perkId + ": no perk"));
 		int rgb = PerkRegistry.tint(PerkRegistry.color(perkId)) & 0xFFFFFF;
 		String fallback = PerkRegistry.fallbackName(perkId);
 		// translatableWithFallback: if the lang key is ever missing (see
@@ -331,12 +335,12 @@ public class PerkPage implements GuiPage {
 		return ICON_CACHE.computeIfAbsent(key, k -> Identifier.parse("witchercraft:textures/screens/" + k + ".png"));
 	}
 
-	/** Draw a perk's glyph in the 16x16 icon area of the cell at (x, y). Falls back
-	 *  to the 3-letter label if the texture id can't be built (unknown perk). */
+	/** Draw a perk's glyph in the 16x16 icon area of the cell at (x, y). A slot no
+	 *  perk procedure claims yet shows its id instead. */
 	private void drawPerkIcon(GuiGraphicsExtractor g, int perkId, int x, int y, int state) {
 		Identifier id = perkIcon(perkId, state);
 		if (id == null) {
-			text(g, trim(PerkRegistry.name(perkId), 3), x + 1, y + 5, state == ICON_NOTLEARNED ? PerkEquipLayout.STATUS_TEXT : TEXT_HELD);
+			text(g, String.valueOf(perkId), x, y + 5, state == ICON_NOTLEARNED ? PerkEquipLayout.STATUS_TEXT : TEXT_HELD);
 			return;
 		}
 		g.blit(RenderPipelines.GUI_TEXTURED, id, ox + x + 1, oy + y + 1, 0, 0, ICON, ICON, ICON_SRC, ICON_SRC, ICON_SRC, ICON_SRC);
@@ -385,8 +389,8 @@ public class PerkPage implements GuiPage {
 		List<PerkTree.Node> nodes = PerkTree.forColor(activeBranch);
 		int tint = PerkRegistry.tint(activeBranch);
 		for (PerkTree.Node n : nodes) {
-			boolean childLearned = PerkLearnedVars.isLearned(entity, n.perkId);
-			boolean childMet = prereqsMet(n, entity);
+			boolean childLearned = PerkCatalog.isLearnedClient(n.perkId);
+			boolean childMet = prereqsMet(n);
 			int col = childLearned ? withAlpha(tint, 0xCC) : (childMet ? withAlpha(tint, 0x77) : PerkEquipLayout.LINK_LOCKED);
 			for (int pre : n.prereqs) {
 				PerkTree.Node p = PerkTree.byId(pre);
@@ -397,9 +401,9 @@ public class PerkPage implements GuiPage {
 			}
 		}
 		for (PerkTree.Node n : nodes) {
-			boolean learned = PerkLearnedVars.isLearned(entity, n.perkId);
+			boolean learned = PerkCatalog.isLearnedClient(n.perkId);
 			boolean equipped = learned && PerkEquipVars.isPerkSocketed(entity, n.perkId);
-			boolean met = prereqsMet(n, entity);
+			boolean met = prereqsMet(n);
 			int t = PerkRegistry.tint(PerkRegistry.color(n.perkId));
 			if (heldPerk == n.perkId) // 1px selection ring (matches the slot frames)
 				drawRect(g, n.x - 1, n.y - 1, PerkTree.NODE_SIZE + 2, PerkTree.NODE_SIZE + 2, PerkEquipLayout.TARGET_BORDER, PerkEquipLayout.TARGET_BORDER);
@@ -425,17 +429,10 @@ public class PerkPage implements GuiPage {
 		}
 	}
 
-	// A node's prereqs are an OR group: zero prereqs = always available, one or
-	// more = any single one being learned satisfies the node (several parents are
-	// alternative unlock paths, not a converging AND requirement). Mirrors the
-	// server-side check in PerkEquipGuiButtonMessage - see TDD 3.10.
-	private boolean prereqsMet(PerkTree.Node n, Player entity) {
-		if (n.prereqs.length == 0)
-			return true;
-		for (int pre : n.prereqs)
-			if (PerkLearnedVars.isLearned(entity, pre))
-				return true;
-		return false;
+	// A node's prereqs are an OR group (PerkTree.prereqsMet), the same check the
+	// server runs in PerkEquipGuiButtonMessage - see TDD 3.10.
+	private boolean prereqsMet(PerkTree.Node n) {
+		return PerkTree.prereqsMet(n, PerkCatalog::isLearnedClient);
 	}
 
 	private void drawConnectors(GuiGraphicsExtractor g, Player entity) {
@@ -516,7 +513,7 @@ public class PerkPage implements GuiPage {
 		int nodePerk = hitNode(lx, ly);
 		if (button == 1) { // right-click a node = learn (server enforces prereqs + points)
 			if (nodePerk > 0) {
-				if (!PerkLearnedVars.isLearned(entity, nodePerk))
+				if (!PerkCatalog.isLearnedClient(nodePerk))
 					sendAction(5000000 + nodePerk, entity);
 				return true;
 			}
@@ -529,7 +526,7 @@ public class PerkPage implements GuiPage {
 				return true;
 			}
 			if (nodePerk > 0) {
-				if (PerkLearnedVars.isLearned(entity, nodePerk))
+				if (PerkCatalog.isLearnedClient(nodePerk))
 					heldPerk = nodePerk;
 				return true;
 			}
@@ -648,10 +645,6 @@ public class PerkPage implements GuiPage {
 
 	private static final Identifier BONUS_FRAME = Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "mutagen_bonus_frame");
 	private static final int BONUS_PAD = 4, BONUS_ICON_GAP = 4, BONUS_ROW_GAP = 2;
-
-	private static String trim(String s, int max) {
-		return s.length() <= max ? s : s.substring(0, max);
-	}
 
 	private static int withAlpha(int argb, int alpha) {
 		return (alpha << 24) | (argb & 0x00FFFFFF);

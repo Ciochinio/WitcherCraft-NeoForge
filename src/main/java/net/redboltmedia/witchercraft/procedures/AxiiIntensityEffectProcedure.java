@@ -8,13 +8,21 @@ public class AxiiIntensityEffectProcedure {
 	public static void execute(Entity entity) {
 		if (entity == null)
 			return;
-		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
+		PerkDefineProcedure.execute(302, "AxiiIntensity", entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksAxiiIntensity);
+		if (PerkLearnRequestedProcedure.execute(entity, 302)) {
+			if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 					_vars.witchercraftPerksAxiiIntensity = true;
 					_vars.markSyncDirty();
 				}
 				CharacterAbilitiesSignsSkillPointsUsedProcedure.execute(entity);
+			}
+		}
+		{
+			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+			_vars.witchercraftEquippedPerkAxiiIntensity = PerkSocketedProcedure.execute(entity, 302);
+			_vars.markSyncDirty();
 		}
 	}
 }

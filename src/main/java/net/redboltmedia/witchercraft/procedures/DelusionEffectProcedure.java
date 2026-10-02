@@ -8,13 +8,21 @@ public class DelusionEffectProcedure {
 	public static void execute(Entity entity) {
 		if (entity == null)
 			return;
-		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
-			{
-				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-				_vars.witchercraftPerksDelusion = true;
-				_vars.markSyncDirty();
+		PerkDefineProcedure.execute(303, "Delusion", entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksDelusion);
+		if (PerkLearnRequestedProcedure.execute(entity, 303)) {
+			if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
+				{
+					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+					_vars.witchercraftPerksDelusion = true;
+					_vars.markSyncDirty();
+				}
+				CharacterAbilitiesSignsSkillPointsUsedProcedure.execute(entity);
 			}
-			CharacterAbilitiesSignsSkillPointsUsedProcedure.execute(entity);
+		}
+		{
+			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+			_vars.witchercraftEquippedPerkDelusion = PerkSocketedProcedure.execute(entity, 303);
+			_vars.markSyncDirty();
 		}
 	}
 }

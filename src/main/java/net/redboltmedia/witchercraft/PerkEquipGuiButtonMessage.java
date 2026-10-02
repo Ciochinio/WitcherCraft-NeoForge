@@ -1,6 +1,6 @@
 package net.redboltmedia.witchercraft;
 
-import net.redboltmedia.witchercraft.procedures.*;
+import net.redboltmedia.witchercraft.procedures.RecomputeEquippedPerksProcedure;
 
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -16,6 +16,8 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.core.SectionPos;
+
+import java.util.Map;
 
 /**
  * Perk equip screen button/action packet.
@@ -97,81 +99,21 @@ public record PerkEquipGuiButtonMessage(int buttonID, int x, int y, int z) imple
 			RecomputeEquippedPerksProcedure.execute(entity);
 	}
 
-	// Learn a tree node: only if not already learned and at least one prerequisite
-	// (if any) is learned - a node with several parents is a set of ALTERNATIVE
-	// unlock paths, not a converging AND requirement; a node with zero prereqs is
-	// always available. The actual point-check / learned-flag / point-spend is
-	// delegated to the perk's existing <Perk>Effect buy procedure, so learning
-	// stays in one place. (Dispatch covers the slice-2a Combat test nodes; extends
-	// to 45.)
+	// Learn a tree node: only a visible slot that a perk procedure claims, not
+	// already learned, with a prerequisite met (PerkTree.prereqsMet: an OR group).
+	// The skill-point check, learned flag and point spend are the perk's own
+	// "if PerkLearnRequested" Blockly block, run through PerkCatalog.learn.
 	private static void tryLearn(Player entity, int perkId) {
-		if (PerkLearnedVars.isLearned(entity, perkId))
-			return;
 		PerkTree.Node n = PerkTree.byId(perkId);
 		if (n == null)
 			return;
-		if (!prereqsMet(n, entity))
+		Map<Integer, Boolean> learned = PerkCatalog.scan(entity);
+		Boolean current = learned.get(perkId);
+		if (current == null || current) // no perk claims this slot, or already learned
 			return;
-		switch (perkId) {
-			case 101 : AnatomicalKnowledgeEffectProcedure.execute(entity); break;
-			case 102 : ColdBloodEffectProcedure.execute(entity); break;
-			case 103 : CripplingShotEffectProcedure.execute(entity); break;
-			case 104 : CripplingStrikesEffectProcedure.execute(entity); break;
-			case 105 : CrushingBlowsEffectProcedure.execute(entity); break;
-			case 106 : DeadlyPrecisionEffectProcedure.execute(entity); break;
-			case 107 : DefenceEffectProcedure.execute(entity); break;
-			case 108 : FleetFootedEffectProcedure.execute(entity); break;
-			case 109 : FloodOfAngerEffectProcedure.execute(entity); break;
-			case 110 : MuscleMemoryEffectProcedure.execute(entity); break;
-			case 111 : PreciseBlowsEffectProcedure.execute(entity); break;
-			case 112 : RazorFocusEffectProcedure.execute(entity); break;
-			case 113 : StrengthTrainingEffectProcedure.execute(entity); break;
-			case 114 : SunderArmorEffectProcedure.execute(entity); break;
-			case 115 : UndyingEffectProcedure.execute(entity); break;
-			case 201 : ClusterBombsEffectProcedure.execute(entity); break;
-			case 202 : DelayedRecoveryEffectProcedure.execute(entity); break;
-			case 203 : EfficiencyEffectProcedure.execute(entity); break;
-			case 204 : HunterInstinctEffectProcedure.execute(entity); break;
-			case 205 : PoisonedBladesEffectProcedure.execute(entity); break;
-			case 206 : ProtectiveCoatingEffectProcedure.execute(entity); break;
-			case 207 : PyrotechnicsEffectProcedure.execute(entity); break;
-			case 208 : RefreshmentEffectProcedure.execute(entity); break;
-			case 209 : SideEffectsEffectProcedure.execute(entity); break;
-			case 301 : AardIntensityEffectProcedure.execute(entity); break;
-			case 302 : AxiiIntensityEffectProcedure.execute(entity); break;
-			case 303 : DelusionEffectProcedure.execute(entity); break;
-			case 304 : DominationEffectProcedure.execute(entity); break;
-			case 305 : ExplodingShieldEffectProcedure.execute(entity); break;
-			case 306 : FarReachingAardEffectProcedure.execute(entity); break;
-			case 307 : FirestreamEffectProcedure.execute(entity); break;
-			case 308 : IgniIntensityEffectProcedure.execute(entity); break;
-			case 309 : MagicTrapEffectProcedure.execute(entity); break;
-			case 310 : PyromaniacEffectProcedure.execute(entity); break;
-			case 311 : QuenDischargeEffectProcedure.execute(entity); break;
-			case 312 : QuenIntensityEffectProcedure.execute(entity); break;
-			case 313 : ShockWaveEffectProcedure.execute(entity); break;
-			case 314 : SustainedGlyphsEffectProcedure.execute(entity); break;
-			case 315 : YrdenIntensityEffectProcedure.execute(entity); break;
-			case 401 : BearSchoolEffectProcedure.execute(entity); break;
-			case 402 : CatSchoolEffectProcedure.execute(entity); break;
-			case 403 : GourmetEffectProcedure.execute(entity); break;
-			case 404 : GriffinSchoolEffectProcedure.execute(entity); break;
-			case 405 : SunAndStarsEffectProcedure.execute(entity); break;
-			case 406 : SurvivalInstinctEffectProcedure.execute(entity); break;
-			default : break;
-		}
-	}
-
-	// A node's prereqs are an OR group: zero prereqs = always available, one or
-	// more = any single one being learned satisfies the node. Mirrors
-	// PerkPage.prereqsMet (client, for render state) - see TDD 3.10.
-	private static boolean prereqsMet(PerkTree.Node n, Player entity) {
-		if (n.prereqs.length == 0)
-			return true;
-		for (int pre : n.prereqs)
-			if (PerkLearnedVars.isLearned(entity, pre))
-				return true;
-		return false;
+		if (!PerkTree.prereqsMet(n, id -> learned.getOrDefault(id, false)))
+			return;
+		PerkCatalog.learn(entity, perkId);
 	}
 
 	@SubscribeEvent

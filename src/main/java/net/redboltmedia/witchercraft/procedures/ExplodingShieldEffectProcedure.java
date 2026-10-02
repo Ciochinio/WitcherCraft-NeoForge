@@ -8,13 +8,21 @@ public class ExplodingShieldEffectProcedure {
 	public static void execute(Entity entity) {
 		if (entity == null)
 			return;
-		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
-			{
-				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-				_vars.witchercraftPerksExplodingShield = true;
-				_vars.markSyncDirty();
+		PerkDefineProcedure.execute(305, "ExplodingShield", entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksExplodingShield);
+		if (PerkLearnRequestedProcedure.execute(entity, 305)) {
+			if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
+				{
+					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+					_vars.witchercraftPerksExplodingShield = true;
+					_vars.markSyncDirty();
+				}
+				CharacterAbilitiesSignsSkillPointsUsedProcedure.execute(entity);
 			}
-			CharacterAbilitiesSignsSkillPointsUsedProcedure.execute(entity);
+		}
+		{
+			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+			_vars.witchercraftEquippedPerkExplodingShield = PerkSocketedProcedure.execute(entity, 305);
+			_vars.markSyncDirty();
 		}
 	}
 }

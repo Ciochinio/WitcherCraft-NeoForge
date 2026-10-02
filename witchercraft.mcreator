@@ -511,19 +511,6 @@
       "path": "~/Character Abilities/Perk Gui"
     },
     {
-      "name": "PerkLearnedVars",
-      "type": "code",
-      "compiles": true,
-      "locked_code": true,
-      "registry_name": "perk_learned_vars",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/PerkLearnedVars.java"
-        ]
-      },
-      "path": "~/Character Abilities/Perk Gui"
-    },
-    {
       "name": "MeditationGuiButtonMessage",
       "type": "code",
       "compiles": true,
@@ -5777,6 +5764,113 @@
       "path": "~/Character Abilities/Perk Calc"
     },
     {
+      "name": "AllPerks",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "all_perks",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/AllPerksProcedure.java"
+        ]
+      },
+      "path": "~/Character Abilities/Perk Calc"
+    },
+    {
+      "name": "PerkDefine",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "perk_define",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "perkId",
+            "type": "number"
+          },
+          {
+            "name": "perkName",
+            "type": "string"
+          },
+          {
+            "name": "learned",
+            "type": "logic"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/PerkDefineProcedure.java"
+        ]
+      },
+      "path": "~/Character Abilities/Perk Calc"
+    },
+    {
+      "name": "PerkLearnRequested",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "perk_learn_requested",
+      "metadata": {
+        "return_type": "logic",
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "perkId",
+            "type": "number"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/PerkLearnRequestedProcedure.java"
+        ]
+      },
+      "path": "~/Character Abilities/Perk Calc"
+    },
+    {
+      "name": "PerkSocketed",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "perk_socketed",
+      "metadata": {
+        "return_type": "logic",
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "perkId",
+            "type": "number"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/PerkSocketedProcedure.java"
+        ]
+      },
+      "path": "~/Character Abilities/Perk Calc"
+    },
+    {
+      "name": "PerkCatalog",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "perk_catalog",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/PerkCatalog.java"
+        ]
+      },
+      "path": "~/Character Abilities/Perk Gui"
+    },
+    {
       "name": "RecomputeEquippedPerksOnLogin",
       "type": "procedure",
       "compiles": true,
@@ -5891,82 +5985,6 @@
         ],
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/procedures/MutagenBlueEffectProcedure.java"
-        ]
-      },
-      "path": "~/Character Abilities/Perk Calc"
-    },
-    {
-      "name": "RecomputeEquippedPerksCombat",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "recompute_equipped_perks_combat",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/RecomputeEquippedPerksCombatProcedure.java"
-        ]
-      },
-      "path": "~/Character Abilities/Perk Calc"
-    },
-    {
-      "name": "RecomputeEquippedPerksAlchemy",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "recompute_equipped_perks_alchemy",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/RecomputeEquippedPerksAlchemyProcedure.java"
-        ]
-      },
-      "path": "~/Character Abilities/Perk Calc"
-    },
-    {
-      "name": "RecomputeEquippedPerksSigns",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "recompute_equipped_perks_signs",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/RecomputeEquippedPerksSignsProcedure.java"
-        ]
-      },
-      "path": "~/Character Abilities/Perk Calc"
-    },
-    {
-      "name": "RecomputeEquippedPerksGeneral",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "recompute_equipped_perks_general",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/RecomputeEquippedPerksGeneralProcedure.java"
         ]
       },
       "path": "~/Character Abilities/Perk Calc"

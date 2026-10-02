@@ -36,6 +36,7 @@
   .node.b3 { border-color:var(--blue); } .node.b4 { border-color:var(--neutral); }
   .node.src { outline:2px solid var(--accent); outline-offset:1px; z-index:6; }
   .node .id { font-size:8px; color:var(--dim); }
+  .node.hid { border-style:dashed; opacity:.45; }
   .lbox { position:absolute; border:2px solid #c070ff; background:#c070ff18; z-index:3; cursor:grab; user-select:none;
           display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--ink); text-shadow:0 1px 2px #000; }
   .lbox.inv { border-color:#66cccc; background:#66cccc10; align-items:flex-end; }
@@ -59,7 +60,7 @@
 <body>
 <header>
   <h1>Tree Node Placer</h1>
-  <span class="hint">Drag nodes to lay out each branch. Turn on <b>Link mode</b> to draw prerequisites (click a parent, then a child). The purple T1-T5 boxes are the sub-tab row (drag any one: x is per tab, the row height is shared) and the <b>Mutagens</b> tab shows the inventory block (drag it). Output regenerates <code>PerkTree.java</code> &rarr; copy &rarr; paste over the file.</span>
+  <span class="hint">Nodes are tree <b>slots</b>, shown by id; a perk's Blockly procedure claims a slot with <code>PerkDefine</code>. Add, hide or delete slots in the <b>Slot</b> panel. Drag nodes to lay out each branch. Turn on <b>Link mode</b> to draw prerequisites (click a parent, then a child). The purple T1-T5 boxes are the sub-tab row (drag any one: x is per tab, the row height is shared) and the <b>Mutagens</b> tab shows the inventory block (drag it). Output regenerates <code>PerkTree.java</code> &rarr; copy &rarr; paste over the file.</span>
 </header>
 
 <div class="wrap">
@@ -74,6 +75,15 @@
       <legend>Editing</legend>
       <label><input type="checkbox" id="linkMode"> Link mode (click parent &rarr; child = child requires parent)</label><br>
       <div class="hint" style="color:var(--dim)">In link mode, click a node then another to add a prerequisite; click the small &times; on a link to remove it. Cycles and duplicates are rejected. Move mode: drag to reposition, arrow keys nudge.</div>
+    </fieldset>
+    <fieldset>
+      <legend>Slot</legend>
+      <div class="row">
+        <button id="addBtn">Add slot to this branch</button>
+        <button id="hideBtn">Hide / show selected</button>
+        <button id="delBtn">Delete selected</button>
+      </div>
+      <div class="hint" style="color:var(--dim)">A new slot gets the next free id of the branch (Combat 1xx, Alchemy 2xx, Signs 3xx, General 4xx). Then write a perk procedure whose <code>PerkDefine</code> uses that id and add it to <code>AllPerks</code>. A hidden slot (dashed) is not shown in game, cannot be learned or equipped, and is skipped as a prerequisite. Prefer hiding to deleting while a perk procedure still uses the id.</div>
     </fieldset>
     <fieldset>
       <legend>Status text (bottom row)</legend>
@@ -106,7 +116,7 @@
 
     <fieldset style="margin-top:12px">
       <legend>Import from Java</legend>
-      <div style="color:var(--dim);margin-bottom:6px">Paste the current <code>PerkTree.java</code> to load its node positions + prerequisites into the editor. Unknown perk ids are ignored; any perk missing from the paste keeps its default-grid position. An older file with bigger nodes (NODE_SIZE above 18) is converted by shrinking each node around its centre.</div>
+      <div style="color:var(--dim);margin-bottom:6px">Paste the current <code>PerkTree.java</code> to load its slots (ids, positions, prerequisites, hidden flags) into the editor. The paste replaces every slot in the editor. An older file with bigger nodes (NODE_SIZE above 18) is converted by shrinking each node around its centre.</div>
       <textarea id="impArea" spellcheck="false" style="height:120px" placeholder="paste PerkTree.java here"></textarea>
       <div class="row" style="margin-top:6px"><button id="impDo">Import</button><span style="color:var(--dim)" id="impInfo"></span></div>
     </fieldset>
@@ -114,20 +124,14 @@
 </div>
 
 <script>
-// perk id -> name (PerkRegistry order); colour = floor(id/100)
-const PERKS = [
-  [101,"AnatomicalKnowledge"],[102,"ColdBlood"],[103,"CripplingShot"],[104,"CripplingStrikes"],[105,"CrushingBlows"],
-  [106,"DeadlyPrecision"],[107,"Defence"],[108,"FleetFooted"],[109,"FloodOfAnger"],[110,"MuscleMemory"],
-  [111,"PreciseBlows"],[112,"RazorFocus"],[113,"StrengthTraining"],[114,"SunderArmor"],[115,"Undying"],
-  [201,"ClusterBombs"],[202,"DelayedRecovery"],[203,"Efficiency"],[204,"HunterInstinct"],[205,"PoisonedBlades"],
-  [206,"ProtectiveCoating"],[207,"Pyrotechnics"],[208,"Refreshment"],[209,"SideEffects"],
-  [301,"AardIntensity"],[302,"AxiiIntensity"],[303,"Delusion"],[304,"Domination"],[305,"ExplodingShield"],
-  [306,"FarReachingAard"],[307,"Firestream"],[308,"IgniIntensity"],[309,"MagicTrap"],[310,"Pyromaniac"],
-  [311,"QuenDischarge"],[312,"QuenIntensity"],[313,"ShockWave"],[314,"SustainedGlyphs"],[315,"YrdenIntensity"],
-  [401,"BearSchool"],[402,"CatSchool"],[403,"Gourmet"],[404,"GriffinSchool"],[405,"SunAndStars"],[406,"SurvivalInstinct"],
+// slots of the default grid; which perk fills a slot is decided in Blockly (PerkDefine)
+const SEED_IDS = [
+  101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,
+  201,202,203,204,205,206,207,208,209,
+  301,302,303,304,305,306,307,308,309,310,311,312,313,314,315,
+  401,402,403,404,405,406,
 ];
-const NAME = {}; PERKS.forEach(([id,n])=>NAME[id]=n);
-const IDS = PERKS.map(p=>p[0]);
+const ids = () => Object.keys(nodes).map(Number).sort((a,b)=>a-b);
 const FRAME_W = 360, PANEL_H = 200;   // FULL frame (matches PerkEquipLayout PANEL_W/H) so you see both sides
 const STROKE = {1:'#ff5555',2:'#55ff55',3:'#5599ff',4:'#cccccc'};
 // equip grid, shown as faint read-only reference (current PerkEquipLayout values;
@@ -152,7 +156,7 @@ const $ = id => document.getElementById(id);
 const SVGNS='http://www.w3.org/2000/svg';
 const stage = $('stage'), out = $('out');
 
-let nodes = {};           // id -> {x,y,prereqs:[]}
+let nodes = {};           // id -> {x,y,prereqs:[],hidden}
 const nodeSize = CELL;
 let zoom = 3, activeBranch = 1, linkMode = false, linkSource = null, selected = null;
 
@@ -160,9 +164,9 @@ function defaultGrid(){
   const n = {};
   for (let color=1; color<=4; color++){
     let i=0;
-    for (const id of IDS){
+    for (const id of SEED_IDS){
       if (branchOf(id)!==color) continue;
-      n[id] = { x: 8 + (i%3)*58, y: 24 + Math.floor(i/3)*32, prereqs: [] };
+      n[id] = { x: 8 + (i%3)*58, y: 24 + Math.floor(i/3)*32, prereqs: [], hidden: false };
       i++;
     }
   }
@@ -178,14 +182,14 @@ function build(){
   let svg = $('edges'); if(!svg){ svg=document.createElementNS(SVGNS,'svg'); svg.id='edges'; if(bg) bg.after(svg); else stage.prepend(svg); }
   drawRefs();
   // nodes for the active branch
-  for (const id of IDS){
+  for (const id of ids()){
     if (branchOf(id)!==activeBranch) continue;
     const nd = nodes[id];
     const el = document.createElement('div');
-    el.className = 'node b'+activeBranch + (linkSource===id?' src':'');
+    el.className = 'node b'+activeBranch + (linkSource===id?' src':'') + (nd.hidden?' hid':'');
     el.style.left=nd.x*zoom+'px'; el.style.top=nd.y*zoom+'px';
     el.style.width=nodeSize*zoom+'px'; el.style.height=nodeSize*zoom+'px';
-    el.innerHTML = '<span>'+NAME[id].slice(0,6)+'</span><span class="id">'+id+'</span>';
+    el.innerHTML = '<span>'+id+'</span>';
     el.dataset.id=id;
     stage.appendChild(el);
     attachNode(el);
@@ -240,9 +244,10 @@ function redrawEdges(){
   const svg=$('edges'); if(!svg) return;
   svg.setAttribute('width', FRAME_W*zoom); svg.setAttribute('height', PANEL_H*zoom);
   svg.innerHTML='';
-  for (const id of IDS){
+  for (const id of ids()){
     if (branchOf(id)!==activeBranch) continue;
     for (const pre of nodes[id].prereqs){
+      if (!nodes[pre]) continue;
       const [px,py]=center(pre), [cx,cy]=center(id);
       arrow(svg, px, py, cx, cy, STROKE[activeBranch], pre, id);
     }
@@ -311,23 +316,24 @@ function addPrereq(parent, child){
 function reaches(from, target){ // does 'from' already (transitively) require 'target'?
   const seen=new Set(); const stack=[from];
   while(stack.length){ const cur=stack.pop(); if(cur===target) return true;
-    for(const p of nodes[cur].prereqs) if(!seen.has(p)){ seen.add(p); stack.push(p); } }
+    for(const p of (nodes[cur]?nodes[cur].prereqs:[])) if(!seen.has(p)){ seen.add(p); stack.push(p); } }
   return false;
 }
 
 function updateInfo(){
   const si=$('selinfo');
-  if(linkMode && linkSource!==null){ si.innerHTML='Link mode: parent = <b>'+NAME[linkSource]+'</b>. Click a child to require it.'; return; }
-  if(selected && branchOf(selected)===activeBranch){
+  if(linkMode && linkSource!==null){ si.innerHTML='Link mode: parent = <b>'+linkSource+'</b>. Click a child to require it.'; return; }
+  if(selected && nodes[selected] && branchOf(selected)===activeBranch){
     const nd=nodes[selected];
-    const pre = nd.prereqs.length? nd.prereqs.map(p=>NAME[p]).join(', ') : 'none';
-    si.innerHTML='<b>'+NAME[selected]+'</b> ('+selected+') &nbsp; x='+nd.x+' y='+nd.y+' &nbsp; requires: '+pre;
+    const pre = nd.prereqs.length? nd.prereqs.join(', ') : 'none';
+    si.innerHTML='<b>Slot '+selected+'</b>'+(nd.hidden?' (hidden)':'')+' &nbsp; x='+nd.x+' y='+nd.y+' &nbsp; requires: '+pre;
   } else si.innerHTML='Click a node to select. Toggle Link mode to draw prerequisites.';
 }
 let flashT; function flashInfo(msg){ const si=$('selinfo'); si.innerHTML='<b style="color:#ff9">'+msg+'</b>'; clearTimeout(flashT); flashT=setTimeout(updateInfo,1600); }
 
 document.addEventListener('keydown', e=>{
-  if(selected===null || branchOf(selected)!==activeBranch || linkMode) return;
+  if(selected===null || !nodes[selected] || branchOf(selected)!==activeBranch || linkMode) return;
+  if(e.target.tagName==='INPUT' || e.target.tagName==='TEXTAREA') return;
   const d={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key]; if(!d) return;
   e.preventDefault(); const m=e.shiftKey?5:1, nd=nodes[selected];
   nd.x=Math.max(0,Math.min(FRAME_W-nodeSize,nd.x+d[0]*m)); nd.y=Math.max(0,Math.min(PANEL_H-nodeSize,nd.y+d[1]*m)); build();
@@ -336,33 +342,42 @@ document.addEventListener('keydown', e=>{
 // ---- export ----
 function renderOut(){
   let body='';
-  for(const id of IDS){
+  for(const id of ids()){
     const nd=nodes[id];
     const args=[id, nd.x, nd.y, ...nd.prereqs].join(', ');
-    body += '\t\t\tnew Node('+args+'),'+(nd.prereqs.length?' // requires '+nd.prereqs.map(p=>NAME[p]).join(', '):'')+'\n';
+    body += '\t\t\tnew Node('+args+')'+(nd.hidden?'.hidden()':'')+',\n';
   }
   out.value =
 `package net.redboltmedia.witchercraft;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.IntPredicate;
 
 /**
- * Perk-tree topology: node positions (GUI-local, left half of the equip screen)
- * and per-node prerequisites. A node's branch is its colour = perkId / 100.
+ * Perk-tree topology: the slots of the tree. Each node is a slot id with a
+ * position (GUI-local, left half of the equip screen), its prerequisites and a
+ * hidden flag. A node's branch is its colour = perkId / 100. Which perk fills a
+ * slot is not decided here: a perk's Blockly procedure claims the id with
+ * PerkDefine (see PerkCatalog). A slot no perk claims shows its id and cannot
+ * be learned.
+ *
+ * Hidden nodes ({@code .hidden()}) act as if they were not in the tree: not
+ * drawn, not learnable, never counted as socketed, and ignored as prerequisites
+ * (a node whose prerequisites are all hidden is a root).
  *
  * {@code prereqs} is an OR group, not AND: zero entries = always learnable, one
  * or more = learning ANY single listed perk unlocks this node (multiple parents
  * are alternative unlock paths converging on one node, not a requirement to
  * learn them all). Enforced identically client-side (PerkPage, for render state)
  * and server-side (PerkEquipGuiButtonMessage, for the actual learn action) - see
- * TECHNICAL_DESIGN_DOCUMENT.md 3.10 "Adding a new perk".
+ * TECHNICAL_DESIGN_DOCUMENT.md 3.10.
  *
  * Editable two ways: by hand (plain Java array literals, \`new Node(id, x, y,
- * prereqId...)\` - no tool required for a quick tweak), or generated wholesale by
- * tools/tree-node-placer.html (drag-position nodes, click-link to draw/delete
- * prerequisite arrows, live-exports a complete file to paste over this one).
- * Both are equally valid; the tool is just a visual aid for large layout passes.
+ * prereqId...)\`, with \`.hidden()\` appended to hide a slot - no tool required for
+ * a quick tweak), or generated wholesale by tools/tree-node-placer.html (add,
+ * hide and position slots, click-link to draw/delete prerequisite arrows,
+ * live-exports a complete file to paste over this one). Both are equally valid.
  */
 public final class PerkTree {
 	private PerkTree() {
@@ -392,12 +407,18 @@ public final class PerkTree {
 		public final int perkId;
 		public final int x, y;
 		public final int[] prereqs;
+		public boolean hidden;
 
 		Node(int perkId, int x, int y, int... prereqs) {
 			this.perkId = perkId;
 			this.x = x;
 			this.y = y;
 			this.prereqs = prereqs;
+		}
+
+		Node hidden() {
+			this.hidden = true;
+			return this;
 		}
 
 		public int cx() {
@@ -412,20 +433,38 @@ public final class PerkTree {
 	public static final Node[] NODES = {
 ${body}	};
 
+	/** The visible node with this id, or null (no such slot, or hidden). */
 	public static Node byId(int perkId) {
 		for (Node n : NODES)
-			if (n.perkId == perkId)
+			if (n.perkId == perkId && !n.hidden)
 				return n;
 		return null;
 	}
 
-	/** nodes belonging to a branch colour (1 red / 2 green / 3 blue / 4 neutral). */
+	/** Visible nodes belonging to a branch colour (1 red / 2 green / 3 blue / 4 neutral). */
 	public static List<Node> forColor(int color) {
 		List<Node> out = new ArrayList<>();
 		for (Node n : NODES)
-			if (n.perkId / 100 == color)
+			if (n.perkId / 100 == color && !n.hidden)
 				out.add(n);
 		return out;
+	}
+
+	/**
+	 * Prerequisites are an OR group: met if any visible prerequisite is learned,
+	 * or if the node has no visible prerequisites. Shared by PerkPage (render
+	 * state) and PerkEquipGuiButtonMessage (the server's learn check).
+	 */
+	public static boolean prereqsMet(Node n, IntPredicate learned) {
+		boolean any = false;
+		for (int pre : n.prereqs) {
+			if (byId(pre) == null)
+				continue;
+			any = true;
+			if (learned.test(pre))
+				return true;
+		}
+		return !any;
 	}
 }
 `;
@@ -447,21 +486,41 @@ syncStatusInputs();
 $('linkMode').addEventListener('change',()=>{ linkMode=$('linkMode').checked; linkSource=null; build(); });
 $('copyBtn').addEventListener('click',async()=>{ out.select(); try{ await navigator.clipboard.writeText(out.value);}catch{document.execCommand('copy');}
   const b=$('copyBtn'), t=b.textContent; b.textContent='Copied!'; setTimeout(()=>b.textContent=t,1200); });
+$('addBtn').addEventListener('click',()=>{
+  if(activeBranch>4){ flashInfo('Pick a perk branch tab first.'); return; }
+  let id=0; for(let k=1;k<100;k++){ if(!nodes[activeBranch*100+k]){ id=activeBranch*100+k; break; } }
+  if(!id){ flashInfo('This branch has no free ids left.'); return; }
+  // first default-grid spot not already taken in this branch
+  const taken=new Set(ids().filter(i=>branchOf(i)===activeBranch).map(i=>nodes[i].x+','+nodes[i].y));
+  let x=8, y=24; for(let i=0;i<60;i++){ const gx=8+(i%3)*58, gy=24+Math.floor(i/3)*32; if(gy>PANEL_H-nodeSize) break; if(!taken.has(gx+','+gy)){ x=gx; y=gy; break; } }
+  nodes[id]={x, y, prereqs:[], hidden:false}; selected=id; build(); flashInfo('Added slot '+id+'.');
+});
+$('hideBtn').addEventListener('click',()=>{
+  if(selected===null || !nodes[selected]){ flashInfo('Select a slot first.'); return; }
+  nodes[selected].hidden=!nodes[selected].hidden; build();
+});
+$('delBtn').addEventListener('click',()=>{
+  if(selected===null || !nodes[selected]){ flashInfo('Select a slot first.'); return; }
+  if(!confirm('Delete slot '+selected+'? A perk procedure that still uses this id will have no slot. Hiding is usually better.')) return;
+  delete nodes[selected];
+  for(const id of ids()) nodes[id].prereqs=nodes[id].prereqs.filter(p=>p!==selected);
+  selected=null; build();
+});
 $('resetBtn').addEventListener('click',()=>{ if(confirm('Reset ALL branches to the default grid and clear prerequisites?')){ nodes=defaultGrid(); L=structuredClone(LAYOUT_SEED); syncStatusInputs(); linkSource=null; selected=null; build(); } });
 
 // ---- import from Java ----
 function parseTreeJava(txt){
-  const n=defaultGrid();
+  const n={};
   const ns=txt.match(/\bint\s+NODE_SIZE\s*=\s*(\d+)\s*;/);
   const size=ns?parseInt(ns[1],10):nodeSize;
   // older files had bigger nodes: shrink each to 18 around its centre
   const shift=size>CELL?Math.floor((size-CELL)/2):0;
   let count=0;
-  for(const m of [...txt.matchAll(/new\s+Node\(([^)]*)\)/g)]){
+  for(const m of [...txt.matchAll(/new\s+Node\(([^)]*)\)(\s*\.hidden\(\))?/g)]){
     const nums=m[1].split(',').map(s=>parseInt(s.trim(),10)).filter(v=>!isNaN(v));
     if(nums.length<3) continue;
-    const id=nums[0]; if(!(id in NAME)) continue;
-    n[id]={x:nums[1]+shift, y:nums[2]+shift, prereqs:nums.slice(3)};
+    const id=nums[0]; if(branchOf(id)<1 || branchOf(id)>4 || id%100===0) continue;
+    n[id]={x:nums[1]+shift, y:nums[2]+shift, prereqs:nums.slice(3), hidden:!!m[2]};
     count++;
   }
   const L2=structuredClone(LAYOUT_SEED);
@@ -474,7 +533,7 @@ function parseTreeJava(txt){
 $('impDo').addEventListener('click',()=>{
   const t=$('impArea').value;
   if(!t.trim()){ $('impInfo').textContent='Paste some Java first.'; return; }
-  try{ const r=parseTreeJava(t); nodes=r.nodes; L=r.layout; syncStatusInputs();
+  try{ const r=parseTreeJava(t); if(!r.count){ $('impInfo').textContent='No nodes found in the paste.'; return; } nodes=r.nodes; L=r.layout; syncStatusInputs();
     linkSource=null; selected=null; build(); $('impInfo').textContent='Imported '+r.count+' nodes'+(r.converted?' (shrunk to 18 around their centres).':'.'); }
   catch(e){ $('impInfo').textContent='Parse error: '+e.message; }
 });

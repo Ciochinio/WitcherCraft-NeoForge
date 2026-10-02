@@ -33,7 +33,13 @@ public final class PerkEquipVars {
 		return e.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerLevel >= slotUnlockLevel(idx);
 	}
 
+	/** The perk in slot idx, or 0. A perk whose tree slot is hidden reads as 0 (empty). */
 	public static int getPerkSocket(Player e, int idx) {
+		int id = rawPerkSocket(e, idx);
+		return id > 0 && PerkTree.byId(id) != null ? id : 0;
+	}
+
+	private static int rawPerkSocket(Player e, int idx) {
 		WitchercraftModVariables.PlayerVariables v = e.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 		switch (idx) {
 			case 0:

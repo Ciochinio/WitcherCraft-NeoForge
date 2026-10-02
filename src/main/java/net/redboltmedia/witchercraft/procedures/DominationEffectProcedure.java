@@ -8,13 +8,21 @@ public class DominationEffectProcedure {
 	public static void execute(Entity entity) {
 		if (entity == null)
 			return;
-		if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
+		PerkDefineProcedure.execute(304, "Domination", entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksDomination);
+		if (PerkLearnRequestedProcedure.execute(entity, 304)) {
+			if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 					_vars.witchercraftPerksDomination = true;
 					_vars.markSyncDirty();
 				}
 				CharacterAbilitiesSignsSkillPointsUsedProcedure.execute(entity);
+			}
+		}
+		{
+			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+			_vars.witchercraftEquippedPerkDomination = PerkSocketedProcedure.execute(entity, 304);
+			_vars.markSyncDirty();
 		}
 	}
 }
