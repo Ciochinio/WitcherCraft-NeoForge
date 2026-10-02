@@ -56,17 +56,22 @@ public final class MutagenEffects {
 
 	/** Mutagen types. {@code branch} is the perk branch colour it synergises with (PerkRegistry.COLOR_*). */
 	public enum Type {
-		RED("red", PerkRegistry.COLOR_RED, MutagenRedEffectProcedure::execute),
-		GREEN("green", PerkRegistry.COLOR_GREEN, MutagenGreenEffectProcedure::execute),
-		BLUE("blue", PerkRegistry.COLOR_BLUE, MutagenBlueEffectProcedure::execute);
+		RED("red", PerkRegistry.COLOR_RED, "attack_icon", true, MutagenRedEffectProcedure::execute),
+		GREEN("green", PerkRegistry.COLOR_GREEN, "health_icon", false, MutagenGreenEffectProcedure::execute),
+		BLUE("blue", PerkRegistry.COLOR_BLUE, "signs_icon", true, MutagenBlueEffectProcedure::execute);
 
 		public final TagKey<Item> tag;
 		public final int branch;
+		private final Identifier bonusIcon;
+		// the stat is in percentage points: its flat amount reads as "+30%"
+		public final boolean percentStat;
 		final Effect effect;
 
-		Type(String id, int branch, Effect effect) {
+		Type(String id, int branch, String icon, boolean percentStat, Effect effect) {
 			this.tag = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "mutagen/" + id));
 			this.branch = branch;
+			this.bonusIcon = Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "textures/screens/" + icon + ".png");
+			this.percentStat = percentStat;
 			this.effect = effect;
 		}
 
@@ -74,6 +79,15 @@ public final class MutagenEffects {
 		public int tint() {
 			return PerkRegistry.tint(branch);
 		}
+
+		/** 16x16 icon at the left of this type's bonus readout rows. */
+		public Identifier bonusIcon() {
+			return bonusIcon;
+		}
+	}
+
+	/** One bonus readout row: the stat name and its signed amount ("+15", "+10%"). */
+	public record Bonus(Component label, String value) {
 	}
 
 	public static final int MAX_LEVEL = 3;
@@ -183,16 +197,16 @@ public final class MutagenEffects {
 	// ---- reading what a socket gives (both sides) -----------------------------------------
 
 	/**
-	 * What socket {@code slot} currently gives, one line per modifier it applied,
-	 * e.g. "+15 Increased Damage" or "+10% Sign Intensity". Read from the player's
+	 * What socket {@code slot} currently gives, one row per modifier it applied,
+	 * e.g. "Increased Damage" / "+15%" or "Max Health" / "+4". Read from the player's
 	 * live attribute modifiers (the {@code mutagen_slot<N>/} ids), which sync to the
 	 * client, so this shows whatever the effect procedure did - level, synergy and
 	 * perk buffs included - without a packet. Effects that are not attribute
 	 * modifiers do not appear.
 	 */
-	public static List<Component> bonusLines(Player player, int slot) {
+	public static List<Bonus> bonusLines(Player player, int slot, Type type) {
 		String prefix = ID_PREFIX + "slot" + (slot + 1) + "/";
-		List<Component> lines = new ArrayList<>();
+		List<Bonus> lines = new ArrayList<>();
 		for (Holder<Attribute> attribute : BuiltInRegistries.ATTRIBUTE.listElements().toList()) {
 			AttributeInstance instance = player.getAttributes().getInstance(attribute);
 			if (instance == null)
@@ -203,8 +217,8 @@ public final class MutagenEffects {
 					continue;
 				boolean percent = modifier.operation() != AttributeModifier.Operation.ADD_VALUE;
 				double amount = percent ? modifier.amount() * 100 : modifier.amount();
-				String value = (amount >= 0 ? "+" : "") + NUMBER.format(amount) + (percent ? "%" : "");
-				lines.add(Component.literal(value + " ").append(Component.translatable(attribute.value().getDescriptionId())));
+				String value = (amount >= 0 ? "+" : "") + NUMBER.format(amount) + (percent || type.percentStat ? "%" : "");
+				lines.add(new Bonus(Component.translatable(attribute.value().getDescriptionId()), value));
 			}
 		}
 		return lines;

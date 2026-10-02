@@ -835,8 +835,19 @@ unchanged as the owner of the tree, equip grid and socket frames; what changed i
   because the generated block checks `hasModifier` first. Health is restored to
   `min(previous, new max)` after the pass, so re-adding Max Health never costs the player health.
 - **Adding a type.** A tag under `mutagen/`, a Blockly procedure with the same three dependencies, and a
-  `MutagenEffects.Type` entry (tag id, synergy branch colour, method reference). Adding an item to an
-  existing type or level is a tag edit only.
+  `MutagenEffects.Type` entry (tag id, synergy branch colour, readout icon name in `textures/screens/`,
+  method reference). Current icons: `attack_icon`, `health_icon`, `signs_icon`. Adding an item to an existing type or level is a tag
+  edit only.
+- **Bonus readout cards.** `MutagenEffects.bonusLines` returns `Bonus(label, value)` rows read from the
+  socket's live modifiers. `PerkPage.drawBonus` draws each row as the nine-slice sprite
+  `witchercraft:mutagen_bonus_frame` tinted `BONUS_FRAME[type]` (`blitSprite` multiplies, so the
+  texture is drawn in greys), the type icon on the `BONUS_ICON_RIGHT[socket]` side and the value
+  centred in the rest; the label is only the row's hover tooltip (`PerkPage.hitBonus`). Every
+  mutagen modifier is `ADD_VALUE`; `Type.percentStat` (red, blue) appends "%" because those stats
+  are percentage points, while green (Max Health) shows the flat amount. Geometry and colours are
+  `PerkEquipLayout.BONUS_*`, edited in `equip-grid-placer.html`. The sprite must live in
+  `textures/gui/sprites/` with its `.png.mcmeta` (the vanilla GUI atlas only reads that folder), so it
+  is the one GUI texture that cannot sit flat in `textures/screens/` and MCreator will not list it.
 
 ### 3.3d Witcher level, skill points, and level-gated perk slots
 

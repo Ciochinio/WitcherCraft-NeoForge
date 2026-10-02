@@ -224,6 +224,10 @@ public class PerkPage implements GuiPage {
 					pendingTooltip = perkTooltip(cur);
 				else if (!PerkEquipVars.isSlotUnlocked(entity, si))
 					pendingTooltip = List.of(Component.translatableWithFallback("gui.witchercraft.shell.skills.slot_locked", "Unlocks at level %s", PerkEquipVars.slotUnlockLevel(si)));
+			} else {
+				Component stat = hitBonus(entity, lx, ly);
+				if (stat != null)
+					pendingTooltip = List.of(stat);
 			}
 		}
 	}
@@ -294,9 +298,9 @@ public class PerkPage implements GuiPage {
 	}
 
 	/** One line of text at panel-local (x, y), its top-left, scaled about that corner. */
-	private void drawScaledText(GuiGraphicsExtractor g, Component c, int x, int y, float scale, int col) {
+	private void drawScaledText(GuiGraphicsExtractor g, Component c, float x, float y, float scale, int col) {
 		g.pose().pushMatrix();
-		g.pose().translate((float) (ox + x), (float) (oy + y));
+		g.pose().translate(ox + x, oy + y);
 		g.pose().scale(scale, scale);
 		g.text(font, c, 0, 0, col, false);
 		g.pose().popMatrix();
@@ -589,41 +593,61 @@ public class PerkPage implements GuiPage {
 	// ---- helpers -------------------------------------------------------------
 
 	/**
-	 * Socket gi's bonus text ("+15 Increased Damage", one line per modifier) in its
-	 * BONUS_* box, left or right aligned, scaled by BONUS_TEXT_SCALE, on a
-	 * BONUS_BG background hugging the text. Nothing for an empty socket.
+	 * Socket gi's bonus card: one BONUS_ROW_H row per modifier, stacked down from
+	 * (BONUS_X, BONUS_Y), each the nine-slice frame tinted for the mutagen type,
+	 * the stat's icon at the BONUS_ICON_RIGHT side and the amount centred in the
+	 * rest. The stat name is the row's tooltip. Nothing for an empty socket.
 	 */
 	private void drawBonus(GuiGraphicsExtractor g, Player entity, int gi) {
 		MutagenEffects.Type type = mutagenType(gi);
 		if (type == null)
 			return;
-		int textCol = PerkEquipLayout.BONUS_TEXT[type.ordinal()];
-		int bgCol = PerkEquipLayout.BONUS_BG[type.ordinal()];
-		List<Component> lines = MutagenEffects.bonusLines(entity, gi);
-		if (lines.isEmpty())
-			return;
+		int t = type.ordinal();
+		List<MutagenEffects.Bonus> rows = MutagenEffects.bonusLines(entity, gi, type);
+		int bx = PerkEquipLayout.BONUS_X[gi], bw = PerkEquipLayout.BONUS_W[gi], rh = PerkEquipLayout.BONUS_ROW_H;
+		boolean iconRight = PerkEquipLayout.BONUS_ICON_RIGHT[gi];
 		float s = PerkEquipLayout.BONUS_TEXT_SCALE;
-		int textW = 0;
-		for (Component line : lines)
-			textW = Math.max(textW, font.width(line));
-		int bx = PerkEquipLayout.BONUS_X[gi], by = PerkEquipLayout.BONUS_Y[gi], bw = PerkEquipLayout.BONUS_W[gi];
-		boolean right = PerkEquipLayout.BONUS_ALIGN_RIGHT[gi];
-		// the background, in panel pixels: the widest line plus a padding all round
-		float blockW = textW * s, blockH = (lines.size() * BONUS_LINE_H - 2) * s;
-		float left = right ? bx + bw - blockW : bx;
-		fill(g, Math.round(left) - BONUS_PAD, by - BONUS_PAD, Math.round(left + blockW) + BONUS_PAD, Math.round(by + blockH) + BONUS_PAD, bgCol);
-		g.pose().pushMatrix();
-		g.pose().translate(ox + left, oy + by);
-		g.pose().scale(s, s);
-		for (int i = 0; i < lines.size(); i++) {
-			Component line = lines.get(i);
-			int lx = right ? textW - font.width(line) : 0;
-			g.text(font, line, lx, i * BONUS_LINE_H, textCol, false);
+		int iconX = iconRight ? bx + bw - BONUS_PAD - ICON : bx + BONUS_PAD;
+		// the value's area: the card minus the padding and the icon with its gap
+		int areaX = iconRight ? bx + BONUS_PAD : iconX + ICON + BONUS_ICON_GAP;
+		int areaW = bw - 2 * BONUS_PAD - ICON - BONUS_ICON_GAP;
+		for (int i = 0; i < rows.size(); i++) {
+			MutagenEffects.Bonus row = rows.get(i);
+			int ry = bonusRowY(gi, i);
+			g.blitSprite(RenderPipelines.GUI_TEXTURED, BONUS_FRAME, ox + bx, oy + ry, bw, rh, PerkEquipLayout.BONUS_FRAME[t]);
+			g.blit(RenderPipelines.GUI_TEXTURED, type.bonusIcon(), ox + iconX, oy + ry + (rh - ICON) / 2, 0, 0, ICON, ICON, ICON, ICON);
+			// value centred on its visible glyphs (7px tall, width minus the trailing gap)
+			float vx = areaX + (areaW - (font.width(row.value()) - 1) * s) / 2f;
+			float vy = ry + (rh - 7 * s) / 2f;
+			drawScaledText(g, Component.literal(row.value()), vx, vy, s, PerkEquipLayout.BONUS_VALUE[t]);
 		}
-		g.pose().popMatrix();
 	}
 
-	private static final int BONUS_LINE_H = 10, BONUS_PAD = 2;
+	private static int bonusRowY(int gi, int row) {
+		return PerkEquipLayout.BONUS_Y[gi] + row * (PerkEquipLayout.BONUS_ROW_H + BONUS_ROW_GAP);
+	}
+
+	/** The stat name of the bonus row under (lx, ly), or null. */
+	private Component hitBonus(Player entity, int lx, int ly) {
+		for (int gi = 0; gi < PerkEquipVars.MUTAGEN_GROUPS; gi++) {
+			MutagenEffects.Type type = mutagenType(gi);
+			if (type == null)
+				continue;
+			int bx = PerkEquipLayout.BONUS_X[gi];
+			if (lx < bx || lx >= bx + PerkEquipLayout.BONUS_W[gi])
+				continue;
+			List<MutagenEffects.Bonus> rows = MutagenEffects.bonusLines(entity, gi, type);
+			for (int i = 0; i < rows.size(); i++) {
+				int ry = bonusRowY(gi, i);
+				if (ly >= ry && ly < ry + PerkEquipLayout.BONUS_ROW_H)
+					return rows.get(i).label();
+			}
+		}
+		return null;
+	}
+
+	private static final Identifier BONUS_FRAME = Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "mutagen_bonus_frame");
+	private static final int BONUS_PAD = 4, BONUS_ICON_GAP = 4, BONUS_ROW_GAP = 2;
 
 	private static String trim(String s, int max) {
 		return s.length() <= max ? s : s.substring(0, max);

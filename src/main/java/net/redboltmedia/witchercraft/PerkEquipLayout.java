@@ -29,7 +29,7 @@ public final class PerkEquipLayout {
 	// 9-11 into the 4 mutagen groups. Two columns left of the central
 	// medallion, two columns right (W3 geometry).
 	public static final int[] SLOT_X = {248, 248, 248, 246, 246, 246, 278, 278, 278, 278, 278, 278};
-	public static final int[] SLOT_Y = {2, 30, 57, 111, 138, 166, 2, 30, 57, 111, 138, 166};
+	public static final int[] SLOT_Y = {2, 30, 56, 111, 138, 166, 2, 30, 57, 111, 138, 166};
 
 	// 4 mutagen sockets (real item slots), socket i next to perk group i.
 	public static final int[] SOCKET_X = {210, 208, 316, 316};
@@ -43,14 +43,17 @@ public final class PerkEquipLayout {
 	public static final int MEDALLION_W = 40;
 	public static final int MEDALLION_H = 20;
 
-	// What each mutagen socket gives ("+15 Increased Damage", one line per bonus,
-	// 10px apart at scale 1, BONUS_TEXT on a BONUS_BG background, both picked by
-	// the socketed mutagen's type: 0 red, 1 green, 2 blue): a box per
-	// socket, the text left- or right-aligned inside it (not clipped).
-	public static final int[] BONUS_X = {158, 116, 248, 248};
-	public static final int[] BONUS_Y = {50, 158, 50, 158};
-	public static final int[] BONUS_W = {70, 110, 110, 110};
-	public static final boolean[] BONUS_ALIGN_RIGHT = {true, true, true, true};
+	// What each mutagen socket gives: a card per socket (x, y = top-left of its
+	// first row, BONUS_W wide), one BONUS_ROW_H row per bonus stacked downwards.
+	// A row is the nine-slice frame tinted BONUS_FRAME, the stat's icon on the
+	// left (or right, BONUS_ICON_RIGHT) and the amount in BONUS_VALUE centred in
+	// the rest; colours are picked by the socketed mutagen's type (0 red, 1 green,
+	// 2 blue). The stat name is the row's tooltip.
+	public static final int[] BONUS_X = {186, 184, 316, 316};
+	public static final int[] BONUS_Y = {50, 158, 50, 156};
+	public static final int[] BONUS_W = {43, 43, 43, 43};
+	public static final boolean[] BONUS_ICON_RIGHT = {false, false, true, true};
+	public static final int BONUS_ROW_H = 18;
 	public static final float BONUS_TEXT_SCALE = 1f;
 
 	// --- Colours (ARGB, 0xAARRGGBB). Edited in the tool's Colours panel.
@@ -66,8 +69,8 @@ public final class PerkEquipLayout {
 	public static final int NODE_LOCKED_BORDER = 0xFF2A2A30;
 	public static final int NODE_LOCKED_INNER = 0xFF121215;
 	public static final int LINK_LOCKED = 0xFF3A3A42;
-	public static final int[] BONUS_TEXT = {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
-	public static final int[] BONUS_BG = {0xAAFF5555, 0xFF55FF55, 0xFF5599FF};
+	public static final int[] BONUS_FRAME = {0xFFE04848, 0xFF58C858, 0xFF5890E8};
+	public static final int[] BONUS_VALUE = {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
 	public static final int STATUS_POINTS = 0xFFDDDD88;
 	public static final int STATUS_TEXT = 0xFF9A9AA2;
 	public static final int MEDALLION_BORDER = 0xFF8A6D3B;

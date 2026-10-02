@@ -683,9 +683,9 @@ bonus for as long as it stays there. Equipped mutagens are kept through death.
 - **Synergy:** every equipped perk of the mutagen's branch colour in the three perk slots above its
   socket adds a further bonus. A Red mutagen under three Combat perks is the strongest Red setup.
 - **Stacking:** two mutagens of the same type in different sockets both apply.
-- **Readout:** next to each filled socket, the Skills page lists exactly what that mutagen gives you
-  right now (for example "+15 Increased Damage"), synergy and perk bonuses included, in that
-  mutagen's colour.
+- **Readout:** next to each filled socket, a small card in that mutagen's colour shows exactly what
+  it gives you right now, synergy and perk bonuses included: the stat's icon and the amount, "+35%"
+  for Red and Blue, a flat "+4" for Green. Hovering the card names the stat.
 
 | Type | Stat | Per mutagen level | Per matching perk |
 |------|------|-------------------|-------------------|
