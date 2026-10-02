@@ -19,6 +19,13 @@ public class AardIntensityEffectProcedure {
 				CharacterAbilitiesSignsSkillPointsUsedProcedure.execute(entity);
 			}
 		}
+		if (PerkUnlearnRequestedProcedure.execute(entity, 301)) {
+			{
+				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+				_vars.witchercraftPerksAardIntensity = false;
+				_vars.markSyncDirty();
+			}
+		}
 		{
 			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 			_vars.witchercraftEquippedPerkAardIntensity = PerkSocketedProcedure.execute(entity, 301);

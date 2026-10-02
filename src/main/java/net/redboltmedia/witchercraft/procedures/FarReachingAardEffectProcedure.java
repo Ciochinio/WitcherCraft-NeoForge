@@ -19,6 +19,13 @@ public class FarReachingAardEffectProcedure {
 				CharacterAbilitiesSignsSkillPointsUsedProcedure.execute(entity);
 			}
 		}
+		if (PerkUnlearnRequestedProcedure.execute(entity, 306)) {
+			{
+				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+				_vars.witchercraftPerksFarReachingAard = false;
+				_vars.markSyncDirty();
+			}
+		}
 		{
 			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 			_vars.witchercraftEquippedPerkFarReachingAard = PerkSocketedProcedure.execute(entity, 306);

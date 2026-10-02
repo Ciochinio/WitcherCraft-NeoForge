@@ -19,6 +19,13 @@ public class ProtectiveCoatingEffectProcedure {
 				CharacterAbilitiesAlchemySkillPointsUsedProcedure.execute(entity);
 			}
 		}
+		if (PerkUnlearnRequestedProcedure.execute(entity, 206)) {
+			{
+				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+				_vars.witchercraftPerksProtectiveCoating = false;
+				_vars.markSyncDirty();
+			}
+		}
 		{
 			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 			_vars.witchercraftEquippedPerkProtectiveCoating = PerkSocketedProcedure.execute(entity, 206);

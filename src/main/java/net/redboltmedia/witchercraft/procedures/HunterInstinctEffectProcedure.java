@@ -19,6 +19,13 @@ public class HunterInstinctEffectProcedure {
 				CharacterAbilitiesAlchemySkillPointsUsedProcedure.execute(entity);
 			}
 		}
+		if (PerkUnlearnRequestedProcedure.execute(entity, 204)) {
+			{
+				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+				_vars.witchercraftPerksHunterInstinct = false;
+				_vars.markSyncDirty();
+			}
+		}
 		{
 			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 			_vars.witchercraftEquippedPerkHunterInstinct = PerkSocketedProcedure.execute(entity, 204);

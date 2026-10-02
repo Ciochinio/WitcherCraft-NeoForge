@@ -19,6 +19,13 @@ public class SunAndStarsEffectProcedure {
 				CharacterAbilitiesSkillPointUsedProcedure.execute(entity);
 			}
 		}
+		if (PerkUnlearnRequestedProcedure.execute(entity, 405)) {
+			{
+				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+				_vars.witchercraftPerksSunAndStars = false;
+				_vars.markSyncDirty();
+			}
+		}
 		{
 			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 			_vars.witchercraftEquippedPerkSunAndStars = PerkSocketedProcedure.execute(entity, 405);

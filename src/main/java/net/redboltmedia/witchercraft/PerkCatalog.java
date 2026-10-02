@@ -25,7 +25,8 @@ import java.util.HashMap;
  *
  * Learning: {@link #learn} runs AllPerks with one id flagged, and that perk's
  * "if PerkLearnRequested" block checks and spends the skill point and sets its
- * learned var. Scan state is per thread, so the client and the integrated
+ * learned var. {@link #unlearnAll} works the same way through each perk's "if
+ * PerkUnlearnRequested" block. Scan state is per thread, so the client and the integrated
  * server never see each other's scans. See TECHNICAL_DESIGN_DOCUMENT.md 3.10.
  */
 public final class PerkCatalog {
@@ -39,10 +40,12 @@ public final class PerkCatalog {
 		final Map<Integer, Boolean> learned = new HashMap<>();
 		final Entity entity;
 		final int learnId;
+		final boolean unlearnAll;
 
-		Scan(Entity entity, int learnId) {
+		Scan(Entity entity, int learnId, boolean unlearnAll) {
 			this.entity = entity;
 			this.learnId = learnId;
+			this.unlearnAll = unlearnAll;
 		}
 	}
 
@@ -68,19 +71,30 @@ public final class PerkCatalog {
 		return scan != null && scan.learnId > 0 && scan.learnId == perkId && scan.entity == entity;
 	}
 
+	/** Called by PerkUnlearnRequestedProcedure: true for every perk during {@link #unlearnAll}. */
+	public static boolean unlearnRequested(Entity entity, int perkId) {
+		Scan scan = CURRENT.get();
+		return scan != null && scan.unlearnAll && perkId > 0 && scan.entity == entity;
+	}
+
 	/** Every perk defined in AllPerks, with this player's learned flag. */
 	public static Map<Integer, Boolean> scan(Player player) {
-		return run(player, 0);
+		return run(player, 0, false);
 	}
 
 	/** Server: run the perk's learn block. The caller has checked the tree (visible, prereqs). */
 	public static void learn(Player player, int perkId) {
-		run(player, perkId);
+		run(player, perkId, false);
 	}
 
-	private static Map<Integer, Boolean> run(Player player, int learnId) {
+	/** Server: run every perk's unlearn block (a full perk reset, see WitcherLevelReset). */
+	public static void unlearnAll(Player player) {
+		run(player, 0, true);
+	}
+
+	private static Map<Integer, Boolean> run(Player player, int learnId, boolean unlearnAll) {
 		Scan outer = CURRENT.get();
-		Scan scan = new Scan(player, learnId);
+		Scan scan = new Scan(player, learnId, unlearnAll);
 		CURRENT.set(scan);
 		try {
 			AllPerksProcedure.execute(player);

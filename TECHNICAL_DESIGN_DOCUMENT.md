@@ -863,11 +863,14 @@ unchanged as the owner of the tree, equip grid and socket frames; what changed i
   these as field initialisers only (the NBT read still falls back to 0), so they apply to new players.
   Existing saves were not migrated. `/resetwitcherlevel` (`ResetWitcherLevel` command calling the
   `WitcherLevelReset` procedure) puts the caller back to level 1, 0 XP, requirement 25 for curve
-  testing. It does not touch learned or equipped perks. Keep its values in sync with the defaults.
+  testing, and resets all perks: learned flags (via `PerkUnlearnAll`, see 3.10), `witchercraftPerksLearned`
+  and the branch counters, and the 12 perk sockets, then recomputes. Keep its values in sync with the
+  defaults. (Before this it left perks learned, so `level - 1 - learned` stayed at 0 SP until the player
+  re-reached their old perk count.)
 - **Skill points are `level - 1 - learned`.** The buy gate (`CharacterAbilitiesSkillPointCheck`,
   called by every `<Perk>Effect`), the unused `CharacterAbilitiesSkillPointsAvailable`, and
-  `PerkPage`'s readout all use it. `PerkPage` clamps the readout at 0, because a level reset can
-  leave more perks learned than points.
+  `PerkPage`'s readout all use it. `PerkPage` clamps the readout at 0 as a safety net (a reset no
+  longer leaves more perks learned than points).
 - **Slot gates are Java data.** `PerkEquipVars.SLOT_UNLOCK_LEVEL` (by slot index, so one mutagen
   group fills before the next) is the only copy. `isSlotUnlocked` is checked server-side in
   `PerkEquipGuiButtonMessage` before a place, and client-side in `PerkPage` (no target highlight,
@@ -1054,7 +1057,7 @@ round-trips (import the file, export, identical text). The tool does not know pe
 
 **Perks - one Blockly procedure each, listed in `AllPerks`.** The procedure is the perk's
 `<Name>Effect` element (the old buy procedure, rewritten; the name is historical) and has exactly
-three parts:
+four parts:
 
 1. `PerkDefine(perkId, perkName, learned)` - the slot id it fills, its name, and its learned var.
    `perkName` is PascalCase (`"CripplingShot"`); lowercased it is the slug for the icon files and lang
@@ -1063,16 +1066,18 @@ three parts:
    `if CharacterAbilitiesSkillPointCheck` then set `witchercraftPerks<Name>` true and call the branch
    spend procedure (`CharacterAbilities{Combat,Alchemy,Signs}SkillPointsUsed`, or
    `CharacterAbilitiesSkillPointUsed` for General).
-3. `set witchercraftEquippedPerk<Name> = PerkSocketed(perkId)`.
+3. `if PerkUnlearnRequested(perkId)` - set `witchercraftPerks<Name>` false. True for every perk during a
+   perk reset (`PerkUnlearnAll`, used by `/resetwitcherlevel`).
+4. `set witchercraftEquippedPerk<Name> = PerkSocketed(perkId)`.
 
-`PerkDefine`, `PerkLearnRequested` and `PerkSocketed` are locked procedures (hand-written Java, custom
+`PerkDefine`, `PerkLearnRequested`, `PerkUnlearnRequested` and `PerkSocketed` are locked procedures (hand-written Java, custom
 dependencies `perkId` number / `perkName` string / `learned` logic, passed with the call block's inputs)
 that forward to `PerkCatalog`. `AllPerks` calls every perk procedure, and `RecomputeEquippedPerks` is
 `AllPerks` -> `PerkModifiers` -> `ApplyMutagenBonus`. MCreator takes a procedure's parameter order
 from its `metadata.dependencies` in `witchercraft.mcreator` (only `world`, `x`, `y`, `z` are moved to
-the front), and the three helpers' Java signatures follow that order. Their Blockly is an empty stub,
+the front), and the helpers' Java signatures follow that order. Their Blockly is an empty stub,
 so do not open and save them in MCreator: a save re-derives the dependencies from the stub (none) and
-every perk procedure's call would then generate without arguments. If it happens, restore the three
+every perk procedure's call would then generate without arguments. If it happens, restore their
 `metadata.dependencies` lists from git.
 
 **How Java reads the perks - `PerkCatalog`.** Running `AllPerks` for a player is a *scan*: each
@@ -1082,13 +1087,17 @@ client and the integrated server never mix scans). Names are cached globally. Us
 - **Client render.** `PerkPage.render` calls `PerkCatalog.refreshClient(player)` once per frame and
   reads learned state with `isLearnedClient`. A scan also executes each perk's equip line on the client
   copy of the vars, which is the same derived value the server computes, so it is harmless. That is
-  also the rule it imposes: **a perk procedure must do nothing but these three parts.** No attribute
+  also the rule it imposes: **a perk procedure must do nothing but these four parts.** No attribute
   changes, sounds, messages or other side effects, because it runs every frame on the client and on
   every recompute on the server. Effects go in their own procedures that read the equipped var.
 - **Server learn.** `PerkEquipGuiButtonMessage.tryLearn` takes a visible node, scans, rejects an
   unclaimed or already-learned id, checks `prereqsMet`, then `PerkCatalog.learn` runs `AllPerks` with
   that id flagged so only that perk's `PerkLearnRequested` is true. The skill-point check and spend stay
   in the perk's own Blockly.
+- **Perk reset.** `PerkUnlearnAll` (locked) runs `AllPerks` with the unlearn flag, so every perk's
+  `PerkUnlearnRequested` is true and each clears its own learned var. `WitcherLevelReset` zeroes
+  `witchercraftPerksLearned`, the three branch counters and the 12 perk sockets in Blockly, then calls
+  `PerkUnlearnAll` and `RecomputeEquippedPerks`. New perks need nothing extra beyond their own part 3.
 
 **Adding a perk:**
 
@@ -1098,7 +1107,7 @@ client and the integrated server never mix scans). Names are cached globally. Us
 2. **Variables** - add player-persistent booleans `witchercraftPerks<Name>` (learned) and
    `witchercraftEquippedPerk<Name>` (equipped) in MCreator.
 3. **Perk procedure** - duplicate an existing `<Name>Effect` in the same branch (so the spend call is
-   already the right branch), then change the id in all three places, the name text, and both
+   already the right branch), then change the id in all four places, the name text, and both
    variables. Keep it `no_ext_trigger`.
 4. **List it** - add one call block for it to `AllPerks`.
 5. **Effect** - apply the buff gated on `witchercraftEquippedPerk<Name>`, never on learned: a flat stat
@@ -1114,7 +1123,7 @@ client and the integrated server never mix scans). Names are cached globally. Us
 
 **Moving a perk.** To move it within the tree, drag its slot in the tool; the id does not change. To
 put it in a different slot (for example another branch), change the number in its `PerkDefine`,
-`PerkLearnRequested` and `PerkSocketed` blocks, and the spend call if the branch changed. The learned
+`PerkLearnRequested`, `PerkUnlearnRequested` and `PerkSocketed` blocks, and the spend call if the branch changed. The learned
 flag survives because it is a variable, but the socket vars store ids, so a player who had it slotted
 must slot it again. **Removing a perk** - hide its slot in the tool. The Blockly can stay, or be
 deleted later together with its `AllPerks` line and variables.

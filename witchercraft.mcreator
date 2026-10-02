@@ -5858,6 +5858,49 @@
       "path": "~/Character Abilities/Perk Calc"
     },
     {
+      "name": "PerkUnlearnRequested",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "perk_unlearn_requested",
+      "metadata": {
+        "return_type": "logic",
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "perkId",
+            "type": "number"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/PerkUnlearnRequestedProcedure.java"
+        ]
+      },
+      "path": "~/Character Abilities/Perk Calc"
+    },
+    {
+      "name": "PerkUnlearnAll",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "perk_unlearn_all",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/PerkUnlearnAllProcedure.java"
+        ]
+      },
+      "path": "~/Character Abilities/Perk Calc"
+    },
+    {
       "name": "PerkCatalog",
       "type": "code",
       "compiles": true,
