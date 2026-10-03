@@ -657,7 +657,19 @@ have to clear in full, so a tree can branch and re-converge without gating a nod
 that feeds into it. A perk pulled from the tree during balancing (hidden) is simply absent: it can't
 be learned or slotted, it stops working if it was already slotted, and nodes that hung off it no
 longer need it. Hovering a node or a slotted perk shows its name (in its branch's colour) and a
-one-line description; whether it's locked, available, or equipped is left to the art alone. The **Map**
+one-line description; whether it's locked, available, or equipped is left to the art alone. The
+**Inventory** tab is the normal Minecraft inventory, not a replacement: **E**, the Inventory key (**I**),
+and the navbar all open the same screen, now shown over the menu background with the navbar and your
+level on top. Everything else on it - crafting grid, armor, recipe book, and anything other mods add
+to the inventory - works exactly as in vanilla, which is the point: WitcherCraft adds to the inventory
+rather than taking it over. Like the rest of the menu it hides the world, so a hit from a hostile mob
+or another player closes it. Creative mode keeps its own inventory untouched. Item-list mods such
+as JEI fill the sides of the screen, so when one is installed the inventory swaps the full navbar
+for a compact icon bar directly above the inventory panel (level on its left, tab names on hover).
+A client setting (**Inventory navbar**: auto, full, or compact) lets each player force either
+style. Those item-list mods are hidden on the Alchemy and Skills tabs, which have no crafting grid
+for them to serve. A character stat sheet
+reached from the inventory is planned but not designed yet. The **Map**
 tab holds the world map, described under World Map in section 9. The remaining unfinished tabs use
 placeholders until those systems get their own screens.
 

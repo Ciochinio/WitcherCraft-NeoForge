@@ -9,7 +9,7 @@ import net.minecraft.resources.Identifier;
 
 import java.util.List;
 
-/** Client-owned settings: world map, minimap, and the Alchemy tab (the class predates the alchemy section). */
+/** Client-owned settings: world map, minimap, the Alchemy tab and the inventory (the class predates both). */
 public final class WorldMapClientConfig {
 	private static final ModConfigSpec SPEC;
 	private static final ModConfigSpec.BooleanValue SHOW_DECORATIONS;
@@ -37,8 +37,12 @@ public final class WorldMapClientConfig {
 	private static final ModConfigSpec.IntValue MINIMAP_VIEWPORT_INSET;
 	private static final ModConfigSpec.DoubleValue MINIMAP_TARGET_ARRIVAL_RADIUS;
 	private static final ModConfigSpec.BooleanValue ALCHEMY_RECIPE_BOOK_OPEN;
+	private static final ModConfigSpec.EnumValue<InventoryNavbar> INVENTORY_NAVBAR;
 
 	public enum MinimapCorner { TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT }
+
+	/** Navbar on the decorated vanilla inventory: AUTO is COMPACT when an item-list overlay mod (JEI, EMI, REI) is installed. */
+	public enum InventoryNavbar { AUTO, FULL, COMPACT }
 
 	static {
 		ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
@@ -78,6 +82,11 @@ public final class WorldMapClientConfig {
 			.translation("witchercraft.configuration.alchemy").push("alchemy");
 		ALCHEMY_RECIPE_BOOK_OPEN = builder.comment("Show the recipe book panel in the Alchemy tab. The book button in the tab toggles it and saves the choice here.")
 			.translation("witchercraft.configuration.alchemy.recipe_book_open").define("recipeBookOpen", true);
+		builder.pop();
+		builder.comment("Personal settings for the WitcherCraft inventory.")
+			.translation("witchercraft.configuration.inventory").push("inventory");
+		INVENTORY_NAVBAR = builder.comment("Navbar on the inventory screen. FULL is the normal menu navbar across the top. COMPACT is a small icon bar directly above the inventory panel, where item-list mods such as JEI, EMI and REI do not draw. AUTO uses COMPACT when one of those mods is installed and FULL otherwise.")
+			.translation("witchercraft.configuration.inventory.navbar").defineEnum("navbar", InventoryNavbar.AUTO);
 		builder.pop();
 		SPEC = builder.build();
 	}
@@ -127,6 +136,7 @@ public final class WorldMapClientConfig {
 		ALCHEMY_RECIPE_BOOK_OPEN.set(open);
 		ALCHEMY_RECIPE_BOOK_OPEN.save();
 	}
+	public static InventoryNavbar inventoryNavbar() { return INVENTORY_NAVBAR.get(); }
 	private static boolean validIdentifier(Object value) {
 		return value instanceof String string && Identifier.tryParse(string) != null;
 	}

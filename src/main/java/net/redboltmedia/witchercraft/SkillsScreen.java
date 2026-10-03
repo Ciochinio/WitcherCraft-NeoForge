@@ -189,6 +189,31 @@ public class SkillsScreen extends AbstractContainerScreen<SkillsMenu> {
 		return false;
 	}
 
+	// ---- overlay mods (JEI and similar) --------------------------------------------
+	// Item-list overlays lay themselves out beside the GUI box these getters report.
+	// Reporting the whole screen leaves them no room, so none show on this tab.
+	// Nothing in vanilla or NeoForge reads them; the slot origin stays leftPos/topPos.
+
+	@Override
+	public int getLeftPos() {
+		return 0;
+	}
+
+	@Override
+	public int getTopPos() {
+		return 0;
+	}
+
+	@Override
+	public int getImageWidth() {
+		return this.width;
+	}
+
+	@Override
+	public int getImageHeight() {
+		return this.height;
+	}
+
 	/** The active slot under a screen point, or null (same bounds as vanilla's hover test). */
 	private Slot slotAt(double mx, double my) {
 		for (Slot slot : this.menu.slots) {
@@ -206,9 +231,8 @@ public class SkillsScreen extends AbstractContainerScreen<SkillsMenu> {
 	private void switchToTab(String pageId) {
 		this.minecraft.getConnection().send(new ServerboundContainerClosePacket(this.menu.containerId));
 		this.minecraft.player.containerMenu = this.minecraft.player.inventoryMenu;
-		if (WitcherGuiPages.isContainerTab(pageId))
-			WitcherGuiPages.open(pageId); // another container tab: the server replaces this screen
-		else
-			this.minecraft.setScreen(new WitcherGuiScreen(pageId));
+		// another container tab: the server replaces this screen; otherwise the
+		// inventory or a WitcherGuiScreen page opens directly
+		WitcherGuiPages.open(pageId);
 	}
 }

@@ -140,8 +140,8 @@ public class WitcherGuiScreen extends Screen {
 		if (event.button() == 0 && !activePage().wantsWorldVisible()) {
 			String pid = ShellChrome.navTabAt(dmx, dmy);
 			if (pid != null) {
-				if (WitcherGuiPages.isContainerTab(pid)) {
-					// needs a server menu: the server opens it and replaces this screen
+				if (WitcherGuiPages.hasOwnScreen(pid)) {
+					// a container tab (the server opens its menu) or the vanilla inventory
 					WitcherGuiPages.open(pid);
 				} else if (!pid.equals(activeTabId)) {
 					activePage().onHidden();

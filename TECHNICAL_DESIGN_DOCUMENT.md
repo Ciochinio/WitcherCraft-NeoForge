@@ -703,7 +703,8 @@ is the first (built in the alchemy redesign's step 0; see `ALCHEMY_REDESIGN_PLAN
   the container-based pause menu) is swapped straight for the new one. A client-side close first would
   drop to the world for a frame and re-centre the cursor.
 - **Leaving to another tab.** The container screen sends `ServerboundContainerClosePacket`, resets the
-  client's `containerMenu`, and `setScreen`s the shell on the target tab, for the same no-flash reason.
+  client's `containerMenu`, and opens the target tab through `WitcherGuiPages.open` (the shell, the
+  vanilla inventory, or another container tab), for the same no-flash reason.
   The server's `removed()` returns the grid. The release of a navbar click is swallowed so vanilla does
   not treat it as a click outside the GUI and throw the carried item.
 - **Two scales on one screen.** The chrome scales with the 640x360 canvas; the slot block (and the
@@ -742,6 +743,9 @@ is the first (built in the alchemy redesign's step 0; see `ALCHEMY_REDESIGN_PLAN
 - **Damage interrupt.** `WitcherGuiDamageInterrupt` closes an open `AlchemyMenu` or `SkillsMenu` on
   the server (`player.closeContainer()`), which returns Alchemy's items, in addition to the shell's
   clientbound close.
+- **No item-list overlays.** Container tabs report the whole screen from `getLeftPos`/`getTopPos`/
+  `getImageWidth`/`getImageHeight` so JEI and similar mods find no room beside them; see 3.3e. Inside
+  the screen, use the `leftPos`/`topPos` fields, not those getters.
 
 ### 3.3c The Skills tab and mutagen items
 
@@ -878,6 +882,65 @@ unchanged as the owner of the tree, equip grid and socket frames; what changed i
   tile is the placeholder `textures/screens/perk_slot_locked.png`. A perk already in a slot is still
   drawn and removable even if the slot is below the player's level (only possible after a reset).
   Mutagen sockets are never gated.
+
+### 3.3e The Inventory tab: the vanilla InventoryScreen, decorated
+
+The Inventory tab is **not** our screen. It is vanilla `InventoryScreen`, decorated from the outside,
+so every mod that hooks the vanilla inventory (recipe book, accessory buttons added in
+`ScreenEvent.Init`, `instanceof InventoryScreen` checks, JEI, slots added to `InventoryMenu`) keeps
+working. **Never replace, subclass, or re-implement it** (a custom screen on `player.inventoryMenu`
+would keep slot-level compatibility but lose everything that targets the class). Only the exact class
+is decorated (`InventoryShell.isDecorated`: `getClass() == InventoryScreen.class`), so creative's
+`CreativeModeInventoryScreen` and other mods' subclasses are untouched.
+
+- **Background and navbar: the project's only mixin.** `InventoryScreen.extractBackground` calls
+  `super.extractBackground` (container screens are `isInGameUi()`, so that is
+  `Screen.extractTransparentBackground`, a 75-80% black gradient) and then blits the panel, in one
+  method. NeoForge's `ScreenEvent.Render.Pre` runs before it (our art would be dimmed nearly black)
+  and `Render.Background` after it (our art would cover the panel); nothing fires in between.
+  `mixin/InventoryShellBackgroundMixin` injects at HEAD of `Screen.extractTransparentBackground`,
+  and for a decorated screen draws `InventoryShell.drawBackground` (shell background, navbar, level
+  readout, through `ShellChrome`) and cancels. The navbar is drawn here rather than in
+  `Render.Post` so it sits under tooltips and the carried item; it never overlaps the centred panel.
+  Config: `src/main/resources/witchercraft.mixins.json` (client list, `JAVA_25`, `defaultRequire`
+  1, so a broken target fails loudly at launch), registered by a `[[mixins]]` entry inside the
+  "custom mixins" user code block of `neoforge.mods.toml`, which MCreator preserves. Mixin classes
+  must stay in their own `mixin` package and are not MCreator elements.
+- **Navbar clicks.** `InventoryShell.Input` handles `ScreenEvent.MouseButtonPressed.Pre`: a click on a
+  tab is cancelled, the matching release is swallowed (so vanilla does not treat it as a click
+  outside and throw the carried item), and switching sends `ServerboundContainerClosePacket` for
+  `inventoryMenu` (the server's `InventoryMenu.removed` returns the crafting grid and carried item),
+  resets the client's `containerMenu`, then `WitcherGuiPages.open`.
+- **Opening.** `WitcherGuiPages.open("inventory")` calls `InventoryShell.open`, a copy of vanilla's E
+  handling (`sendOpenInventory` when `isServerControlledInventory`, e.g. riding a horse; otherwise the
+  tutorial hook and `setScreen(new InventoryScreen(player))`). `WitcherGuiPages.hasOwnScreen` (container
+  tabs plus inventory) is what `WitcherGuiScreen` checks before switching pages in place. Alchemy and
+  Skills leave through `WitcherGuiPages.open` for every target.
+- **Damage interrupt.** The clientbound close in `WitcherGuiDamageInterrupt` calls
+  `InventoryShell.close()`, i.e. `player.closeContainer()` on a decorated inventory, the same path as
+  pressing E. This is the reason the background is opaque-safe.
+- **Item-list overlay mods (JEI, EMI, REI).** There is no shared way to reserve screen space: each
+  of these mods lays its panels out in the strips beside the GUI box the screen reports, top to
+  bottom, so they cover the full navbar's ends, and their clicks there reached our navbar. We take no
+  compile dependency on any of them. Two generic levers instead:
+  - **Alchemy and Skills hide overlays** by overriding `getLeftPos`/`getTopPos`/`getImageWidth`/
+    `getImageHeight` to report the whole screen, which leaves no side strips. Vanilla and NeoForge
+    never call these four (only the deprecated `getGuiLeft`-style wrappers delegate to them), and JEI
+    29.6 reads exactly these through its NeoForge `ScreenHelper`; the real slot origin is still the
+    `leftPos`/`topPos` fields. Use the fields, never the getters, inside those screens.
+  - **The inventory can use a compact navbar** (`ShellChrome.drawCompactNavbar`/`compactNavTabAt`, in
+    screen pixels): a level badge plus one icon tab per `NAV` entry, labels as tooltips, the panel's
+    width wide, directly above the panel, the one area those mods leave alone. It follows the panel
+    when the recipe book shifts it. Client config `inventory.navbar` (in `WorldMapClientConfig`):
+    `AUTO` (default) is compact when a mod id in `InventoryShell.OVERLAY_MODS` (`jei`, `emi`,
+    `roughlyenoughitems`) is loaded, else full; `FULL` and `COMPACT` force one. Whether JEI is
+    toggled off (Ctrl+O) cannot be seen without its API, so `AUTO` stays compact then. Another overlay
+    mod is supported by adding its mod id.
+- **Placement is vanilla.** The panel stays centred by vanilla (`leftPos`/`topPos` are not moved), so
+  it is not placed in the content region like Alchemy and Skills. With auto GUI scale the screen is at
+  least 240 GUI px tall, so the panel top (at least 37 px down) clears the navbar (design y 41, about
+  11% of the height). A forced high GUI scale on a short window, or a window narrower than 16:9 (the
+  canvas letterboxes vertically and pushes the navbar down), can make them overlap.
 
 ### 3.4 The tools: one per GUI, plus a navbar-only chrome editor
 

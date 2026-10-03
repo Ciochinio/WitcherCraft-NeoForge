@@ -15,21 +15,23 @@ authors="Ciochu, RedBoltMedia"
 
 
 # Start of user code block custom mixins
+[[mixins]]
+config="witchercraft.mixins.json"
 # End of user code block custom mixins
 
 [[dependencies.witchercraft]]
-    modId="neoforge"
-    type="required"
-    versionRange="[26.1.2.95,)"
-    ordering="AFTER"
-    side="BOTH"
+modId="neoforge"
+type="required"
+versionRange="[26.1.2.95,)"
+ordering="AFTER"
+side="BOTH"
 
 [[dependencies.witchercraft]]
-    modId="minecraft"
-    type="required"
-    versionRange="[26.1.2]"
-    ordering="AFTER"
-    side="BOTH"
+modId="minecraft"
+type="required"
+versionRange="[26.1.2]"
+ordering="AFTER"
+side="BOTH"
 
 
 

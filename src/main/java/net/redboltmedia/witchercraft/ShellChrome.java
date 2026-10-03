@@ -129,6 +129,86 @@ public final class ShellChrome {
 		return null;
 	}
 
+	// ---- compact navbar (SCREEN coords) -------------------------------------------
+	// A small icon bar for screens where item-list mods (JEI and similar) own the
+	// side strips: the decorated vanilla inventory draws it directly above its
+	// panel, the one area those mods leave alone. Level badge on the left, then one
+	// icon tab per NAV entry; labels show as tooltips.
+
+	public static final int COMPACT_H = 20;
+	public static final int COMPACT_GAP = 2;
+	public static final int COMPACT_LEVEL_W = 24;
+	public static final int COMPACT_ICON = 16;
+	private static final int COMPACT_LEVEL_BG = 0xB0000000;
+
+	/** Left edge and width of compact tab i, for a bar starting at x with width w. */
+	private static int compactTabX(int x, int w, int i) {
+		return x + COMPACT_LEVEL_W + COMPACT_GAP + i * (compactTabW(w) + COMPACT_GAP);
+	}
+
+	private static int compactTabW(int w) {
+		int n = WitcherGuiLayout.NAV.length;
+		return n <= 0 ? 0 : (w - COMPACT_LEVEL_W - COMPACT_GAP - (n - 1) * COMPACT_GAP) / n;
+	}
+
+	/**
+	 * Draw the compact bar at (x, y), w wide, COMPACT_H tall, in SCREEN coords.
+	 * Queues the hovered tab's label as a tooltip.
+	 */
+	public static void drawCompactNavbar(GuiGraphicsExtractor g, Font font, String activeTabId, int x, int y, int w, int mouseX, int mouseY) {
+		drawCompactLevel(g, font, x, y);
+		int tw = compactTabW(w), th = COMPACT_H;
+		WitcherGuiLayout.Nav[] navs = WitcherGuiLayout.NAV;
+		for (int i = 0; i < navs.length; i++) {
+			WitcherGuiLayout.Nav nav = navs[i];
+			boolean active = nav.pageId.equals(activeTabId);
+			int tx = compactTabX(x, w, i);
+			g.fill(tx, y, tx + tw, y + th, active ? TAB_BG_ACTIVE : TAB_BG);
+			g.fill(tx, y, tx + tw, y + 1, TAB_BORDER);
+			g.fill(tx, y + th - 1, tx + tw, y + th, TAB_BORDER);
+			if (nav.icon != null && !nav.icon.isEmpty())
+				g.blit(RenderPipelines.GUI_TEXTURED, Identifier.parse(nav.icon), tx + (tw - COMPACT_ICON) / 2, y + (th - COMPACT_ICON) / 2, 0, 0, COMPACT_ICON, COMPACT_ICON, COMPACT_ICON, COMPACT_ICON);
+			if (active)
+				g.fill(tx + 2, y + th, tx + tw - 2, y + th + 1, TAB_ACCENT);
+			if (mouseX >= tx && mouseX < tx + tw && mouseY >= y && mouseY < y + th)
+				g.setComponentTooltipForNextFrame(font, java.util.List.of(navLabel(nav)), mouseX, mouseY);
+		}
+	}
+
+	/** The pageId of the compact tab under a SCREEN point, or null. */
+	public static String compactNavTabAt(int x, int y, int w, double mx, double my) {
+		if (my < y || my >= y + COMPACT_H)
+			return null;
+		int tw = compactTabW(w);
+		for (int i = 0; i < WitcherGuiLayout.NAV.length; i++) {
+			int tx = compactTabX(x, w, i);
+			if (mx >= tx && mx < tx + tw)
+				return WitcherGuiLayout.NAV[i].pageId;
+		}
+		return null;
+	}
+
+	/** Level number over a thin XP bar, in a COMPACT_LEVEL_W x COMPACT_H box. */
+	private static void drawCompactLevel(GuiGraphicsExtractor g, Font font, int x, int y) {
+		Minecraft mc = Minecraft.getInstance();
+		if (mc.player == null)
+			return;
+		WitchercraftModVariables.PlayerVariables v = mc.player.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+		int level = (int) Math.floor(v.witchercraftPlayerLevel);
+		double req = v.witchercraftPlayerExperienceRequirement;
+		double frac = req > 0 ? Math.max(0, Math.min(1, v.witchercraftPlayerExperience / req)) : 0;
+
+		int w = COMPACT_LEVEL_W, h = COMPACT_H;
+		g.fill(x, y, x + w, y + h, COMPACT_LEVEL_BG);
+		Component num = Component.literal(Integer.toString(level));
+		g.text(font, num, x + (w - font.width(num)) / 2, y + 3, WitcherGuiLayout.LEVEL_TEXT_COLOR, true);
+		int bx = x + 2, by = y + h - 5, bw = w - 4;
+		g.fill(bx, by, bx + bw, by + 2, WitcherGuiLayout.XP_BAR_BG_COLOR);
+		int filled = (int) Math.round(frac * bw);
+		if (filled > 0)
+			g.fill(bx, by, bx + filled, by + 2, WitcherGuiLayout.XP_BAR_FILL_COLOR);
+	}
+
 	/**
 	 * Level + XP readout, drawn in DESIGN-canvas coords (call inside the shell's
 	 * design->screen transform). Reads the live, already-synced player vars, so it

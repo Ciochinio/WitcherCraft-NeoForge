@@ -66,12 +66,25 @@ public final class WitcherGuiPages {
 	}
 
 	/**
+	 * Tabs that are a screen of their own rather than a page inside
+	 * {@link WitcherGuiScreen}: the container tabs, plus Inventory, which is the
+	 * decorated vanilla {@link net.minecraft.client.gui.screens.inventory.InventoryScreen}
+	 * ({@link InventoryShell}).
+	 */
+	public static boolean hasOwnScreen(String pageId) {
+		return isContainerTab(pageId) || InventoryShell.TAB_ID.equals(pageId);
+	}
+
+	/**
 	 * THE routing point for opening the shell on a tab (nav clicks, P, per-tab
-	 * keys, the pause menu). A container tab asks the server to open its menu; any
-	 * other tab opens {@link WitcherGuiScreen} directly.
+	 * keys, the pause menu). A container tab asks the server to open its menu,
+	 * Inventory opens the vanilla inventory, and any other tab opens
+	 * {@link WitcherGuiScreen} directly.
 	 */
 	public static void open(String pageId) {
-		if ("alchemy".equals(pageId))
+		if (InventoryShell.TAB_ID.equals(pageId))
+			InventoryShell.open();
+		else if ("alchemy".equals(pageId))
 			ClientPacketDistributor.sendToServer(AlchemyOpenMessage.INSTANCE);
 		else if ("skills".equals(pageId))
 			ClientPacketDistributor.sendToServer(SkillsOpenMessage.INSTANCE);

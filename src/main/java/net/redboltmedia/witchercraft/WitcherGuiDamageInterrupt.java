@@ -22,6 +22,8 @@ import net.minecraft.world.entity.player.Player;
  * Closes the opaque Witcher GUI shell after real damage from a hostile mob or
  * another player. Environmental damage leaves the shell open. Container-backed
  * tabs (Alchemy, Skills) are closed on the server instead, which returns their items.
+ * The decorated vanilla inventory ({@link InventoryShell}) is closed on the client
+ * the way E closes it, which tells the server to return the crafting grid.
  *
  * HAND-MAINTAINED: tracked by the locked WitcherGuiScreen code element.
  */
@@ -60,6 +62,8 @@ public final class WitcherGuiDamageInterrupt {
 					Minecraft minecraft = Minecraft.getInstance();
 					if (minecraft.screen instanceof WitcherGuiScreen screen)
 						screen.onClose();
+					else
+						InventoryShell.close(); // the decorated vanilla inventory, closed like E
 				});
 			}
 		}
