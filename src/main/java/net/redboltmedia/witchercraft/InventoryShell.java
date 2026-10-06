@@ -75,9 +75,13 @@ public final class InventoryShell {
 		return overlayModLoaded;
 	}
 
-	/** Compact bar origin: directly above the panel, clamped to the screen top. */
+	/** Compact bar origin: the panel's column, at the full navbar's height. */
 	private static int compactY(AbstractContainerScreen<?> screen) {
-		return Math.max(0, screen.getTopPos() - ShellChrome.COMPACT_GAP - ShellChrome.COMPACT_H);
+		// at the top like the full navbar, but never lower than just above the panel
+		float s = ShellChrome.layoutScale(screen.width, screen.height);
+		int top = Math.round(ShellChrome.offsetY(screen.height, s) + WitcherGuiLayout.NAV_Y * s);
+		int abovePanel = screen.getTopPos() - ShellChrome.COMPACT_GAP - ShellChrome.COMPACT_H;
+		return Math.max(0, Math.min(top, abovePanel));
 	}
 
 	/** Shell background plus the navbar, in place of vanilla's dim. */

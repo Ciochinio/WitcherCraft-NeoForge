@@ -11043,35 +11043,35 @@
       "EntitySlime"
     ],
     "ITEMS:minecraft:head_armor": [
+      "~WolvenArmor@CUSTOM:WolvenArmor.helmet",
       "~GriffinArmor@CUSTOM:GriffinArmor.helmet",
       "~ManticoreArmor@CUSTOM:ManticoreArmor.helmet",
       "~ViperArmor@CUSTOM:ViperArmor.helmet",
       "~UrsineArmor@CUSTOM:UrsineArmor.helmet",
-      "~WolvenArmor@CUSTOM:WolvenArmor.helmet",
       "~FelineArmor@CUSTOM:FelineArmor.helmet"
     ],
     "ITEMS:minecraft:chest_armor": [
+      "~WolvenArmor@CUSTOM:WolvenArmor.body",
       "~GriffinArmor@CUSTOM:GriffinArmor.body",
       "~ManticoreArmor@CUSTOM:ManticoreArmor.body",
       "~ViperArmor@CUSTOM:ViperArmor.body",
       "~UrsineArmor@CUSTOM:UrsineArmor.body",
-      "~WolvenArmor@CUSTOM:WolvenArmor.body",
       "~FelineArmor@CUSTOM:FelineArmor.body"
     ],
     "ITEMS:minecraft:leg_armor": [
+      "~WolvenArmor@CUSTOM:WolvenArmor.legs",
       "~GriffinArmor@CUSTOM:GriffinArmor.legs",
       "~ManticoreArmor@CUSTOM:ManticoreArmor.legs",
       "~ViperArmor@CUSTOM:ViperArmor.legs",
       "~UrsineArmor@CUSTOM:UrsineArmor.legs",
-      "~WolvenArmor@CUSTOM:WolvenArmor.legs",
       "~FelineArmor@CUSTOM:FelineArmor.legs"
     ],
     "ITEMS:minecraft:foot_armor": [
+      "~WolvenArmor@CUSTOM:WolvenArmor.boots",
       "~GriffinArmor@CUSTOM:GriffinArmor.boots",
       "~ManticoreArmor@CUSTOM:ManticoreArmor.boots",
       "~ViperArmor@CUSTOM:ViperArmor.boots",
       "~UrsineArmor@CUSTOM:UrsineArmor.boots",
-      "~WolvenArmor@CUSTOM:WolvenArmor.boots",
       "~FelineArmor@CUSTOM:FelineArmor.boots"
     ],
     "ENCHANTMENTS:minecraft:treasure": [

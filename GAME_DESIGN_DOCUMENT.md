@@ -665,7 +665,7 @@ to the inventory - works exactly as in vanilla, which is the point: WitcherCraft
 rather than taking it over. Like the rest of the menu it hides the world, so a hit from a hostile mob
 or another player closes it. Creative mode keeps its own inventory untouched. Item-list mods such
 as JEI fill the sides of the screen, so when one is installed the inventory swaps the full navbar
-for a compact icon bar directly above the inventory panel (level on its left, tab names on hover).
+for a compact icon bar at the top of the screen, lined up with the inventory panel (level on its left, tab names on hover).
 A client setting (**Inventory navbar**: auto, full, or compact) lets each player force either
 style. Those item-list mods are hidden on the Alchemy and Skills tabs, which have no crafting grid
 for them to serve. A character stat sheet
@@ -718,6 +718,12 @@ strengthen mutagens are all tuned there.
 The Schools are the witcher orders, and each has its own armor. WitcherCraft has six full sets -
 Wolven, Feline, Griffin, Ursine, Viper, and Manticore - and each is a complete four-piece set
 (helmet, chestplate, leggings, boots) with its own custom 3D model.
+
+The models sit close to the body - slimmer than vanilla armor, with real depth for plates,
+straps, and pouches. The helmet-slot piece of each set is a pair of gauntlets and is meant to
+render on the hands. Status: Wolven is the first set on its custom model (chestplate, leggings,
+boots). For now its gloves and bracers are drawn as part of the chestplate, whatever is in
+the helmet slot, and the other five sets still use the old flat textures.
 
 The payoff is the **School Effect**. Wear all four pieces of a set and its effect switches on and
 stays on, shown on your HUD; take any piece off and it drops immediately. You can only run one

@@ -19,6 +19,7 @@ Anything marked **tunable** is a value you are expected to change. Anything desc
 4. [Cockatrice and hybrid mob movement](#4-cockatrice-and-hybrid-mob-movement)
 5. [World map terrain pipeline](#5-world-map-terrain-pipeline)
 6. [Alchemy recipes](#6-alchemy-recipes)
+7. [Custom armor models](#7-custom-armor-models)
 
 ---
 
@@ -930,7 +931,7 @@ is decorated (`InventoryShell.isDecorated`: `getClass() == InventoryScreen.class
     `leftPos`/`topPos` fields. Use the fields, never the getters, inside those screens.
   - **The inventory can use a compact navbar** (`ShellChrome.drawCompactNavbar`/`compactNavTabAt`, in
     screen pixels): a level badge plus one icon tab per `NAV` entry, labels as tooltips, the panel's
-    width wide, directly above the panel, the one area those mods leave alone. It follows the panel
+    width wide, in the panel's column (the one area those mods leave alone) at the full navbar's height, dropping only as far as needed to stay above the panel. It follows the panel
     when the recipe book shifts it. Client config `inventory.navbar` (in `WorldMapClientConfig`):
     `AUTO` (default) is compact when a mod id in `InventoryShell.OVERLAY_MODS` (`jei`, `emi`,
     `roughlyenoughitems`) is loaded, else full; `FULL` and `COMPACT` force one. Whether JEI is
@@ -2861,3 +2862,118 @@ stop all manuscripts, the server option `alchemy.recipeKnowledge = "ALL_KNOWN"` 
 
 **From a datapack.** All of these files can be overridden by a datapack at the same path, so server
 owners can change chances, chests and prices without touching the mod.
+
+---
+
+## 7. Custom armor models
+
+### 7.1 What the system is for
+
+Each School armor set gets its own slim 3D model instead of the vanilla armor shape. Wolven is the
+first (2026-10-06). The model plugs into MCreator's own armor custom-model feature, so the armor
+element stays an ordinary generated element.
+
+### 7.2 The pieces
+
+| File | Role | Owner |
+|---|---|---|
+| `models/blockbench/<Set>Armor.bbmodel` | Source model (Blockbench, Modded Entity, box UV) | Hand-edited |
+| `models/mojmap-1.21.x/Model<Set>Armor.java` | MCreator's stored copy of the Java model | MCreator workspace |
+| `src/.../client/model/Model<Set>Armor.java` | Generated from the stored copy | MCreator (regenerated) |
+| `src/.../init/WitchercraftModModels.java` | Registers the layer definition | MCreator (regenerated) |
+| `textures/entities/<set>_armor.png` | One texture shared by every piece | Hand-painted |
+| `elements/<Set>Armor.mod.json` | `bodyModelName`, part names, `*ModelTexture` | MCreator element |
+| `src/.../client/renderer/item/<Set>ArmorArmor.java` | Builds a `HumanoidModel` from the parts | MCreator (regenerated) |
+
+### 7.3 Model contract
+
+MCreator's armor template takes named `ModelPart` fields and puts them into a fresh
+`HumanoidModel` as `body`, `left_arm`, and so on. `HumanoidModel.setupAnim` resets each part to its
+baked pose and then rotates it, so every part must be a top-level bone whose pivot matches vanilla.
+
+| Part | Blockbench pivot | Java offset | Used by |
+|---|---|---|---|
+| `helmet` | 0, 24, 0 | 0, 0, 0 | Empty; reserved for the gauntlet item |
+| `body` | 0, 24, 0 | 0, 0, 0 | Chestplate |
+| `arm_r` / `arm_l` | 5 / -5, 22, 0 | -5 / 5, 2, 0 | Chestplate |
+| `gauntlet_r` / `gauntlet_l` | 5 / -5, 22, 0 | -5 / 5, 2, 0 | Empty; reserved (see 7.5) |
+| `leg_r` / `leg_l` | 1.9 / -1.9, 12, 0 | -1.9 / 1.9, 12, 0 | Leggings |
+| `boot_r` / `boot_l` | 1.9 / -1.9, 12, 0 | -1.9 / 1.9, 12, 0 | Boots |
+
+Rules that are easy to break:
+
+- **The Java export negates X.** In Blockbench, +X is the wearer's RIGHT. A part named `arm_r` must
+  sit at Blockbench +X so it exports to vanilla's `right_arm` offset (-5, 2, 0).
+- **Box UV only, one texture.** Java entity models cannot do per-face UV or multiple textures. Keep box
+  sizes integer (positions and inflate can be fractional). Wolven uses a 64x64 UV layout with a
+  128x128 PNG, so the texture paints at double resolution.
+- **Thickness.** The player's skin overlay sits at 0.25 inflate, so armor shells start at 0.35. Details
+  stack from 0.45 to 0.75. Anything thinner lets the skin poke through.
+- **Shoulder plates.** A tilted plate must keep its top surface above the sleeve top (y 24.35) across
+  the whole arm width, or the sleeve pokes through the steel.
+- **Parts must be public.** The armor template reads `model.body` and the other parts directly.
+- **Rotated cubes** become child parts (`<name>_rN`) under their bone. They rotate with the bone.
+
+### 7.4 How to add a set
+
+1. Build `<Set>Armor.bbmodel` from `WolvenArmor.bbmodel` (same bones, pivots, and naming).
+2. Generate the Java model with `tools/bb2java.js` (see 7.7). Blockbench's own Modded Entity export
+   would also need converting to the 26.1 API (`Identifier`, `EntityModel<LivingEntityRenderState>`,
+   public fields, empty `setupAnim`), which the tool does for you.
+3. Save the stored copy to `models/mojmap-1.21.x/` and the texture to `textures/entities/`.
+4. In the armor element, set the chestplate, leggings, and boots model to the new model, the part
+   names from 7.3, and the texture. Leave the helmet on Default until 7.5 exists.
+5. Regenerate in MCreator (or mirror the template by hand), compile, and check it in game: arms and
+   legs swing correctly, left and right are not swapped, sneaking looks right, and nothing clips.
+
+### 7.5 Gauntlets (not implemented)
+
+For now the gloves and bracers are cubes on the chestplate's `arm_r` and `arm_l`, so they render
+whenever the chestplate is worn, whatever is in the helmet slot. The user chose this so the hands are
+never bare sleeve. If the layer below is built, move those cubes back into `gauntlet_r` and `gauntlet_l`.
+
+
+Every set uses the helmet slot for gauntlets, and MCreator's helmet model can only render on the head.
+The planned fix is a hand-written player render layer that draws `gauntlet_r` and `gauntlet_l` on
+the arms when the head slot holds a gauntlet item. The helmet piece then maps to the empty `helmet`
+bone.
+
+Do not register a second `IClientItemExtensions` for the gauntlet item. MCreator already registers
+one, and NeoForge 26.1.2.95 throws on a duplicate registration.
+
+### 7.6 MCreator quirk: the armor layer texture field
+
+The armor element's **Armor layer texture** dropdown (`armorTextureFile`) shows empty every time the
+Wolven element is reopened, and saving fails with "Armor needs to have a texture". Pick the texture
+again (`wolven.`) before every save. The element file keeps the right value (`"wolven."`); only the
+editor fails to show it. The likely cause is the trailing dot in the old texture names
+(`wolven._layer_1.png`). All six sets use names like that (`cat.`, `griffin._`), so expect the same
+on every armor element. Renaming the layer files to dot-free names would probably fix it, but this
+has not been tried.
+
+Changing that dropdown has no visible effect on Wolven's chestplate, leggings, or boots, because those
+use the model texture (`textures/entities/wolven_armor.png`). The layer texture now only feeds the
+helmet-slot (gauntlet) item, which still uses the default model.
+
+### 7.7 Changing the model or its texture
+
+**Texture only.** Paint in Blockbench, then export the texture over
+`src/main/resources/assets/witchercraft/textures/entities/wolven_armor.png`. No code changes. Keep
+the size (128x128 on a 64x64 UV layout).
+
+**Shape (cubes, positions, sizes).** Edit `models/blockbench/WolvenArmor.bbmodel` in Blockbench and
+save it. Then regenerate both Java copies from the repo root (Node.js required):
+
+```
+node tools/bb2java.js models/blockbench/WolvenArmor.bbmodel ModelWolvenArmor model_wolven_armor models/mojmap-1.21.x/ModelWolvenArmor.java src/main/java/net/redboltmedia/witchercraft/client/model/ModelWolvenArmor.java net.redboltmedia.witchercraft.client.model
+```
+
+Then rebuild (MCreator build, or `gradlew compileJava` followed by running the client). The armor
+element itself does not need to change unless a part is renamed.
+
+Rules while editing (see 7.3): keep the bone names and pivots; keep box UV and one texture; keep box
+sizes whole numbers (positions and inflate may be fractional); new cubes need their own free UV area,
+or they overlap other pieces' paint; a cube rotated inside a bone is fine. If the UV layout changes,
+re-export the texture too. Do not use Blockbench's "Export Java Entity" plus MCreator's model import:
+that file uses the older API and private fields, and the armor element would not compile against it.
+
