@@ -721,9 +721,13 @@ Wolven, Feline, Griffin, Ursine, Viper, and Manticore - and each is a complete f
 
 The models sit close to the body - slimmer than vanilla armor, with real depth for plates,
 straps, and pouches. The helmet-slot piece of each set is a pair of gauntlets and is meant to
-render on the hands. Status: Wolven is the first set on its custom model (chestplate, leggings,
-boots). For now its gloves and bracers are drawn as part of the chestplate, whatever is in
-the helmet slot, and the other five sets still use the old flat textures.
+render on the hands. Status: Wolven and Ursine are on their custom models (chestplate, leggings,
+boots). For now their gloves and bracers are drawn as part of the chestplate, whatever is in
+the helmet slot, and the other four sets still use the old flat textures.
+
+The Ursine set is the heavy one: a long chainmail coat with tan-trimmed hem and toggles, a dark
+leather chest piece under an olive scarf, two-plate steel pauldrons, long steel vambraces, oxblood
+belts with a strap and pouch, and dark-green quilted skirt panels and sleeves.
 
 The payoff is the **School Effect**. Wear all four pieces of a set and its effect switches on and
 stays on, shown on your HUD; take any piece off and it drops immediately. You can only run one

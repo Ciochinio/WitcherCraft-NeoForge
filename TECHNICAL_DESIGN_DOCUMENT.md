@@ -2869,9 +2869,9 @@ owners can change chances, chests and prices without touching the mod.
 
 ### 7.1 What the system is for
 
-Each School armor set gets its own slim 3D model instead of the vanilla armor shape. Wolven is the
-first (2026-10-06). The model plugs into MCreator's own armor custom-model feature, so the armor
-element stays an ordinary generated element.
+Each School armor set gets its own slim 3D model instead of the vanilla armor shape. Wolven was the
+first (2026-10-06) and Ursine the second (2026-10-09). The model plugs into MCreator's own armor
+custom-model feature, so the armor element stays an ordinary generated element.
 
 ### 7.2 The pieces
 
@@ -2905,10 +2905,16 @@ Rules that are easy to break:
 - **The Java export negates X.** In Blockbench, +X is the wearer's RIGHT. A part named `arm_r` must
   sit at Blockbench +X so it exports to vanilla's `right_arm` offset (-5, 2, 0).
 - **Box UV only, one texture.** Java entity models cannot do per-face UV or multiple textures. Keep box
-  sizes integer (positions and inflate can be fractional). Wolven uses a 64x64 UV layout with a
+  sizes integer (positions and inflate can be fractional). Every set uses a 64x64 UV layout with a
   128x128 PNG, so the texture paints at double resolution.
 - **Thickness.** The player's skin overlay sits at 0.25 inflate, so armor shells start at 0.35. Details
   stack from 0.45 to 0.75. Anything thinner lets the skin poke through.
+- **Inflate also adds height.** It grows every dimension, so a 1-tall box at 0.65 inflate is 2.3 tall.
+  For a thin band such as a belt, use a wider and deeper box with inflate near 0 (Ursine's belts are
+  9x1x5 boxes on the 8x4 torso).
+- **The legs overlap at the centre.** Inflated leg pieces cross x = 0, so the two legs' front and back
+  faces become coplanar there and flicker. Ursine draws every left-leg and left-boot piece 0.05 more
+  inflated than its right twin, so one side always wins.
 - **Shoulder plates.** A tilted plate must keep its top surface above the sleeve top (y 24.35) across
   the whole arm width, or the sleeve pokes through the steel.
 - **Parts must be public.** The armor template reads `model.body` and the other parts directly.
@@ -2916,7 +2922,8 @@ Rules that are easy to break:
 
 ### 7.4 How to add a set
 
-1. Build `<Set>Armor.bbmodel` from `WolvenArmor.bbmodel` (same bones, pivots, and naming).
+1. Build `<Set>Armor.bbmodel` with the bones, pivots, and naming from 7.3. The cubes inside each bone
+   are free; earlier sets are a detail reference, not a template.
 2. Generate the Java model with `tools/bb2java.js` (see 7.7). Blockbench's own Modded Entity export
    would also need converting to the 26.1 API (`Identifier`, `EntityModel<LivingEntityRenderState>`,
    public fields, empty `setupAnim`), which the tool does for you.
@@ -2928,8 +2935,8 @@ Rules that are easy to break:
 
 ### 7.5 Gauntlets (not implemented)
 
-For now the gloves and bracers are cubes on the chestplate's `arm_r` and `arm_l`, so they render
-whenever the chestplate is worn, whatever is in the helmet slot. The user chose this so the hands are
+For now the gloves and bracers (Wolven and Ursine) are cubes on the chestplate's `arm_r` and `arm_l`,
+so they render whenever the chestplate is worn, whatever is in the helmet slot. The user chose this so the hands are
 never bare sleeve. If the layer below is built, move those cubes back into `gauntlet_r` and `gauntlet_l`.
 
 
@@ -2945,27 +2952,31 @@ one, and NeoForge 26.1.2.95 throws on a duplicate registration.
 
 The armor element's **Armor layer texture** dropdown (`armorTextureFile`) shows empty every time the
 Wolven element is reopened, and saving fails with "Armor needs to have a texture". Pick the texture
-again (`wolven.`) before every save. The element file keeps the right value (`"wolven."`); only the
+again (`wolven.`, or `bearamor.` for Ursine) before every save. The element file keeps the right
+value (`"wolven."`); only the
 editor fails to show it. The likely cause is the trailing dot in the old texture names
 (`wolven._layer_1.png`). All six sets use names like that (`cat.`, `griffin._`), so expect the same
 on every armor element. Renaming the layer files to dot-free names would probably fix it, but this
 has not been tried.
 
-Changing that dropdown has no visible effect on Wolven's chestplate, leggings, or boots, because those
-use the model texture (`textures/entities/wolven_armor.png`). The layer texture now only feeds the
-helmet-slot (gauntlet) item, which still uses the default model.
+Changing that dropdown has no visible effect on a custom-model set's chestplate, leggings, or boots,
+because those use the model texture (`textures/entities/<set>_armor.png`). The layer texture now only
+feeds the helmet-slot (gauntlet) item, which still uses the default model.
 
 ### 7.7 Changing the model or its texture
 
-**Texture only.** Paint in Blockbench, then export the texture over
-`src/main/resources/assets/witchercraft/textures/entities/wolven_armor.png`. No code changes. Keep
-the size (128x128 on a 64x64 UV layout).
+**Texture only.** Paint in Blockbench, save the `.bbmodel` (it embeds the texture), then export the
+texture over `src/main/resources/assets/witchercraft/textures/entities/<set>_armor.png`
+(`wolven_armor.png`, `ursine_armor.png`). No code changes. Keep the size (128x128 on a 64x64 UV
+layout). The `.bbmodel` and the PNG are the source of truth; Ursine's texture includes hand-painted
+pixels, so do not regenerate it from scratch.
 
-**Shape (cubes, positions, sizes).** Edit `models/blockbench/WolvenArmor.bbmodel` in Blockbench and
+**Shape (cubes, positions, sizes).** Edit `models/blockbench/<Set>Armor.bbmodel` in Blockbench and
 save it. Then regenerate both Java copies from the repo root (Node.js required):
 
 ```
 node tools/bb2java.js models/blockbench/WolvenArmor.bbmodel ModelWolvenArmor model_wolven_armor models/mojmap-1.21.x/ModelWolvenArmor.java src/main/java/net/redboltmedia/witchercraft/client/model/ModelWolvenArmor.java net.redboltmedia.witchercraft.client.model
+node tools/bb2java.js models/blockbench/UrsineArmor.bbmodel ModelUrsineArmor model_ursine_armor models/mojmap-1.21.x/ModelUrsineArmor.java src/main/java/net/redboltmedia/witchercraft/client/model/ModelUrsineArmor.java net.redboltmedia.witchercraft.client.model
 ```
 
 Then rebuild (MCreator build, or `gradlew compileJava` followed by running the client). The armor
