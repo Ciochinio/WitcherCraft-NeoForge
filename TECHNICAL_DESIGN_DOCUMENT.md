@@ -2870,7 +2870,7 @@ owners can change chances, chests and prices without touching the mod.
 ### 7.1 What the system is for
 
 Each School armor set gets its own slim 3D model instead of the vanilla armor shape. Wolven was the
-first (2026-10-06) and Ursine the second (2026-10-09). The model plugs into MCreator's own armor
+first (2026-10-06), Ursine the second (2026-10-09), and Manticore the third (2026-10-10). The model plugs into MCreator's own armor
 custom-model feature, so the armor element stays an ordinary generated element.
 
 ### 7.2 The pieces
@@ -2915,6 +2915,10 @@ Rules that are easy to break:
 - **The legs overlap at the centre.** Inflated leg pieces cross x = 0, so the two legs' front and back
   faces become coplanar there and flicker. Ursine draws every left-leg and left-boot piece 0.05 more
   inflated than its right twin, so one side always wins.
+- **The torso and the trousers overlap at the hip.** The body shell reaches below y 12 by its inflate and
+  the trousers reach above y 12 by theirs, so a torso shell with the same inflate as either trouser leg
+  shares its front and back planes there and flickers. Manticore's vest is 0.45 for this reason (its
+  trousers are 0.35 and 0.4).
 - **Shoulder plates.** A tilted plate must keep its top surface above the sleeve top (y 24.35) across
   the whole arm width, or the sleeve pokes through the steel.
 - **Parts must be public.** The armor template reads `model.body` and the other parts directly.
@@ -2935,7 +2939,7 @@ Rules that are easy to break:
 
 ### 7.5 Gauntlets (not implemented)
 
-For now the gloves and bracers (Wolven and Ursine) are cubes on the chestplate's `arm_r` and `arm_l`,
+For now the gloves and bracers (Wolven, Ursine, and Manticore) are cubes on the chestplate's `arm_r` and `arm_l`,
 so they render whenever the chestplate is worn, whatever is in the helmet slot. The user chose this so the hands are
 never bare sleeve. If the layer below is built, move those cubes back into `gauntlet_r` and `gauntlet_l`.
 
@@ -2952,7 +2956,7 @@ one, and NeoForge 26.1.2.95 throws on a duplicate registration.
 
 The armor element's **Armor layer texture** dropdown (`armorTextureFile`) shows empty every time the
 Wolven element is reopened, and saving fails with "Armor needs to have a texture". Pick the texture
-again (`wolven.`, or `bearamor.` for Ursine) before every save. The element file keeps the right
+again (`wolven.`, `bearamor.` for Ursine, or `mantikora.` for Manticore) before every save. The element file keeps the right
 value (`"wolven."`); only the
 editor fails to show it. The likely cause is the trailing dot in the old texture names
 (`wolven._layer_1.png`). All six sets use names like that (`cat.`, `griffin._`), so expect the same
@@ -2967,7 +2971,7 @@ feeds the helmet-slot (gauntlet) item, which still uses the default model.
 
 **Texture only.** Paint in Blockbench, save the `.bbmodel` (it embeds the texture), then export the
 texture over `src/main/resources/assets/witchercraft/textures/entities/<set>_armor.png`
-(`wolven_armor.png`, `ursine_armor.png`). No code changes. Keep the size (128x128 on a 64x64 UV
+(`wolven_armor.png`, `ursine_armor.png`, `manticore_armor.png`). No code changes. Keep the size (128x128 on a 64x64 UV
 layout). The `.bbmodel` and the PNG are the source of truth; Ursine's texture includes hand-painted
 pixels, so do not regenerate it from scratch.
 
@@ -2977,6 +2981,7 @@ save it. Then regenerate both Java copies from the repo root (Node.js required):
 ```
 node tools/bb2java.js models/blockbench/WolvenArmor.bbmodel ModelWolvenArmor model_wolven_armor models/mojmap-1.21.x/ModelWolvenArmor.java src/main/java/net/redboltmedia/witchercraft/client/model/ModelWolvenArmor.java net.redboltmedia.witchercraft.client.model
 node tools/bb2java.js models/blockbench/UrsineArmor.bbmodel ModelUrsineArmor model_ursine_armor models/mojmap-1.21.x/ModelUrsineArmor.java src/main/java/net/redboltmedia/witchercraft/client/model/ModelUrsineArmor.java net.redboltmedia.witchercraft.client.model
+node tools/bb2java.js models/blockbench/ManticoreArmor.bbmodel ModelManticoreArmor model_manticore_armor models/mojmap-1.21.x/ModelManticoreArmor.java src/main/java/net/redboltmedia/witchercraft/client/model/ModelManticoreArmor.java net.redboltmedia.witchercraft.client.model
 ```
 
 Then rebuild (MCreator build, or `gradlew compileJava` followed by running the client). The armor
