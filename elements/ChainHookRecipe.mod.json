@@ -1,0 +1,31 @@
+{
+  "_fv": 89,
+  "_type": "recipe",
+  "definition": {
+    "recipeType": "Crafting",
+    "recipeRetstackSize": 1,
+    "group": "",
+    "unlockingItems": [
+      "Blocks.CHAIN"
+    ],
+    "cookingBookCategory": "MISC",
+    "xpReward": 0,
+    "cookingTime": 200,
+    "craftingBookCategory": "EQUIPMENT",
+    "recipeShapeless": false,
+    "recipeSlots": [
+      "",
+      "",
+      "Items.IRON_INGOT",
+      "",
+      "Blocks.CHAIN",
+      "",
+      "Blocks.CHAIN",
+      "",
+      ""
+    ],
+    "recipeReturnStack": "CUSTOM:ChainHook",
+    "name": "chain_hook",
+    "namespace": "mod"
+  }
+}

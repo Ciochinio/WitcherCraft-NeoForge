@@ -538,5 +538,7 @@
   "gui.witchercraft.shell.skills.points": "SP available: %s",
   "gui.witchercraft.shell.skills.instructions": "R-click=learn  L-click learned=hold",
   "gui.witchercraft.shell.skills.slot_locked": "Unlocks at level %s",
-  "gui.witchercraft.shell.skills.slot_level": "%s"
+  "gui.witchercraft.shell.skills.slot_level": "%s",
+  "item.witchercraft.chain_hook": "Chain Hook",
+  "entity.witchercraft.chain_hook": "Chain Hook"
 }

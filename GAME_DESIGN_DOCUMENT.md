@@ -564,6 +564,43 @@ payloads of individual bombs and decoctions.
 Reflect Damage returns a portion of the damage you take to whoever dealt it, giving tank-leaning
 builds a way to punish being hit.
 
+### Chain Hook
+
+The Chain Hook is a weighted hook on an iron chain. Spin it up, throw it at a monster, then yank the
+monster in to your blade. It works on any living creature, including other players when PvP is on.
+It cannot latch onto blocks.
+
+- **Spin:** hold right-click to spin the hook. Like drawing a bow, you walk slowly while spinning.
+  The spin speeds up in three stages, and each new stage clicks. Stage 2 starts after
+  **0.5 seconds** of holding, stage 3 after **1 second**.
+- **Throw:** let go to throw. The stage you reached sets how far and how fast the hook flies:
+
+  | Stage | Hold | Range | Speed |
+  |---|---|---|---|
+  | 1 | under 0.5 s (a tap works) | **8 blocks** | slow |
+  | 2 | 0.5 to 1 s | **12 blocks** | medium |
+  | 3 | 1 s or more | **16 blocks** | fast |
+
+  If the hook hits a block or flies past its range, it comes back as a miss.
+- **Hook:** a hook that lands deals **3 damage** at any stage and stays attached. The chain stays
+  visible from your hand to the target. Each hook that lands costs **1 durability** (**128 uses**).
+  Misses cost nothing.
+- **Yank:** right-click again to yank the target toward you. It hops off its feet and is pulled
+  over **0.4 seconds**, at up to **2 blocks per tick**, to about **3 blocks** in front of you, then
+  brakes hard and stumbles to a stop there.
+  If you stand higher, the pull also lifts it toward your height, by at most **0.6 blocks per tick**
+  and never more than **5 blocks** in total, so a monster one or two blocks below comes up onto
+  your level while one far below is dragged into the cliff. Knockback resistance weakens the pull, and
+  creatures with full knockback resistance (Iron Golems, Wardens, anyone in full Netherite) do not
+  move.
+- **Cancel:** right-clicking while the hook is still in the air pulls it back as a miss.
+- **The chain breaks** if the target dies or leaves the dimension, if it gets more than
+  **20 blocks** away, if you put the Chain Hook away, or if you leave it hooked for **10 seconds**
+  without yanking.
+- **Cooldown:** **1 second** after a miss, so the hook cannot be spammed. **3 seconds** after a hook
+  lands, whether you yanked the target in or the chain broke.
+- **Recipe:** two iron chains on a diagonal with an iron ingot at the top-right corner.
+
 ---
 
 ## 6. Character Progression

@@ -20,6 +20,7 @@ Anything marked **tunable** is a value you are expected to change. Anything desc
 5. [World map terrain pipeline](#5-world-map-terrain-pipeline)
 6. [Alchemy recipes](#6-alchemy-recipes)
 7. [Custom armor models](#7-custom-armor-models)
+8. [Chain Hook](#8-chain-hook)
 
 ---
 
@@ -3004,3 +3005,173 @@ vanilla's own, it applies the stand's head, body, arm, and leg poses and vanilla
 1 lower, legs 1 higher). This covers every School set, so new sets need nothing extra. It relies on
 `setupAnim` resetting each part's pose first, which vanilla's `Model.setupAnim` does.
 
+
+---
+
+## 8. Chain Hook
+
+### 8.1 Ownership
+
+The Chain Hook is split between MCreator and hand-maintained code. All elements sit in the
+`~/Weapons/ChainHook` browser folder.
+
+| Element | Kind | Owns |
+|---|---|---|
+| `ChainHook` | Unlocked MCreator item | Name, texture, tool model, stack size 1, durability 128, use duration 72000 (held like a bow), creative tab. Its triggers call the three procedures below. |
+| `ChainHookRecipe` | Unlocked MCreator recipe | The shaped crafting recipe. |
+| `ChainHookUse` | Locked procedure | Right-click trigger, both sides. Calls `ChainHookEntity.use`. |
+| `ChainHookChargeTick` | Locked procedure | Every-tick-while-using trigger, server side. Calls `ChainHookEntity.chargeTick`. |
+| `ChainHookRelease` | Locked procedure | Stopped-using trigger, server side. Calls `ChainHookEntity.release`. |
+| `ChainHookEntity` | Locked code element | The projectile, its `EntityType` (own `DeferredRegister`, attached in `WitchercraftMod`'s "mod init" user code block), charge stages, every tuning constant, cooldowns, durability, and the per-player hook lookup. |
+| `ChainHookRenderer` | Locked code element (client) | Hook head and 3D chain drawing, plus the item's `IClientItemExtensions` (first-person spin, third-person arm pose). Registers itself through `EntityRenderersEvent.RegisterRenderers` and `RegisterClientExtensionsEvent`. |
+
+The three procedures are thin bridges that work out the hand and call `ChainHookEntity`. Every
+gameplay number lives as a `public static final` at the top of `ChainHookEntity`. Keep them in sync
+with the Chain Hook section of the GDD.
+
+### 8.2 Charging and throwing
+
+The item has a use duration, so MCreator's generated `use()` calls `startUsingItem` before
+`ChainHookUse` runs. Every right-click therefore starts a charge.
+
+- **No hook out:** `ChainHookUse` does nothing and the charge continues. While charging,
+  `chargeTick` plays a whoosh every `STAGE_WHOOSH_INTERVAL` ticks and a crossbow click on reaching
+  `STAGE_2_TICKS` and `STAGE_3_TICKS`. `release` reads `getTicksUsingItem()`, picks the stage with
+  `stageFor`, and throws with that stage's `STAGE_RANGE` and `STAGE_SPEED`. The range is stored on the
+  hook as `maxRange`.
+- **Hook out:** `ChainHookUse` calls `stopUsingItem()` on both sides, then on the server cancels a
+  flying hook or starts the pull on a hooked one. The client needs to know a hook is out so it can stop its own
+  predicted charge. That is why the lookup exists on both sides (8.4).
+
+Switching slots while charging stops the use without `releaseUsing`, so nothing is thrown. Vanilla
+skips `Item.use` while the item is on cooldown, so a charge cannot start during one. The 20%
+walking speed while charging is vanilla's using-an-item slowdown.
+
+### 8.3 Hook lifecycle
+
+`ChainHookEntity` extends `Projectile` and is modeled on vanilla `FishingHook`. The server is
+authoritative. It has three states, derived from two fields rather than an enum:
+
+- **Flying** (`hookedIn == null`). The server checks for hits along the move vector each tick and
+  fires `EventHooks.onProjectileImpact` before `onHit`. A block hit, leaving `maxRange`, or a second
+  right-click retracts the hook with `MISS_COOLDOWN`.
+- **Hooked** (`hookedIn != null`, `pullTicksLeft < 0`). On contact the hook deals `HOOK_DAMAGE` as
+  `thrown(hook, owner)` damage and costs 1 durability through `hurtAndBreak`. If the target is a
+  player and the damage is refused (PvP off, creative), the hook does not latch and counts as a miss.
+  The target's entity id + 1 is synced in `DATA_HOOKED_ENTITY`, and both sides pin the hook to the
+  target every tick.
+- **Pulling** (`pullTicksLeft >= 0`). `startPull` gives the target a `PULL_LIFT` hop, scaled by
+  `1 - knockback resistance`. Then for `PULL_TICKS` ticks `tickPull` sets its horizontal velocity
+  toward the owner:
+  - The speed is `(horizontal distance - STOP_DISTANCE) / ticksLeft`, so the target arrives about
+    `STOP_DISTANCE` away on the last tick.
+  - The speed is capped at `MAX_PULL_SPEED` and scaled by `1 - knockback resistance`.
+  - Vertically, when the owner is higher, the target gets the upward speed that reaches the owner's
+    height by the last tick, plus one tick of gravity (0.08). This is capped at
+    `MAX_PULL_RISE_SPEED` and stops once the target is `MAX_RISE` above `pullStartY`. It is
+    applied as `max(current vy, needed)`, never added, so it cannot compound. Otherwise gravity acts.
+  - `hurtMarked` is set so players get the motion packet.
+  - The pull ends at `STOP_DISTANCE` or after `PULL_TICKS`. The target then keeps only
+    `PULL_END_CARRY` (30%) of its horizontal speed and loses any upward speed, and the hook retracts
+    with `HIT_COOLDOWN`. Without this brake an airborne mob, which loses only about 9% of its speed
+    per tick, coasted past the owner and landed behind them.
+
+  History, so it is not repeated:
+  1. **Version 1:** this same pull, but it also added the vertical part of the pull to the target's
+     vertical velocity every tick, using 3D distance. Players liked the feel, but the vertical
+     additions compounded and launched mobs skyward when the owner stood above.
+  2. **One aimed launch** solved from vanilla airborne physics. It was correct but felt soft.
+  3. **Constant-speed drag** holding the target at a fixed height. It felt like a straight-line
+     grab rather than a pull on a chain.
+
+  The current code is version 1 with the pull measured by horizontal distance and a limited vertical
+  pull. A horizontal-only pull left mobs stuck against a single block when the owner stood one block
+  higher. Never add to the target's vertical velocity per tick; use `max` against a capped target
+  speed. Simulated: an owner 1 block up lifts the target about 1 block; 15 blocks up lifts it about
+  4.8 blocks over the 8 ticks.
+
+Any retract after the hook landed uses `HIT_COOLDOWN`. Breaking conditions are checked on the server
+every tick:
+- the target is dead or in another level
+- the owner is no longer holding the item in either hand
+- while hooked and not yet pulling, the owner is more than `BREAK_RANGE` away or `HOOKED_TIMEOUT`
+  ticks have passed
+
+### 8.4 Per-player hook lookup
+
+Each side keeps its own static `WeakHashMap<Player, ChainHookEntity>`. The two maps are separate
+because the integrated server and the client run on different threads.
+
+- **Server map:** filled by `release` and cleared in `remove()`.
+- **Client map:** filled in `recreateFromPacket` and cleared in `onClientRemoval()`.
+- **Lookup:** `activeHook` picks the map from the player's level side and treats a removed entity as
+  absent.
+
+The entity type is `noSave`, so hooks never persist across a restart or chunk unload.
+
+### 8.5 Rendering
+
+**Chain.** `ChainHookRenderer` copies the hand placement from vanilla `FishingHookRenderer`,
+including the first-person near-plane offset. The arm is the main arm when the main hand holds a
+Chain Hook, and the off arm otherwise. The chain is straight and built like a vanilla item model,
+from vanilla's own `minecraft:textures/item/iron_chain.png`. The texture is referenced, not copied.
+
+- **Texture area.** The chain repeats a 3x5 pixel area of the sprite: columns from `CHAIN_COL0` (6)
+  and rows from `CHAIN_ROW0` (2). Those rows hold one round link and one side-on link, and row 7
+  repeats row 2, so the area tiles seamlessly.
+- **Extrusion.** Each opaque pixel, listed in `CHAIN_MASK`, becomes a 1/16-block cube. Every face of
+  a cube samples that pixel's centre, so the cube takes its colour. Faces shared with an opaque
+  neighbour are skipped, wrapping across tiles along the chain. This gives the 1-pixel-thick lit
+  edges that vanilla items have.
+- **Scale.** One tile is `LINK_TILE_LENGTH` (5/16 block) long and 3/16 block wide. That is vanilla
+  scale: one sprite pixel equals 1/16 block.
+- **Facing.** Each tile is turned around the chain axis toward the camera (`camera.pos`, moved into
+  the chain's local space), like a beacon beam, so the art is never seen edge-on.
+- **Resource packs.** A pack that recolours the chain sprite restyles the chain. `CHAIN_MASK` is
+  copied from the vanilla sprite, so a pack that redraws the pixel layout looks wrong until the mask
+  and origin constants are updated. Reading the mask from the loaded sprite would remove this.
+
+Three earlier versions were replaced:
+1. Two crossed flat ribbons, like the vanilla chain block. From most angles one ribbon was edge-on,
+   and the chain looked like floating rings.
+2. Real 3D box links. They looked like a ladder rather than a Minecraft chain.
+3. A flat camera-facing strip. It had no thickness and read as a sticker.
+
+Their textures are kept in `textures/entities/_unused/`.
+
+**Head.** The camera-facing head (`chain_hook_head.png`) is drawn only while the hook flies. Once it
+is attached, the chain simply ends in the target's body. The head and item textures are placeholders.
+
+**Item.** `ChainHookRenderer.ItemExtensions` is registered for the Chain Hook item. MCreator only
+registers client item extensions for armor, and NeoForge throws on a duplicate. If the item ever
+becomes an armor-like element, merge the two.
+- `applyForgeHandTransform`: while charging, applies vanilla's arm placement, then rotates the item
+  around the X axis (pitch) at `SPIN_PIVOT_Y` / `SPIN_PIVOT_Z` by `spinAngle(ticks)`. The item whirls
+  forward underneath and back over the top, in a vertical circle beside the player. `spinAngle` integrates
+  `SPIN_DEGREES_PER_TICK` stage by stage, so the speed changes without the angle jumping.
+  An earlier roll-axis (Z) spin looked like drilling.
+- `getArmPose`: returns `THROW_TRIDENT` while charging.
+
+The MCreator use animation stays `none`, so only this extension controls the look.
+
+**Held sprite and mirroring.** The item uses MCreator's Tool model, which is vanilla `item/handheld`.
+Any flat item sprite shows its mirrored back face when viewed from the other side, so the hook looks
+flipped from some third-person angles. Vanilla items do the same. Switching to `item/handheld_rod`
+does not fix it: that hold rotates the sprite 180 degrees around Y in first and third person alike,
+so it would mirror the first-person view instead. A real fix needs a 3D (Blockbench) item model.
+
+If a custom JSON model is ever used: MCreator stores it as workspace `models/<name>.json` and copies
+it to `models/custom/` with its `textures` block stripped. The texture comes from the element's
+mapping, formatted as `<modid>:block/<name>`, so the texture must live in `textures/block/`.
+
+### 8.6 Known limitations
+
+- MCreator generates `use()` to return the result of `super.use`, which is `PASS`. The arm swing on
+  throw and reel therefore comes from `player.swing(hand, true)`. On a main-hand use the client may
+  also try the off-hand item.
+- The pull is horizontal. A wall or a block taller than step height in the way stops the target
+  until `PULL_TICKS` runs out.
+- The chain uses the hook's light level along its whole length.
+- First-person spin pivot and chain anchor are eyeballed constants. Tune them in game.
+- The third-person view has the raised arm only. A whirling chain above the hand is future polish.
+- The held item is a flat sprite and looks mirrored from some third-person angles (see 8.5).

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "  b",
+    " a ",
+    "a  "
+  ],
+  "key": {
+    "a": "minecraft:iron_chain",
+    "b": "minecraft:iron_ingot"
+  },
+  "result": {
+    "id": "witchercraft:chain_hook",
+    "count": 1
+  }
+}

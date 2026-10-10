@@ -107,6 +107,7 @@ public class WitchercraftModItems {
 	public static final DeferredItem<Item> GHOUL_SPAWN_EGG;
 	public static final DeferredItem<Item> COCKATRICE_SPAWN_EGG;
 	public static final DeferredItem<Item> FAST_TRAVEL_SIGN;
+	public static final DeferredItem<Item> CHAIN_HOOK;
 	static {
 		WHITE_HONEY = register("white_honey", WhiteHoneyItem::new);
 		BLIZZARD = register("blizzard", BlizzardItem::new);
@@ -196,6 +197,7 @@ public class WitchercraftModItems {
 		GHOUL_SPAWN_EGG = register("ghoul_spawn_egg", properties -> new SpawnEggItem(properties.spawnEgg(WitchercraftModEntities.GHOUL.get())));
 		COCKATRICE_SPAWN_EGG = register("cockatrice_spawn_egg", properties -> new SpawnEggItem(properties.spawnEgg(WitchercraftModEntities.COCKATRICE.get())));
 		FAST_TRAVEL_SIGN = block(WitchercraftModBlocks.FAST_TRAVEL_SIGN, new Item.Properties().stacksTo(16));
+		CHAIN_HOOK = register("chain_hook", ChainHookItem::new);
 	}
 
 	// Start of user code block custom items

@@ -10207,6 +10207,142 @@
         ]
       },
       "path": "~/Admin/Commands"
+    },
+    {
+      "name": "ChainHook",
+      "type": "item",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "chain_hook",
+      "metadata": {
+        "files": [
+          "src/main/resources/assets/witchercraft/items/chain_hook.json",
+          "src/main/java/net/redboltmedia/witchercraft/item/ChainHookItem.java",
+          "src/main/resources/assets/witchercraft/models/item/chain_hook.json"
+        ]
+      },
+      "path": "~/Weapons/ChainHook"
+    },
+    {
+      "name": "ChainHookUse",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "chain_hook_use",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "world",
+            "type": "world"
+          },
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "itemstack",
+            "type": "itemstack"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/ChainHookUseProcedure.java"
+        ]
+      },
+      "path": "~/Weapons/ChainHook"
+    },
+    {
+      "name": "ChainHookEntity",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "chain_hook_entity",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/ChainHookEntity.java"
+        ]
+      },
+      "path": "~/Weapons/ChainHook"
+    },
+    {
+      "name": "ChainHookRenderer",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "chain_hook_renderer",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/ChainHookRenderer.java"
+        ]
+      },
+      "path": "~/Weapons/ChainHook"
+    },
+    {
+      "name": "ChainHookRecipe",
+      "type": "recipe",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "chain_hook_recipe",
+      "metadata": {
+        "files": [
+          "src/main/resources/data/witchercraft/recipe/chain_hook.json",
+          "src/main/resources/data/witchercraft/advancement/recipes/chain_hook_recipe.json"
+        ]
+      },
+      "path": "~/Weapons/ChainHook"
+    },
+    {
+      "name": "ChainHookChargeTick",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "chain_hook_charge_tick",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "world",
+            "type": "world"
+          },
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "itemstack",
+            "type": "itemstack"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/ChainHookChargeTickProcedure.java"
+        ]
+      },
+      "path": "~/Weapons/ChainHook"
+    },
+    {
+      "name": "ChainHookRelease",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "chain_hook_release",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "world",
+            "type": "world"
+          },
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "itemstack",
+            "type": "itemstack"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/ChainHookReleaseProcedure.java"
+        ]
+      },
+      "path": "~/Weapons/ChainHook"
     }
   ],
   "variable_elements": [
@@ -11629,7 +11765,9 @@
       "gui.witchercraft.shell.skills.points": "SP available: %s",
       "gui.witchercraft.shell.skills.instructions": "R-click\u003dlearn  L-click learned\u003dhold",
       "gui.witchercraft.shell.skills.slot_locked": "Unlocks at level %s",
-      "gui.witchercraft.shell.skills.slot_level": "%s"
+      "gui.witchercraft.shell.skills.slot_level": "%s",
+      "item.witchercraft.chain_hook": "Chain Hook",
+      "entity.witchercraft.chain_hook": "Chain Hook"
     }
   },
   "metadata": {
@@ -12322,7 +12460,12 @@
       },
       {
         "name": "Weapons",
-        "children": []
+        "children": [
+          {
+            "name": "ChainHook",
+            "children": []
+          }
+        ]
       },
       {
         "name": "HUD",
