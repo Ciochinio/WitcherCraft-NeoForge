@@ -2993,3 +2993,14 @@ or they overlap other pieces' paint; a cube rotated inside a bone is fine. If th
 re-export the texture too. Do not use Blockbench's "Export Java Entity" plus MCreator's model import:
 that file uses the older API and private fields, and the armor element would not compile against it.
 
+### 7.8 Armor stands
+
+MCreator's template wraps the custom parts in a plain `HumanoidModel`, which animates like a living
+player: on an armor stand the arms bob with the stand's age and the stand's pose is ignored. Vanilla
+avoids this with `ArmorStandArmorModel`. The hand-maintained client mixin
+`mixin/ArmorStandCustomArmorPoseMixin` (registered in `witchercraft.mixins.json`) injects at the end of
+`HumanoidModel.setupAnim`. When the render state is an `ArmorStandRenderState` and the model is not
+vanilla's own, it applies the stand's head, body, arm, and leg poses and vanilla's stand offsets (head
+1 lower, legs 1 higher). This covers every School set, so new sets need nothing extra. It relies on
+`setupAnim` resetting each part's pose first, which vanilla's `Model.setupAnim` does.
+
