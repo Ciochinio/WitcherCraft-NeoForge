@@ -17,6 +17,7 @@ public class WitchercraftModModels {
 		event.registerLayerDefinition(ModelUrsineArmor.LAYER_LOCATION, ModelUrsineArmor::createBodyLayer);
 		event.registerLayerDefinition(ModelCockatrice.LAYER_LOCATION, ModelCockatrice::createBodyLayer);
 		event.registerLayerDefinition(ModelManticoreArmor.LAYER_LOCATION, ModelManticoreArmor::createBodyLayer);
+		event.registerLayerDefinition(ModelGriffinArmor.LAYER_LOCATION, ModelGriffinArmor::createBodyLayer);
 		event.registerLayerDefinition(ModelGhoul.LAYER_LOCATION, ModelGhoul::createBodyLayer);
 		event.registerLayerDefinition(ModelAlghoul.LAYER_LOCATION, ModelAlghoul::createBodyLayer);
 		event.registerLayerDefinition(ModelWolvenArmor.LAYER_LOCATION, ModelWolvenArmor::createBodyLayer);

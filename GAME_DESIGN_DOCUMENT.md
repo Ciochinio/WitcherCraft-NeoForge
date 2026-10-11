@@ -758,9 +758,9 @@ Wolven, Feline, Griffin, Ursine, Viper, and Manticore - and each is a complete f
 
 The models sit close to the body - slimmer than vanilla armor, with real depth for plates,
 straps, and pouches. The helmet-slot piece of each set is a pair of gauntlets and is meant to
-render on the hands. Status: Wolven, Ursine, and Manticore are on their custom models (chestplate,
-leggings, boots). For now their gloves and bracers are drawn as part of the chestplate, whatever is
-in the helmet slot, and the other three sets still use the old flat textures.
+render on the hands. Status: Wolven, Ursine, Manticore, and Griffin are on their custom models
+(chestplate, leggings, boots). For now their gloves and bracers are drawn as part of the chestplate,
+whatever is in the helmet slot, and the other two sets still use the old flat textures.
 
 The Ursine set is the heavy one: a long chainmail coat with tan-trimmed hem and toggles, a dark
 leather chest piece under an olive scarf, two-plate steel pauldrons, long steel vambraces, oxblood
@@ -773,6 +773,17 @@ plate crosses a vial bandolier of three red vials that ends at a hip pouch, and 
 again on the back. Below that are a wide red-brown belt with a silver buckle, black gloves with
 studded bracers and flared quilted cuffs, brown trousers quilted on the outer thighs, and short
 dark-brown boots with a fold-over cuff and a red ankle strap.
+
+The Griffin set is the Sign-caster's medium armor, modelled closely on the Witcher 3 original: a
+dark olive leather tunic with four gold chevron plate strips down the front, dark slate shoulder
+panels with gold trim joined by a buckled chest strap, a thick chain collar over a brown leather
+collar and dark cravat, and a sword baldric that crosses the chest and the back. An orange-brown
+belt with a crossed buckle and hanging tongue holds two teal-trimmed gold scale tassets on the hips.
+The arms carry green pauldrons with a gold griffin medallion, chain sleeves, and long green
+vambraces with teal trim and a gold plate whose outer side covers the back of the brown gloves.
+The leggings add the tunic's chain hem with hanging gold points, dark teal and olive trousers with
+laced panels behind the thighs, and round bronze knee cops; the boots are knee-high olive leather
+with a studded top band, buckled straps behind, and metal toe caps.
 
 The payoff is the **School Effect**. Wear all four pieces of a set and its effect switches on and
 stays on, shown on your HUD; take any piece off and it drops immediately. You can only run one
