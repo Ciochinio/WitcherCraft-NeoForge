@@ -21,6 +21,7 @@ Anything marked **tunable** is a value you are expected to change. Anything desc
 6. [Alchemy recipes](#6-alchemy-recipes)
 7. [Custom armor models](#7-custom-armor-models)
 8. [Chain Hook](#8-chain-hook)
+9. [Custom weapon models](#9-custom-weapon-models)
 
 ---
 
@@ -3183,3 +3184,106 @@ mapping, formatted as `<modid>:block/<name>`, so the texture must live in `textu
 - First-person spin pivot and chain anchor are eyeballed constants. Tune them in game.
 - The third-person view has the raised arm only. A whirling chain above the hand is future polish.
 - The held item is a flat sprite and looks mirrored from some third-person angles (see 8.5).
+
+---
+
+## 9. Custom weapon models
+
+### 9.1 What the system is for
+
+Unique swords get a held 3D model instead of a flat sprite. Aerondight was the first (2026-10-12).
+The sword is an ordinary MCreator `tool` element (type Sword) that uses MCreator's JSON custom-model
+option, so no hand-written rendering code is involved. The model is a Minecraft cuboid (block/item)
+model, not an entity model like the armor in section 7.
+
+### 9.2 The pieces
+
+| File | Role | Owner |
+|---|---|---|
+| `models/blockbench/<Name>.bbmodel` | Source model (Blockbench, Java Block/Item format, per-face UV) | Hand-edited |
+| `models/<name>.json` + `models/<name>.json.textures` | MCreator's stored copy of the JSON model and its texture mapping (`"0": "<name>"`) | MCreator workspace |
+| `assets/witchercraft/models/custom/<name>.json` | The stored copy with its `textures` block stripped | MCreator (regenerated) |
+| `assets/witchercraft/models/item/<name>.json` | `parent` = the custom model; texture `0` = `block/<name>`, `particle` = `item/<name>` | MCreator (regenerated) |
+| `assets/witchercraft/textures/block/<name>.png` | The 3D model's texture (MCreator maps JSON-model textures from `textures/block/`) | Hand-painted |
+| `assets/witchercraft/textures/item/<name>.png` | Flat 16x16 sprite: break particles and the MCreator element icon only | Hand-painted |
+| `elements/<Name>.mod.json` | `toolType: Sword`, `renderType: 1`, `customModelName: "<name>:default"`, stats | MCreator element |
+| `data/minecraft/tags/item/swords.json` | MCreator adds every Sword tool here automatically (`tag_elements` entry `~<Name>@CUSTOM:<Name>`) | MCreator (regenerated) |
+
+Being in `minecraft:swords` is what lets oils go on the sword: every oil enchantment element lists
+`TAG:minecraft:swords` as its supported items.
+
+### 9.3 Model contract
+
+- **Built vertically.** The sword lies along +Y on the line x = 8, z = 8, with the flat of the blade
+  facing +Z/-Z. Aerondight spans y -15.75 (pommel cap) to 32 (tip): the blade box runs from -0.5
+  (its end hidden behind the guard arms) to 25 and seven solid tip steps run from 25 to 32, the crossguard centre is (8, -1, 8),
+  and the grip runs from y -11.75 to -3.5. Every coordinate must stay inside -16..32, so the model
+  is nearly full length; a longer blade now means a shorter hilt.
+- **Minecraft proportions, not realistic ones.** A realistic 2-unit blade on a 44-unit sword renders
+  about 1 world pixel wide in hand, which looked like a wire next to vanilla swords in game. The
+  blade is 3.5 units wide and 0.75 deep, the guard arms are 8.25 long and 1.5 thick, the grip is
+  1.75 thick, and the pommel 2.5. Vanilla swords are drawn about 2 to 2.5 pixels wide; this blade is
+  about 1.9 at the third-person scale.
+- **Texture density.** 4 texels per model unit on a 128x128 texture. Keep UV rectangles on whole
+  texels.
+- **Free rotation is allowed.** Minecraft 26.1 accepts any angle on a cuboid, and multi-axis
+  rotation through `"rotation": {"x", "y", "z", "origin"}` (applied X, then Y, then Z). In web
+  Blockbench this needs the project's Java version set to "1.21.11 - 26.2"
+  (`java_block_version: "1.21.11"`); the older settings snap to 22.5-degree steps on one axis.
+  Aerondight's final model only uses single-axis rotations (guard arms at +-32 degrees and the
+  centre boss at 45 degrees about Z), so it exports in the classic `angle`/`axis` form.
+- **Points are solid steps; only the wolf heads are cutout cards.** A thin card with a cutout
+  triangle looked hollow from the side in game, so the blade tip is 7 stacked boxes and the langet
+  point 4, each 1 texel narrower per side than the one below. Item models render cutout, so the four
+  wolf-head flanges on the pommel are still thin boxes whose front and back faces carry the
+  silhouette, with their side faces omitted.
+  Omitting a face (no entry in `faces`) is how a face is hidden; in Blockbench, a face set to no
+  texture exports the same way.
+- **No overlapping faces may share a plane.** Two coplanar faces flicker in game (z-fighting). The
+  first wired version had the langet front exactly in the right guard arm's front plane and the left
+  arm only 0.01 behind it. Front planes (half depth in Z) are now spaced out: blade 0.375, langet
+  0.5, left arm 0.575, right arm 0.625, centre boss 0.75. The arms start at the guard centre instead
+  of reaching past it, and the boss covers the wedge where they still cross.
+- **Low detail.** Small 3D detail (many spikes, star-shaped rings from two crossed boxes, noisy
+  flanges) read as noise at hand size; the user preferred plain bars and blocks with a few
+  accents.
+
+### 9.4 Display transforms
+
+The `display` block in the stored model is inherited by the generated item model (MCreator keeps
+every key except `textures` when it copies the JSON). The values are derived from vanilla
+`item/handheld`, so the sword is held like a vanilla sword:
+
+- The model is first turned -45 degrees about Z, which maps +Y onto the diagonal a vanilla sword
+  sprite is drawn on, then given vanilla's hand rotation. The translation places the grip centre
+  (8, -7.625, 8) where vanilla's handle pixel (3.5, 3.5) lands.
+- Scales: **0.55** third person (about 1.65 blocks long), **0.36** first person, **0.43** GUI and item
+  frame, **0.38** on the ground (dropped items looked small at 0.26). The GUI view also turns the sword 30 degrees about its own axis so
+  the guard shows some depth, with `gui_light: front`.
+- Minecraft applies a "left-hand fix" at runtime: it negates the left-hand transform's rotation Y
+  and Z and translation X. The left-hand entries follow vanilla's pattern (rotation Y and Z mirrored,
+  same translation), so both hands behave like a vanilla sword.
+- 26.1 also has an `on_shelf` context (shelf blocks), which has no fallback to another context. The
+  model gives it the item-frame transform so the 48-unit sword is scaled down there too (not yet
+  checked on a shelf in game). Blockbench 5.2 keeps and exports it.
+
+### 9.5 Changing the model or its texture
+
+1. Edit `models/blockbench/<Name>.bbmodel` in Blockbench and save it (the texture is embedded).
+2. Export the texture over `textures/block/<name>.png`.
+3. Export the model with File > Export > Block/Item Model and replace `models/<name>.json`. Keep the
+   `textures` block pointing at `witchercraft:block/<name>`.
+4. Copy the same JSON without its `textures` block to `assets/witchercraft/models/custom/<name>.json`
+   (MCreator does this itself on its next build or regeneration).
+
+The first Aerondight passes were generated by a script in a session scratchpad, not kept in the
+repo. The `.bbmodel` is now the source of truth.
+
+### 9.6 Known limitations
+
+- Aerondight's stats are provisional (diamond-sword level) and it has no recipe or loot source; it
+  is only in the WitcherCraft creative tab. Its effect and the steel/silver rules are not designed.
+- The display transforms are computed, not tuned in game. First-person size and position are the
+  most likely to need adjustment.
+- In the inventory slot a realistic longsword is thin; a flat GUI sprite (`guiTexture`) is the
+  fallback if the 3D icon reads poorly.

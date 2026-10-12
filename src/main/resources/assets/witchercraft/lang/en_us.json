@@ -540,5 +540,6 @@
   "gui.witchercraft.shell.skills.slot_locked": "Unlocks at level %s",
   "gui.witchercraft.shell.skills.slot_level": "%s",
   "item.witchercraft.chain_hook": "Chain Hook",
-  "entity.witchercraft.chain_hook": "Chain Hook"
+  "entity.witchercraft.chain_hook": "Chain Hook",
+  "item.witchercraft.aerondight": "Aerondight"
 }

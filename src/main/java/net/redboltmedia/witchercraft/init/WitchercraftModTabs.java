@@ -106,5 +106,6 @@ public class WitchercraftModTabs {
 				tabData.accept(WitchercraftModItems.COCKATRICE_SPAWN_EGG.get());
 				tabData.accept(WitchercraftModBlocks.FAST_TRAVEL_SIGN.get().asItem());
 				tabData.accept(WitchercraftModItems.CHAIN_HOOK.get());
+				tabData.accept(WitchercraftModItems.AERONDIGHT.get());
 			}).build());
 }

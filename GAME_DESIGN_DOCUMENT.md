@@ -601,6 +601,21 @@ It cannot latch onto blocks.
   lands, whether you yanked the target in or the chain broke.
 - **Recipe:** two iron chains on a diagonal with an iron ingot at the top-right corner.
 
+### Swords
+
+Unique named swords each get their own 3D model, and in time their own behavior. Every sword takes
+oils. What separates steel swords from silver swords is not designed yet.
+
+**Aerondight** is a legendary silver sword: a long blade engraved with runes, a crossguard swept
+toward the tip with one spike on each arm, a brown leather grip between two silver rings, and a dark
+pommel ringed with four wolf heads.
+
+- **Stats (provisional):** **7** attack damage, **1.6** attack speed, **1561** durability,
+  enchantability **10**. These match a diamond sword until Aerondight's own effect is designed.
+- **Rarity:** Epic (purple name).
+- **How to get it:** the WitcherCraft creative tab only, for now. There is no recipe or loot source
+  yet.
+
 ---
 
 ## 6. Character Progression

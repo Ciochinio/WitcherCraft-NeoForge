@@ -10343,6 +10343,21 @@
         ]
       },
       "path": "~/Weapons/ChainHook"
+    },
+    {
+      "name": "Aerondight",
+      "type": "tool",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "aerondight",
+      "metadata": {
+        "files": [
+          "src/main/resources/assets/witchercraft/items/aerondight.json",
+          "src/main/java/net/redboltmedia/witchercraft/item/AerondightItem.java",
+          "src/main/resources/assets/witchercraft/models/item/aerondight.json"
+        ]
+      },
+      "path": "~/Weapons"
     }
   ],
   "variable_elements": [
@@ -11221,6 +11236,9 @@
       "~HangedMansVenomEnchantment@CUSTOM:HangedMansVenomEnchantment",
       "~VampireOilEnchantment@CUSTOM:VampireOilEnchantment",
       "~InsectoidOilEnchantment@CUSTOM:InsectoidOilEnchantment"
+    ],
+    "ITEMS:minecraft:swords": [
+      "~Aerondight@CUSTOM:Aerondight"
     ]
   },
   "tab_element_order": {},
@@ -11767,7 +11785,8 @@
       "gui.witchercraft.shell.skills.slot_locked": "Unlocks at level %s",
       "gui.witchercraft.shell.skills.slot_level": "%s",
       "item.witchercraft.chain_hook": "Chain Hook",
-      "entity.witchercraft.chain_hook": "Chain Hook"
+      "entity.witchercraft.chain_hook": "Chain Hook",
+      "item.witchercraft.aerondight": "Aerondight"
     }
   },
   "metadata": {

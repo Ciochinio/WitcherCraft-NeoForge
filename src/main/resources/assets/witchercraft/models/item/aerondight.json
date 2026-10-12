@@ -1,0 +1,7 @@
+{
+  "parent": "witchercraft:custom/aerondight",
+  "textures": {
+    "0": "witchercraft:block/aerondight",
+    "particle": "witchercraft:item/aerondight"
+  }
+}
