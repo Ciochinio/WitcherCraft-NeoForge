@@ -2872,7 +2872,7 @@ owners can change chances, chests and prices without touching the mod.
 ### 7.1 What the system is for
 
 Each School armor set gets its own slim 3D model instead of the vanilla armor shape. Wolven was the
-first (2026-10-06), Ursine the second (2026-10-09), Manticore the third (2026-10-10), and Griffin the fourth (2026-10-11). The model plugs into MCreator's own armor
+first (2026-10-06), Ursine the second (2026-10-09), Manticore the third (2026-10-10), Griffin the fourth (2026-10-11), and Feline the fifth (2026-10-14). The model plugs into MCreator's own armor
 custom-model feature, so the armor element stays an ordinary generated element.
 
 ### 7.2 The pieces
@@ -2914,6 +2914,16 @@ Rules that are easy to break:
 - **Inflate also adds height.** It grows every dimension, so a 1-tall box at 0.65 inflate is 2.3 tall.
   For a thin band such as a belt, use a wider and deeper box with inflate near 0 (Ursine's belts are
   9x1x5 boxes on the 8x4 torso).
+- **Negative inflate packs more texels.** The texture is spread over the inflated box, so a larger box
+  with a negative inflate gets more texels per unit. Feline's belts are 10x2x6 boxes at -0.4 (drawn
+  9.2 x 1.2 x 5.2), which gives each belt four texel rows for its triangle band instead of two; its
+  hip flaps and knee guards are 4x4x2 boxes at -0.4 and -0.5, for 8x8 texels on a 3-unit plate (the
+  flaps cut their top texel row so they start under the lower belt instead of covering it).
+- **Shared UV puts outer paint on the inner side.** A cube and its mirrored twin with the same UV
+  offset show the same side region as the outer face of one limb and the inner face of the other.
+  That is fine for symmetric patterns; a one-sided detail needs its own UV for the left piece. Feline
+  avoids the problem by keeping its boots the same on every side, and its shoulder caps paint the
+  sign in both side regions, so each arm shows it outside and the inner copy stays hidden.
 - **The legs overlap at the centre.** Inflated leg pieces cross x = 0, so the two legs' front and back
   faces become coplanar there and flicker. Ursine draws every left-leg and left-boot piece 0.05 more
   inflated than its right twin, so one side always wins.
@@ -2921,6 +2931,14 @@ Rules that are easy to break:
   the trousers reach above y 12 by theirs, so a torso shell with the same inflate as either trouser leg
   shares its front and back planes there and flickers. Manticore's vest is 0.45 for this reason (its
   trousers are 0.35 and 0.4).
+- **Cover the hip joint from the chestplate.** The leggings only get `leg_r` and `leg_l` (MCreator's
+  element has no body part for them), so nothing joins the legs at the hip unless the chestplate does
+  it. Wolven's hem is a body piece that reaches below y 12. A trouser leg's front face
+  sits 2.35 out from the hip pivot, so a body piece reaching d below y 12 stays clear of any leg swing
+  if its front and back stand at least sqrt(d^2 + 2.35^2) off the centre line. A full skirt reads as
+  a skirt, though: Feline had one (reaching 1.3 below) and lost it on request; it now ends like
+  Griffin, with the jacket shell 0.45 below y 12 and its hip flaps 0.25 below, standing 2.9 out. A
+  55-degree stride shows no gap at the hip either way.
 - **Shoulder plates.** A tilted plate must keep its top surface above the sleeve top (y 24.35) across
   the whole arm width, or the sleeve pokes through the steel.
 - **Transparent texels are allowed.** Vanilla's `EquipmentLayerRenderer` draws the custom model with
@@ -2948,7 +2966,7 @@ Rules that are easy to break:
 
 ### 7.5 Gauntlets (not implemented)
 
-For now the gloves and bracers (Wolven, Ursine, Manticore, and Griffin) are cubes on the chestplate's `arm_r` and `arm_l`,
+For now the gloves and bracers (Wolven, Ursine, Manticore, Griffin, and Feline) are cubes on the chestplate's `arm_r` and `arm_l`,
 so they render whenever the chestplate is worn, whatever is in the helmet slot. The user chose this so the hands are
 never bare sleeve. If the layer below is built, move those cubes back into `gauntlet_r` and `gauntlet_l`.
 
@@ -2965,7 +2983,7 @@ one, and NeoForge 26.1.2.95 throws on a duplicate registration.
 
 The armor element's **Armor layer texture** dropdown (`armorTextureFile`) shows empty every time the
 Wolven element is reopened, and saving fails with "Armor needs to have a texture". Pick the texture
-again (`wolven.`, `bearamor.` for Ursine, `mantikora.` for Manticore, or `griffin._` for Griffin) before every save. The element file keeps the right
+again (`wolven.`, `bearamor.` for Ursine, `mantikora.` for Manticore, `griffin._` for Griffin, or `cat.` for Feline) before every save. The element file keeps the right
 value (`"wolven."`); only the
 editor fails to show it. The likely cause is the trailing dot in the old texture names
 (`wolven._layer_1.png`). All six sets use names like that (`cat.`, `griffin._`), so expect the same
@@ -2980,7 +2998,7 @@ feeds the helmet-slot (gauntlet) item, which still uses the default model.
 
 **Texture only.** Paint in Blockbench, save the `.bbmodel` (it embeds the texture), then export the
 texture over `src/main/resources/assets/witchercraft/textures/entities/<set>_armor.png`
-(`wolven_armor.png`, `ursine_armor.png`, `manticore_armor.png`, `griffin_armor.png`). No code changes. Keep the size (128x128 on a 64x64 UV
+(`wolven_armor.png`, `ursine_armor.png`, `manticore_armor.png`, `griffin_armor.png`, `feline_armor.png`). No code changes. Keep the size (128x128 on a 64x64 UV
 layout). The `.bbmodel` and the PNG are the source of truth; Ursine's texture includes hand-painted
 pixels, so do not regenerate it from scratch.
 
@@ -2992,6 +3010,7 @@ node tools/bb2java.js models/blockbench/WolvenArmor.bbmodel ModelWolvenArmor mod
 node tools/bb2java.js models/blockbench/UrsineArmor.bbmodel ModelUrsineArmor model_ursine_armor models/mojmap-1.21.x/ModelUrsineArmor.java src/main/java/net/redboltmedia/witchercraft/client/model/ModelUrsineArmor.java net.redboltmedia.witchercraft.client.model
 node tools/bb2java.js models/blockbench/ManticoreArmor.bbmodel ModelManticoreArmor model_manticore_armor models/mojmap-1.21.x/ModelManticoreArmor.java src/main/java/net/redboltmedia/witchercraft/client/model/ModelManticoreArmor.java net.redboltmedia.witchercraft.client.model
 node tools/bb2java.js models/blockbench/GriffinArmor.bbmodel ModelGriffinArmor model_griffin_armor models/mojmap-1.21.x/ModelGriffinArmor.java src/main/java/net/redboltmedia/witchercraft/client/model/ModelGriffinArmor.java net.redboltmedia.witchercraft.client.model
+node tools/bb2java.js models/blockbench/FelineArmor.bbmodel ModelFelineArmor model_feline_armor models/mojmap-1.21.x/ModelFelineArmor.java src/main/java/net/redboltmedia/witchercraft/client/model/ModelFelineArmor.java net.redboltmedia.witchercraft.client.model
 ```
 
 Then rebuild (MCreator build, or `gradlew compileJava` followed by running the client). The armor

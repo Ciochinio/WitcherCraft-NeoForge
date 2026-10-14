@@ -773,9 +773,9 @@ Wolven, Feline, Griffin, Ursine, Viper, and Manticore - and each is a complete f
 
 The models sit close to the body - slimmer than vanilla armor, with real depth for plates,
 straps, and pouches. The helmet-slot piece of each set is a pair of gauntlets and is meant to
-render on the hands. Status: Wolven, Ursine, Manticore, and Griffin are on their custom models
-(chestplate, leggings, boots). For now their gloves and bracers are drawn as part of the chestplate,
-whatever is in the helmet slot, and the other two sets still use the old flat textures.
+render on the hands. Status: Wolven, Ursine, Manticore, Griffin, and Feline are on their custom
+models (chestplate, leggings, boots). For now their gloves and bracers are drawn as part of the
+chestplate, whatever is in the helmet slot, and Viper still uses the old flat textures.
 
 The Ursine set is the heavy one: a long chainmail coat with tan-trimmed hem and toggles, a dark
 leather chest piece under an olive scarf, two-plate steel pauldrons, long steel vambraces, oxblood
@@ -799,6 +799,18 @@ vambraces with teal trim and a gold plate whose outer side covers the back of th
 The leggings add the tunic's chain hem with hanging gold points, dark teal and olive trousers with
 laced panels behind the thighs, and round bronze knee cops; the boots are knee-high olive leather
 with a studded top band, buckled straps behind, and metal toe caps.
+
+The Feline set is the crit fighter's light armor, modelled closely on the Witcher 3 original: a navy
+padded jacket covered in a grid of silver studs, cream sheepskin lapels around a chain-mail collar,
+two short buckled straps closing the chest, and a red-brown sword strap that crosses the chest and
+the back. Two belts of interlocking steel and ochre triangles, buckled on the left and the lower one
+sagging towards the left hip, carry a dark red pouch on the right hip. The jacket ends at the hips,
+as long as the Griffin tunic, with two short navy flaps with grey-blue piping below the belts; the
+left flap bears the white Feline sign. The arms carry studded navy shoulder caps with the sign on
+both outer sides, chain-mail sleeves, a sheepskin roll at the elbow, plain red-brown
+panelled bracers, and black gloves with a brown cuff. The leggings are plain dark navy trousers with
+panelled leather knee guards; the boots are short, plain near-black leather with a strap at the top
+and across the instep, dark cognac feet, and toe caps.
 
 The payoff is the **School Effect**. Wear all four pieces of a set and its effect switches on and
 stays on, shown on your HUD; take any piece off and it drops immediately. You can only run one
