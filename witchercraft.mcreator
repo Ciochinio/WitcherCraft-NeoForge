@@ -2052,71 +2052,6 @@
       "path": "~/Alchemy/Oils/VampireOil"
     },
     {
-      "name": "GlossaryMenuGui",
-      "type": "gui",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "glossary_menu_gui",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/network/GlossaryMenuGuiButtonMessage.java",
-          "src/main/java/net/redboltmedia/witchercraft/world/inventory/GlossaryMenuGuiMenu.java",
-          "src/main/java/net/redboltmedia/witchercraft/client/gui/GlossaryMenuGuiScreen.java"
-        ]
-      },
-      "path": "~/Glossary"
-    },
-    {
-      "name": "GlossaryMenuGuiOpen",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "glossary_menu_gui_open",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/GlossaryMenuGuiOpenProcedure.java"
-        ],
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "x",
-            "type": "number"
-          },
-          {
-            "name": "y",
-            "type": "number"
-          },
-          {
-            "name": "z",
-            "type": "number"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ]
-      },
-      "path": "~/Glossary"
-    },
-    {
-      "name": "BestiaryMenuGui",
-      "type": "gui",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "bestiary_menu_gui",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/client/gui/BestiaryMenuGuiScreen.java",
-          "src/main/java/net/redboltmedia/witchercraft/world/inventory/BestiaryMenuGuiMenu.java",
-          "src/main/java/net/redboltmedia/witchercraft/network/BestiaryMenuGuiButtonMessage.java"
-        ]
-      },
-      "path": "~/Bestiary"
-    },
-    {
       "name": "PauseMenuGuiBlindEnd",
       "type": "procedure",
       "compiles": true,
@@ -2134,41 +2069,6 @@
         ]
       },
       "path": "~/Pause Menu"
-    },
-    {
-      "name": "BestiaryMenuGuiOpen",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "bestiary_menu_gui_open",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/BestiaryMenuGuiOpenProcedure.java"
-        ],
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "x",
-            "type": "number"
-          },
-          {
-            "name": "y",
-            "type": "number"
-          },
-          {
-            "name": "z",
-            "type": "number"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ]
-      },
-      "path": "~/Bestiary"
     },
     {
       "name": "GoldenOrioleEffect",
@@ -4544,306 +4444,6 @@
         ]
       },
       "path": "~/Admin/Commands"
-    },
-    {
-      "name": "DrownerGui",
-      "type": "gui",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "drowner_gui",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/client/gui/DrownerGuiScreen.java",
-          "src/main/java/net/redboltmedia/witchercraft/network/DrownerGuiButtonMessage.java",
-          "src/main/java/net/redboltmedia/witchercraft/world/inventory/DrownerGuiMenu.java"
-        ]
-      },
-      "path": "~/Bestiary/Necrophages/Drowner"
-    },
-    {
-      "name": "DrownerGuiOpen",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "drowner_gui_open",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/DrownerGuiOpenProcedure.java"
-        ],
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "x",
-            "type": "number"
-          },
-          {
-            "name": "y",
-            "type": "number"
-          },
-          {
-            "name": "z",
-            "type": "number"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ]
-      },
-      "path": "~/Bestiary/Necrophages/Drowner"
-    },
-    {
-      "name": "RotfiendGui",
-      "type": "gui",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "rotfiend_gui",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/world/inventory/RotfiendGuiMenu.java",
-          "src/main/java/net/redboltmedia/witchercraft/network/RotfiendGuiButtonMessage.java",
-          "src/main/java/net/redboltmedia/witchercraft/client/gui/RotfiendGuiScreen.java"
-        ]
-      },
-      "path": "~/Bestiary/Necrophages/Rotfiend"
-    },
-    {
-      "name": "RotfiendGuiOpen",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "rotfiend_gui_open",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/RotfiendGuiOpenProcedure.java"
-        ],
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "x",
-            "type": "number"
-          },
-          {
-            "name": "y",
-            "type": "number"
-          },
-          {
-            "name": "z",
-            "type": "number"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ]
-      },
-      "path": "~/Bestiary/Necrophages/Rotfiend"
-    },
-    {
-      "name": "FogletGui",
-      "type": "gui",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "foglet_gui",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/world/inventory/FogletGuiMenu.java",
-          "src/main/java/net/redboltmedia/witchercraft/client/gui/FogletGuiScreen.java",
-          "src/main/java/net/redboltmedia/witchercraft/network/FogletGuiButtonMessage.java"
-        ]
-      },
-      "path": "~/Bestiary/Necrophages/foglet"
-    },
-    {
-      "name": "FogletGuiOpen",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "foglet_gui_open",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/FogletGuiOpenProcedure.java"
-        ],
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "x",
-            "type": "number"
-          },
-          {
-            "name": "y",
-            "type": "number"
-          },
-          {
-            "name": "z",
-            "type": "number"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ]
-      },
-      "path": "~/Bestiary/Necrophages/foglet"
-    },
-    {
-      "name": "BruxaGui",
-      "type": "gui",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "bruxa_gui",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/client/gui/BruxaGuiScreen.java",
-          "src/main/java/net/redboltmedia/witchercraft/world/inventory/BruxaGuiMenu.java",
-          "src/main/java/net/redboltmedia/witchercraft/network/BruxaGuiButtonMessage.java"
-        ]
-      },
-      "path": "~/Bestiary/Vampires/Bruxa"
-    },
-    {
-      "name": "GraveirGui",
-      "type": "gui",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "graveir_gui",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/client/gui/GraveirGuiScreen.java",
-          "src/main/java/net/redboltmedia/witchercraft/network/GraveirGuiButtonMessage.java",
-          "src/main/java/net/redboltmedia/witchercraft/world/inventory/GraveirGuiMenu.java"
-        ]
-      },
-      "path": "~/Bestiary/Vampires/Graveir"
-    },
-    {
-      "name": "HigherVampireGui",
-      "type": "gui",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "higher_vampire_gui",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/world/inventory/HigherVampireGuiMenu.java",
-          "src/main/java/net/redboltmedia/witchercraft/network/HigherVampireGuiButtonMessage.java",
-          "src/main/java/net/redboltmedia/witchercraft/client/gui/HigherVampireGuiScreen.java"
-        ]
-      },
-      "path": "~/Bestiary/Vampires/Higher Vampire"
-    },
-    {
-      "name": "BruxaGuiOpen",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "bruxa_gui_open",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/BruxaGuiOpenProcedure.java"
-        ],
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "x",
-            "type": "number"
-          },
-          {
-            "name": "y",
-            "type": "number"
-          },
-          {
-            "name": "z",
-            "type": "number"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ]
-      },
-      "path": "~/Bestiary/Vampires/Bruxa"
-    },
-    {
-      "name": "GraveirGuiOpen",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "graveir_gui_open",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/GraveirGuiOpenProcedure.java"
-        ],
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "x",
-            "type": "number"
-          },
-          {
-            "name": "y",
-            "type": "number"
-          },
-          {
-            "name": "z",
-            "type": "number"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ]
-      },
-      "path": "~/Bestiary/Vampires/Graveir"
-    },
-    {
-      "name": "HigherVampireGuiOpen",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "higher_vampire_gui_open",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/HigherVampireGuiOpenProcedure.java"
-        ],
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "x",
-            "type": "number"
-          },
-          {
-            "name": "y",
-            "type": "number"
-          },
-          {
-            "name": "z",
-            "type": "number"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ]
-      },
-      "path": "~/Bestiary/Vampires/Higher Vampire"
     },
     {
       "name": "DevLog",
@@ -10358,6 +9958,58 @@
         ]
       },
       "path": "~/Weapons"
+    },
+    {
+      "name": "GlossaryPage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "glossary_page",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/GlossaryPage.java"
+        ]
+      },
+      "path": "~/Glossary"
+    },
+    {
+      "name": "GlossaryLayout",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "glossary_layout",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/GlossaryLayout.java"
+        ]
+      },
+      "path": "~/Glossary"
+    },
+    {
+      "name": "GlossaryBestiary",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "glossary_bestiary",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/GlossaryBestiary.java"
+        ]
+      },
+      "path": "~/Glossary/Bestiary"
+    },
+    {
+      "name": "GlossaryTutorials",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "glossary_tutorials",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/GlossaryTutorials.java"
+        ]
+      },
+      "path": "~/Glossary/Tutorials"
     }
   ],
   "variable_elements": [
@@ -12111,92 +11763,6 @@
         ]
       },
       {
-        "name": "Bestiary",
-        "children": [
-          {
-            "name": "Beasts",
-            "children": []
-          },
-          {
-            "name": "Cursed Ones",
-            "children": []
-          },
-          {
-            "name": "Draconids",
-            "children": []
-          },
-          {
-            "name": "Humans",
-            "children": [
-              {
-                "name": "Bandit",
-                "children": []
-              }
-            ]
-          },
-          {
-            "name": "Insectoids",
-            "children": []
-          },
-          {
-            "name": "Necrophages",
-            "children": [
-              {
-                "name": "Drowner",
-                "children": []
-              },
-              {
-                "name": "foglet",
-                "children": []
-              },
-              {
-                "name": "Rotfiend",
-                "children": []
-              }
-            ]
-          },
-          {
-            "name": "Ogroids",
-            "children": [
-              {
-                "name": "Nekker",
-                "children": []
-              }
-            ]
-          },
-          {
-            "name": "Relics",
-            "children": []
-          },
-          {
-            "name": "Specters",
-            "children": [
-              {
-                "name": "Wraith",
-                "children": []
-              }
-            ]
-          },
-          {
-            "name": "Vampires",
-            "children": [
-              {
-                "name": "Bruxa",
-                "children": []
-              },
-              {
-                "name": "Graveir",
-                "children": []
-              },
-              {
-                "name": "Higher Vampire",
-                "children": []
-              }
-            ]
-          }
-        ]
-      },
-      {
         "name": "Character Abilities",
         "children": [
           {
@@ -12441,7 +12007,16 @@
       },
       {
         "name": "Glossary",
-        "children": []
+        "children": [
+          {
+            "name": "Bestiary",
+            "children": []
+          },
+          {
+            "name": "Tutorials",
+            "children": []
+          }
+        ]
       },
       {
         "name": "Items",

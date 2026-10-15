@@ -47,7 +47,7 @@ public final class GlossaryLayout {
 	// --- left ribbons (creatures / topics), top to bottom ----------------------
 	// The selected one sticks out SIDE_SHIFT further. An icon, then the name cut to
 	// SIDE_TEXT_W. More than SIDE_ROWS entries show page arrows under the ribbons.
-	public static final int SIDE_X = 28;
+	public static final int SIDE_X = 47;
 	public static final int SIDE_Y = 45;
 	public static final int SIDE_W = 106;
 	public static final int SIDE_H = 22;
@@ -60,7 +60,7 @@ public final class GlossaryLayout {
 
 	// --- right ribbons (Bestiary, Tutorials), top to bottom ---------------------
 	// SIDE_SHIFT applies here too; the label is right-aligned RIGHT_TEXT_INSET from the tip.
-	public static final int RIGHT_X = 514;
+	public static final int RIGHT_X = 492;
 	public static final int RIGHT_Y = 50;
 	public static final int RIGHT_W = 106;
 	public static final int RIGHT_H = 22;

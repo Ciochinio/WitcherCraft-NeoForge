@@ -3,7 +3,9 @@
  */
 package net.redboltmedia.witchercraft.init;
 
-import net.redboltmedia.witchercraft.client.gui.*;
+import net.redboltmedia.witchercraft.client.gui.SignGuiScreen;
+import net.redboltmedia.witchercraft.client.gui.PauseMenuGuiScreen;
+import net.redboltmedia.witchercraft.client.gui.CharacterGuiScreen;
 
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -15,16 +17,8 @@ public class WitchercraftModScreens {
 	@SubscribeEvent
 	public static void clientLoad(RegisterMenuScreensEvent event) {
 		event.register(WitchercraftModMenus.PAUSE_MENU_GUI.get(), PauseMenuGuiScreen::new);
-		event.register(WitchercraftModMenus.GLOSSARY_MENU_GUI.get(), GlossaryMenuGuiScreen::new);
-		event.register(WitchercraftModMenus.BESTIARY_MENU_GUI.get(), BestiaryMenuGuiScreen::new);
 		event.register(WitchercraftModMenus.CHARACTER_GUI.get(), CharacterGuiScreen::new);
 		event.register(WitchercraftModMenus.SIGN_GUI.get(), SignGuiScreen::new);
-		event.register(WitchercraftModMenus.DROWNER_GUI.get(), DrownerGuiScreen::new);
-		event.register(WitchercraftModMenus.ROTFIEND_GUI.get(), RotfiendGuiScreen::new);
-		event.register(WitchercraftModMenus.FOGLET_GUI.get(), FogletGuiScreen::new);
-		event.register(WitchercraftModMenus.BRUXA_GUI.get(), BruxaGuiScreen::new);
-		event.register(WitchercraftModMenus.GRAVEIR_GUI.get(), GraveirGuiScreen::new);
-		event.register(WitchercraftModMenus.HIGHER_VAMPIRE_GUI.get(), HigherVampireGuiScreen::new);
 	}
 
 	public interface ScreenAccessor {
