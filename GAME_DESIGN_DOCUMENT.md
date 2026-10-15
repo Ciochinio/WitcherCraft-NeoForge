@@ -871,12 +871,13 @@ it's weak to, and one description of what it is and how it fights - so a player 
 walks into a fight already knowing how to win it. Reading the Bestiary is the intended first step of
 any hunt, the same loop as consulting a contract board and then a book in the source games.
 
-The tab is laid out like the source games' bestiary, but nothing in it scrolls: a column of category
-icons (one per category, shown as that category's oil), the creatures of the chosen category, a 3D
-model of the chosen creature that you can drag to turn, the oils it is weak to under the model, and a
-text panel with the stats and the description, which turns like book pages. Every model is scaled to
-fit the model area, from a ghoul to a horse. Long lists and long texts split into pages instead of
-scrolling.
+The Glossary is drawn as an old witcher's book with bookmark ribbons, and you get around it by clicking
+ribbons, never by flipping pages or scrolling. Ribbons along the top are the categories, each in its own
+colour with that category's oil on it. Ribbons down the left side are the creatures of the chosen
+category, each with its spawn egg and name. Two ribbons on the right switch between the Bestiary and the
+Tutorials. The left page shows a 3D model of the creature that you can drag to turn - scaled to fit the
+page, from a ghoul to a horse - with the oils it is weak to and its health, damage and armor under it;
+the right page has its name and description.
 
 Every creature tagged into a category appears, including vanilla creatures that are tagged, and its
 health, damage and armor are read live from the game, so the entry is always right. Entries will later
@@ -1157,9 +1158,10 @@ Travel is free in creative mode. It spends vanilla XP only and never touches Wit
 The Glossary is the mod's "look things up" tab in the WitcherCraft menu (**G**). It has two halves:
 the [Bestiary](#the-bestiary) and **Tutorials**, short guides to the mod's own mechanics grouped by
 system - Signs, Alchemy, Hunting and World - so a player can check how Signs, brewing, oils, Toxicity,
-the medallion, meditation or fast travel work without leaving the game. Each topic has a picture and a
-text that turns like book pages, and any key it mentions is shown as the key the player actually has
-bound. More topics are added as systems land.
+the medallion, meditation or fast travel work without leaving the game. It is the same book: the top
+ribbons are the groups, the left ribbons the topics, and each topic's picture and text fill the two
+pages. Any key a topic mentions is shown as the key the player actually has bound. More topics are added
+as systems land.
 
 ### Admin and debug tools
 

@@ -64,10 +64,11 @@
 			font-size: 11px;
 		}
 
-		.content { position: absolute; left: 3px; top: 41px; width: 634px; height: 316px; outline: 1px dashed rgba(255, 255, 255, .08); }
+		.content { position: absolute; left: 3px; top: 41px; width: 634px; height: 316px; }
 		.el { position: absolute; overflow: hidden; white-space: nowrap; }
 		.drag { cursor: move; }
 		.drag:hover { outline: 1px solid var(--accent); }
+		.guide { position: absolute; border: 1px dashed rgba(90, 60, 30, .55); }
 		.view-toggle button.on { border-color: var(--accent); color: var(--accent); }
 
 		/* ---- control panel ---- */
@@ -88,6 +89,7 @@
 			font: inherit;
 		}
 
+		input.wide { width: 360px; }
 		input.color { width: 96px; }
 		input:focus { outline: none; border-color: var(--accent); }
 
@@ -118,13 +120,13 @@
 			resize: vertical;
 		}
 
-		.hint { color: var(--ink-dim); font-size: 11px; }
+		.hint { color: var(--ink-dim); font-size: 11px; max-width: 640px; }
 	</style>
 </head>
 <body>
 	<header>
 		<h1>WitcherCraft glossary layout creator</h1>
-		<p>Lays out the Glossary tab (GlossaryPage). Drag the panels or edit the numbers, then copy GlossaryLayout.java over the file.</p>
+		<p>Lays out the Glossary book (GlossaryPage). Drag the book, pages, ribbon rows and doll box, or edit the numbers, then copy GlossaryLayout.java over the file.</p>
 	</header>
 
 	<div class="wrap">
@@ -137,7 +139,8 @@
 				<div class="nav">shared navbar, non-editable</div>
 				<div class="content" id="content"></div>
 			</div>
-			<div class="hint">1:1 design canvas. Text widths are approximate (the game font is about 6 px per character).</div>
+			<div class="hint">1:1 design canvas, drawn with the real textures from src/main/resources (open this file from the repo so the paths resolve).
+				Dashed boxes are the page and doll rects. Text widths are approximate (the game font is about 5-6 px per character).</div>
 		</div>
 
 		<div class="side">
@@ -147,8 +150,8 @@
 			</fieldset>
 
 			<fieldset>
-				<legend>Colours (0xAARRGGBB)</legend>
-				<div id="colorInputs"></div>
+				<legend>Art and colours</legend>
+				<div id="artInputs"></div>
 			</fieldset>
 
 			<div class="actions">
@@ -169,43 +172,60 @@
 	</div>
 
 	<script>
-		// Sections of GlossaryLayout.java, in file order: the comment lines above each block and its fields.
+		// GlossaryLayout.java, in file order: each block's comment lines and fields.
+		// Field kinds: int, hex (0xAARRGGBB), hexes (int[] of colours), str (texture path).
 		const SECTIONS = [
-			{comments: ['// --- sub-tabs: a centred row of fixed-width tabs, styled like the navbar ---'],
-				fields: {SUBTAB_Y: 2, SUBTAB_W: 90, SUBTAB_H: 16, SUBTAB_GAP: 4}},
-			{comments: ['// --- Bestiary: category rail, one RAIL_CELL square per category ---------'],
-				fields: {RAIL_X: 6, RAIL_Y: 24, RAIL_W: 26, RAIL_H: 288, RAIL_PAD_Y: 5, RAIL_CELL: 20, RAIL_STEP: 23}},
-			{comments: ['// --- Bestiary: entry list (category name, then LIST_ROWS rows, then the page footer)'],
-				fields: {LIST_X: 36, LIST_Y: 24, LIST_W: 150, LIST_H: 288, LIST_HEADER_H: 20, LIST_ROW_H: 22, LIST_ROWS: 11}},
-			{comments: ['// --- Bestiary: doll area. The whole model fits DOLL_FILL_PERCENT of it at any angle (drag to rotate)'],
-				fields: {DOLL_X: 192, DOLL_Y: 30, DOLL_W: 228, DOLL_H: 220, DOLL_FILL_PERCENT: 90, DOLL_YAW: 25}},
-			{comments: ['// "Weak to" label and its icon cells, centred under the doll'],
-				fields: {WEAK_Y: 260, WEAK_CELL: 20, WEAK_GAP: 4}},
-			{comments: [
-				'// --- info panel (Bestiary entry text; also the Tutorials text) ------------',
-				'// Name at the top, then from BODY_Y the stats (Bestiary only, STATS_GAP',
-				'// below them) and the text split into pages of whole lines, and the page',
-				'// footer at the bottom.'],
-				fields: {INFO_X: 426, INFO_Y: 24, INFO_W: 202, INFO_H: 288, INFO_PAD: 8, BODY_Y: 24, STATS_GAP: 8, LINE_H: 10, FOOTER_H: 16, PAGE_BUTTON: 12}},
-			{comments: ['// --- Tutorials: topic list (group headers + entries) and illustration ------'],
-				fields: {TOPIC_X: 6, TOPIC_Y: 24, TOPIC_W: 180, TOPIC_H: 288, TOPIC_GROUP_H: 16, TOPIC_ROW_H: 14, IMAGE_X: 192, IMAGE_Y: 24, IMAGE_W: 228, IMAGE_H: 288, IMAGE_ICON_SCALE: 4}},
-			{comments: ['// --- colours (0xAARRGGBB). Sub-tabs match the navbar, panels the map, cells the skills tree.'],
-				colors: {SUBTAB_BG: '0x66101015', SUBTAB_BG_ACTIVE: '0xB0000000', SUBTAB_BORDER: '0xFF33333D', SUBTAB_TEXT: '0xFFC9C9D2', SUBTAB_TEXT_ACTIVE: '0xFFFFFFFF',
-					ACCENT: '0xFFFFDD55', PANEL_BG: '0xB0101015', PANEL_BORDER: '0xFF665E4A', DIVIDER: '0xFF3A3630', CELL_BORDER: '0xFF4A4A52', CELL_INNER: '0xFF1B1B20',
-					ROW_HOVER: '0xFF26262E', ROW_SELECTED: '0xFF393944', BUTTON_BG: '0xFF26262E', BUTTON_HOVER: '0xFF393944', TITLE: '0xFFD6AD52', TEXT: '0xFFE4DDCB',
-					BODY: '0xFFCFC7B0', TEXT_DIM: '0xFF777781'}}
+			{comments: ['// --- the book: BOOK_TEX stretched over this rect -------------------------'],
+				fields: [['BOOK_X', 'int', 112], ['BOOK_Y', 'int', 14], ['BOOK_W', 'int', 430], ['BOOK_H', 'int', 300]]},
+			{comments: ['// the writable parchment of each page (inside the corner ornaments)'],
+				fields: [['LEFT_PAGE_X', 'int', 174], ['LEFT_PAGE_Y', 'int', 45], ['LEFT_PAGE_W', 'int', 133], ['LEFT_PAGE_H', 'int', 241],
+					['RIGHT_PAGE_X', 'int', 348], ['RIGHT_PAGE_Y', 'int', 45], ['RIGHT_PAGE_W', 'int', 133], ['RIGHT_PAGE_H', 'int', 241]]},
+			{comments: ['// --- top ribbons (categories / Tutorials groups), left to right ------------',
+				'// The selected one hangs TOP_LIFT higher than the rest; icons are 16x16.'],
+				fields: [['TOP_X', 'int', 159], ['TOP_Y', 'int', 2], ['TOP_W', 'int', 30], ['TOP_H', 'int', 36], ['TOP_STEP', 'int', 33], ['TOP_LIFT', 'int', 5], ['TOP_ICON_Y', 'int', 4]]},
+			{comments: ['// --- left ribbons (creatures / topics), top to bottom ----------------------',
+				'// The selected one sticks out SIDE_SHIFT further. An icon, then the name cut to',
+				'// SIDE_TEXT_W. More than SIDE_ROWS entries show page arrows under the ribbons.'],
+				fields: [['SIDE_X', 'int', 28], ['SIDE_Y', 'int', 45], ['SIDE_W', 'int', 106], ['SIDE_H', 'int', 22], ['SIDE_STEP', 'int', 25], ['SIDE_SHIFT', 'int', 4],
+					['SIDE_ROWS', 'int', 10], ['SIDE_ICON_X', 'int', 9], ['SIDE_TEXT_X', 'int', 27], ['SIDE_TEXT_W', 'int', 66]]},
+			{comments: ['// --- right ribbons (Bestiary, Tutorials), top to bottom ---------------------',
+				'// SIDE_SHIFT applies here too; the label is right-aligned RIGHT_TEXT_INSET from the tip.'],
+				fields: [['RIGHT_X', 'int', 514], ['RIGHT_Y', 'int', 50], ['RIGHT_W', 'int', 106], ['RIGHT_H', 'int', 22], ['RIGHT_STEP', 'int', 26], ['RIGHT_TEXT_INSET', 'int', 14]]},
+			{comments: ['// --- left page, Bestiary: doll (the whole model fits DOLL_FILL_PERCENT of the',
+				'// box at any angle; drag to rotate), the "Weak to" row and the stats row'],
+				fields: [['DOLL_X', 'int', 174], ['DOLL_Y', 'int', 48], ['DOLL_W', 'int', 133], ['DOLL_H', 'int', 158], ['DOLL_FILL_PERCENT', 'int', 90], ['DOLL_YAW', 'int', 25],
+					['WEAK_Y', 'int', 210], ['WEAK_CELL', 'int', 20], ['WEAK_GAP', 'int', 4], ['STATS_Y', 'int', 258], ['STATS_GAP', 'int', 12]]},
+			{comments: ['// --- text: a title and rule at the top of its page, then lines --------------',
+				'// Tutorials put the title, a TOPIC_ICON_SCALE x 16 icon and the first lines on',
+				'// the left page and run on to the right one. Text that still does not fit gets',
+				'// page arrows in the right page\'s footer.'],
+				fields: [['TITLE_H', 'int', 18], ['LINE_H', 'int', 9], ['FOOTER_H', 'int', 16], ['PAGE_BUTTON', 'int', 12], ['TOPIC_ICON_SCALE', 'int', 3], ['TOPIC_ICON_GAP', 'int', 8]]},
+			{comments: ['// --- art ----------------------------------------------------------------------',
+				'// Ribbons are light grey and tinted per ribbon with the colours below.'],
+				fields: [['BOOK_TEX', 'str', 'witchercraft:textures/screens/book.png'], ['RIBBON_TOP_TEX', 'str', 'witchercraft:textures/screens/glossary_ribbon_top.png'],
+					['RIBBON_LEFT_TEX', 'str', 'witchercraft:textures/screens/glossary_ribbon_side.png'], ['RIBBON_RIGHT_TEX', 'str', 'witchercraft:textures/screens/glossary_ribbon_side_right.png']]},
+			{comments: ['// --- colours (0xAARRGGBB) --------------------------------------------------------',
+				'// Top ribbons per category (GlossaryBestiary.Category order) and per Tutorials group',
+				'// (GlossaryTutorials.GROUPS order); left ribbons take the selected top ribbon\'s colour.',
+				'// Ribbons that are not selected are drawn at RIBBON_IDLE_PERCENT brightness.'],
+				fields: [['CATEGORY_COLORS', 'hexes', ['0xFF8A6A45', '0xFF6A4A7A', '0xFFA05A30', '0xFF7A8A3A', '0xFF4F6E52', '0xFF8A7A50', '0xFF3F6A78', '0xFF7A80A0', '0xFF8A2E2E', '0xFF6A6A6A']],
+					['GROUP_COLORS', 'hexes', ['0xFF3F5A8A', '0xFF4F7A4A', '0xFF8A3A2A', '0xFF8A7340']], ['TAB_COLORS', 'hexes', ['0xFF7A2A2A', '0xFF2F4A6A']],
+					['RIBBON_IDLE_PERCENT', 'int', 72], ['RIBBON_TEXT', 'hex', '0xFFF2E8D2'], ['INK', 'hex', '0xFF3A2A18'], ['INK_TITLE', 'hex', '0xFF4A3520'], ['INK_DIM', 'hex', '0xFF7A6545'],
+					['RULE', 'hex', '0x804A3520'], ['CELL_BORDER', 'hex', '0xFF7A6545'], ['CELL_INNER', 'hex', '0x22000000'], ['BUTTON_HOVER', 'hex', '0x334A3520']]}
 		];
 
 		const HEADER = `package net.redboltmedia.witchercraft;
 
 /**
- * Geometry and colours of the Glossary tab ({@link GlossaryPage}): the sub-tab
- * row (Bestiary, Tutorials), the Bestiary's category rail, entry list, doll and
- * info panel, and the Tutorials' topic list and illustration. The Tutorials text
- * reuses the info panel, so both sub-tabs share the same three columns.
+ * Geometry, art and colours of the Glossary tab ({@link GlossaryPage}): an open
+ * book with three sets of bookmark ribbons. Top ribbons pick a category (or a
+ * Tutorials group), left ribbons pick a creature (or topic), right ribbons switch
+ * between Bestiary and Tutorials. The left page holds the doll (or a topic's
+ * picture), the right page the text.
  *
  * All coordinates are DESIGN-canvas pixels relative to the shell's content
- * region (the area below the navbar, 634x316 on the 640x360 canvas).
+ * region (the area below the navbar, 634x316 on the 640x360 canvas). Ribbons
+ * are drawn under the book, so their inner ends tuck behind its cover.
  *
  * Generated by tools/glossary-layout-creator.html - paste this over the file
  * wholesale. Keep it a dumb data holder (no logic) so the tool can overwrite it.
@@ -215,43 +235,53 @@ public final class GlossaryLayout {
 	}
 `;
 
-		const defaults = {}, defaultColors = {};
-		for (const s of SECTIONS) {
-			Object.assign(defaults, s.fields || {});
-			Object.assign(defaultColors, s.colors || {});
-		}
-		let v = {...defaults}, colors = {...defaultColors}, view = 'bestiary';
+		// book.png's cover edge (fraction of its 638 width), as in GlossaryPage
+		const COVER_LEFT = 22 / 638;
+		// swallowtail depth of the ribbon art, as a fraction of its length (gen.js)
+		const NOTCH_SIDE = 7 / 106, NOTCH_TOP = 9 / 36;
+		const texUrl = id => '../src/main/resources/assets/witchercraft/textures/' + id.replace(/^witchercraft:textures\//, '');
+
+		const defaults = {};
+		for (const s of SECTIONS)
+			for (const [k, , d] of s.fields)
+				defaults[k] = Array.isArray(d) ? [...d] : d;
+		let v = structuredClone(defaults), view = 'bestiary';
 
 		const inputs = document.querySelector('#inputs'),
-			colorInputs = document.querySelector('#colorInputs'),
+			artInputs = document.querySelector('#artInputs'),
 			content = document.querySelector('#content'),
 			out = document.querySelector('#out');
 
 		for (const s of SECTIONS) {
-			if (!s.fields)
-				continue;
+			const geometry = s.fields.every(([, kind]) => kind === 'int') && !s.comments[0].includes('colours');
+			const host = geometry ? inputs : artInputs;
 			const g = document.createElement('div');
 			g.className = 'group';
 			g.textContent = s.comments[0].replace(/^\/\/\s*(---\s*)?/, '').replace(/\s*-+$/, '');
-			inputs.append(g);
-			for (const k of Object.keys(s.fields))
-				inputs.append(field(k, 'number', () => v[k], val => v[k] = Number(val)));
+			host.append(g);
+			for (const [k, kind] of s.fields)
+				host.append(field(k, kind));
 		}
-		for (const k of Object.keys(colors))
-			colorInputs.append(field(k, 'text', () => colors[k], val => colors[k] = val, 'color'));
 
-		function field(k, type, get, set, cls) {
+		function field(k, kind) {
 			const l = document.createElement('label');
 			l.textContent = k;
 			const i = document.createElement('input');
-			i.type = type;
-			if (cls)
-				i.className = cls;
-			i.value = get();
+			i.type = kind === 'int' ? 'number' : 'text';
+			i.className = kind === 'str' || kind === 'hexes' ? 'wide' : kind === 'hex' ? 'color' : '';
 			i.dataset.key = k;
-			i.oninput = () => { set(i.value); render(); };
+			i.dataset.kind = kind;
+			i.value = show(k, kind);
+			i.oninput = () => {
+				v[k] = kind === 'int' ? Number(i.value) : kind === 'hexes' ? i.value.split(/[\s,]+/).filter(Boolean) : i.value;
+				render();
+			};
 			l.append(i);
 			return l;
+		}
+
+		function show(k, kind) {
+			return kind === 'hexes' ? v[k].join(', ') : v[k];
 		}
 
 		// 0xAARRGGBB -> css rgba
@@ -260,8 +290,13 @@ public final class GlossaryLayout {
 			return `rgba(${(n >>> 16) & 255},${(n >>> 8) & 255},${n & 255},${(((n >>> 24) & 255) / 255).toFixed(3)})`;
 		}
 
-		// approximate width of game-font text
-		const textW = s => s.length * 6;
+		function shade(argb, percent) {
+			const n = parseInt(String(argb).replace(/^0x/i, ''), 16) >>> 0;
+			const c = s => Math.min(255, Math.floor(((n >>> s) & 255) * percent / 100));
+			return `rgb(${c(16)},${c(8)},${c(0)})`;
+		}
+
+		const textW = s => s.length * 5.5;
 
 		function el(x, y, w, h, style = {}, text = '', drag = null) {
 			const d = document.createElement('div');
@@ -275,136 +310,109 @@ public final class GlossaryLayout {
 			return d;
 		}
 
-		function txt(x, y, s, color) {
-			return el(x, y, textW(s) + 2, 9, {color: css(color), fontSize: '8px', lineHeight: '9px'}, s);
+		function txt(x, y, s, color, shadow) {
+			return el(x, y, textW(s) + 4, 9, {color: css(color), fontSize: '8px', lineHeight: '9px', textShadow: shadow ? '1px 1px 0 rgba(0,0,0,.6)' : 'none'}, s);
 		}
 
-		function panel(x, y, w, h, drag) {
-			return el(x, y, w, h, {background: css(colors.PANEL_BG), border: '1px solid ' + css(colors.PANEL_BORDER)}, '', drag);
+		function img(id, x, y, w, h) {
+			const i = document.createElement('img');
+			i.src = texUrl(id);
+			i.className = 'el';
+			Object.assign(i.style, {left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px'});
+			content.append(i);
+			return i;
 		}
 
-		function cell(x, y, size, border, fill) {
-			el(x, y, size, size, {background: css(colors.CELL_INNER), border: '1px solid ' + css(border)});
-			if (fill)
-				el(x + (size - 12) / 2, y + (size - 12) / 2, 12, 12, {background: fill, borderRadius: '3px'});
+		// a ribbon: the grey art, multiplied by the tint inside the ribbon's outline
+		function ribbon(id, x, y, w, h, color, selected, clip) {
+			img(id, x, y, w, h);
+			el(x, y, w, h, {background: selected ? css(color) : shade(color, v.RIBBON_IDLE_PERCENT), mixBlendMode: 'multiply', clipPath: clip});
 		}
 
-		function divider(x, y, w) {
-			el(x + 4, y, w - 8, 1, {background: css(colors.DIVIDER)});
+		const leftClip = `polygon(${NOTCH_SIDE * 100}% 50%, 0 0, 100% 0, 100% 100%, 0 100%)`;
+		const rightClip = `polygon(${100 - NOTCH_SIDE * 100}% 50%, 100% 0, 0 0, 0 100%, 100% 100%)`;
+		const topClip = `polygon(50% ${NOTCH_TOP * 100}%, 0 0, 0 100%, 100% 100%, 100% 0)`;
+
+		function guide(x, y, w, h, drag) {
+			const d = el(x, y, w, h, {}, '', drag);
+			d.classList.add('guide');
+			return d;
 		}
 
-		function pager(left, footerY) {
-			const b = v.PAGE_BUTTON, label = '1 / 2', w = 2 * b + 12 + textW(label);
-			const y = footerY + (v.FOOTER_H - b) / 2;
-			for (const [bx, glyph] of [[left, '<'], [left + w - b, '>']])
-				el(bx, y, b, b, {background: css(colors.BUTTON_BG), border: '1px solid ' + css(colors.CELL_BORDER), color: css(colors.TEXT), textAlign: 'center', lineHeight: (b - 2) + 'px'}, glyph);
-			txt(left + (w - textW(label)) / 2, y + (b - 8) / 2 + 1, label, colors.TEXT_DIM);
-			return w;
-		}
-
-		function subTabs() {
-			const names = ['Bestiary', 'Tutorials'], total = names.length * v.SUBTAB_W + (names.length - 1) * v.SUBTAB_GAP;
-			names.forEach((n, i) => {
-				const x = (634 - total) / 2 + i * (v.SUBTAB_W + v.SUBTAB_GAP), active = (i === 0) === (view === 'bestiary');
-				el(x, v.SUBTAB_Y, v.SUBTAB_W, v.SUBTAB_H, {
-					background: css(active ? colors.SUBTAB_BG_ACTIVE : colors.SUBTAB_BG),
-					borderTop: '1px solid ' + css(colors.SUBTAB_BORDER), borderBottom: '1px solid ' + css(colors.SUBTAB_BORDER),
-					color: css(active ? colors.SUBTAB_TEXT_ACTIVE : colors.SUBTAB_TEXT), textAlign: 'center', lineHeight: (v.SUBTAB_H - 2) + 'px'
-				}, n);
-				if (active)
-					el(x + 3, v.SUBTAB_Y + v.SUBTAB_H, v.SUBTAB_W - 6, 1, {background: css(colors.ACCENT)});
-			});
-		}
-
-		// stats: fixed lines above a rule (Bestiary only); the text pages below them
-		function infoPanel(title, stats) {
-			panel(v.INFO_X, v.INFO_Y, v.INFO_W, v.INFO_H, ['INFO_X', 'INFO_Y']);
-			txt(v.INFO_X + v.INFO_PAD, v.INFO_Y + 6, title, colors.TITLE);
-			divider(v.INFO_X, v.INFO_Y + 17, v.INFO_W);
-			let bodyY = v.BODY_Y;
-			stats.forEach((s, i) => txt(v.INFO_X + v.INFO_PAD, v.INFO_Y + v.BODY_Y + i * v.LINE_H, s, colors.TEXT));
-			if (stats.length) {
-				bodyY += stats.length * v.LINE_H + v.STATS_GAP;
-				divider(v.INFO_X, v.INFO_Y + bodyY - Math.floor(v.STATS_GAP / 2) - 1, v.INFO_W);
-			}
-			const perPage = Math.max(1, Math.floor((v.INFO_H - bodyY - v.FOOTER_H) / v.LINE_H));
-			const chars = Math.floor((v.INFO_W - 2 * v.INFO_PAD) / 6);
-			for (let i = 0; i < perPage; i++)
-				txt(v.INFO_X + v.INFO_PAD, v.INFO_Y + bodyY + i * v.LINE_H, (i % 5 === 4 ? '' : 'Lorem ipsum dolor sit amet consectetur adipiscing elit'.slice(0, chars - (i % 3) * 4)), colors.BODY);
-			const fy = v.INFO_Y + v.INFO_H - v.FOOTER_H;
-			const w = 2 * v.PAGE_BUTTON + 12 + textW('1 / 2');
-			pager(v.INFO_X + v.INFO_W / 2 - w / 2, fy);
-		}
-
-		function renderBestiary() {
-			// rail
-			panel(v.RAIL_X, v.RAIL_Y, v.RAIL_W, v.RAIL_H, ['RAIL_X', 'RAIL_Y']);
-			const oilColors = ['#8a6a3a', '#5a4a7a', '#b05a2a', '#6a8a3a', '#4a7a5a', '#7a5a3a', '#3a6a7a', '#7a7a9a', '#8a2a2a', '#6a6a6a'];
-			for (let i = 0; i < 10; i++)
-				cell(v.RAIL_X + (v.RAIL_W - v.RAIL_CELL) / 2, v.RAIL_Y + v.RAIL_PAD_Y + i * v.RAIL_STEP, v.RAIL_CELL, i === 4 ? colors.ACCENT : colors.CELL_BORDER, oilColors[i]);
-
-			// entry list
-			panel(v.LIST_X, v.LIST_Y, v.LIST_W, v.LIST_H, ['LIST_X', 'LIST_Y']);
-			txt(v.LIST_X + v.INFO_PAD, v.LIST_Y + (v.LIST_HEADER_H - 8) / 2, 'Necrophages', colors.TITLE);
-			divider(v.LIST_X, v.LIST_Y + v.LIST_HEADER_H - 1, v.LIST_W);
-			const names = ['Alghoul', 'Ghoul', 'Zombie', 'Drowner', 'Rotfiend', 'Foglet', 'Grave Hag', 'Water Hag', 'Nekker', 'Wight', 'Devourer', 'Ekimmara'];
-			for (let r = 0; r < v.LIST_ROWS; r++) {
-				const rx = v.LIST_X + 3, ry = v.LIST_Y + v.LIST_HEADER_H + 2 + r * v.LIST_ROW_H, rw = v.LIST_W - 6, rh = v.LIST_ROW_H - 2;
-				if (r === 0) {
-					el(rx, ry, rw, rh, {background: css(colors.ROW_SELECTED)});
-					el(rx, ry, 2, rh, {background: css(colors.ACCENT)});
-				} else if (r === 2) {
-					el(rx, ry, rw, rh, {background: css(colors.ROW_HOVER)});
-				}
-				el(rx + 5, ry + (rh - 16) / 2, 16, 16, {background: '#6a5a4a', borderRadius: '50%'});
-				txt(rx + 26, ry + (rh - 8) / 2, names[r % names.length], r === 0 ? colors.SUBTAB_TEXT_ACTIVE : colors.TEXT);
-			}
-			const fy = v.LIST_Y + v.LIST_H - v.FOOTER_H;
-			const pw = 2 * v.PAGE_BUTTON + 12 + textW('1 / 2');
-			pager(v.LIST_X + v.LIST_W - 4 - pw, fy);
-
-			// doll box, model at DOLL_FILL_PERCENT of it, and the weaknesses
-			el(v.DOLL_X, v.DOLL_Y, v.DOLL_W, v.DOLL_H, {border: '1px dashed rgba(255,255,255,.25)'}, '', ['DOLL_X', 'DOLL_Y']);
-			const mh = v.DOLL_H * v.DOLL_FILL_PERCENT / 100, mw = mh * 0.5;
-			el(v.DOLL_X + (v.DOLL_W - mw) / 2, v.DOLL_Y + (v.DOLL_H - mh) / 2, mw, mh, {background: 'rgba(160,150,130,.35)', borderRadius: '40% 40% 12% 12%', color: css(colors.TEXT_DIM), textAlign: 'center', paddingTop: (mh / 2 - 4) + 'px'}, 'doll');
-			const cx = v.DOLL_X + v.DOLL_W / 2;
-			txt(cx - textW('Weak to') / 2, v.WEAK_Y, 'Weak to', colors.TEXT);
-			cell(cx - v.WEAK_CELL / 2, v.WEAK_Y + 12, v.WEAK_CELL, colors.CELL_BORDER, '#4a7a5a');
-
-			infoPanel('Alghoul', ['Health: 50', 'Damage: 5', 'Armor: 0']);
-		}
-
-		function renderTutorials() {
-			panel(v.TOPIC_X, v.TOPIC_Y, v.TOPIC_W, v.TOPIC_H, ['TOPIC_X', 'TOPIC_Y']);
-			const groups = [['Signs', ['Casting Signs', 'Sign Intensity']], ['Alchemy', ['Brewing', 'Oils', 'Toxicity']], ['Hunting', ['Witcher Medallion', 'Monster Categories']], ['World', ['Meditation', 'Fast Travel']]];
-			let ry = v.TOPIC_Y + 4, first = true;
-			for (const [g, topics] of groups) {
-				txt(v.TOPIC_X + v.INFO_PAD, ry + 5, g, colors.TITLE);
-				ry += v.TOPIC_GROUP_H;
-				for (const t of topics) {
-					const rx = v.TOPIC_X + 3, rw = v.TOPIC_W - 6;
-					if (first) {
-						el(rx, ry, rw, v.TOPIC_ROW_H, {background: css(colors.ROW_SELECTED)});
-						el(rx, ry, 2, v.TOPIC_ROW_H, {background: css(colors.ACCENT)});
-					}
-					txt(rx + 12, ry + (v.TOPIC_ROW_H - 8) / 2, t, first ? colors.SUBTAB_TEXT_ACTIVE : colors.TEXT);
-					ry += v.TOPIC_ROW_H;
-					first = false;
-				}
-			}
-			panel(v.IMAGE_X, v.IMAGE_Y, v.IMAGE_W, v.IMAGE_H, ['IMAGE_X', 'IMAGE_Y']);
-			const icon = 16 * v.IMAGE_ICON_SCALE;
-			el(v.IMAGE_X + (v.IMAGE_W - icon) / 2, v.IMAGE_Y + (v.IMAGE_H - icon) / 2, icon, icon, {background: 'rgba(200,120,40,.45)', borderRadius: '50%', color: css(colors.TEXT_DIM), textAlign: 'center', paddingTop: (icon / 2 - 4) + 'px'}, 'icon');
-			infoPanel('Casting Signs', []);
+		function color(list, i) {
+			return list.length ? list[i % list.length] : '0xFF808080';
 		}
 
 		function render() {
 			content.innerHTML = '';
-			subTabs();
-			if (view === 'bestiary')
-				renderBestiary();
-			else
-				renderTutorials();
+			const bestiary = view === 'bestiary';
+			const coverLeft = v.BOOK_X + Math.round(v.BOOK_W * COVER_LEFT);
+
+			// right ribbons
+			['Bestiary', 'Tutorials'].forEach((label, i) => {
+				const sel = (i === 0) === bestiary, rx = v.RIGHT_X - (sel ? 0 : v.SIDE_SHIFT), ry = v.RIGHT_Y + i * v.RIGHT_STEP;
+				ribbon(v.RIBBON_RIGHT_TEX, rx, ry, v.RIGHT_W, v.RIGHT_H, color(v.TAB_COLORS, i), sel, rightClip);
+				txt(rx + v.RIGHT_W - v.RIGHT_TEXT_INSET - textW(label), ry + (v.RIGHT_H - 8) / 2, label, v.RIBBON_TEXT, true);
+			});
+			el(v.RIGHT_X, v.RIGHT_Y, v.RIGHT_W, v.RIGHT_STEP + v.RIGHT_H, {}, '', ['RIGHT_X', 'RIGHT_Y']);
+
+			// top ribbons
+			const tops = bestiary ? 10 : 4, topSel = bestiary ? 4 : 0, topColors = bestiary ? v.CATEGORY_COLORS : v.GROUP_COLORS;
+			for (let i = 0; i < tops; i++) {
+				const sel = i === topSel, rx = v.TOP_X + i * v.TOP_STEP, ry = v.TOP_Y + (sel ? 0 : v.TOP_LIFT);
+				ribbon(v.RIBBON_TOP_TEX, rx, ry, v.TOP_W, v.TOP_H, color(topColors, i), sel, topClip);
+				el(rx + (v.TOP_W - 16) / 2, ry + v.TOP_ICON_Y, 16, 16, {background: 'rgba(255,255,255,.35)', borderRadius: '3px'});
+			}
+			el(v.TOP_X, v.TOP_Y, tops * v.TOP_STEP, v.TOP_H, {}, '', ['TOP_X', 'TOP_Y']);
+
+			// left ribbons
+			const names = bestiary ? ['Alghoul', 'Ghoul', 'Zombie'] : ['Casting Signs', 'Sign Intensity'];
+			names.forEach((n, i) => {
+				const sel = i === 0, rx = v.SIDE_X + (sel ? 0 : v.SIDE_SHIFT), ry = v.SIDE_Y + i * v.SIDE_STEP;
+				ribbon(v.RIBBON_LEFT_TEX, rx, ry, v.SIDE_W, v.SIDE_H, color(topColors, topSel), sel, leftClip);
+				el(rx + v.SIDE_ICON_X, ry + (v.SIDE_H - 16) / 2, 16, 16, {background: 'rgba(255,255,255,.35)', borderRadius: '50%'});
+				txt(rx + v.SIDE_TEXT_X, ry + (v.SIDE_H - 8) / 2, n, v.RIBBON_TEXT, true);
+			});
+			for (let i = names.length; i < v.SIDE_ROWS; i++)
+				el(v.SIDE_X + v.SIDE_SHIFT, v.SIDE_Y + i * v.SIDE_STEP, coverLeft - v.SIDE_X - v.SIDE_SHIFT, v.SIDE_H, {border: '1px dotted rgba(255,255,255,.12)'});
+			el(v.SIDE_X, v.SIDE_Y, v.SIDE_W, v.SIDE_ROWS * v.SIDE_STEP, {}, '', ['SIDE_X', 'SIDE_Y']);
+
+			// the book over the ribbons' inner ends
+			img(v.BOOK_TEX, v.BOOK_X, v.BOOK_Y, v.BOOK_W, v.BOOK_H);
+			el(v.BOOK_X + v.BOOK_W * 0.2, v.BOOK_Y + v.BOOK_H - 14, v.BOOK_W * 0.6, 12, {}, '', ['BOOK_X', 'BOOK_Y']);
+
+			const L = [v.LEFT_PAGE_X, v.LEFT_PAGE_Y, v.LEFT_PAGE_W, v.LEFT_PAGE_H], R = [v.RIGHT_PAGE_X, v.RIGHT_PAGE_Y, v.RIGHT_PAGE_W, v.RIGHT_PAGE_H];
+			guide(...L, ['LEFT_PAGE_X', 'LEFT_PAGE_Y']);
+			guide(...R, ['RIGHT_PAGE_X', 'RIGHT_PAGE_Y']);
+			const lorem = 'Ghouls feed on the dead and gather wherever corpses lie unburied, smelling rot from miles away and coming in packs';
+			const lineChars = Math.floor(v.RIGHT_PAGE_W / 5.5);
+			const lines = (n, x0, y0) => { for (let i = 0; i < n; i++) txt(x0, y0 + i * v.LINE_H, lorem.slice((i * 7) % 40, (i * 7) % 40 + lineChars - (i % 4) * 3), v.INK); };
+			const title = (s, x0, y0, w0) => { txt(x0, y0, s, v.INK_TITLE); el(x0, y0 + 11, w0, 1, {background: css(v.RULE)}); };
+
+			if (bestiary) {
+				guide(v.DOLL_X, v.DOLL_Y, v.DOLL_W, v.DOLL_H, ['DOLL_X', 'DOLL_Y']);
+				const mh = v.DOLL_H * v.DOLL_FILL_PERCENT / 100, mw = mh * 0.45;
+				el(v.DOLL_X + (v.DOLL_W - mw) / 2, v.DOLL_Y + (v.DOLL_H - mh) / 2, mw, mh, {background: 'rgba(90,70,50,.35)', borderRadius: '40% 40% 12% 12%'});
+				const cx = v.LEFT_PAGE_X + v.LEFT_PAGE_W / 2;
+				txt(cx - textW('Weak to') / 2, v.WEAK_Y, 'Weak to', v.INK_TITLE);
+				el(cx - v.WEAK_CELL / 2, v.WEAK_Y + 11, v.WEAK_CELL, v.WEAK_CELL, {background: css(v.CELL_INNER), border: '1px solid ' + css(v.CELL_BORDER)});
+				const stats = ['50', '5', '0'], sw = stats.reduce((a, s) => a + 11 + textW(s), 0) + 2 * v.STATS_GAP;
+				let sx = cx - sw / 2;
+				for (const [i, s] of stats.entries()) {
+					el(sx, v.STATS_Y, 9, 9, {background: ['#c33', '#888', '#bbb'][i]});
+					txt(sx + 11, v.STATS_Y + 1, s, v.INK);
+					sx += 11 + textW(s) + v.STATS_GAP;
+				}
+				title('Alghoul', ...R.slice(0, 3));
+				lines(Math.floor((v.RIGHT_PAGE_H - v.TITLE_H - v.FOOTER_H) / v.LINE_H), v.RIGHT_PAGE_X, v.RIGHT_PAGE_Y + v.TITLE_H);
+			} else {
+				title('Casting Signs', ...L.slice(0, 3));
+				const icon = 16 * v.TOPIC_ICON_SCALE;
+				el(v.LEFT_PAGE_X + (v.LEFT_PAGE_W - icon) / 2, v.LEFT_PAGE_Y + v.TITLE_H, icon, icon, {background: 'rgba(200,120,40,.45)', borderRadius: '50%'});
+				const top = v.TITLE_H + icon + v.TOPIC_ICON_GAP;
+				lines(Math.floor((v.LEFT_PAGE_H - top) / v.LINE_H), v.LEFT_PAGE_X, v.LEFT_PAGE_Y + top);
+				lines(Math.floor((v.RIGHT_PAGE_H - v.FOOTER_H) / v.LINE_H), v.RIGHT_PAGE_X, v.RIGHT_PAGE_Y);
+			}
 			out.value = javaText();
 		}
 
@@ -414,19 +422,24 @@ public final class GlossaryLayout {
 				s += '\n';
 				for (const c of sec.comments)
 					s += '\t' + c + '\n';
-				for (const k of Object.keys(sec.fields || {}))
-					s += '\tpublic static final int ' + k + ' = ' + v[k] + ';\n';
-				for (const k of Object.keys(sec.colors || {}))
-					s += '\tpublic static final int ' + k + ' = ' + colors[k] + ';\n';
+				for (const [k, kind] of sec.fields) {
+					if (kind === 'str')
+						s += '\tpublic static final String ' + k + ' = "' + v[k] + '";\n';
+					else if (kind === 'hexes')
+						s += '\tpublic static final int[] ' + k + ' = {' + v[k].join(', ') + '};\n';
+					else
+						s += '\tpublic static final int ' + k + ' = ' + v[k] + ';\n';
+				}
 			}
 			return s + '}\n';
 		}
 
-		// ---- drag a panel: moves its X/Y fields ----
+		// ---- drag: moves a pair of X/Y fields ----
 		let drag = null;
 		function startDrag(e, keys) {
 			drag = {keys, x: e.clientX, y: e.clientY, ox: v[keys[0]], oy: v[keys[1]]};
 			e.preventDefault();
+			e.stopPropagation();
 		}
 		window.addEventListener('mousemove', e => {
 			if (!drag)
@@ -448,28 +461,29 @@ public final class GlossaryLayout {
 		document.querySelector('#showTutorials').onclick = () => setView('tutorials');
 
 		document.querySelector('#copy').onclick = () => navigator.clipboard.writeText(out.value);
-		document.querySelector('#reset').onclick = () => { v = {...defaults}; colors = {...defaultColors}; sync(); render(); };
+		document.querySelector('#reset').onclick = () => { v = structuredClone(defaults); sync(); render(); };
 		document.querySelector('#load').onclick = () => {
 			const s = document.querySelector('#import').value;
-			for (const k of Object.keys(v)) {
-				const m = s.match(new RegExp('int\\s+' + k + '\\s*=\\s*(-?\\d+)\\s*;'));
-				if (m)
-					v[k] = Number(m[1]);
-			}
-			for (const k of Object.keys(colors)) {
-				const m = s.match(new RegExp('int\\s+' + k + '\\s*=\\s*(0x[0-9A-Fa-f]+)'));
-				if (m)
-					colors[k] = m[1];
+			for (const sec of SECTIONS) {
+				for (const [k, kind] of sec.fields) {
+					let m;
+					if (kind === 'str' && (m = s.match(new RegExp('String\\s+' + k + '\\s*=\\s*"([^"]*)"'))))
+						v[k] = m[1];
+					else if (kind === 'hexes' && (m = s.match(new RegExp('int\\[\\]\\s+' + k + '\\s*=\\s*\\{([^}]*)\\}'))))
+						v[k] = m[1].split(/[\s,]+/).filter(Boolean);
+					else if (kind === 'hex' && (m = s.match(new RegExp('int\\s+' + k + '\\s*=\\s*(0x[0-9A-Fa-f]+)'))))
+						v[k] = m[1];
+					else if (kind === 'int' && (m = s.match(new RegExp('int\\s+' + k + '\\s*=\\s*(-?\\d+)\\s*;'))))
+						v[k] = Number(m[1]);
+				}
 			}
 			sync();
 			render();
 		};
 
 		function sync() {
-			for (const i of inputs.querySelectorAll('input'))
-				i.value = v[i.dataset.key];
-			for (const i of colorInputs.querySelectorAll('input'))
-				i.value = colors[i.dataset.key];
+			for (const i of document.querySelectorAll('input[data-key]'))
+				i.value = show(i.dataset.key, i.dataset.kind);
 		}
 
 		render();

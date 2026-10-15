@@ -94,6 +94,54 @@ public final class GlossaryBestiary {
 		}
 	}
 
+	/**
+	 * A weakness besides the category's oil: a Sign or a bomb. A creature has it when it is in the
+	 * entity tag {@code witchercraft:weak_to_<id>} - the same tag the Sign's or bomb's own procedure
+	 * can check ("is entity tagged as") to deal the extra damage, so the Bestiary and the damage
+	 * stay in step. Shown in the "Weak to" row after the oils, in this order.
+	 */
+	public record Weakness(String id, TagKey<EntityType<?>> tag, Supplier<Item> item, String texture) {
+		public Component name() {
+			return item != null ? new ItemStack(item.get()).getHoverName() : Component.translatable("glossary.witchercraft.weakness." + id);
+		}
+
+		/** The item icon, or empty when the icon is a texture (64x64 Sign art). */
+		public ItemStack itemIcon() {
+			return item == null ? ItemStack.EMPTY : new ItemStack(item.get());
+		}
+	}
+
+	private static Weakness sign(String id) {
+		return new Weakness(id, weakTag(id), null, "witchercraft:textures/screens/" + id + ".png");
+	}
+
+	private static Weakness bomb(String id, Supplier<Item> item) {
+		return new Weakness(id, weakTag(id), item, null);
+	}
+
+	private static TagKey<EntityType<?>> weakTag(String id) {
+		return TagKey.create(Registries.ENTITY_TYPE, Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "weak_to_" + id));
+	}
+
+	public static final List<Weakness> WEAKNESSES = List.of(
+			sign("aard"), sign("igni"), sign("yrden"), sign("quen"), sign("axii"),
+			bomb("grapeshot", () -> WitchercraftModItems.GRAPESHOT.get()),
+			bomb("dancing_star", () -> WitchercraftModItems.DANCING_STAR.get()),
+			bomb("devils_puffball", () -> WitchercraftModItems.DEVILS_PUFFBALL.get()),
+			bomb("northern_wind", () -> WitchercraftModItems.NORTHERN_WIND.get()),
+			bomb("samum", () -> WitchercraftModItems.SAMUM.get()),
+			bomb("dimeritium_bomb", () -> WitchercraftModItems.DIMERITIUM_BOMB.get()));
+
+	/** The extra weaknesses whose {@code weak_to_<id>} tag holds this creature. */
+	public static List<Weakness> weaknessesOf(EntityType<?> type) {
+		Holder<EntityType<?>> holder = BuiltInRegistries.ENTITY_TYPE.wrapAsHolder(type);
+		List<Weakness> out = new ArrayList<>();
+		for (Weakness w : WEAKNESSES)
+			if (holder.is(w.tag()))
+				out.add(w);
+		return out;
+	}
+
 	private static final Map<Category, List<Entry>> ENTRIES = new EnumMap<>(Category.class);
 	private static final Map<EntityType<?>, LivingEntity> DOLLS = new HashMap<>();
 	private static Level dollLevel;

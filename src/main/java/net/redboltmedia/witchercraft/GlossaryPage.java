@@ -37,20 +37,22 @@ import net.minecraft.world.item.ItemStack;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 /**
- * The Glossary tab: two sub-tabs laid out in the same three columns, so nothing
- * ever scrolls - lists and text that outgrow their panel are split into pages.
+ * The Glossary tab, drawn as an open book (the old bestiary's {@code book.png}) with three
+ * sets of bookmark ribbons. Nothing scrolls and nothing needs page turning to navigate:
  *
- * - Bestiary: a rail of monster categories ({@link GlossaryBestiary}, one per
- *   category tag), the creatures in the selected one, a 3D doll of the selected
- *   creature (fitted to the doll area, drag to rotate) with the oils it is weak
- *   to, and an info panel with its stats and one description.
- * - Tutorials: topics grouped by system ({@link GlossaryTutorials}), a large
- *   illustration, and the topic's text in the same info panel.
+ * - right-edge ribbons switch between Bestiary and Tutorials;
+ * - top ribbons pick a monster category ({@link GlossaryBestiary}, one per category tag,
+ *   with its oil as the icon) or a Tutorials group;
+ * - left ribbons pick a creature (spawn egg + name) or a topic, tinted like the top ribbon;
+ * - Bestiary: the left page shows the doll (fitted to its box, drag to rotate), the oils it
+ *   is weak to and its stats; the right page its name and description.
+ * - Tutorials: the title, the topic's icon and its text run from the left page onto the
+ *   right one; a topic with its own picture shows it on the left page instead.
  *
- * Geometry and colours are {@link GlossaryLayout} (tools/glossary-layout-creator.html).
- * Styling follows the rest of the shell: sub-tabs like the navbar, panels like the
- * map, cells like the skills tree. Pure client state; the selection is remembered
- * for the session. The mouse wheel turns pages wherever there are pages.
+ * Text too long for its pages gets page arrows in the right page's footer; a category with
+ * more creatures than fit gets arrows under the left ribbons. Geometry, art and colours are
+ * {@link GlossaryLayout} (tools/glossary-layout-creator.html). Pure client state; the
+ * selection is remembered for the session.
  */
 public class GlossaryPage implements GuiPage {
 
@@ -68,6 +70,10 @@ public class GlossaryPage implements GuiPage {
 		}
 	}
 
+	/** One bookmark: its label (tooltip, or the text on a left ribbon), its icon and its colour. */
+	private record Ribbon(Component label, ItemStack item, String texture, int texW, int texH, int color) {
+	}
+
 	/** A page footer: prev button, "page / pages", next button. */
 	private record Pager(int prevX, int nextX, int y, int labelX, Component label, int page, int pages) {
 	}
@@ -75,22 +81,29 @@ public class GlossaryPage implements GuiPage {
 	/**
 	 * A posed model's extents in blocks, feet at y 0: its lowest and highest point, and the
 	 * largest distance of any point from the vertical axis the doll turns around (so the
-	 * fitted doll stays inside its area at every angle).
+	 * fitted doll stays inside its box at every angle).
 	 */
 	private record DollFit(float minY, float maxY, float radius) {
 	}
 
+	// Where book.png's cover edges are, as fractions of the texture (638x445): ribbons are
+	// only clickable where they show from under the cover.
+	private static final float COVER_LEFT = 22f / 638f, COVER_RIGHT = 605f / 638f, COVER_TOP = 25f / 445f;
+
 	private static final DecimalFormat NUMBER = new DecimalFormat("0.##");
-	private static final int LOCK_FADE = 0xAA101015;
 	private static final int DOLL_DRAG_DEGREES_PER_PX = 2;
+	private static final Identifier HEART_SPRITE = Identifier.withDefaultNamespace("hud/heart/full");
+	private static final Identifier ARMOR_SPRITE = Identifier.withDefaultNamespace("hud/armor_full");
+	private static final Identifier ATTACK_ICON = Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "textures/screens/attack_icon.png");
 
 	// --- session state (static: survives closing and reopening the menu) -----
 	private static SubTab subTab = SubTab.BESTIARY;
 	private static GlossaryBestiary.Category category;
 	private static EntityType<?> selectedType;
-	private static int listPage;
-	private static int textPage;
+	private static String groupId;
 	private static String topicId;
+	private static int sidePage;
+	private static int textPage;
 	private static float dollYaw = GlossaryLayout.DOLL_YAW;
 
 	private final String pageId;
@@ -137,6 +150,56 @@ public class GlossaryPage implements GuiPage {
 	}
 
 	// ==========================================================================
+	// what the ribbons hold
+	// ==========================================================================
+
+	private static List<Ribbon> topRibbons() {
+		List<Ribbon> out = new ArrayList<>();
+		if (subTab == SubTab.BESTIARY) {
+			for (GlossaryBestiary.Category c : GlossaryBestiary.Category.values())
+				out.add(new Ribbon(c.title(), c.oil(), null, 0, 0, color(GlossaryLayout.CATEGORY_COLORS, c.ordinal())));
+		} else {
+			for (int i = 0; i < GlossaryTutorials.GROUPS.size(); i++) {
+				GlossaryTutorials.Group group = GlossaryTutorials.GROUPS.get(i);
+				GlossaryTutorials.Topic icon = group.topics().get(0);
+				out.add(new Ribbon(group.title(), icon.itemIcon(), icon.texture(), icon.textureW(), icon.textureH(), color(GlossaryLayout.GROUP_COLORS, i)));
+			}
+		}
+		return out;
+	}
+
+	private static int selectedTop() {
+		return subTab == SubTab.BESTIARY ? currentCategory().ordinal() : GlossaryTutorials.GROUPS.indexOf(selectedGroup());
+	}
+
+	private static List<Ribbon> sideRibbons() {
+		List<Ribbon> out = new ArrayList<>();
+		int color = topRibbons().get(selectedTop()).color();
+		if (subTab == SubTab.BESTIARY) {
+			for (GlossaryBestiary.Entry e : GlossaryBestiary.entries(currentCategory()))
+				out.add(new Ribbon(e.name(), e.icon(), null, 0, 0, color));
+		} else {
+			for (GlossaryTutorials.Topic t : selectedGroup().topics())
+				out.add(new Ribbon(t.title(), t.itemIcon(), t.texture(), t.textureW(), t.textureH(), color));
+		}
+		return out;
+	}
+
+	/** Index of the selected left ribbon in the full list, or -1. */
+	private static int selectedSide() {
+		if (subTab == SubTab.BESTIARY) {
+			GlossaryBestiary.Entry entry = selectedEntry();
+			return entry == null ? -1 : GlossaryBestiary.entries(currentCategory()).indexOf(entry);
+		}
+		GlossaryTutorials.Topic topic = selectedTopic();
+		return topic == null ? -1 : selectedGroup().topics().indexOf(topic);
+	}
+
+	private static int color(int[] colors, int i) {
+		return colors.length == 0 ? 0xFF808080 : colors[Math.floorMod(i, colors.length)];
+	}
+
+	// ==========================================================================
 	// rendering
 	// ==========================================================================
 
@@ -144,130 +207,149 @@ public class GlossaryPage implements GuiPage {
 	public void render(GuiGraphicsExtractor g, int x, int y, int w, int h, int mouseX, int mouseY, float partial) {
 		Font font = Minecraft.getInstance().font;
 		pendingTooltip = null;
-		drawSubTabs(g, font, x, y, w, mouseX, mouseY);
+
+		// ribbons first: their inner ends tuck under the book's cover
+		drawTabRibbons(g, font, x, y, mouseX, mouseY);
+		drawTopRibbons(g, x, y, mouseX, mouseY);
+		drawSideRibbons(g, font, x, y, mouseX, mouseY);
+		blit(g, Identifier.parse(GlossaryLayout.BOOK_TEX), x + GlossaryLayout.BOOK_X, y + GlossaryLayout.BOOK_Y, GlossaryLayout.BOOK_W, GlossaryLayout.BOOK_H, -1);
+
 		if (subTab == SubTab.BESTIARY)
 			renderBestiary(g, font, x, y, mouseX, mouseY);
 		else
 			renderTutorials(g, font, x, y, mouseX, mouseY);
 	}
 
-	// ---- sub-tabs (navbar style: translucent tab, top and bottom rule, gold underline)
+	// ---- ribbons -----------------------------------------------------------------
 
-	private static int subTabX(int x, int w, int i) {
-		int n = SubTab.values().length;
-		int total = n * GlossaryLayout.SUBTAB_W + (n - 1) * GlossaryLayout.SUBTAB_GAP;
-		return x + (w - total) / 2 + i * (GlossaryLayout.SUBTAB_W + GlossaryLayout.SUBTAB_GAP);
+	private static int coverLeft(int x) {
+		return x + GlossaryLayout.BOOK_X + Math.round(GlossaryLayout.BOOK_W * COVER_LEFT);
 	}
 
-	private void drawSubTabs(GuiGraphicsExtractor g, Font font, int x, int y, int w, int mouseX, int mouseY) {
-		int ty = y + GlossaryLayout.SUBTAB_Y, tw = GlossaryLayout.SUBTAB_W, th = GlossaryLayout.SUBTAB_H;
+	private static int coverRight(int x) {
+		return x + GlossaryLayout.BOOK_X + Math.round(GlossaryLayout.BOOK_W * COVER_RIGHT);
+	}
+
+	private static int coverTop(int y) {
+		return y + GlossaryLayout.BOOK_Y + Math.round(GlossaryLayout.BOOK_H * COVER_TOP);
+	}
+
+	private static int tabRibbonX(int x, boolean selected) {
+		return x + GlossaryLayout.RIGHT_X - (selected ? 0 : GlossaryLayout.SIDE_SHIFT);
+	}
+
+	private static int tabRibbonY(int y, int i) {
+		return y + GlossaryLayout.RIGHT_Y + i * GlossaryLayout.RIGHT_STEP;
+	}
+
+	private static int topRibbonX(int x, int i) {
+		return x + GlossaryLayout.TOP_X + i * GlossaryLayout.TOP_STEP;
+	}
+
+	private static int topRibbonY(int y, boolean selected) {
+		return y + GlossaryLayout.TOP_Y + (selected ? 0 : GlossaryLayout.TOP_LIFT);
+	}
+
+	private static int sideRibbonX(int x, boolean selected) {
+		return x + GlossaryLayout.SIDE_X + (selected ? 0 : GlossaryLayout.SIDE_SHIFT);
+	}
+
+	private static int sideRibbonY(int y, int row) {
+		return y + GlossaryLayout.SIDE_Y + row * GlossaryLayout.SIDE_STEP;
+	}
+
+	private static int sidePages(int count) {
+		return Math.max(1, (count + GlossaryLayout.SIDE_ROWS - 1) / GlossaryLayout.SIDE_ROWS);
+	}
+
+	/** A ribbon texture tinted: full colour when selected, a little lighter on hover, darker otherwise. */
+	private static void ribbon(GuiGraphicsExtractor g, String texture, int x, int y, int w, int h, int color, boolean selected, boolean hover) {
+		int tint = selected ? color : shade(color, hover ? (GlossaryLayout.RIBBON_IDLE_PERCENT + 100) / 2 : GlossaryLayout.RIBBON_IDLE_PERCENT);
+		blit(g, Identifier.parse(texture), x, y, w, h, tint);
+	}
+
+	private void drawTabRibbons(GuiGraphicsExtractor g, Font font, int x, int y, int mouseX, int mouseY) {
 		for (SubTab tab : SubTab.values()) {
-			int tx = subTabX(x, w, tab.ordinal());
-			boolean active = tab == subTab;
-			boolean hover = MapPage.inside(mouseX, mouseY, tx, ty, tw, th);
-			g.fill(tx, ty, tx + tw, ty + th, active ? GlossaryLayout.SUBTAB_BG_ACTIVE : GlossaryLayout.SUBTAB_BG);
-			g.fill(tx, ty, tx + tw, ty + 1, GlossaryLayout.SUBTAB_BORDER);
-			g.fill(tx, ty + th - 1, tx + tw, ty + th, GlossaryLayout.SUBTAB_BORDER);
+			boolean selected = tab == subTab;
+			int rx = tabRibbonX(x, selected), ry = tabRibbonY(y, tab.ordinal());
+			boolean hover = MapPage.inside(mouseX, mouseY, coverRight(x), ry, rx + GlossaryLayout.RIGHT_W - coverRight(x), GlossaryLayout.RIGHT_H);
+			ribbon(g, GlossaryLayout.RIBBON_RIGHT_TEX, rx, ry, GlossaryLayout.RIGHT_W, GlossaryLayout.RIGHT_H, color(GlossaryLayout.TAB_COLORS, tab.ordinal()), selected, hover);
 			Component label = tab.title();
-			g.text(font, label, tx + (tw - font.width(label)) / 2, ty + (th - 8) / 2, active || hover ? GlossaryLayout.SUBTAB_TEXT_ACTIVE : GlossaryLayout.SUBTAB_TEXT, false);
-			if (active)
-				g.fill(tx + 3, ty + th, tx + tw - 3, ty + th + 1, GlossaryLayout.ACCENT);
+			g.text(font, label, rx + GlossaryLayout.RIGHT_W - GlossaryLayout.RIGHT_TEXT_INSET - font.width(label), ry + (GlossaryLayout.RIGHT_H - 8) / 2,
+					GlossaryLayout.RIBBON_TEXT, true);
 		}
 	}
 
-	// ---- Bestiary --------------------------------------------------------------
+	private void drawTopRibbons(GuiGraphicsExtractor g, int x, int y, int mouseX, int mouseY) {
+		List<Ribbon> ribbons = topRibbons();
+		int selected = selectedTop();
+		for (int i = 0; i < ribbons.size(); i++) {
+			Ribbon r = ribbons.get(i);
+			boolean isSelected = i == selected;
+			int rx = topRibbonX(x, i), ry = topRibbonY(y, isSelected);
+			boolean hover = MapPage.inside(mouseX, mouseY, rx, ry, GlossaryLayout.TOP_W, coverTop(y) - ry);
+			ribbon(g, GlossaryLayout.RIBBON_TOP_TEX, rx, ry, GlossaryLayout.TOP_W, GlossaryLayout.TOP_H, r.color(), isSelected, hover);
+			drawIcon(g, r, rx + (GlossaryLayout.TOP_W - 16) / 2, ry + GlossaryLayout.TOP_ICON_Y);
+			if (hover)
+				pendingTooltip = List.of(r.label());
+		}
+	}
+
+	private void drawSideRibbons(GuiGraphicsExtractor g, Font font, int x, int y, int mouseX, int mouseY) {
+		List<Ribbon> ribbons = sideRibbons();
+		int selected = selectedSide();
+		int pages = sidePages(ribbons.size());
+		sidePage = clamp(sidePage, pages);
+		int first = sidePage * GlossaryLayout.SIDE_ROWS;
+		for (int i = first; i < ribbons.size() && i < first + GlossaryLayout.SIDE_ROWS; i++) {
+			Ribbon r = ribbons.get(i);
+			boolean isSelected = i == selected;
+			int rx = sideRibbonX(x, isSelected), ry = sideRibbonY(y, i - first);
+			boolean hover = MapPage.inside(mouseX, mouseY, rx, ry, coverLeft(x) - rx, GlossaryLayout.SIDE_H);
+			ribbon(g, GlossaryLayout.RIBBON_LEFT_TEX, rx, ry, GlossaryLayout.SIDE_W, GlossaryLayout.SIDE_H, r.color(), isSelected, hover);
+			drawIcon(g, r, rx + GlossaryLayout.SIDE_ICON_X, ry + (GlossaryLayout.SIDE_H - 16) / 2);
+			String name = r.label().getString();
+			String shown = fit(font, name, GlossaryLayout.SIDE_TEXT_W);
+			g.text(font, Component.literal(shown), rx + GlossaryLayout.SIDE_TEXT_X, ry + (GlossaryLayout.SIDE_H - 8) / 2, GlossaryLayout.RIBBON_TEXT, true);
+			if (hover && !shown.equals(name))
+				pendingTooltip = List.of(r.label());
+		}
+		if (ribbons.isEmpty())
+			g.text(font, Component.translatable("glossary.witchercraft.empty_category"), x + GlossaryLayout.SIDE_X + GlossaryLayout.SIDE_SHIFT, sideRibbonY(y, 0) + 6,
+					GlossaryLayout.RIBBON_TEXT, true);
+		if (pages > 1)
+			drawPager(g, font, sidePager(font, x, y, pages), mouseX, mouseY, false);
+	}
+
+	private Pager sidePager(Font font, int x, int y, int pages) {
+		int left = x + GlossaryLayout.SIDE_X + GlossaryLayout.SIDE_SHIFT;
+		int fy = sideRibbonY(y, GlossaryLayout.SIDE_ROWS);
+		return pager(font, left, fy, sidePage, pages);
+	}
+
+	private static void drawIcon(GuiGraphicsExtractor g, Ribbon r, int ix, int iy) {
+		if (!r.item().isEmpty()) {
+			g.fakeItem(r.item(), ix, iy);
+		} else if (r.texture() != null) {
+			float fit = 16f / Math.max(r.texW(), r.texH());
+			int tw = Math.round(r.texW() * fit), th = Math.round(r.texH() * fit);
+			blit(g, Identifier.parse(r.texture()), ix + (16 - tw) / 2, iy + (16 - th) / 2, tw, th, -1);
+		}
+	}
+
+	// ---- Bestiary pages ------------------------------------------------------------
 
 	private void renderBestiary(GuiGraphicsExtractor g, Font font, int x, int y, int mouseX, int mouseY) {
-		GlossaryBestiary.Category cat = currentCategory();
-		List<GlossaryBestiary.Entry> entries = GlossaryBestiary.entries(cat);
-		GlossaryBestiary.Entry entry = selectedEntry(entries);
-
-		drawRail(g, x, y, cat, mouseX, mouseY);
-		drawEntryList(g, font, x, y, cat, entries, entry, mouseX, mouseY);
-		drawDollColumn(g, font, x, y, entry, mouseX, mouseY);
-		drawEntryInfo(g, font, x, y, entry, mouseX, mouseY);
-	}
-
-	private static int railCellX(int x) {
-		return x + GlossaryLayout.RAIL_X + (GlossaryLayout.RAIL_W - GlossaryLayout.RAIL_CELL) / 2;
-	}
-
-	private static int railCellY(int y, int i) {
-		return y + GlossaryLayout.RAIL_Y + GlossaryLayout.RAIL_PAD_Y + i * GlossaryLayout.RAIL_STEP;
-	}
-
-	private void drawRail(GuiGraphicsExtractor g, int x, int y, GlossaryBestiary.Category current, int mouseX, int mouseY) {
-		panel(g, x + GlossaryLayout.RAIL_X, y + GlossaryLayout.RAIL_Y, GlossaryLayout.RAIL_W, GlossaryLayout.RAIL_H);
-		int size = GlossaryLayout.RAIL_CELL;
-		for (GlossaryBestiary.Category c : GlossaryBestiary.Category.values()) {
-			int cx = railCellX(x), cy = railCellY(y, c.ordinal());
-			boolean active = c == current;
-			boolean hover = MapPage.inside(mouseX, mouseY, cx, cy, size, size);
-			cell(g, cx, cy, size, active ? GlossaryLayout.ACCENT : hover ? GlossaryLayout.TEXT_DIM : GlossaryLayout.CELL_BORDER);
-			int ix = cx + (size - 16) / 2, iy = cy + (size - 16) / 2;
-			g.fakeItem(c.oil(), ix, iy);
-			if (GlossaryBestiary.entries(c).isEmpty() && !active)
-				g.fill(ix, iy, ix + 16, iy + 16, LOCK_FADE);
-			if (hover)
-				pendingTooltip = List.of(c.title());
-		}
-	}
-
-	private static int listRowY(int y, int row) {
-		return y + GlossaryLayout.LIST_Y + GlossaryLayout.LIST_HEADER_H + 2 + row * GlossaryLayout.LIST_ROW_H;
-	}
-
-	private static int listPages(int count) {
-		return Math.max(1, (count + GlossaryLayout.LIST_ROWS - 1) / GlossaryLayout.LIST_ROWS);
-	}
-
-	private void drawEntryList(GuiGraphicsExtractor g, Font font, int x, int y, GlossaryBestiary.Category cat, List<GlossaryBestiary.Entry> entries,
-			GlossaryBestiary.Entry selected, int mouseX, int mouseY) {
-		int lx = x + GlossaryLayout.LIST_X, ly = y + GlossaryLayout.LIST_Y, lw = GlossaryLayout.LIST_W, lh = GlossaryLayout.LIST_H;
-		panel(g, lx, ly, lw, lh);
-		g.text(font, cat.title(), lx + GlossaryLayout.INFO_PAD, ly + (GlossaryLayout.LIST_HEADER_H - 8) / 2, GlossaryLayout.TITLE, false);
-		divider(g, lx, ly + GlossaryLayout.LIST_HEADER_H - 1, lw);
-
-		int pages = listPages(entries.size());
-		listPage = clamp(listPage, pages);
-		int first = listPage * GlossaryLayout.LIST_ROWS;
-		int rowW = lw - 6, rowH = GlossaryLayout.LIST_ROW_H - 2;
-		for (int i = first; i < entries.size() && i < first + GlossaryLayout.LIST_ROWS; i++) {
-			GlossaryBestiary.Entry entry = entries.get(i);
-			int rx = lx + 3, ry = listRowY(y, i - first);
-			boolean isSelected = entry.equals(selected);
-			boolean hover = MapPage.inside(mouseX, mouseY, rx, ry, rowW, rowH);
-			if (isSelected) {
-				g.fill(rx, ry, rx + rowW, ry + rowH, GlossaryLayout.ROW_SELECTED);
-				g.fill(rx, ry, rx + 2, ry + rowH, GlossaryLayout.ACCENT);
-			} else if (hover) {
-				g.fill(rx, ry, rx + rowW, ry + rowH, GlossaryLayout.ROW_HOVER);
-			}
-			ItemStack icon = entry.icon();
-			if (!icon.isEmpty())
-				g.fakeItem(icon, rx + 5, ry + (rowH - 16) / 2);
-			String name = entry.name().getString();
-			String shown = fit(font, name, rowW - 30);
-			g.text(font, Component.literal(shown), rx + 26, ry + (rowH - 8) / 2, isSelected ? GlossaryLayout.SUBTAB_TEXT_ACTIVE : GlossaryLayout.TEXT, false);
-			if (hover && !shown.equals(name))
-				pendingTooltip = List.of(entry.name());
-		}
-		if (entries.isEmpty())
-			g.text(font, Component.translatable("glossary.witchercraft.empty_category"), lx + GlossaryLayout.INFO_PAD, listRowY(y, 0) + 6, GlossaryLayout.TEXT_DIM, false);
-
-		if (pages > 1)
-			drawPager(g, font, listPager(font, x, y, pages), mouseX, mouseY);
-	}
-
-	private Pager listPager(Font font, int x, int y, int pages) {
-		int right = x + GlossaryLayout.LIST_X + GlossaryLayout.LIST_W - 4;
-		int fy = y + GlossaryLayout.LIST_Y + GlossaryLayout.LIST_H - GlossaryLayout.FOOTER_H;
-		return pager(font, right - pagerWidth(font, pages), fy, listPage, pages);
-	}
-
-	private void drawDollColumn(GuiGraphicsExtractor g, Font font, int x, int y, GlossaryBestiary.Entry entry, int mouseX, int mouseY) {
-		if (entry == null)
+		GlossaryBestiary.Entry entry = selectedEntry();
+		if (entry == null) {
+			drawTitle(g, font, currentCategory().title(), x + GlossaryLayout.RIGHT_PAGE_X, y + GlossaryLayout.RIGHT_PAGE_Y, GlossaryLayout.RIGHT_PAGE_W);
+			g.text(font, Component.translatable("glossary.witchercraft.empty_category"), x + GlossaryLayout.RIGHT_PAGE_X, y + GlossaryLayout.RIGHT_PAGE_Y + GlossaryLayout.TITLE_H,
+					GlossaryLayout.INK_DIM, false);
+			lastTextPages = 1;
 			return;
+		}
+
+		// left page: doll, weaknesses, stats
 		int dx = x + GlossaryLayout.DOLL_X, dy = y + GlossaryLayout.DOLL_Y, dw = GlossaryLayout.DOLL_W, dh = GlossaryLayout.DOLL_H;
 		LivingEntity doll = brokenDolls.contains(entry.type()) ? null : GlossaryBestiary.doll(entry.type());
 		if (doll != null) {
@@ -276,29 +358,87 @@ public class GlossaryPage implements GuiPage {
 			// not a living creature (or its renderer failed): its spawn egg, large
 			ItemStack icon = entry.icon();
 			if (!icon.isEmpty())
-				drawScaledItem(g, icon, dx + dw / 2, dy + dh / 2, GlossaryLayout.IMAGE_ICON_SCALE);
+				drawScaledItem(g, icon, dx + dw / 2, dy + dh / 2, GlossaryLayout.TOPIC_ICON_SCALE);
 		}
 		if (MapPage.inside(mouseX, mouseY, dx, dy, dw, dh) || draggingDoll) {
 			Component hint = Component.translatable("glossary.witchercraft.drag_hint");
-			g.text(font, hint, dx + (dw - font.width(hint)) / 2, dy + dh - 10, GlossaryLayout.TEXT_DIM, false);
+			g.text(font, hint, dx + (dw - font.width(hint)) / 2, dy + dh - 9, GlossaryLayout.INK_DIM, false);
 		}
+		drawWeaknesses(g, font, x, y, entry, mouseX, mouseY);
+		if (doll != null)
+			drawStats(g, font, x, y, doll, mouseX, mouseY);
 
-		// "Weak to" and one cell per oil, centred under the doll
-		List<ItemStack> oils = weaknesses(entry);
-		if (oils.isEmpty())
+		// right page: name and description
+		int px = x + GlossaryLayout.RIGHT_PAGE_X, py = y + GlossaryLayout.RIGHT_PAGE_Y;
+		drawTitle(g, font, entry.name(), px, py, GlossaryLayout.RIGHT_PAGE_W);
+		String key = entry.descriptionKey();
+		Component description = I18n.exists(key) ? Component.translatable(key) : Component.translatable("glossary.witchercraft.no_notes").withColor(GlossaryLayout.INK_DIM);
+		List<FormattedCharSequence> lines = font.split(description, GlossaryLayout.RIGHT_PAGE_W);
+		int perPage = rightPageLines(GlossaryLayout.TITLE_H);
+		int pages = pageCount(lines.size(), perPage);
+		textPage = clamp(textPage, pages);
+		drawLines(g, font, lines, textPage * perPage, perPage, px, py + GlossaryLayout.TITLE_H);
+		drawTextPager(g, font, x, y, pages, mouseX, mouseY);
+	}
+
+	private void drawWeaknesses(GuiGraphicsExtractor g, Font font, int x, int y, GlossaryBestiary.Entry entry, int mouseX, int mouseY) {
+		List<Ribbon> weak = weaknesses(entry);
+		if (weak.isEmpty())
 			return;
+		int cx = x + GlossaryLayout.LEFT_PAGE_X + GlossaryLayout.LEFT_PAGE_W / 2, wy = y + GlossaryLayout.WEAK_Y;
 		Component label = Component.translatable("glossary.witchercraft.weak_to");
-		int cx = dx + dw / 2, wy = y + GlossaryLayout.WEAK_Y;
-		g.text(font, label, cx - font.width(label) / 2, wy, GlossaryLayout.TEXT, false);
-		int size = GlossaryLayout.WEAK_CELL, gap = GlossaryLayout.WEAK_GAP;
-		int total = oils.size() * size + (oils.size() - 1) * gap;
-		for (int i = 0; i < oils.size(); i++) {
-			int ox = cx - total / 2 + i * (size + gap), oy = wy + 12;
+		g.text(font, label, cx - font.width(label) / 2, wy, GlossaryLayout.INK_TITLE, false);
+		// one row, centred; cells shrink (down to 17) when more than fit the page
+		int n = weak.size(), size = GlossaryLayout.WEAK_CELL, gap = GlossaryLayout.WEAK_GAP;
+		if (n * size + (n - 1) * gap > GlossaryLayout.LEFT_PAGE_W) {
+			gap = 2;
+			size = Math.max(17, (GlossaryLayout.LEFT_PAGE_W - (n - 1) * gap) / n);
+		}
+		int total = n * size + (n - 1) * gap;
+		for (int i = 0; i < n; i++) {
+			int ox = cx - total / 2 + i * (size + gap), oy = wy + 11;
 			boolean hover = MapPage.inside(mouseX, mouseY, ox, oy, size, size);
-			cell(g, ox, oy, size, hover ? GlossaryLayout.ACCENT : GlossaryLayout.CELL_BORDER);
-			g.fakeItem(oils.get(i), ox + (size - 16) / 2, oy + (size - 16) / 2);
+			g.fill(ox, oy, ox + size, oy + size, GlossaryLayout.CELL_INNER);
+			MapPage.drawBorder(g, ox, oy, size, size, hover ? GlossaryLayout.INK_TITLE : GlossaryLayout.CELL_BORDER);
+			drawIcon(g, weak.get(i), ox + (size - 16) / 2, oy + (size - 16) / 2);
 			if (hover)
-				pendingTooltip = List.of(oils.get(i).getHoverName());
+				pendingTooltip = List.of(weak.get(i).label());
+		}
+	}
+
+	/** Health, damage and armor read live from the doll: a 9x9 icon and the number each, centred on the left page. */
+	private void drawStats(GuiGraphicsExtractor g, Font font, int x, int y, LivingEntity doll, int mouseX, int mouseY) {
+		record Stat(String key, Holder<Attribute> attribute, int icon) {
+		}
+		List<Stat> stats = List.of(new Stat("health", Attributes.MAX_HEALTH, 0), new Stat("damage", Attributes.ATTACK_DAMAGE, 1), new Stat("armor", Attributes.ARMOR, 2));
+		List<Stat> shown = new ArrayList<>();
+		List<String> values = new ArrayList<>();
+		int total = 0;
+		for (Stat s : stats) {
+			double value = GlossaryBestiary.stat(doll, s.attribute());
+			if (value < 0)
+				continue;
+			String text = NUMBER.format(value);
+			shown.add(s);
+			values.add(text);
+			total += 9 + 2 + font.width(text);
+		}
+		if (shown.isEmpty())
+			return;
+		total += (shown.size() - 1) * GlossaryLayout.STATS_GAP;
+		int sx = x + GlossaryLayout.LEFT_PAGE_X + (GlossaryLayout.LEFT_PAGE_W - total) / 2, sy = y + GlossaryLayout.STATS_Y;
+		for (int i = 0; i < shown.size(); i++) {
+			Stat s = shown.get(i);
+			switch (s.icon()) {
+				case 0 -> g.blitSprite(RenderPipelines.GUI_TEXTURED, HEART_SPRITE, sx, sy, 9, 9);
+				case 1 -> blit(g, ATTACK_ICON, sx, sy, 9, 9, -1);
+				default -> g.blitSprite(RenderPipelines.GUI_TEXTURED, ARMOR_SPRITE, sx, sy, 9, 9);
+			}
+			int w = 9 + 2 + font.width(values.get(i));
+			g.text(font, values.get(i), sx + 11, sy + 1, GlossaryLayout.INK, false);
+			if (MapPage.inside(mouseX, mouseY, sx, sy - 1, w, 11))
+				pendingTooltip = List.of(Component.translatable("glossary.witchercraft.stat." + s.key()));
+			sx += w + GlossaryLayout.STATS_GAP;
 		}
 	}
 
@@ -368,166 +508,107 @@ public class GlossaryPage implements GuiPage {
 		return new DollFit(0.0F, doll.getBbHeight(), doll.getBbWidth() * 0.71F);
 	}
 
-	private void drawEntryInfo(GuiGraphicsExtractor g, Font font, int x, int y, GlossaryBestiary.Entry entry, int mouseX, int mouseY) {
-		int ix = x + GlossaryLayout.INFO_X, iy = y + GlossaryLayout.INFO_Y, iw = GlossaryLayout.INFO_W;
-		panel(g, ix, iy, iw, GlossaryLayout.INFO_H);
-		if (entry == null)
-			return;
-		drawTitle(g, font, entry.name(), ix, iy, iw);
-
-		// stats: a fixed block on every page, ruled off from the description
-		List<Component> stats = stats(entry);
-		int sy = iy + GlossaryLayout.BODY_Y;
-		for (int i = 0; i < stats.size(); i++)
-			g.text(font, stats.get(i), ix + GlossaryLayout.INFO_PAD, sy + i * GlossaryLayout.LINE_H, GlossaryLayout.TEXT, false);
-		int bodyY = GlossaryLayout.BODY_Y;
-		if (!stats.isEmpty()) {
-			bodyY += stats.size() * GlossaryLayout.LINE_H + GlossaryLayout.STATS_GAP;
-			divider(g, ix, iy + bodyY - GlossaryLayout.STATS_GAP / 2 - 1, iw);
-		}
-
-		String key = entry.descriptionKey();
-		Component description = I18n.exists(key) ? Component.translatable(key) : Component.translatable("glossary.witchercraft.no_notes").withColor(GlossaryLayout.TEXT_DIM);
-		drawPagedText(g, font, x, y, font.split(description, iw - 2 * GlossaryLayout.INFO_PAD), bodyY, mouseX, mouseY);
-	}
-
-	/** Health, damage and armor, read live from the doll (none for a creature that is not living). */
-	private static List<Component> stats(GlossaryBestiary.Entry entry) {
-		List<Component> stats = new ArrayList<>();
-		LivingEntity doll = GlossaryBestiary.doll(entry.type());
-		if (doll != null) {
-			addStat(stats, "health", doll, Attributes.MAX_HEALTH);
-			addStat(stats, "damage", doll, Attributes.ATTACK_DAMAGE);
-			addStat(stats, "armor", doll, Attributes.ARMOR);
-		}
-		return stats;
-	}
-
-	private static void addStat(List<Component> out, String key, LivingEntity doll, Holder<Attribute> attribute) {
-		double value = GlossaryBestiary.stat(doll, attribute);
-		if (value >= 0)
-			out.add(statLine(key, Component.literal(NUMBER.format(value))));
-	}
-
-	private static Component statLine(String key, Component value) {
-		return Component.translatable("glossary.witchercraft.stat." + key).withColor(GlossaryLayout.TEXT_DIM)
-				.append(Component.literal(" ")).append(value.copy().withColor(GlossaryLayout.TEXT));
-	}
-
-	/** The oils of every category the creature is tagged into. */
-	private static List<ItemStack> weaknesses(GlossaryBestiary.Entry entry) {
-		List<ItemStack> oils = new ArrayList<>();
-		for (GlossaryBestiary.Category c : GlossaryBestiary.Category.values())
-			if (GlossaryBestiary.entries(c).contains(entry))
-				oils.add(c.oil());
-		return oils;
-	}
-
-	// ---- Tutorials ---------------------------------------------------------------
-
-	/** One row of the topic list: a group header or a topic. */
-	private record TopicRow(GlossaryTutorials.Group group, GlossaryTutorials.Topic topic, int y, int h) {
-	}
-
-	private static List<TopicRow> topicRows(int y) {
-		List<TopicRow> rows = new ArrayList<>();
-		int ry = y + GlossaryLayout.TOPIC_Y + 4;
-		for (GlossaryTutorials.Group group : GlossaryTutorials.GROUPS) {
-			rows.add(new TopicRow(group, null, ry, GlossaryLayout.TOPIC_GROUP_H));
-			ry += GlossaryLayout.TOPIC_GROUP_H;
-			for (GlossaryTutorials.Topic topic : group.topics()) {
-				rows.add(new TopicRow(group, topic, ry, GlossaryLayout.TOPIC_ROW_H));
-				ry += GlossaryLayout.TOPIC_ROW_H;
+	/**
+	 * What the creature is weak to: the oil of every category it is tagged into, then its extra
+	 * weaknesses (Signs, bombs) from the {@code witchercraft:weak_to_<id>} tags.
+	 */
+	private static List<Ribbon> weaknesses(GlossaryBestiary.Entry entry) {
+		List<Ribbon> out = new ArrayList<>();
+		for (GlossaryBestiary.Category c : GlossaryBestiary.Category.values()) {
+			if (GlossaryBestiary.entries(c).contains(entry)) {
+				ItemStack oil = c.oil();
+				out.add(new Ribbon(oil.getHoverName(), oil, null, 0, 0, 0));
 			}
 		}
-		return rows;
+		for (GlossaryBestiary.Weakness w : GlossaryBestiary.weaknessesOf(entry.type()))
+			out.add(new Ribbon(w.name(), w.itemIcon(), w.texture(), 64, 64, 0));
+		return out;
 	}
 
-	private static GlossaryTutorials.Topic selectedTopic() {
-		List<GlossaryTutorials.Topic> topics = GlossaryTutorials.topics();
-		for (GlossaryTutorials.Topic t : topics)
-			if (t.id().equals(topicId))
-				return t;
-		if (topics.isEmpty())
-			return null;
-		topicId = topics.get(0).id();
-		return topics.get(0);
-	}
+	// ---- Tutorials pages -------------------------------------------------------------
 
 	private void renderTutorials(GuiGraphicsExtractor g, Font font, int x, int y, int mouseX, int mouseY) {
-		GlossaryTutorials.Topic selected = selectedTopic();
-
-		// topic list
-		int lx = x + GlossaryLayout.TOPIC_X, lw = GlossaryLayout.TOPIC_W;
-		panel(g, lx, y + GlossaryLayout.TOPIC_Y, lw, GlossaryLayout.TOPIC_H);
-		for (TopicRow row : topicRows(y)) {
-			if (row.topic() == null) {
-				g.text(font, row.group().title(), lx + GlossaryLayout.INFO_PAD, row.y() + 5, GlossaryLayout.TITLE, false);
-				continue;
-			}
-			int rx = lx + 3, rw = lw - 6;
-			boolean isSelected = row.topic() == selected;
-			boolean hover = MapPage.inside(mouseX, mouseY, rx, row.y(), rw, row.h());
-			if (isSelected) {
-				g.fill(rx, row.y(), rx + rw, row.y() + row.h(), GlossaryLayout.ROW_SELECTED);
-				g.fill(rx, row.y(), rx + 2, row.y() + row.h(), GlossaryLayout.ACCENT);
-			} else if (hover) {
-				g.fill(rx, row.y(), rx + rw, row.y() + row.h(), GlossaryLayout.ROW_HOVER);
-			}
-			g.text(font, Component.literal(fit(font, row.topic().title().getString(), rw - 20)), rx + 12, row.y() + (row.h() - 8) / 2,
-					isSelected ? GlossaryLayout.SUBTAB_TEXT_ACTIVE : GlossaryLayout.TEXT, false);
-		}
-		if (selected == null)
+		GlossaryTutorials.Topic topic = selectedTopic();
+		if (topic == null) {
+			lastTextPages = 1;
 			return;
+		}
+		int lx = x + GlossaryLayout.LEFT_PAGE_X, ly = y + GlossaryLayout.LEFT_PAGE_Y, lw = GlossaryLayout.LEFT_PAGE_W;
+		int rx = x + GlossaryLayout.RIGHT_PAGE_X, ry = y + GlossaryLayout.RIGHT_PAGE_Y;
+		List<FormattedCharSequence> lines = font.split(topic.text(), GlossaryLayout.RIGHT_PAGE_W);
+		int rightLines = rightPageLines(0);
 
-		// illustration: the topic's own image, or its icon drawn large
-		int px = x + GlossaryLayout.IMAGE_X, py = y + GlossaryLayout.IMAGE_Y, pw = GlossaryLayout.IMAGE_W, ph = GlossaryLayout.IMAGE_H;
-		panel(g, px, py, pw, ph);
-		Identifier image = selected.image();
+		Identifier image = topic.image();
 		if (imageExists.computeIfAbsent(image, id -> Minecraft.getInstance().getResourceManager().getResource(id).isPresent())) {
-			blit(g, image, px + 1, py + 1, pw - 2, ph - 2);
-		} else if (!selected.itemIcon().isEmpty()) {
-			drawScaledItem(g, selected.itemIcon(), px + pw / 2, py + ph / 2, GlossaryLayout.IMAGE_ICON_SCALE);
-		} else if (selected.texture() != null) {
-			float fit = 16f * GlossaryLayout.IMAGE_ICON_SCALE / Math.max(selected.textureW(), selected.textureH());
-			int tw = Math.round(selected.textureW() * fit), th = Math.round(selected.textureH() * fit);
-			blit(g, Identifier.parse(selected.texture()), px + (pw - tw) / 2, py + (ph - th) / 2, tw, th);
+			// the topic's own picture fills the left page; title and text on the right
+			blit(g, image, lx, ly, lw, GlossaryLayout.LEFT_PAGE_H, -1);
+			drawTitle(g, font, topic.title(), rx, ry, GlossaryLayout.RIGHT_PAGE_W);
+			int perPage = rightPageLines(GlossaryLayout.TITLE_H);
+			int pages = pageCount(lines.size(), perPage);
+			textPage = clamp(textPage, pages);
+			drawLines(g, font, lines, textPage * perPage, perPage, rx, ry + GlossaryLayout.TITLE_H);
+			drawTextPager(g, font, x, y, pages, mouseX, mouseY);
+			return;
 		}
 
-		// text, in the info panel
-		int ix = x + GlossaryLayout.INFO_X, iy = y + GlossaryLayout.INFO_Y, iw = GlossaryLayout.INFO_W;
-		panel(g, ix, iy, iw, GlossaryLayout.INFO_H);
-		drawTitle(g, font, selected.title(), ix, iy, iw);
-		List<FormattedCharSequence> lines = new ArrayList<>(font.split(selected.text(), iw - 2 * GlossaryLayout.INFO_PAD));
-		drawPagedText(g, font, x, y, lines, GlossaryLayout.BODY_Y, mouseX, mouseY);
+		// title, icon and the first lines on the left page, the rest running on to the right
+		drawTitle(g, font, topic.title(), lx, ly, lw);
+		int iconSize = 16 * GlossaryLayout.TOPIC_ICON_SCALE;
+		int iconY = ly + GlossaryLayout.TITLE_H;
+		if (!topic.itemIcon().isEmpty()) {
+			drawScaledItem(g, topic.itemIcon(), lx + lw / 2, iconY + iconSize / 2, GlossaryLayout.TOPIC_ICON_SCALE);
+		} else if (topic.texture() != null) {
+			float fit = (float) iconSize / Math.max(topic.textureW(), topic.textureH());
+			int tw = Math.round(topic.textureW() * fit), th = Math.round(topic.textureH() * fit);
+			blit(g, Identifier.parse(topic.texture()), lx + (lw - tw) / 2, iconY + (iconSize - th) / 2, tw, th, -1);
+		}
+		int leftTop = GlossaryLayout.TITLE_H + iconSize + GlossaryLayout.TOPIC_ICON_GAP;
+		int leftLines = Math.max(0, (GlossaryLayout.LEFT_PAGE_H - leftTop) / GlossaryLayout.LINE_H);
+		int perSpread = leftLines + rightLines;
+		int pages = pageCount(lines.size(), perSpread);
+		textPage = clamp(textPage, pages);
+		int first = textPage * perSpread;
+		drawLines(g, font, lines, first, leftLines, lx, ly + leftTop);
+		drawLines(g, font, lines, first + leftLines, rightLines, rx, ry);
+		drawTextPager(g, font, x, y, pages, mouseX, mouseY);
 	}
 
-	// ---- shared: paged text in the info panel ------------------------------------
+	// ---- text -------------------------------------------------------------------------
 
-	private static int linesPerPage(int bodyY) {
-		return Math.max(1, (GlossaryLayout.INFO_H - bodyY - GlossaryLayout.FOOTER_H) / GlossaryLayout.LINE_H);
+	/** How many lines fit on the right page below {@code top}, leaving room for the footer. */
+	private static int rightPageLines(int top) {
+		return Math.max(1, (GlossaryLayout.RIGHT_PAGE_H - top - GlossaryLayout.FOOTER_H) / GlossaryLayout.LINE_H);
 	}
 
-	private void drawPagedText(GuiGraphicsExtractor g, Font font, int x, int y, List<FormattedCharSequence> lines, int bodyY, int mouseX, int mouseY) {
-		int perPage = linesPerPage(bodyY);
-		int pages = Math.max(1, (lines.size() + perPage - 1) / perPage);
+	private static int pageCount(int lines, int perPage) {
+		return Math.max(1, (lines + Math.max(1, perPage) - 1) / Math.max(1, perPage));
+	}
+
+	private static void drawLines(GuiGraphicsExtractor g, Font font, List<FormattedCharSequence> lines, int first, int count, int tx, int ty) {
+		for (int i = first; i < lines.size() && i < first + count; i++)
+			g.text(font, lines.get(i), tx, ty + (i - first) * GlossaryLayout.LINE_H, GlossaryLayout.INK, false);
+	}
+
+	private void drawTextPager(GuiGraphicsExtractor g, Font font, int x, int y, int pages, int mouseX, int mouseY) {
 		textPage = clamp(textPage, pages);
 		lastTextPages = pages;
-		int tx = x + GlossaryLayout.INFO_X + GlossaryLayout.INFO_PAD, ty = y + GlossaryLayout.INFO_Y + bodyY;
-		int first = textPage * perPage;
-		for (int i = first; i < lines.size() && i < first + perPage; i++)
-			g.text(font, lines.get(i), tx, ty + (i - first) * GlossaryLayout.LINE_H, GlossaryLayout.BODY, false);
 		if (pages > 1)
-			drawPager(g, font, textPager(font, x, y, pages), mouseX, mouseY);
+			drawPager(g, font, textPager(font, x, y, pages), mouseX, mouseY, true);
 	}
 
 	private Pager textPager(Font font, int x, int y, int pages) {
-		int centre = x + GlossaryLayout.INFO_X + GlossaryLayout.INFO_W / 2;
-		int fy = y + GlossaryLayout.INFO_Y + GlossaryLayout.INFO_H - GlossaryLayout.FOOTER_H;
+		int centre = x + GlossaryLayout.RIGHT_PAGE_X + GlossaryLayout.RIGHT_PAGE_W / 2;
+		int fy = y + GlossaryLayout.RIGHT_PAGE_Y + GlossaryLayout.RIGHT_PAGE_H - GlossaryLayout.FOOTER_H;
 		return pager(font, centre - pagerWidth(font, pages) / 2, fy, textPage, pages);
 	}
 
-	// ---- shared drawing helpers ----------------------------------------------------
+	private static void drawTitle(GuiGraphicsExtractor g, Font font, Component title, int px, int py, int pw) {
+		String shown = fit(font, title.getString(), pw);
+		g.text(font, Component.literal(shown), px, py, GlossaryLayout.INK_TITLE, false);
+		g.fill(px, py + 11, px + pw, py + 12, GlossaryLayout.RULE);
+	}
+
+	// ---- pager ------------------------------------------------------------------------
 
 	private static Component pagerLabel(int page, int pages) {
 		return Component.literal((page + 1) + " / " + pages);
@@ -547,40 +628,25 @@ public class GlossaryPage implements GuiPage {
 		return new Pager(left, left + width - b, y, labelX, label, page, pages);
 	}
 
-	private static void drawPager(GuiGraphicsExtractor g, Font font, Pager p, int mouseX, int mouseY) {
-		drawPageButton(g, font, p.prevX(), p.y(), "<", p.page() > 0, mouseX, mouseY);
-		drawPageButton(g, font, p.nextX(), p.y(), ">", p.page() < p.pages() - 1, mouseX, mouseY);
-		g.text(font, p.label(), p.labelX(), p.y() + (GlossaryLayout.PAGE_BUTTON - 8) / 2 + 1, GlossaryLayout.TEXT_DIM, false);
+	/** On the parchment ({@code onPage}) in ink; off it (under the left ribbons) in ribbon text. */
+	private static void drawPager(GuiGraphicsExtractor g, Font font, Pager p, int mouseX, int mouseY, boolean onPage) {
+		drawPageButton(g, font, p.prevX(), p.y(), "<", p.page() > 0, mouseX, mouseY, onPage);
+		drawPageButton(g, font, p.nextX(), p.y(), ">", p.page() < p.pages() - 1, mouseX, mouseY, onPage);
+		g.text(font, p.label(), p.labelX(), p.y() + (GlossaryLayout.PAGE_BUTTON - 8) / 2 + 1, onPage ? GlossaryLayout.INK_DIM : GlossaryLayout.RIBBON_TEXT, !onPage);
 	}
 
-	private static void drawPageButton(GuiGraphicsExtractor g, Font font, int bx, int by, String glyph, boolean enabled, int mouseX, int mouseY) {
+	private static void drawPageButton(GuiGraphicsExtractor g, Font font, int bx, int by, String glyph, boolean enabled, int mouseX, int mouseY, boolean onPage) {
 		int b = GlossaryLayout.PAGE_BUTTON;
 		boolean hover = enabled && MapPage.inside(mouseX, mouseY, bx, by, b, b);
-		g.fill(bx, by, bx + b, by + b, hover ? GlossaryLayout.BUTTON_HOVER : GlossaryLayout.BUTTON_BG);
-		MapPage.drawBorder(g, bx, by, b, b, hover ? GlossaryLayout.ACCENT : GlossaryLayout.CELL_BORDER);
-		g.text(font, glyph, bx + (b - font.width(glyph)) / 2 + 1, by + (b - 8) / 2 + 1, enabled ? GlossaryLayout.TEXT : GlossaryLayout.TEXT_DIM, false);
+		if (hover)
+			g.fill(bx, by, bx + b, by + b, GlossaryLayout.BUTTON_HOVER);
+		int ink = onPage ? GlossaryLayout.INK : GlossaryLayout.RIBBON_TEXT;
+		int dim = onPage ? GlossaryLayout.CELL_BORDER : shade(GlossaryLayout.RIBBON_TEXT, 50);
+		MapPage.drawBorder(g, bx, by, b, b, enabled ? ink : dim);
+		g.text(font, glyph, bx + (b - font.width(glyph)) / 2 + 1, by + (b - 8) / 2 + 1, enabled ? ink : dim, false);
 	}
 
-	private static void drawTitle(GuiGraphicsExtractor g, Font font, Component title, int ix, int iy, int iw) {
-		String shown = fit(font, title.getString(), iw - 2 * GlossaryLayout.INFO_PAD);
-		g.text(font, Component.literal(shown), ix + GlossaryLayout.INFO_PAD, iy + 6, GlossaryLayout.TITLE, false);
-		divider(g, ix, iy + 17, iw);
-	}
-
-	private static void panel(GuiGraphicsExtractor g, int x, int y, int w, int h) {
-		g.fill(x, y, x + w, y + h, GlossaryLayout.PANEL_BG);
-		MapPage.drawBorder(g, x, y, w, h, GlossaryLayout.PANEL_BORDER);
-	}
-
-	private static void divider(GuiGraphicsExtractor g, int x, int y, int w) {
-		g.fill(x + 4, y, x + w - 4, y + 1, GlossaryLayout.DIVIDER);
-	}
-
-	/** A skills-tree style cell: 1px frame around a dark inner square. */
-	private static void cell(GuiGraphicsExtractor g, int x, int y, int size, int border) {
-		g.fill(x, y, x + size, y + size, border);
-		g.fill(x + 1, y + 1, x + size - 1, y + size - 1, GlossaryLayout.CELL_INNER);
-	}
+	// ---- small helpers ------------------------------------------------------------------
 
 	private static void drawScaledItem(GuiGraphicsExtractor g, ItemStack stack, int centreX, int centreY, int scale) {
 		g.pose().pushMatrix();
@@ -590,8 +656,17 @@ public class GlossaryPage implements GuiPage {
 		g.pose().popMatrix();
 	}
 
-	private static void blit(GuiGraphicsExtractor g, Identifier texture, int x, int y, int w, int h) {
-		g.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, 0, 0, w, h, w, h);
+	/** The whole texture stretched over the rect, multiplied by {@code color} (-1 = untinted). */
+	private static void blit(GuiGraphicsExtractor g, Identifier texture, int x, int y, int w, int h, int color) {
+		g.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, 0, 0, w, h, w, h, color);
+	}
+
+	/** An ARGB colour with its RGB scaled to {@code percent} (alpha kept). */
+	private static int shade(int argb, int percent) {
+		int r = Math.min(255, ((argb >> 16) & 0xFF) * percent / 100);
+		int gr = Math.min(255, ((argb >> 8) & 0xFF) * percent / 100);
+		int b = Math.min(255, (argb & 0xFF) * percent / 100);
+		return (argb & 0xFF000000) | (r << 16) | (gr << 8) | b;
 	}
 
 	/** The text cut to fit a width, with "..." when cut. */
@@ -625,8 +700,9 @@ public class GlossaryPage implements GuiPage {
 		return category = firstFilled != null ? firstFilled : GlossaryBestiary.Category.values()[0];
 	}
 
-	/** The selected creature, falling back to the category's first one. */
-	private static GlossaryBestiary.Entry selectedEntry(List<GlossaryBestiary.Entry> entries) {
+	/** The selected creature, falling back to the category's first one (null for an empty category). */
+	private static GlossaryBestiary.Entry selectedEntry() {
+		List<GlossaryBestiary.Entry> entries = GlossaryBestiary.entries(currentCategory());
 		for (GlossaryBestiary.Entry e : entries)
 			if (e.type() == selectedType)
 				return e;
@@ -637,13 +713,52 @@ public class GlossaryPage implements GuiPage {
 		return entries.get(0);
 	}
 
-	private static void selectCategory(GlossaryBestiary.Category c) {
-		if (c == category)
+	private static GlossaryTutorials.Group selectedGroup() {
+		for (GlossaryTutorials.Group group : GlossaryTutorials.GROUPS)
+			if (group.id().equals(groupId))
+				return group;
+		GlossaryTutorials.Group first = GlossaryTutorials.GROUPS.get(0);
+		groupId = first.id();
+		return first;
+	}
+
+	private static GlossaryTutorials.Topic selectedTopic() {
+		List<GlossaryTutorials.Topic> topics = selectedGroup().topics();
+		for (GlossaryTutorials.Topic t : topics)
+			if (t.id().equals(topicId))
+				return t;
+		if (topics.isEmpty())
+			return null;
+		topicId = topics.get(0).id();
+		textPage = 0;
+		return topics.get(0);
+	}
+
+	/** Select top ribbon i: a category, or a Tutorials group. Its first entry or topic follows. */
+	private static void selectTop(int i) {
+		if (i == selectedTop())
 			return;
-		category = c;
-		listPage = 0;
-		List<GlossaryBestiary.Entry> entries = GlossaryBestiary.entries(c);
-		selectedType = entries.isEmpty() ? null : entries.get(0).type();
+		if (subTab == SubTab.BESTIARY) {
+			category = GlossaryBestiary.Category.values()[i];
+			List<GlossaryBestiary.Entry> entries = GlossaryBestiary.entries(category);
+			selectedType = entries.isEmpty() ? null : entries.get(0).type();
+		} else {
+			GlossaryTutorials.Group group = GlossaryTutorials.GROUPS.get(i);
+			groupId = group.id();
+			topicId = group.topics().isEmpty() ? null : group.topics().get(0).id();
+		}
+		sidePage = 0;
+		textPage = 0;
+	}
+
+	/** Select left ribbon i (index in the full list). */
+	private static void selectSide(int i) {
+		if (i == selectedSide())
+			return;
+		if (subTab == SubTab.BESTIARY)
+			selectedType = GlossaryBestiary.entries(currentCategory()).get(i).type();
+		else
+			topicId = selectedGroup().topics().get(i).id();
 		textPage = 0;
 	}
 
@@ -656,82 +771,68 @@ public class GlossaryPage implements GuiPage {
 		if (button != 0)
 			return false;
 		Font font = Minecraft.getInstance().font;
+
+		// right ribbons: Bestiary / Tutorials
 		for (SubTab tab : SubTab.values()) {
-			if (MapPage.inside(mouseX, mouseY, subTabX(x, w, tab.ordinal()), y + GlossaryLayout.SUBTAB_Y, GlossaryLayout.SUBTAB_W, GlossaryLayout.SUBTAB_H)) {
+			int rx = tabRibbonX(x, tab == subTab), ry = tabRibbonY(y, tab.ordinal());
+			if (MapPage.inside(mouseX, mouseY, coverRight(x), ry, rx + GlossaryLayout.RIGHT_W - coverRight(x), GlossaryLayout.RIGHT_H)) {
 				if (tab != subTab) {
 					subTab = tab;
+					sidePage = 0;
 					textPage = 0;
 				}
 				return true;
 			}
 		}
-		return subTab == SubTab.BESTIARY ? clickBestiary(font, x, y, mouseX, mouseY) : clickTutorials(font, x, y, mouseX, mouseY);
-	}
 
-	private boolean clickBestiary(Font font, int x, int y, double mouseX, double mouseY) {
-		GlossaryBestiary.Category cat = currentCategory();
-		List<GlossaryBestiary.Entry> entries = GlossaryBestiary.entries(cat);
-
-		// category rail
-		for (GlossaryBestiary.Category c : GlossaryBestiary.Category.values()) {
-			if (MapPage.inside(mouseX, mouseY, railCellX(x), railCellY(y, c.ordinal()), GlossaryLayout.RAIL_CELL, GlossaryLayout.RAIL_CELL)) {
-				selectCategory(c);
+		// top ribbons
+		int selectedTop = selectedTop();
+		List<Ribbon> top = topRibbons();
+		for (int i = 0; i < top.size(); i++) {
+			int rx = topRibbonX(x, i), ry = topRibbonY(y, i == selectedTop);
+			if (MapPage.inside(mouseX, mouseY, rx, ry, GlossaryLayout.TOP_W, coverTop(y) - ry)) {
+				selectTop(i);
 				return true;
 			}
 		}
 
-		// entry rows and the list's pager
-		int lx = x + GlossaryLayout.LIST_X;
-		int first = listPage * GlossaryLayout.LIST_ROWS;
-		for (int i = first; i < entries.size() && i < first + GlossaryLayout.LIST_ROWS; i++) {
-			if (MapPage.inside(mouseX, mouseY, lx + 3, listRowY(y, i - first), GlossaryLayout.LIST_W - 6, GlossaryLayout.LIST_ROW_H - 2)) {
-				if (entries.get(i).type() != selectedType) {
-					selectedType = entries.get(i).type();
-					textPage = 0;
-				}
+		// left ribbons and their pager
+		List<Ribbon> side = sideRibbons();
+		int selectedSide = selectedSide();
+		int first = sidePage * GlossaryLayout.SIDE_ROWS;
+		for (int i = first; i < side.size() && i < first + GlossaryLayout.SIDE_ROWS; i++) {
+			int rx = sideRibbonX(x, i == selectedSide), ry = sideRibbonY(y, i - first);
+			if (MapPage.inside(mouseX, mouseY, rx, ry, coverLeft(x) - rx, GlossaryLayout.SIDE_H)) {
+				selectSide(i);
 				return true;
 			}
 		}
-		int listPages = listPages(entries.size());
-		if (listPages > 1) {
-			int turn = pagerClick(listPager(font, x, y, listPages), mouseX, mouseY);
+		int sidePages = sidePages(side.size());
+		if (sidePages > 1) {
+			int turn = pagerClick(sidePager(font, x, y, sidePages), mouseX, mouseY);
 			if (turn != 0) {
-				listPage = clamp(listPage + turn, listPages);
+				sidePage = clamp(sidePage + turn, sidePages);
 				return true;
 			}
 		}
 
-		// doll: start a drag-to-rotate
-		if (MapPage.inside(mouseX, mouseY, x + GlossaryLayout.DOLL_X, y + GlossaryLayout.DOLL_Y, GlossaryLayout.DOLL_W, GlossaryLayout.DOLL_H)) {
+		// the doll: start a drag-to-rotate
+		if (subTab == SubTab.BESTIARY && MapPage.inside(mouseX, mouseY, x + GlossaryLayout.DOLL_X, y + GlossaryLayout.DOLL_Y, GlossaryLayout.DOLL_W, GlossaryLayout.DOLL_H)) {
 			draggingDoll = true;
 			return true;
 		}
 
-		return clickTextPager(font, x, y, mouseX, mouseY) || insidePanels(x, y, mouseX, mouseY);
-	}
-
-	private boolean clickTutorials(Font font, int x, int y, double mouseX, double mouseY) {
-		int rx = x + GlossaryLayout.TOPIC_X + 3, rw = GlossaryLayout.TOPIC_W - 6;
-		for (TopicRow row : topicRows(y)) {
-			if (row.topic() != null && MapPage.inside(mouseX, mouseY, rx, row.y(), rw, row.h())) {
-				if (!row.topic().id().equals(topicId)) {
-					topicId = row.topic().id();
-					textPage = 0;
-				}
+		// the text pager
+		if (lastTextPages > 1) {
+			int turn = pagerClick(textPager(font, x, y, lastTextPages), mouseX, mouseY);
+			if (turn != 0) {
+				textPage = clamp(textPage + turn, lastTextPages);
 				return true;
 			}
 		}
-		return clickTextPager(font, x, y, mouseX, mouseY) || insidePanels(x, y, mouseX, mouseY);
-	}
 
-	private boolean clickTextPager(Font font, int x, int y, double mouseX, double mouseY) {
-		if (lastTextPages <= 1)
-			return false;
-		int turn = pagerClick(textPager(font, x, y, lastTextPages), mouseX, mouseY);
-		if (turn == 0)
-			return false;
-		textPage = clamp(textPage + turn, lastTextPages);
-		return true;
+		// clicks on the book itself are swallowed, like the other tabs do
+		return MapPage.inside(mouseX, mouseY, x + GlossaryLayout.BOOK_X, y + GlossaryLayout.BOOK_Y, GlossaryLayout.BOOK_W, GlossaryLayout.BOOK_H);
 	}
 
 	/** -1 for the prev button, +1 for next, 0 for neither. */
@@ -742,12 +843,6 @@ public class GlossaryPage implements GuiPage {
 		if (MapPage.inside(mouseX, mouseY, p.nextX(), p.y(), b, b))
 			return 1;
 		return 0;
-	}
-
-	/** Clicks on a panel's empty space are swallowed, like the other tabs do. */
-	private static boolean insidePanels(int x, int y, double mouseX, double mouseY) {
-		return MapPage.inside(mouseX, mouseY, x + GlossaryLayout.RAIL_X, y + GlossaryLayout.RAIL_Y, GlossaryLayout.INFO_X + GlossaryLayout.INFO_W - GlossaryLayout.RAIL_X,
-				GlossaryLayout.INFO_H);
 	}
 
 	@Override
@@ -772,20 +867,21 @@ public class GlossaryPage implements GuiPage {
 		if (scrollY == 0)
 			return false;
 		int turn = scrollY < 0 ? 1 : -1;
-		if (MapPage.inside(mouseX, mouseY, x + GlossaryLayout.INFO_X, y + GlossaryLayout.INFO_Y, GlossaryLayout.INFO_W, GlossaryLayout.INFO_H)) {
-			textPage = clamp(textPage + turn, lastTextPages);
+		// over the top ribbons: the next or previous category / group
+		if (mouseY < coverTop(y) && mouseX >= x + GlossaryLayout.TOP_X && mouseX < coverRight(x)) {
+			int count = topRibbons().size();
+			selectTop(Math.floorMod(selectedTop() + turn, count));
 			return true;
 		}
-		if (subTab == SubTab.BESTIARY) {
-			if (MapPage.inside(mouseX, mouseY, x + GlossaryLayout.LIST_X, y + GlossaryLayout.LIST_Y, GlossaryLayout.LIST_W, GlossaryLayout.LIST_H)) {
-				listPage = clamp(listPage + turn, listPages(GlossaryBestiary.entries(currentCategory()).size()));
-				return true;
-			}
-			if (MapPage.inside(mouseX, mouseY, x + GlossaryLayout.RAIL_X, y + GlossaryLayout.RAIL_Y, GlossaryLayout.RAIL_W, GlossaryLayout.RAIL_H)) {
-				GlossaryBestiary.Category[] all = GlossaryBestiary.Category.values();
-				selectCategory(all[Math.floorMod(currentCategory().ordinal() + turn, all.length)]);
-				return true;
-			}
+		// over the left ribbons: their pages
+		if (mouseX < coverLeft(x)) {
+			sidePage = clamp(sidePage + turn, sidePages(sideRibbons().size()));
+			return true;
+		}
+		// over the book: the text's pages
+		if (MapPage.inside(mouseX, mouseY, x + GlossaryLayout.BOOK_X, y + GlossaryLayout.BOOK_Y, GlossaryLayout.BOOK_W, GlossaryLayout.BOOK_H)) {
+			textPage = clamp(textPage + turn, lastTextPages);
+			return true;
 		}
 		return false;
 	}
