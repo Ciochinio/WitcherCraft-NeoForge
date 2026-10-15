@@ -22,5 +22,6 @@ public class WitchercraftModModels {
 		event.registerLayerDefinition(ModelAlghoul.LAYER_LOCATION, ModelAlghoul::createBodyLayer);
 		event.registerLayerDefinition(ModelWolvenArmor.LAYER_LOCATION, ModelWolvenArmor::createBodyLayer);
 		event.registerLayerDefinition(ModelFelineArmor.LAYER_LOCATION, ModelFelineArmor::createBodyLayer);
+		event.registerLayerDefinition(ModelViperArmor.LAYER_LOCATION, ModelViperArmor::createBodyLayer);
 	}
 }

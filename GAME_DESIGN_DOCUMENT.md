@@ -773,9 +773,9 @@ Wolven, Feline, Griffin, Ursine, Viper, and Manticore - and each is a complete f
 
 The models sit close to the body - slimmer than vanilla armor, with real depth for plates,
 straps, and pouches. The helmet-slot piece of each set is a pair of gauntlets and is meant to
-render on the hands. Status: Wolven, Ursine, Manticore, Griffin, and Feline are on their custom
-models (chestplate, leggings, boots). For now their gloves and bracers are drawn as part of the
-chestplate, whatever is in the helmet slot, and Viper still uses the old flat textures.
+render on the hands. Status: all six sets are on their custom models (chestplate, leggings, boots).
+For now their gloves and bracers are drawn as part of the chestplate, whatever is in the helmet
+slot.
 
 The Ursine set is the heavy one: a long chainmail coat with tan-trimmed hem and toggles, a dark
 leather chest piece under an olive scarf, two-plate steel pauldrons, long steel vambraces, oxblood
@@ -811,6 +811,19 @@ both outer sides, chain-mail sleeves, a sheepskin roll at the elbow, plain red-b
 panelled bracers, and black gloves with a brown cuff. The leggings are plain dark navy trousers with
 panelled leather knee guards; the boots are short, plain near-black leather with a strap at the top
 and across the instep, dark cognac feet, and toe caps.
+
+The Viper set is the oil fighter's dark armor, modelled on the Witcher 3 original and kept
+left-right symmetric apart from the sword strap: black leather with olive snakeskin scales over the
+chest, a short stand collar, and a stitched hem. Below the chest a teal-tinted chain-mail panel sits
+between black leather side panels laced in brown, crossed by a stitched dark belt with a centred
+steel buckle and two gold-tipped cord tassels on the hips; the upper back is teal chain mail, and a
+dark sword strap with a steel buckle crosses the chest and the back. The arms carry two layers of
+teal chain-mail pauldrons trimmed in black leather (the lower one ends in an open mail fringe),
+olive cuffs that come to a point on the outer side, and black gloves with a tan wrist strap and
+steel buckle, a raised plate over the back of the hand, and finger lines. The leggings are dark
+trousers padded in vertical channels down the front of the thigh, with rounded olive knee pads
+held by a strap; the boots are short charcoal leather with a stitched rolled top, an ankle crease,
+a welt and sole, and toe caps.
 
 The payoff is the **School Effect**. Wear all four pieces of a set and its effect switches on and
 stays on, shown on your HUD; take any piece off and it drops immediately. You can only run one

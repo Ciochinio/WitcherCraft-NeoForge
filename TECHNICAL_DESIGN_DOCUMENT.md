@@ -2872,7 +2872,7 @@ owners can change chances, chests and prices without touching the mod.
 ### 7.1 What the system is for
 
 Each School armor set gets its own slim 3D model instead of the vanilla armor shape. Wolven was the
-first (2026-10-06), Ursine the second (2026-10-09), Manticore the third (2026-10-10), Griffin the fourth (2026-10-11), and Feline the fifth (2026-10-14). The model plugs into MCreator's own armor
+first (2026-10-06), Ursine the second (2026-10-09), Manticore the third (2026-10-10), Griffin the fourth (2026-10-11), Feline the fifth (2026-10-14), and Viper the sixth (2026-10-15). The model plugs into MCreator's own armor
 custom-model feature, so the armor element stays an ordinary generated element.
 
 ### 7.2 The pieces
@@ -2931,6 +2931,15 @@ Rules that are easy to break:
   the trousers reach above y 12 by theirs, so a torso shell with the same inflate as either trouser leg
   shares its front and back planes there and flickers. Manticore's vest is 0.45 for this reason (its
   trousers are 0.35 and 0.4).
+- **Every face can z-fight, not only fronts.** Two cubes whose faces land in the same plane (edge +
+  inflate) flicker wherever they overlap - including top faces that are only seen from above or in
+  third person. Viper's collar first ended at 24.4 + 0.2 = 24.6, the same height as its chest piece
+  (24 + 0.6), and the top of the torso flickered. Raising the collar to 24.7 stopped the flicker but
+  turned the top of the torso into a black lid seen from above, so the collar's top face is now a
+  1-texel leather rim with a transparent middle and the chest piece's mail top shows through.
+  `node tools/viper-armor/zfight.js <model.bbmodel>` lists every coplanar overlap across all bones in
+  the rest pose (rotated cubes skipped). It also reports faces buried inside other cubes (toe caps
+  inside boots, sleeve ends behind the jacket), so judge each hit by whether it can be seen.
 - **Cover the hip joint from the chestplate.** The leggings only get `leg_r` and `leg_l` (MCreator's
   element has no body part for them), so nothing joins the legs at the hip unless the chestplate does
   it. Wolven's hem is a body piece that reaches below y 12. A trouser leg's front face
@@ -2966,7 +2975,7 @@ Rules that are easy to break:
 
 ### 7.5 Gauntlets (not implemented)
 
-For now the gloves and bracers (Wolven, Ursine, Manticore, Griffin, and Feline) are cubes on the chestplate's `arm_r` and `arm_l`,
+For now the gloves and bracers (Wolven, Ursine, Manticore, Griffin, Feline, and Viper) are cubes on the chestplate's `arm_r` and `arm_l`,
 so they render whenever the chestplate is worn, whatever is in the helmet slot. The user chose this so the hands are
 never bare sleeve. If the layer below is built, move those cubes back into `gauntlet_r` and `gauntlet_l`.
 
@@ -2983,7 +2992,7 @@ one, and NeoForge 26.1.2.95 throws on a duplicate registration.
 
 The armor element's **Armor layer texture** dropdown (`armorTextureFile`) shows empty every time the
 Wolven element is reopened, and saving fails with "Armor needs to have a texture". Pick the texture
-again (`wolven.`, `bearamor.` for Ursine, `mantikora.` for Manticore, `griffin._` for Griffin, or `cat.` for Feline) before every save. The element file keeps the right
+again (`wolven.`, `bearamor.` for Ursine, `mantikora.` for Manticore, `griffin._` for Griffin, `cat.` for Feline, or `viperarmor.` for Viper) before every save. The element file keeps the right
 value (`"wolven."`); only the
 editor fails to show it. The likely cause is the trailing dot in the old texture names
 (`wolven._layer_1.png`). All six sets use names like that (`cat.`, `griffin._`), so expect the same
@@ -2998,7 +3007,7 @@ feeds the helmet-slot (gauntlet) item, which still uses the default model.
 
 **Texture only.** Paint in Blockbench, save the `.bbmodel` (it embeds the texture), then export the
 texture over `src/main/resources/assets/witchercraft/textures/entities/<set>_armor.png`
-(`wolven_armor.png`, `ursine_armor.png`, `manticore_armor.png`, `griffin_armor.png`, `feline_armor.png`). No code changes. Keep the size (128x128 on a 64x64 UV
+(`wolven_armor.png`, `ursine_armor.png`, `manticore_armor.png`, `griffin_armor.png`, `feline_armor.png`, `viper_armor.png`). No code changes. Keep the size (128x128 on a 64x64 UV
 layout). The `.bbmodel` and the PNG are the source of truth; Ursine's texture includes hand-painted
 pixels, so do not regenerate it from scratch.
 
@@ -3011,7 +3020,16 @@ node tools/bb2java.js models/blockbench/UrsineArmor.bbmodel ModelUrsineArmor mod
 node tools/bb2java.js models/blockbench/ManticoreArmor.bbmodel ModelManticoreArmor model_manticore_armor models/mojmap-1.21.x/ModelManticoreArmor.java src/main/java/net/redboltmedia/witchercraft/client/model/ModelManticoreArmor.java net.redboltmedia.witchercraft.client.model
 node tools/bb2java.js models/blockbench/GriffinArmor.bbmodel ModelGriffinArmor model_griffin_armor models/mojmap-1.21.x/ModelGriffinArmor.java src/main/java/net/redboltmedia/witchercraft/client/model/ModelGriffinArmor.java net.redboltmedia.witchercraft.client.model
 node tools/bb2java.js models/blockbench/FelineArmor.bbmodel ModelFelineArmor model_feline_armor models/mojmap-1.21.x/ModelFelineArmor.java src/main/java/net/redboltmedia/witchercraft/client/model/ModelFelineArmor.java net.redboltmedia.witchercraft.client.model
+node tools/bb2java.js models/blockbench/ViperArmor.bbmodel ModelViperArmor model_viper_armor models/mojmap-1.21.x/ModelViperArmor.java src/main/java/net/redboltmedia/witchercraft/client/model/ModelViperArmor.java net.redboltmedia.witchercraft.client.model
 ```
+
+Viper's `.bbmodel` and texture were not painted by hand: `tools/viper-armor/viper_core.js` builds both
+(cubes and every texel) and runs unchanged in Node and in web Blockbench's console.
+`node tools/viper-armor/gen.js <dir>` writes `ViperArmor.bbmodel`, `viper_armor.png`, and a raw
+`viper_armor.rgba`; `node tools/viper-armor/render.js <bbmodel> <rgba> <out.png> [scale] [views]` renders
+front/back/side/walk previews over a magenta stand-in body, so any skin poking through shows up. To
+change Viper, edit `viper_core.js`, regenerate, copy the `.bbmodel` and PNG over the repo copies, and
+run bb2java as above. If the `.bbmodel` is edited in Blockbench instead, the generator is out of date.
 
 Then rebuild (MCreator build, or `gradlew compileJava` followed by running the client). The armor
 element itself does not need to change unless a part is renamed.
