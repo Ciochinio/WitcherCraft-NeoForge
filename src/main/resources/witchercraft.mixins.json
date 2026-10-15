@@ -6,7 +6,8 @@
   "mixins": [],
   "client": [
     "InventoryShellBackgroundMixin",
-    "ArmorStandCustomArmorPoseMixin"
+    "ArmorStandCustomArmorPoseMixin",
+    "LivingEntityRendererAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

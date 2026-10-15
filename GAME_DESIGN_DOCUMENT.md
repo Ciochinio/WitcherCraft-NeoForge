@@ -865,11 +865,22 @@ preparation, and getting it wrong means leaving most of your damage on the table
 
 ### The Bestiary
 
-The Bestiary is an in-game encyclopedia, opened from the system menu. Each creature has its own
-entry - lore, combat stats such as health and attacks, and the oil it's weak to - so a player who
-does their reading walks into a fight already knowing how to win it. Reading the Bestiary is the
-intended first step of any hunt, the same loop as consulting a contract board and then a book in
-the source games.
+The Bestiary is an in-game encyclopedia, the first half of the **Glossary** tab of the WitcherCraft
+menu (**G** opens it directly). Each creature has its own entry - its health, damage and armor, the oil
+it's weak to, and one description of what it is and how it fights - so a player who does their reading
+walks into a fight already knowing how to win it. Reading the Bestiary is the intended first step of
+any hunt, the same loop as consulting a contract board and then a book in the source games.
+
+The tab is laid out like the source games' bestiary, but nothing in it scrolls: a column of category
+icons (one per category, shown as that category's oil), the creatures of the chosen category, a 3D
+model of the chosen creature that you can drag to turn, the oils it is weak to under the model, and a
+text panel with the stats and the description, which turns like book pages. Every model is scaled to
+fit the model area, from a ghoul to a horse. Long lists and long texts split into pages instead of
+scrolling.
+
+Every creature tagged into a category appears, including vanilla creatures that are tagged, and its
+health, damage and armor are read live from the game, so the entry is always right. Entries will later
+unlock as you hunt: an unknown creature shows as a locked entry until you kill one.
 
 ### Monsters and alchemy
 
@@ -1143,9 +1154,12 @@ Travel is free in creative mode. It spends vanilla XP only and never touches Wit
 
 ### Glossary
 
-The Glossary is a reference for the Witcher universe's terminology - the in-world vocabulary a
-player new to the setting can lean on. It sits beside the Bestiary as the mod's "look things up"
-half.
+The Glossary is the mod's "look things up" tab in the WitcherCraft menu (**G**). It has two halves:
+the [Bestiary](#the-bestiary) and **Tutorials**, short guides to the mod's own mechanics grouped by
+system - Signs, Alchemy, Hunting and World - so a player can check how Signs, brewing, oils, Toxicity,
+the medallion, meditation or fast travel work without leaving the game. Each topic has a picture and a
+text that turns like book pages, and any key it mentions is shown as the key the player actually has
+bound. More topics are added as systems land.
 
 ### Admin and debug tools
 

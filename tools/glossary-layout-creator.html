@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>WitcherCraft glossary layout creator</title>
+	<style>
+		:root {
+			--bg: #14141a;
+			--panel: #1b1b22;
+			--panel-2: #0e0e13;
+			--line: #33333d;
+			--ink: #e8e8ef;
+			--ink-dim: #9a9aa6;
+			--accent: #c7a95b;
+			--code: #cfe8cf;
+			--stage-bg: #2c2618;
+			--nav-bg: #201d22;
+		}
+
+		* { box-sizing: border-box; }
+
+		body {
+			margin: 0;
+			background: var(--bg);
+			color: var(--ink);
+			font: 13px/1.5 Consolas, "Cascadia Mono", monospace;
+		}
+
+		header {
+			padding: 14px 20px;
+			border-bottom: 1px solid var(--line);
+			background: linear-gradient(180deg, #191921, var(--bg));
+		}
+
+		header h1 { margin: 0 0 4px; font-size: 17px; letter-spacing: .5px; color: var(--accent); }
+		header p { margin: 0; color: var(--ink-dim); }
+
+		.wrap { display: flex; gap: 20px; padding: 20px; flex-wrap: wrap; align-items: flex-start; }
+
+		/* ---- preview stage: the 640x360 design canvas at 1:1 ---- */
+		.stage-col { display: flex; flex-direction: column; gap: 8px; }
+		.stage {
+			position: relative;
+			width: 640px;
+			height: 360px;
+			background: var(--stage-bg);
+			border: 1px solid #444;
+			border-radius: 4px;
+			overflow: hidden;
+			box-shadow: 0 6px 24px rgba(0, 0, 0, .35);
+			font: 8px/1 Consolas, monospace;
+			user-select: none;
+		}
+
+		.nav {
+			position: absolute;
+			width: 100%;
+			height: 41px;
+			background: var(--nav-bg);
+			color: #888;
+			text-align: center;
+			padding: 13px;
+			font-size: 11px;
+		}
+
+		.content { position: absolute; left: 3px; top: 41px; width: 634px; height: 316px; outline: 1px dashed rgba(255, 255, 255, .08); }
+		.el { position: absolute; overflow: hidden; white-space: nowrap; }
+		.drag { cursor: move; }
+		.drag:hover { outline: 1px solid var(--accent); }
+		.view-toggle button.on { border-color: var(--accent); color: var(--accent); }
+
+		/* ---- control panel ---- */
+		.side { width: 560px; display: flex; flex-direction: column; gap: 4px; }
+
+		fieldset { border: 1px solid var(--line); border-radius: 4px; margin: 0 0 12px; padding: 8px 10px 10px; background: var(--panel); }
+		legend { padding: 0 6px; color: var(--accent); font-size: 12px; letter-spacing: .5px; text-transform: uppercase; }
+		.group { color: var(--ink-dim); font-size: 11px; margin: 6px 0 2px; }
+		label { display: inline-flex; gap: 6px; align-items: center; margin: 3px 8px 3px 0; color: var(--ink-dim); font-size: 11px; }
+
+		input {
+			width: 66px;
+			background: var(--panel-2);
+			color: var(--ink);
+			border: 1px solid #444;
+			border-radius: 3px;
+			padding: 3px 5px;
+			font: inherit;
+		}
+
+		input.color { width: 96px; }
+		input:focus { outline: none; border-color: var(--accent); }
+
+		.actions { display: flex; gap: 8px; margin: 4px 0 10px; }
+
+		button {
+			background: var(--panel);
+			color: var(--ink);
+			border: 1px solid #555;
+			border-radius: 3px;
+			padding: 7px 14px;
+			font: inherit;
+			cursor: pointer;
+		}
+
+		button:hover { border-color: var(--accent); background: #24242d; }
+		#copy { border-color: var(--accent); color: var(--accent); }
+
+		textarea {
+			width: 100%;
+			height: 260px;
+			background: var(--panel-2);
+			color: var(--code);
+			border: 1px solid #444;
+			border-radius: 4px;
+			padding: 10px;
+			font: inherit;
+			resize: vertical;
+		}
+
+		.hint { color: var(--ink-dim); font-size: 11px; }
+	</style>
+</head>
+<body>
+	<header>
+		<h1>WitcherCraft glossary layout creator</h1>
+		<p>Lays out the Glossary tab (GlossaryPage). Drag the panels or edit the numbers, then copy GlossaryLayout.java over the file.</p>
+	</header>
+
+	<div class="wrap">
+		<div class="stage-col">
+			<div class="actions view-toggle">
+				<button id="showBestiary" class="on">Bestiary</button>
+				<button id="showTutorials">Tutorials</button>
+			</div>
+			<div class="stage">
+				<div class="nav">shared navbar, non-editable</div>
+				<div class="content" id="content"></div>
+			</div>
+			<div class="hint">1:1 design canvas. Text widths are approximate (the game font is about 6 px per character).</div>
+		</div>
+
+		<div class="side">
+			<fieldset>
+				<legend>Geometry</legend>
+				<div id="inputs"></div>
+			</fieldset>
+
+			<fieldset>
+				<legend>Colours (0xAARRGGBB)</legend>
+				<div id="colorInputs"></div>
+			</fieldset>
+
+			<div class="actions">
+				<button id="copy">Copy GlossaryLayout.java</button>
+				<button id="reset">Reset</button>
+			</div>
+
+			<textarea id="out" spellcheck="false"></textarea>
+
+			<fieldset>
+				<legend>Import from Java</legend>
+				<textarea id="import" style="height:110px" placeholder="Paste GlossaryLayout.java"></textarea>
+				<div class="actions">
+					<button id="load">Import</button>
+				</div>
+			</fieldset>
+		</div>
+	</div>
+
+	<script>
+		// Sections of GlossaryLayout.java, in file order: the comment lines above each block and its fields.
+		const SECTIONS = [
+			{comments: ['// --- sub-tabs: a centred row of fixed-width tabs, styled like the navbar ---'],
+				fields: {SUBTAB_Y: 2, SUBTAB_W: 90, SUBTAB_H: 16, SUBTAB_GAP: 4}},
+			{comments: ['// --- Bestiary: category rail, one RAIL_CELL square per category ---------'],
+				fields: {RAIL_X: 6, RAIL_Y: 24, RAIL_W: 26, RAIL_H: 288, RAIL_PAD_Y: 5, RAIL_CELL: 20, RAIL_STEP: 23}},
+			{comments: ['// --- Bestiary: entry list (category name, then LIST_ROWS rows, then the page footer)'],
+				fields: {LIST_X: 36, LIST_Y: 24, LIST_W: 150, LIST_H: 288, LIST_HEADER_H: 20, LIST_ROW_H: 22, LIST_ROWS: 11}},
+			{comments: ['// --- Bestiary: doll area. The whole model fits DOLL_FILL_PERCENT of it at any angle (drag to rotate)'],
+				fields: {DOLL_X: 192, DOLL_Y: 30, DOLL_W: 228, DOLL_H: 220, DOLL_FILL_PERCENT: 90, DOLL_YAW: 25}},
+			{comments: ['// "Weak to" label and its icon cells, centred under the doll'],
+				fields: {WEAK_Y: 260, WEAK_CELL: 20, WEAK_GAP: 4}},
+			{comments: [
+				'// --- info panel (Bestiary entry text; also the Tutorials text) ------------',
+				'// Name at the top, then from BODY_Y the stats (Bestiary only, STATS_GAP',
+				'// below them) and the text split into pages of whole lines, and the page',
+				'// footer at the bottom.'],
+				fields: {INFO_X: 426, INFO_Y: 24, INFO_W: 202, INFO_H: 288, INFO_PAD: 8, BODY_Y: 24, STATS_GAP: 8, LINE_H: 10, FOOTER_H: 16, PAGE_BUTTON: 12}},
+			{comments: ['// --- Tutorials: topic list (group headers + entries) and illustration ------'],
+				fields: {TOPIC_X: 6, TOPIC_Y: 24, TOPIC_W: 180, TOPIC_H: 288, TOPIC_GROUP_H: 16, TOPIC_ROW_H: 14, IMAGE_X: 192, IMAGE_Y: 24, IMAGE_W: 228, IMAGE_H: 288, IMAGE_ICON_SCALE: 4}},
+			{comments: ['// --- colours (0xAARRGGBB). Sub-tabs match the navbar, panels the map, cells the skills tree.'],
+				colors: {SUBTAB_BG: '0x66101015', SUBTAB_BG_ACTIVE: '0xB0000000', SUBTAB_BORDER: '0xFF33333D', SUBTAB_TEXT: '0xFFC9C9D2', SUBTAB_TEXT_ACTIVE: '0xFFFFFFFF',
+					ACCENT: '0xFFFFDD55', PANEL_BG: '0xB0101015', PANEL_BORDER: '0xFF665E4A', DIVIDER: '0xFF3A3630', CELL_BORDER: '0xFF4A4A52', CELL_INNER: '0xFF1B1B20',
+					ROW_HOVER: '0xFF26262E', ROW_SELECTED: '0xFF393944', BUTTON_BG: '0xFF26262E', BUTTON_HOVER: '0xFF393944', TITLE: '0xFFD6AD52', TEXT: '0xFFE4DDCB',
+					BODY: '0xFFCFC7B0', TEXT_DIM: '0xFF777781'}}
+		];
+
+		const HEADER = `package net.redboltmedia.witchercraft;
+
+/**
+ * Geometry and colours of the Glossary tab ({@link GlossaryPage}): the sub-tab
+ * row (Bestiary, Tutorials), the Bestiary's category rail, entry list, doll and
+ * info panel, and the Tutorials' topic list and illustration. The Tutorials text
+ * reuses the info panel, so both sub-tabs share the same three columns.
+ *
+ * All coordinates are DESIGN-canvas pixels relative to the shell's content
+ * region (the area below the navbar, 634x316 on the 640x360 canvas).
+ *
+ * Generated by tools/glossary-layout-creator.html - paste this over the file
+ * wholesale. Keep it a dumb data holder (no logic) so the tool can overwrite it.
+ */
+public final class GlossaryLayout {
+	private GlossaryLayout() {
+	}
+`;
+
+		const defaults = {}, defaultColors = {};
+		for (const s of SECTIONS) {
+			Object.assign(defaults, s.fields || {});
+			Object.assign(defaultColors, s.colors || {});
+		}
+		let v = {...defaults}, colors = {...defaultColors}, view = 'bestiary';
+
+		const inputs = document.querySelector('#inputs'),
+			colorInputs = document.querySelector('#colorInputs'),
+			content = document.querySelector('#content'),
+			out = document.querySelector('#out');
+
+		for (const s of SECTIONS) {
+			if (!s.fields)
+				continue;
+			const g = document.createElement('div');
+			g.className = 'group';
+			g.textContent = s.comments[0].replace(/^\/\/\s*(---\s*)?/, '').replace(/\s*-+$/, '');
+			inputs.append(g);
+			for (const k of Object.keys(s.fields))
+				inputs.append(field(k, 'number', () => v[k], val => v[k] = Number(val)));
+		}
+		for (const k of Object.keys(colors))
+			colorInputs.append(field(k, 'text', () => colors[k], val => colors[k] = val, 'color'));
+
+		function field(k, type, get, set, cls) {
+			const l = document.createElement('label');
+			l.textContent = k;
+			const i = document.createElement('input');
+			i.type = type;
+			if (cls)
+				i.className = cls;
+			i.value = get();
+			i.dataset.key = k;
+			i.oninput = () => { set(i.value); render(); };
+			l.append(i);
+			return l;
+		}
+
+		// 0xAARRGGBB -> css rgba
+		function css(argb) {
+			const n = parseInt(String(argb).replace(/^0x/i, ''), 16) >>> 0;
+			return `rgba(${(n >>> 16) & 255},${(n >>> 8) & 255},${n & 255},${(((n >>> 24) & 255) / 255).toFixed(3)})`;
+		}
+
+		// approximate width of game-font text
+		const textW = s => s.length * 6;
+
+		function el(x, y, w, h, style = {}, text = '', drag = null) {
+			const d = document.createElement('div');
+			d.className = 'el' + (drag ? ' drag' : '');
+			Object.assign(d.style, {left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px'}, style);
+			if (text)
+				d.textContent = text;
+			if (drag)
+				d.onmousedown = e => startDrag(e, drag);
+			content.append(d);
+			return d;
+		}
+
+		function txt(x, y, s, color) {
+			return el(x, y, textW(s) + 2, 9, {color: css(color), fontSize: '8px', lineHeight: '9px'}, s);
+		}
+
+		function panel(x, y, w, h, drag) {
+			return el(x, y, w, h, {background: css(colors.PANEL_BG), border: '1px solid ' + css(colors.PANEL_BORDER)}, '', drag);
+		}
+
+		function cell(x, y, size, border, fill) {
+			el(x, y, size, size, {background: css(colors.CELL_INNER), border: '1px solid ' + css(border)});
+			if (fill)
+				el(x + (size - 12) / 2, y + (size - 12) / 2, 12, 12, {background: fill, borderRadius: '3px'});
+		}
+
+		function divider(x, y, w) {
+			el(x + 4, y, w - 8, 1, {background: css(colors.DIVIDER)});
+		}
+
+		function pager(left, footerY) {
+			const b = v.PAGE_BUTTON, label = '1 / 2', w = 2 * b + 12 + textW(label);
+			const y = footerY + (v.FOOTER_H - b) / 2;
+			for (const [bx, glyph] of [[left, '<'], [left + w - b, '>']])
+				el(bx, y, b, b, {background: css(colors.BUTTON_BG), border: '1px solid ' + css(colors.CELL_BORDER), color: css(colors.TEXT), textAlign: 'center', lineHeight: (b - 2) + 'px'}, glyph);
+			txt(left + (w - textW(label)) / 2, y + (b - 8) / 2 + 1, label, colors.TEXT_DIM);
+			return w;
+		}
+
+		function subTabs() {
+			const names = ['Bestiary', 'Tutorials'], total = names.length * v.SUBTAB_W + (names.length - 1) * v.SUBTAB_GAP;
+			names.forEach((n, i) => {
+				const x = (634 - total) / 2 + i * (v.SUBTAB_W + v.SUBTAB_GAP), active = (i === 0) === (view === 'bestiary');
+				el(x, v.SUBTAB_Y, v.SUBTAB_W, v.SUBTAB_H, {
+					background: css(active ? colors.SUBTAB_BG_ACTIVE : colors.SUBTAB_BG),
+					borderTop: '1px solid ' + css(colors.SUBTAB_BORDER), borderBottom: '1px solid ' + css(colors.SUBTAB_BORDER),
+					color: css(active ? colors.SUBTAB_TEXT_ACTIVE : colors.SUBTAB_TEXT), textAlign: 'center', lineHeight: (v.SUBTAB_H - 2) + 'px'
+				}, n);
+				if (active)
+					el(x + 3, v.SUBTAB_Y + v.SUBTAB_H, v.SUBTAB_W - 6, 1, {background: css(colors.ACCENT)});
+			});
+		}
+
+		// stats: fixed lines above a rule (Bestiary only); the text pages below them
+		function infoPanel(title, stats) {
+			panel(v.INFO_X, v.INFO_Y, v.INFO_W, v.INFO_H, ['INFO_X', 'INFO_Y']);
+			txt(v.INFO_X + v.INFO_PAD, v.INFO_Y + 6, title, colors.TITLE);
+			divider(v.INFO_X, v.INFO_Y + 17, v.INFO_W);
+			let bodyY = v.BODY_Y;
+			stats.forEach((s, i) => txt(v.INFO_X + v.INFO_PAD, v.INFO_Y + v.BODY_Y + i * v.LINE_H, s, colors.TEXT));
+			if (stats.length) {
+				bodyY += stats.length * v.LINE_H + v.STATS_GAP;
+				divider(v.INFO_X, v.INFO_Y + bodyY - Math.floor(v.STATS_GAP / 2) - 1, v.INFO_W);
+			}
+			const perPage = Math.max(1, Math.floor((v.INFO_H - bodyY - v.FOOTER_H) / v.LINE_H));
+			const chars = Math.floor((v.INFO_W - 2 * v.INFO_PAD) / 6);
+			for (let i = 0; i < perPage; i++)
+				txt(v.INFO_X + v.INFO_PAD, v.INFO_Y + bodyY + i * v.LINE_H, (i % 5 === 4 ? '' : 'Lorem ipsum dolor sit amet consectetur adipiscing elit'.slice(0, chars - (i % 3) * 4)), colors.BODY);
+			const fy = v.INFO_Y + v.INFO_H - v.FOOTER_H;
+			const w = 2 * v.PAGE_BUTTON + 12 + textW('1 / 2');
+			pager(v.INFO_X + v.INFO_W / 2 - w / 2, fy);
+		}
+
+		function renderBestiary() {
+			// rail
+			panel(v.RAIL_X, v.RAIL_Y, v.RAIL_W, v.RAIL_H, ['RAIL_X', 'RAIL_Y']);
+			const oilColors = ['#8a6a3a', '#5a4a7a', '#b05a2a', '#6a8a3a', '#4a7a5a', '#7a5a3a', '#3a6a7a', '#7a7a9a', '#8a2a2a', '#6a6a6a'];
+			for (let i = 0; i < 10; i++)
+				cell(v.RAIL_X + (v.RAIL_W - v.RAIL_CELL) / 2, v.RAIL_Y + v.RAIL_PAD_Y + i * v.RAIL_STEP, v.RAIL_CELL, i === 4 ? colors.ACCENT : colors.CELL_BORDER, oilColors[i]);
+
+			// entry list
+			panel(v.LIST_X, v.LIST_Y, v.LIST_W, v.LIST_H, ['LIST_X', 'LIST_Y']);
+			txt(v.LIST_X + v.INFO_PAD, v.LIST_Y + (v.LIST_HEADER_H - 8) / 2, 'Necrophages', colors.TITLE);
+			divider(v.LIST_X, v.LIST_Y + v.LIST_HEADER_H - 1, v.LIST_W);
+			const names = ['Alghoul', 'Ghoul', 'Zombie', 'Drowner', 'Rotfiend', 'Foglet', 'Grave Hag', 'Water Hag', 'Nekker', 'Wight', 'Devourer', 'Ekimmara'];
+			for (let r = 0; r < v.LIST_ROWS; r++) {
+				const rx = v.LIST_X + 3, ry = v.LIST_Y + v.LIST_HEADER_H + 2 + r * v.LIST_ROW_H, rw = v.LIST_W - 6, rh = v.LIST_ROW_H - 2;
+				if (r === 0) {
+					el(rx, ry, rw, rh, {background: css(colors.ROW_SELECTED)});
+					el(rx, ry, 2, rh, {background: css(colors.ACCENT)});
+				} else if (r === 2) {
+					el(rx, ry, rw, rh, {background: css(colors.ROW_HOVER)});
+				}
+				el(rx + 5, ry + (rh - 16) / 2, 16, 16, {background: '#6a5a4a', borderRadius: '50%'});
+				txt(rx + 26, ry + (rh - 8) / 2, names[r % names.length], r === 0 ? colors.SUBTAB_TEXT_ACTIVE : colors.TEXT);
+			}
+			const fy = v.LIST_Y + v.LIST_H - v.FOOTER_H;
+			const pw = 2 * v.PAGE_BUTTON + 12 + textW('1 / 2');
+			pager(v.LIST_X + v.LIST_W - 4 - pw, fy);
+
+			// doll box, model at DOLL_FILL_PERCENT of it, and the weaknesses
+			el(v.DOLL_X, v.DOLL_Y, v.DOLL_W, v.DOLL_H, {border: '1px dashed rgba(255,255,255,.25)'}, '', ['DOLL_X', 'DOLL_Y']);
+			const mh = v.DOLL_H * v.DOLL_FILL_PERCENT / 100, mw = mh * 0.5;
+			el(v.DOLL_X + (v.DOLL_W - mw) / 2, v.DOLL_Y + (v.DOLL_H - mh) / 2, mw, mh, {background: 'rgba(160,150,130,.35)', borderRadius: '40% 40% 12% 12%', color: css(colors.TEXT_DIM), textAlign: 'center', paddingTop: (mh / 2 - 4) + 'px'}, 'doll');
+			const cx = v.DOLL_X + v.DOLL_W / 2;
+			txt(cx - textW('Weak to') / 2, v.WEAK_Y, 'Weak to', colors.TEXT);
+			cell(cx - v.WEAK_CELL / 2, v.WEAK_Y + 12, v.WEAK_CELL, colors.CELL_BORDER, '#4a7a5a');
+
+			infoPanel('Alghoul', ['Health: 50', 'Damage: 5', 'Armor: 0']);
+		}
+
+		function renderTutorials() {
+			panel(v.TOPIC_X, v.TOPIC_Y, v.TOPIC_W, v.TOPIC_H, ['TOPIC_X', 'TOPIC_Y']);
+			const groups = [['Signs', ['Casting Signs', 'Sign Intensity']], ['Alchemy', ['Brewing', 'Oils', 'Toxicity']], ['Hunting', ['Witcher Medallion', 'Monster Categories']], ['World', ['Meditation', 'Fast Travel']]];
+			let ry = v.TOPIC_Y + 4, first = true;
+			for (const [g, topics] of groups) {
+				txt(v.TOPIC_X + v.INFO_PAD, ry + 5, g, colors.TITLE);
+				ry += v.TOPIC_GROUP_H;
+				for (const t of topics) {
+					const rx = v.TOPIC_X + 3, rw = v.TOPIC_W - 6;
+					if (first) {
+						el(rx, ry, rw, v.TOPIC_ROW_H, {background: css(colors.ROW_SELECTED)});
+						el(rx, ry, 2, v.TOPIC_ROW_H, {background: css(colors.ACCENT)});
+					}
+					txt(rx + 12, ry + (v.TOPIC_ROW_H - 8) / 2, t, first ? colors.SUBTAB_TEXT_ACTIVE : colors.TEXT);
+					ry += v.TOPIC_ROW_H;
+					first = false;
+				}
+			}
+			panel(v.IMAGE_X, v.IMAGE_Y, v.IMAGE_W, v.IMAGE_H, ['IMAGE_X', 'IMAGE_Y']);
+			const icon = 16 * v.IMAGE_ICON_SCALE;
+			el(v.IMAGE_X + (v.IMAGE_W - icon) / 2, v.IMAGE_Y + (v.IMAGE_H - icon) / 2, icon, icon, {background: 'rgba(200,120,40,.45)', borderRadius: '50%', color: css(colors.TEXT_DIM), textAlign: 'center', paddingTop: (icon / 2 - 4) + 'px'}, 'icon');
+			infoPanel('Casting Signs', []);
+		}
+
+		function render() {
+			content.innerHTML = '';
+			subTabs();
+			if (view === 'bestiary')
+				renderBestiary();
+			else
+				renderTutorials();
+			out.value = javaText();
+		}
+
+		function javaText() {
+			let s = HEADER;
+			for (const sec of SECTIONS) {
+				s += '\n';
+				for (const c of sec.comments)
+					s += '\t' + c + '\n';
+				for (const k of Object.keys(sec.fields || {}))
+					s += '\tpublic static final int ' + k + ' = ' + v[k] + ';\n';
+				for (const k of Object.keys(sec.colors || {}))
+					s += '\tpublic static final int ' + k + ' = ' + colors[k] + ';\n';
+			}
+			return s + '}\n';
+		}
+
+		// ---- drag a panel: moves its X/Y fields ----
+		let drag = null;
+		function startDrag(e, keys) {
+			drag = {keys, x: e.clientX, y: e.clientY, ox: v[keys[0]], oy: v[keys[1]]};
+			e.preventDefault();
+		}
+		window.addEventListener('mousemove', e => {
+			if (!drag)
+				return;
+			v[drag.keys[0]] = Math.round(drag.ox + e.clientX - drag.x);
+			v[drag.keys[1]] = Math.round(drag.oy + e.clientY - drag.y);
+			sync();
+			render();
+		});
+		window.addEventListener('mouseup', () => drag = null);
+
+		function setView(next) {
+			view = next;
+			document.querySelector('#showBestiary').classList.toggle('on', view === 'bestiary');
+			document.querySelector('#showTutorials').classList.toggle('on', view === 'tutorials');
+			render();
+		}
+		document.querySelector('#showBestiary').onclick = () => setView('bestiary');
+		document.querySelector('#showTutorials').onclick = () => setView('tutorials');
+
+		document.querySelector('#copy').onclick = () => navigator.clipboard.writeText(out.value);
+		document.querySelector('#reset').onclick = () => { v = {...defaults}; colors = {...defaultColors}; sync(); render(); };
+		document.querySelector('#load').onclick = () => {
+			const s = document.querySelector('#import').value;
+			for (const k of Object.keys(v)) {
+				const m = s.match(new RegExp('int\\s+' + k + '\\s*=\\s*(-?\\d+)\\s*;'));
+				if (m)
+					v[k] = Number(m[1]);
+			}
+			for (const k of Object.keys(colors)) {
+				const m = s.match(new RegExp('int\\s+' + k + '\\s*=\\s*(0x[0-9A-Fa-f]+)'));
+				if (m)
+					colors[k] = m[1];
+			}
+			sync();
+			render();
+		};
+
+		function sync() {
+			for (const i of inputs.querySelectorAll('input'))
+				i.value = v[i.dataset.key];
+			for (const i of colorInputs.querySelectorAll('input'))
+				i.value = colors[i.dataset.key];
+		}
+
+		render();
+	</script>
+</body>
+</html>

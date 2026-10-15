@@ -11185,7 +11185,8 @@
       "EntityWolf"
     ],
     "ENTITIES:mod:draconid": [
-      "EntityBlaze"
+      "EntityBlaze",
+      "CUSTOM:Cockatrice"
     ],
     "ENTITIES:mod:cursed": [
       "EntitySkeleton"
@@ -11786,7 +11787,51 @@
       "gui.witchercraft.shell.skills.slot_level": "%s",
       "item.witchercraft.chain_hook": "Chain Hook",
       "entity.witchercraft.chain_hook": "Chain Hook",
-      "item.witchercraft.aerondight": "Aerondight"
+      "item.witchercraft.aerondight": "Aerondight",
+      "glossary.witchercraft.tab.bestiary": "Bestiary",
+      "glossary.witchercraft.tab.tutorials": "Tutorials",
+      "glossary.witchercraft.category.beast": "Beasts",
+      "glossary.witchercraft.category.cursed": "Cursed Ones",
+      "glossary.witchercraft.category.draconid": "Draconids",
+      "glossary.witchercraft.category.insectoid": "Insectoids",
+      "glossary.witchercraft.category.necrophage": "Necrophages",
+      "glossary.witchercraft.category.ogroid": "Ogroids",
+      "glossary.witchercraft.category.relict": "Relicts",
+      "glossary.witchercraft.category.specter": "Specters",
+      "glossary.witchercraft.category.vampire": "Vampires",
+      "glossary.witchercraft.category.humanoid": "Humans",
+      "glossary.witchercraft.empty_category": "Nothing recorded yet.",
+      "glossary.witchercraft.no_notes": "Nothing recorded yet.",
+      "glossary.witchercraft.weak_to": "Weak to",
+      "glossary.witchercraft.drag_hint": "Drag to rotate",
+      "glossary.witchercraft.stat.health": "Health:",
+      "glossary.witchercraft.stat.damage": "Damage:",
+      "glossary.witchercraft.stat.armor": "Armor:",
+      "glossary.witchercraft.tutorial_group.signs": "Signs",
+      "glossary.witchercraft.tutorial_group.alchemy": "Alchemy",
+      "glossary.witchercraft.tutorial_group.hunting": "Hunting",
+      "glossary.witchercraft.tutorial_group.world": "World",
+      "glossary.witchercraft.tutorial.signs.title": "Casting Signs",
+      "glossary.witchercraft.tutorial.signs.text": "Signs are a witcher\u0027s battle magic: short bursts that buy room, pin a crowd or turn a fight.\n\nPress %1$s to open the Sign menu and pick a Sign. It stays your active Sign until you pick another. Press %2$s to cast it.\n\nA cast costs stamina - your hunger bar, shown as a white stamina meter - and starts a shared cooldown of about two seconds. With too little stamina the cast is refused and nothing is spent.\n\nAard throws enemies back. Igni burns everything in a line in front of you. Quen shields you from damage for 10 seconds. Yrden lays a ring that slows anything inside it. Axii freezes the creature you aim at, and gives the stamina back if there is nothing there.",
+      "glossary.witchercraft.tutorial.sign_intensity.title": "Sign Intensity",
+      "glossary.witchercraft.tutorial.sign_intensity.text": "Sign Intensity is how strong your Signs are. It is worked out all the time from whatever is boosting it right now, so a bonus counts the moment it starts and stops the moment it ends.\n\nSigns-tree perks, Griffin armor and some alchemy add to it. Petri\u0027s Philter raises it for a while, and Foglet Decoction raises it while it rains.\n\nYour current Sign Intensity is shown on the character screen.",
+      "glossary.witchercraft.tutorial.brewing.title": "Brewing",
+      "glossary.witchercraft.tutorial.brewing.text": "You can brew anywhere. Open the WitcherCraft menu with %1$s and go to the Alchemy tab, or press %2$s to open it directly.\n\nPut a base in the centre of the circle and the ingredients in the five slots around it, then press Brew. The base decides what you make: alcohol makes potions, White Gull makes decoctions, Tallow makes oils and Saltpeter makes bombs.\n\nA recipe needs exactly its ingredients, in any order. If the mix is wrong nothing happens and nothing is used up, so trying costs nothing. Potions and decoctions come out one at a time, oils and bombs three at a time.\n\nClosing the tab or taking a hit from a monster puts everything in the circle back into your inventory.",
+      "glossary.witchercraft.tutorial.oils.title": "Oils",
+      "glossary.witchercraft.tutorial.oils.text": "An oil coats your blade so it hits one kind of monster harder.\n\nHold the oil in your off-hand and a sword in your main hand, then use the oil. Each use takes one oil. A blade carries one oil at a time and keeps it until you apply a different one. After applying, oils are on a 10 second cooldown.\n\nThe bonus damage only lands on monsters of the oil\u0027s category; on anything else it does nothing. Every Bestiary entry shows which oil works on that creature.",
+      "glossary.witchercraft.tutorial.toxicity.title": "Toxicity",
+      "glossary.witchercraft.tutorial.toxicity.text": "Every potion and decoction you drink adds Toxicity: 10 to 25 for a potion, 50 for a decoction. The Toxicity bar sits above your hunger bar.\n\nToxicity drains on its own, 1 point every 3 seconds. Below your Overdose Threshold there is no penalty. Above it you take damage every tick until it drops back under, and the further over you are, the more it hurts.\n\nWhite Honey sets Toxicity to 0 at once, but it also removes every potion and decoction effect you have.\n\nThe Alchemy skill tree raises your Overdose Threshold.",
+      "glossary.witchercraft.tutorial.medallion.title": "Witcher Medallion",
+      "glossary.witchercraft.tutorial.medallion.text": "The medallion in the middle of your HUD shakes when monsters are near. The closer they get, the harder it shakes.\n\nIt senses through walls, up to 24 blocks away, so the warning comes before you can see what caused it.\n\nIt reacts to monsters, not people: bandits will not move it, but hostile creatures from other mods will.",
+      "glossary.witchercraft.tutorial.monster_categories.title": "Monster Categories",
+      "glossary.witchercraft.tutorial.monster_categories.text": "Every monster belongs to a category - Beasts, Cursed Ones, Draconids, Insectoids, Necrophages, Ogroids, Relicts, Specters, Vampires or Humans - and every category has an oil that hurts it.\n\nThe Bestiary (%1$s) lists the creatures of each category. Pick one to see its model, what it is weak to, and what is known about it.\n\nCoat your blade with the right oil before a hunt. The wrong one does nothing.",
+      "glossary.witchercraft.tutorial.meditation.title": "Meditation",
+      "glossary.witchercraft.tutorial.meditation.text": "Meditation moves time forward. Open it with %1$s or from the WitcherCraft menu, pick an hour on the dial, and the world speeds up to that hour.\n\nUse it to wait for nightfall, skip to daylight, or let your Toxicity drain.\n\nYou cannot meditate in a cramped space or with monsters nearby. It costs stamina: 2 to set up camp and 2 more for every 4 hours, 12 at most. A campfire close by makes setting up free.\n\nTaking damage from a monster or a player stops it. Meditating is not sleeping, so it does not keep phantoms away.",
+      "glossary.witchercraft.tutorial.fast_travel.title": "Fast Travel",
+      "glossary.witchercraft.tutorial.fast_travel.text": "Signposts are fast-travel destinations. Every village has one near its bell, and you can craft your own and place them anywhere in the Overworld.\n\nA signpost shows on the map as a question mark once you are within 128 blocks, and you discover it when you get within 16 blocks.\n\nRight-click a signpost to open the map in travel mode, then click another signpost to travel there. A trip costs 5 XP plus 1 for every 100 blocks. You cannot set off in combat or with monsters nearby.",
+      "glossary.witchercraft.ghoul.description": "Ghouls feed on the dead. They gather wherever corpses lie unburied - old battlefields, plague pits, forgotten graveyards - and can smell rot from miles away.\n\nAlone, a ghoul is a coward. In a pack it grows bold enough to rush the living, and the pack is rarely far behind the first one you see. Smaller and faster than its alghoul cousin, a ghoul closes the distance quickly and strikes with a heavy slap.\n\nGhouls do not appear in the wild yet; for now they only come from a spawn egg.",
+      "glossary.witchercraft.alghoul.description": "An alghoul is what a ghoul becomes when it has fed long enough: bigger, smarter and far more dangerous. It leads the pack rather than following it.\n\nIts spikes stay hidden at first. Once it has been fighting for a few seconds it raises a crest of bony spikes along its back, and while they are up every blow you land on it pricks you back for 2 damage. Axii stops it raising its spikes and forces raised ones back down; until Axii can do this, a Night Vision effect on the alghoul stands in for it.\n\nAlghouls do not appear in the wild yet; for now they only come from a spawn egg.",
+      "glossary.witchercraft.cockatrice.description": "A draconid with the body of a great bird and a serpent\u0027s tail. Cockatrices are territorial and quick to anger.\n\nLeft alone, one wanders on foot and now and then takes to the air for a short flight, landing not far from where it started. On the ground it fights with a head bash or a wing slam; in a fight it can also take a short flight and strike with both wings from the air.\n\nCockatrices do not appear in the wild yet; for now they only come from a spawn egg."
     }
   },
   "metadata": {

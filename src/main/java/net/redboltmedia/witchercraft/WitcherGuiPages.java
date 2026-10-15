@@ -41,6 +41,10 @@ public final class WitcherGuiPages {
 
 		MapPage map = new MapPage();
 		CUSTOM.put(map.id(), map);
+
+		// Bestiary + Tutorials.
+		GlossaryPage glossary = new GlossaryPage("glossary");
+		CUSTOM.put(glossary.id(), glossary);
 	}
 
 	/** The page handling a given id (never null - falls back to a PlaceholderPage). */
