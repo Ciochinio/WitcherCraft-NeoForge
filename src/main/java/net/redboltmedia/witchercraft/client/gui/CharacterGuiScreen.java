@@ -76,8 +76,6 @@ public class CharacterGuiScreen extends AbstractContainerScreen<CharacterGuiMenu
 		guiGraphics.text(this.font, Component.translatable("gui.witchercraft.character_gui.label_movement_speed"), 6, 16, -12829636, false);
 		guiGraphics.text(this.font, Component.translatable("gui.witchercraft.character_gui.label_attack_speed"), 6, 25, -12829636, false);
 		guiGraphics.text(this.font, CharacterGuiAttackSpeedProcedure.execute(entity), 87, 25, -12829636, false);
-		guiGraphics.text(this.font, Component.translatable("gui.witchercraft.character_gui.label_crit_chance"), 6, 34, -12829636, false);
-		guiGraphics.text(this.font, CharacterGuiCritChanceProcedure.execute(entity), 87, 34, -12829636, false);
 		guiGraphics.text(this.font, Component.translatable("gui.witchercraft.character_gui.label_crit_damage"), 6, 43, -12829636, false);
 		guiGraphics.text(this.font, CharacterGuiCritDamageProcedure.execute(entity), 87, 43, -12829636, false);
 		guiGraphics.text(this.font, Component.translatable("gui.witchercraft.character_gui.label_health"), 6, 52, -12829636, false);

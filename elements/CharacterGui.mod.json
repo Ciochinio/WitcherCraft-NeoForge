@@ -97,41 +97,6 @@
       {
         "type": "label",
         "data": {
-          "name": "label_crit_chance",
-          "text": {
-            "fixedValue": "Crit Chance"
-          },
-          "color": {
-            "value": -12829636,
-            "falpha": 0.0
-          },
-          "hasShadow": false,
-          "x": 132,
-          "y": 71,
-          "locked": false
-        }
-      },
-      {
-        "type": "label",
-        "data": {
-          "name": "label_proc_character_gui_crit_chance",
-          "text": {
-            "fixedValue": "",
-            "name": "CharacterGuiCritChance"
-          },
-          "color": {
-            "value": -12829636,
-            "falpha": 0.0
-          },
-          "hasShadow": false,
-          "x": 213,
-          "y": 71,
-          "locked": false
-        }
-      },
-      {
-        "type": "label",
-        "data": {
           "name": "label_crit_damage",
           "text": {
             "fixedValue": "Crit Damage"

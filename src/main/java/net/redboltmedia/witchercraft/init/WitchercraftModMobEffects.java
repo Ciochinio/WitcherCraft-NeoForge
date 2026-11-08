@@ -3,7 +3,11 @@
  */
 package net.redboltmedia.witchercraft.init;
 
-import net.redboltmedia.witchercraft.procedures.*;
+import net.redboltmedia.witchercraft.procedures.WyvernDecoctionEndProcedure;
+import net.redboltmedia.witchercraft.procedures.SuccubusDecoctionEndProcedure;
+import net.redboltmedia.witchercraft.procedures.QuenBrokeProcedure;
+import net.redboltmedia.witchercraft.procedures.QuenActiveShieldDropProcedure;
+import net.redboltmedia.witchercraft.procedures.GraveHagDecoctionEndProcedure;
 import net.redboltmedia.witchercraft.potion.*;
 import net.redboltmedia.witchercraft.WitchercraftMod;
 
@@ -45,10 +49,8 @@ public class WitchercraftModMobEffects {
 	public static final DeferredHolder<MobEffect, MobEffect> BLEED = REGISTRY.register("bleed", BleedMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> ENEMY_NEARBY = REGISTRY.register("enemy_nearby", EnemyNearbyMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> UNDYING_COOLDOWN = REGISTRY.register("undying_cooldown", UndyingCooldownMobEffect::new);
-	public static final DeferredHolder<MobEffect, MobEffect> DODGE_COOLDOWN = REGISTRY.register("dodge_cooldown", DodgeCooldownMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> PETRIS_PHILTER_EFFECT = REGISTRY.register("petris_philter_effect", PetrisPhilterEffectMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> PLAYER_TRACKER = REGISTRY.register("player_tracker", PlayerTrackerMobEffect::new);
-	public static final DeferredHolder<MobEffect, MobEffect> CORRECT_OIL = REGISTRY.register("correct_oil", CorrectOilMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> WATER_HAG_DECOCTION_EFFECT = REGISTRY.register("water_hag_decoction_effect", WaterHagDecoctionEffectMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> EKIMMARA_DECOCTION_EFFECT = REGISTRY.register("ekimmara_decoction_effect", EkimmaraDecoctionEffectMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> KATAKAN_DECOCTION_EFFECT = REGISTRY.register("katakan_decoction_effect", KatakanDecoctionEffectMobEffect::new);
@@ -68,7 +70,6 @@ public class WitchercraftModMobEffects {
 	public static final DeferredHolder<MobEffect, MobEffect> QUEN_ACTIVE_SHIELD = REGISTRY.register("quen_active_shield", QuenActiveShieldMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> SIGN_HOLD = REGISTRY.register("sign_hold", SignHoldMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> QUEN_EFFECT = REGISTRY.register("quen_effect", QuenEffectMobEffect::new);
-	public static final DeferredHolder<MobEffect, MobEffect> DAMAGE_BLOCKED = REGISTRY.register("damage_blocked", DamageBlockedMobEffect::new);
 
 	@SubscribeEvent
 	public static void onEffectRemoved(MobEffectEvent.Remove event) {
@@ -87,9 +88,7 @@ public class WitchercraftModMobEffects {
 	}
 
 	private static void expireEffects(Entity entity, MobEffectInstance effectInstance) {
-		if (effectInstance.is(CORRECT_OIL)) {
-			CorrectOilEndProcedure.execute(entity);
-		} else if (effectInstance.is(WYVERN_DECOCTION_EFFECT)) {
+		if (effectInstance.is(WYVERN_DECOCTION_EFFECT)) {
 			WyvernDecoctionEndProcedure.execute(entity);
 		} else if (effectInstance.is(SUCCUBUS_DECOCTION_EFFECT)) {
 			SuccubusDecoctionEndProcedure.execute(entity);

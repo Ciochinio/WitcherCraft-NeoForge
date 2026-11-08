@@ -33,8 +33,6 @@ import java.util.function.Supplier;
 public class WitchercraftModVariables {
 	public static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister.create(NeoForgeRegistries.Keys.ATTACHMENT_TYPES, WitchercraftMod.MODID);
 	public static final Supplier<AttachmentType<PlayerVariables>> PLAYER_VARIABLES = ATTACHMENT_TYPES.register("player_variables", () -> AttachmentType.serializable(PlayerVariables::new).build());
-	public static double witchercraftSeconds = 0;
-	public static double witchercraftMinutes = 0;
 	public static double meditationState = 0;
 	public static double meditationAnchorTicks = 0;
 	public static double meditationDeltaTicks = 0;
@@ -89,7 +87,6 @@ public class WitchercraftModVariables {
 		clone.witchercraftPerkSocket10 = original.witchercraftPerkSocket10;
 		clone.witchercraftPerkSocket11 = original.witchercraftPerkSocket11;
 		clone.witchercraftPerkSocket12 = original.witchercraftPerkSocket12;
-		clone.witchercraftSelectedPerk = original.witchercraftSelectedPerk;
 		clone.witchercraftEquippedPerkAnatomicalKnowledge = original.witchercraftEquippedPerkAnatomicalKnowledge;
 		clone.witchercraftEquippedPerkColdBlood = original.witchercraftEquippedPerkColdBlood;
 		clone.witchercraftEquippedPerkCripplingShot = original.witchercraftEquippedPerkCripplingShot;
@@ -220,7 +217,6 @@ public class WitchercraftModVariables {
 		public double witchercraftPerkSocket10 = 0;
 		public double witchercraftPerkSocket11 = 0;
 		public double witchercraftPerkSocket12 = 0;
-		public double witchercraftSelectedPerk = 0;
 		public boolean witchercraftEquippedPerkAnatomicalKnowledge = false;
 		public boolean witchercraftEquippedPerkColdBlood = false;
 		public boolean witchercraftEquippedPerkCripplingShot = false;
@@ -347,7 +343,6 @@ public class WitchercraftModVariables {
 			output.putDouble("witchercraftPerkSocket10", witchercraftPerkSocket10);
 			output.putDouble("witchercraftPerkSocket11", witchercraftPerkSocket11);
 			output.putDouble("witchercraftPerkSocket12", witchercraftPerkSocket12);
-			output.putDouble("witchercraftSelectedPerk", witchercraftSelectedPerk);
 			output.putBoolean("witchercraftEquippedPerkAnatomicalKnowledge", witchercraftEquippedPerkAnatomicalKnowledge);
 			output.putBoolean("witchercraftEquippedPerkColdBlood", witchercraftEquippedPerkColdBlood);
 			output.putBoolean("witchercraftEquippedPerkCripplingShot", witchercraftEquippedPerkCripplingShot);
@@ -475,7 +470,6 @@ public class WitchercraftModVariables {
 			witchercraftPerkSocket10 = input.getDoubleOr("witchercraftPerkSocket10", 0);
 			witchercraftPerkSocket11 = input.getDoubleOr("witchercraftPerkSocket11", 0);
 			witchercraftPerkSocket12 = input.getDoubleOr("witchercraftPerkSocket12", 0);
-			witchercraftSelectedPerk = input.getDoubleOr("witchercraftSelectedPerk", 0);
 			witchercraftEquippedPerkAnatomicalKnowledge = input.getBooleanOr("witchercraftEquippedPerkAnatomicalKnowledge", false);
 			witchercraftEquippedPerkColdBlood = input.getBooleanOr("witchercraftEquippedPerkColdBlood", false);
 			witchercraftEquippedPerkCripplingShot = input.getBooleanOr("witchercraftEquippedPerkCripplingShot", false);

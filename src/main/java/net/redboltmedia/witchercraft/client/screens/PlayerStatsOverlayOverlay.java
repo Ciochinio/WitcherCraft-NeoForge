@@ -33,7 +33,6 @@ public class PlayerStatsOverlayOverlay {
 		if (PlayerStatsOverlayOnProcedure.execute(entity)) {
 			event.getGuiGraphics().text(Minecraft.getInstance().font, Component.translatable("gui.witchercraft.player_stats_overlay.label_movementspeed"), w / 2 + -207, h / 2 + -112, -1, false);
 			event.getGuiGraphics().text(Minecraft.getInstance().font, Component.translatable("gui.witchercraft.player_stats_overlay.label_attackspeed"), w / 2 + -207, h / 2 + -103, -1, false);
-			event.getGuiGraphics().text(Minecraft.getInstance().font, Component.translatable("gui.witchercraft.player_stats_overlay.label_critchance"), w / 2 + -207, h / 2 + -94, -1, false);
 			event.getGuiGraphics().text(Minecraft.getInstance().font, Component.translatable("gui.witchercraft.player_stats_overlay.label_critdamage"), w / 2 + -207, h / 2 + -85, -1, false);
 			event.getGuiGraphics().text(Minecraft.getInstance().font, Component.translatable("gui.witchercraft.player_stats_overlay.label_health"), w / 2 + -207, h / 2 + -76, -1, false);
 			event.getGuiGraphics().text(Minecraft.getInstance().font, Component.translatable("gui.witchercraft.player_stats_overlay.label_healthregen"), w / 2 + -207, h / 2 + -67, -1, false);
@@ -44,9 +43,6 @@ public class PlayerStatsOverlayOverlay {
 			event.getGuiGraphics().text(Minecraft.getInstance().font,
 
 					CharacterGuiAttackSpeedProcedure.execute(entity), w / 2 + -108, h / 2 + -103, -1, false);
-			event.getGuiGraphics().text(Minecraft.getInstance().font,
-
-					CharacterGuiCritChanceProcedure.execute(entity), w / 2 + -108, h / 2 + -94, -1, false);
 			event.getGuiGraphics().text(Minecraft.getInstance().font,
 
 					CharacterGuiCritDamageProcedure.execute(entity), w / 2 + -108, h / 2 + -85, -1, false);
@@ -75,14 +71,6 @@ public class PlayerStatsOverlayOverlay {
 			event.getGuiGraphics().text(Minecraft.getInstance().font,
 
 					CharacterGuiAdditionalDamageProcedure.execute(entity), w / 2 + -108, h / 2 + -31, -1, false);
-			event.getGuiGraphics().text(Minecraft.getInstance().font, Component.translatable("gui.witchercraft.player_stats_overlay.label_dodge_chance"), w / 2 + -207, h / 2 + -13, -1, false);
-			event.getGuiGraphics().text(Minecraft.getInstance().font,
-
-					CharacterGuiDodgeChanceProcedure.execute(entity), w / 2 + -108, h / 2 + -13, -1, false);
-			event.getGuiGraphics().text(Minecraft.getInstance().font, Component.translatable("gui.witchercraft.player_stats_overlay.label_instantkillchance"), w / 2 + -207, h / 2 + -4, -1, false);
-			event.getGuiGraphics().text(Minecraft.getInstance().font,
-
-					CharacterGuiInstantKillChanceProcedure.execute(entity), w / 2 + -108, h / 2 + -4, -1, false);
 			event.getGuiGraphics().text(Minecraft.getInstance().font, Component.translatable("gui.witchercraft.player_stats_overlay.label_potion_duration"), w / 2 + -207, h / 2 + 5, -1, false);
 			event.getGuiGraphics().text(Minecraft.getInstance().font,
 
@@ -99,10 +87,6 @@ public class PlayerStatsOverlayOverlay {
 			event.getGuiGraphics().text(Minecraft.getInstance().font,
 
 					CharacterGuiLifeStealProcedure.execute(entity), w / 2 + -108, h / 2 + 32, -1, false);
-			event.getGuiGraphics().text(Minecraft.getInstance().font, Component.translatable("gui.witchercraft.player_stats_overlay.label_reflectdamage"), w / 2 + -207, h / 2 + 41, -1, false);
-			event.getGuiGraphics().text(Minecraft.getInstance().font,
-
-					CharacterGuiReflectDamageProcedure.execute(entity), w / 2 + -108, h / 2 + 41, -1, false);
 			event.getGuiGraphics().text(Minecraft.getInstance().font, Component.translatable("gui.witchercraft.player_stats_overlay.label_signhold"), w / 2 + -207, h / 2 + 50, -1, false);
 			event.getGuiGraphics().text(Minecraft.getInstance().font,
 

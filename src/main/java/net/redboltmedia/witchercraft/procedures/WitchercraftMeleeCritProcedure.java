@@ -28,6 +28,7 @@ public class WitchercraftMeleeCritProcedure {
 		if (sourceentity == null)
 			return;
 		double critBonus = 0;
+		double hitType = 0;
 		if (sourceentity instanceof LivingEntity _livingEntity0 && _livingEntity0.getAttributes().hasAttribute(WitchercraftModAttributes.CRIT_DAMAGE)) {
 			critBonus = 0;
 			if (isvanillacritical) {
@@ -38,15 +39,24 @@ public class WitchercraftMeleeCritProcedure {
 						+ (sourceentity instanceof LivingEntity _livingEntity1 && _livingEntity1.getAttributes().hasAttribute(WitchercraftModAttributes.CRIT_DAMAGE) ? _livingEntity1.getAttribute(WitchercraftModAttributes.CRIT_DAMAGE).getValue() : 0)
 								* 0.01;
 			}
+			hitType = 0;
+			if (IsFullyChargedAttackProcedure.execute(sourceentity)) {
+				if (isvanillacritical) {
+					hitType = 2;
+				} else {
+					hitType = 1;
+				}
+			}
 			if (critBonus > 0) {
 				if (event instanceof CriticalHitEvent _event)
 					_event.setCriticalHit(true);
 				if (event instanceof CriticalHitEvent _event) {
 					_event.setDamageMultiplier(1);
 				}
-				sourceentity.getPersistentData().putDouble("witchercraftCritBonus", critBonus);
-				sourceentity.getPersistentData().putDouble("witchercraftCritTick", (sourceentity.tickCount));
 			}
+			sourceentity.getPersistentData().putDouble("witchercraftCritBonus", critBonus);
+			sourceentity.getPersistentData().putDouble("witchercraftHitType", hitType);
+			sourceentity.getPersistentData().putDouble("witchercraftHitTick", (sourceentity.tickCount));
 		}
 	}
 }

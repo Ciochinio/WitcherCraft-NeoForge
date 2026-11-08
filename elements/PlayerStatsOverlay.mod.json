@@ -43,24 +43,6 @@
       {
         "type": "label",
         "data": {
-          "name": "label_critchance",
-          "text": {
-            "fixedValue": "CritChance"
-          },
-          "color": {
-            "value": -1,
-            "falpha": 0.0
-          },
-          "hasShadow": false,
-          "anchorPoint": "CENTER",
-          "x": 6,
-          "y": 26,
-          "locked": false
-        }
-      },
-      {
-        "type": "label",
-        "data": {
           "name": "label_critdamage",
           "text": {
             "fixedValue": "CritDamage"
@@ -165,25 +147,6 @@
           "anchorPoint": "CENTER",
           "x": 105,
           "y": 17,
-          "locked": false
-        }
-      },
-      {
-        "type": "label",
-        "data": {
-          "name": "label_proc_character_gui_crit_chance",
-          "text": {
-            "fixedValue": "",
-            "name": "CharacterGuiCritChance"
-          },
-          "color": {
-            "value": -1,
-            "falpha": 0.0
-          },
-          "hasShadow": false,
-          "anchorPoint": "CENTER",
-          "x": 105,
-          "y": 26,
           "locked": false
         }
       },
@@ -414,80 +377,6 @@
       {
         "type": "label",
         "data": {
-          "name": "label_dodge_chance",
-          "text": {
-            "fixedValue": "Dodge Chance"
-          },
-          "color": {
-            "value": -1,
-            "falpha": 0.0
-          },
-          "hasShadow": false,
-          "anchorPoint": "CENTER",
-          "x": 6,
-          "y": 107,
-          "locked": false
-        }
-      },
-      {
-        "type": "label",
-        "data": {
-          "name": "label_proc_character_gui_dodge_chance",
-          "text": {
-            "fixedValue": "",
-            "name": "CharacterGuiDodgeChance"
-          },
-          "color": {
-            "value": -1,
-            "falpha": 0.0
-          },
-          "hasShadow": false,
-          "anchorPoint": "CENTER",
-          "x": 105,
-          "y": 107,
-          "locked": false
-        }
-      },
-      {
-        "type": "label",
-        "data": {
-          "name": "label_instantkillchance",
-          "text": {
-            "fixedValue": "InstantKillChance"
-          },
-          "color": {
-            "value": -1,
-            "falpha": 0.0
-          },
-          "hasShadow": false,
-          "anchorPoint": "CENTER",
-          "x": 6,
-          "y": 116,
-          "locked": false
-        }
-      },
-      {
-        "type": "label",
-        "data": {
-          "name": "label_proc_character_gui_instant_kill",
-          "text": {
-            "fixedValue": "",
-            "name": "CharacterGuiInstantKillChance"
-          },
-          "color": {
-            "value": -1,
-            "falpha": 0.0
-          },
-          "hasShadow": false,
-          "anchorPoint": "CENTER",
-          "x": 105,
-          "y": 116,
-          "locked": false
-        }
-      },
-      {
-        "type": "label",
-        "data": {
           "name": "label_potion_duration",
           "text": {
             "fixedValue": "Potion Duration"
@@ -630,43 +519,6 @@
           "anchorPoint": "CENTER",
           "x": 105,
           "y": 152,
-          "locked": false
-        }
-      },
-      {
-        "type": "label",
-        "data": {
-          "name": "label_reflectdamage",
-          "text": {
-            "fixedValue": "ReflectDamage"
-          },
-          "color": {
-            "value": -1,
-            "falpha": 0.0
-          },
-          "hasShadow": false,
-          "anchorPoint": "CENTER",
-          "x": 6,
-          "y": 161,
-          "locked": false
-        }
-      },
-      {
-        "type": "label",
-        "data": {
-          "name": "label_proc_character_gui_reflect_damag",
-          "text": {
-            "fixedValue": "",
-            "name": "CharacterGuiReflectDamage"
-          },
-          "color": {
-            "value": -1,
-            "falpha": 0.0
-          },
-          "hasShadow": false,
-          "anchorPoint": "CENTER",
-          "x": 105,
-          "y": 161,
           "locked": false
         }
       },

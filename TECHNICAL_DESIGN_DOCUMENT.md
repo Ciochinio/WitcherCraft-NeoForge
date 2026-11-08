@@ -271,9 +271,10 @@ player variable, no procedure running on the server, and no packet. It therefore
 This matters because the obvious thing to reuse is
 [EnemyNearbyDetection](../elements/EnemyNearbyDetection.mod.json), the Cold Blood feeder, and it is
 not fit for it. That procedure runs a full AABB scan **every tick for every player** and calls
-`markSyncDirty()` once per entity found. It is also logically wrong: the flag is reassigned on each
-loop iteration, so the *farthest* entity in range decides the result. Fixing it is a separate job;
-do not build on it.
+`markSyncDirty()` once per mob found. (Its logic bug - the *farthest* entity in range used to decide
+the result - is fixed: it now clears the flag first and only sets it. With `DevLog` on it also shows
+the `EnemyNearby` effect icon as a marker for the flag.) The per-tick scan and sync cost still stand,
+so do not build on it.
 
 The scan runs every `MEDALLION_SCAN_INTERVAL` ticks (**10**) and caches an intensity step:
 
@@ -456,20 +457,20 @@ modifier is added or removed, and `setSyncable(true)` handles the client copy.
 
 ### 2.3 The pieces
 
-**14 custom attributes**, registered in `WitchercraftModAttributes` from `attribute`-type elements:
-crit chance, crit damage, additional damage, increased damage, life steal, oil damage, dodge chance,
-potion duration, sign intensity, instant kill chance, reflect damage, toxicity overdose threshold,
-passive health regeneration, passive stamina regeneration.
+**10 custom attributes**, registered in `WitchercraftModAttributes` from `attribute`-type elements:
+crit damage, additional damage, increased damage, life steal, oil damage, potion duration, sign
+intensity, toxicity overdose threshold, passive health regeneration, passive stamina regeneration.
 
-Four of them - **crit chance, dodge chance, instant kill chance and reflect damage** - are cut from
-the design (GDD 5). Nothing in combat reads them any more. They stay registered only so the perks and
-effects that still add modifiers to them (Precise Blows, Katakan, Blizzard, Leshen, Thunderbolt's storm
-modifier, ...) keep compiling; the perk rework removes those sources and then the attributes.
+Crit chance, dodge chance, instant kill chance and reflect damage were cut from the design (GDD 5) and
+are gone: the attributes, their stat-sheet procedures, and every modifier that fed them (Katakan,
+Blizzard's dodge half, Leshen, Deadly Precision, Razor Focus, the crit-chance half of Precise Blows and
+Crushing Blows, Anatomical Knowledge, Thunderbolt's storm modifier) were moved to `trash/`. Old saves
+still carry the removed attributes on the player; Minecraft drops unknown attributes on load.
 
 Health, movement speed and attack speed use **vanilla** `MAX_HEALTH`, `MOVEMENT_SPEED` and
 `ATTACK_SPEED`. Nothing is registered for them; only their sources live here.
 
-A stat's **base value is the attribute's `defaultValue`** - crit chance **5**, crit damage **50**,
+A stat's **base value is the attribute's `defaultValue`** - crit damage **50**,
 toxicity overdose threshold **70**, everything else **0**. These are *contract*: there is no longer a
 "base stats" procedure, and nothing seeds them at login or respawn.
 
@@ -517,7 +518,7 @@ would silently multiply it.
 **A dynamic modifier needs an expiry hook.** `entity_add_modifier` only adds when absent; it cannot
 update an amount, so changing one means remove-then-add at the point the value changes. Because
 nothing removes it when the effect ends, each dynamic source also needs an `onExpired` procedure -
-`WyvernDecoctionEnd`, `SuccubusDecoctionEnd`, `GraveHagDecoctionEnd`, `CorrectOilEnd`. Declaring
+`WyvernDecoctionEnd`, `SuccubusDecoctionEnd`, `GraveHagDecoctionEnd`. Declaring
 `onExpired` on the element is not enough on its own: the dispatch in `expireEffects` inside
 `WitchercraftModMobEffects` is hand-written and needs the matching branch.
 
@@ -548,10 +549,9 @@ character sheet - the attributes are syncable, so the client already has the val
 
 ### 2.6 Known limitations
 
-- **Dead leftovers from the old damage pipeline.** Nothing applies the `CorrectOil`, `DamageBlocked` or
-  `DodgeCooldown` effects any more, so those three effects and the `CorrectOilStart` / `CorrectOilEnd`
-  procedures are dead. They are left in place for the perk-rework cleanup, together with the four cut
-  attributes (2.3), so that pass removes them all at once.
+- **Perks and effects left empty by the stat cut.** Katakan, Leshen, Deadly Precision, Razor Focus and
+  Anatomical Knowledge currently do nothing; Blizzard keeps only its attack speed. They wait for the
+  perk rework (GDD 5 marks them "Rework pending").
 - **Five element files use unicode escapes and a BOM** (`AltQuenCast`, `QuenActiveShieldAura`,
   `QuenActiveShieldTick`, `SignCastHold`, `SignCastHoldCost`). They store `<` as a
   literal escape sequence rather than the character, so ordinary text search and replace will not
@@ -577,8 +577,9 @@ and the re-hit had no attacker attached. The new pipeline changes the hit in pla
 
 | Element | Trigger | Job |
 |---|---|---|
-| `WitchercraftMeleeCrit` | Player critical hit | Works out the crit bonus: +0.5 for a vanilla jump crit, + Crit Damage when a condition is true on a charged swing. Forces the crit (vanilla stars and sound), sets vanilla's multiplier to 1, and stores the bonus on the attacker. |
-| `WitchercraftIncomingDamage` | Entity attacked | Melee: `(amount + flat + oil) x (1 + %) x (1 + crit bonus)`, then execute, then sets the incoming damage amount. Arrows: a fully drawn arrow on a condition gets `x (1 + Crit Damage)`. |
+| `WitchercraftMeleeCrit` | Player critical hit (every swing) | Works out the crit bonus (+0.5 for a vanilla jump crit, + Crit Damage when a condition is true on a charged swing) and the hit type (1 fast, 2 strong, 0 uncharged). Forces the crit (vanilla stars and sound) when there is a bonus, sets vanilla's multiplier to 1, and stores bonus and type on the attacker. |
+| `WitchercraftIncomingDamage` | Entity attacked | Melee: `(amount + flat + oil) x (1 + %) x (1 + crit bonus)`, then execute, then sets the incoming damage amount, updates the hit memory and calls the fast/strong hook. Arrows: a fully drawn arrow on a condition gets `x (1 + Crit Damage)`. |
+| `WitchercraftOnFastHit`, `WitchercraftOnStrongHit` | none (called by IncomingDamage) | Perk hooks, empty for now. Run after a typed hit has landed. |
 | `WitchercraftAfterDamage` | none (called by the bridge) | Life steal and Black Blood, from the damage that actually reached health. |
 | `WitchercraftCritCondition` | none, returns logic | The list of crit conditions. Only Thunderbolt in a storm today. |
 | `WitchercraftOilMatches` | none, returns logic | Main-hand oil enchantment vs the target's category tag, for all ten oils. |
@@ -590,11 +591,17 @@ and the re-hit had no attacker attached. The new pipeline changes the hit in pla
 Plus the `witchercraft:execute_immune` entity tag (Ender Dragon, Wither, Warden).
 
 **The crit handoff.** Vanilla fires the critical-hit event before the hit is dealt, in the same tick.
-`WitchercraftMeleeCrit` writes `witchercraftCritBonus` and `witchercraftCritTick` (the attacker's
-`tickCount`) into the attacker's persistent NBT; `WitchercraftIncomingDamage` uses the bonus only if the
-stamp matches the current tick, and zeroes it. The stamp is what stops a crit from a swing that never
-landed (cancelled, invulnerable target) being used by a later hit. NBT is used instead of a player
-variable because a player variable write ships the whole variable blob to the client (2.2).
+`WitchercraftMeleeCrit` writes `witchercraftCritBonus`, `witchercraftHitType` and `witchercraftHitTick`
+(the attacker's `tickCount`) into the attacker's persistent NBT on every swing; `WitchercraftIncomingDamage`
+uses bonus and type only if the stamp matches the current tick, and zeroes both. The stamp is what
+stops a crit from a swing that never landed (cancelled, invulnerable target) being used by a later
+hit. Zeroing on first read is what keeps sweep targets (hurt after the main target, same tick) from
+getting a crit or a type. NBT is used instead of a player variable because a player variable write
+ships the whole variable blob to the client (2.2).
+
+**Hit memory.** On a typed hit, `WitchercraftIncomingDamage` keeps `witchercraftLastHitType` and
+`witchercraftHitStreak` (same type in a row) in the attacker's NBT, for perks like Three Strikes.
+Uncharged hits leave it untouched; whether they should break a streak is for the perk that reads it.
 
 Vanilla's x1.5 is set to 1 in the crit event, because vanilla only multiplies the weapon's base
 damage. The witcher bonus is applied in `WitchercraftIncomingDamage` to the whole hit, so flat damage,

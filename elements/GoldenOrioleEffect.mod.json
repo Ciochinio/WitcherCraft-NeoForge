@@ -9,11 +9,12 @@
       "falpha": 0.0
     },
     "onAddedSound": "",
-    "isInstant": true,
+    "isInstant": false,
     "mobEffectCategory": "BENEFICIAL",
     "renderStatusInInventory": true,
     "renderStatusInHUD": true,
     "isCuredbyHoney": false,
-    "modifiers": []
+    "modifiers": [],
+    "onActiveTick": "GoldenOrioleEffectActive"
   }
 }

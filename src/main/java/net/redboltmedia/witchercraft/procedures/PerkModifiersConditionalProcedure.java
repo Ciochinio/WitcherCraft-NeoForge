@@ -34,19 +34,6 @@ public class PerkModifiersConditionalProcedure {
 		if (entity == null)
 			return;
 		if (!world.isClientSide()) {
-			if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkAnatomicalKnowledge == true && ((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY).getItem() == Items.CROSSBOW
-					|| (entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY).getItem() == Items.BOW)) {
-				if (entity instanceof LivingEntity _entity) {
-					AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:perk_anatomical_knowledge"), 10, AttributeModifier.Operation.ADD_VALUE);
-					if (!_entity.getAttribute(WitchercraftModAttributes.CRIT_CHANCE).hasModifier(modifier.id())) {
-						_entity.getAttribute(WitchercraftModAttributes.CRIT_CHANCE).addTransientModifier(modifier);
-					}
-				}
-			} else {
-				if (entity instanceof LivingEntity _entity) {
-					_entity.getAttribute(WitchercraftModAttributes.CRIT_CHANCE).removeModifier(Identifier.parse("witchercraft:perk_anatomical_knowledge"));
-				}
-			}
 			if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkCripplingShot == true && ((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY).getItem() == Items.CROSSBOW
 					|| (entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY).getItem() == Items.BOW)) {
 				if (entity instanceof LivingEntity _entity) {

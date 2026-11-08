@@ -487,13 +487,35 @@ bombs will get their own scaling, and arrows keep vanilla damage (they take part
 below). The result is the hit itself - it is changed in place, lands once, and keeps you as the
 attacker, so kill credit, XP and loot work normally.
 
+### Fast and strong attacks
+
+Every fully charged melee hit has a type. Perks build on the two types the way Witcher 3's tree
+builds on fast and strong attacks, without any new key.
+
+```
+                      on the ground (charged)    jumping (charged)
+no condition          FAST        x1.0           STRONG      x1.5
+condition true        FAST + crit x1+CD          STRONG + crit  x1.5+CD
+uncharged (spam)      no type - never triggers a perk
+```
+
+- **Fast attack** - a fully charged hit from the ground. Vanilla's sweep only happens on these, so
+  fast attacks are the ones that hit groups.
+- **Strong attack** - a fully charged jump crit. One target, more damage, and the jump is its
+  commitment.
+- **Uncharged hits have no type**, so spam-clicking can't build streaks or stacks.
+- The type is about *how* you swing; a condition crit (below) is a separate layer that can land on
+  either type. A thunderstorm with Thunderbolt doesn't turn fast attacks into strong ones.
+- Attack speed is not changed for strong attacks. If they turn out too spammable, the fix is a
+  short recovery after a strong attack, not a global attack-speed change.
+
 ### Crits
 
 A crit needs a **fully charged** swing (or a **fully drawn** bow). Spam-clicking never crits.
 There are two kinds, and they add together:
 
-- **Jump crit** - vanilla's falling attack. It works for everyone from the start and is always
-  **x1.5**; Crit Damage doesn't change it.
+- **Jump crit** - vanilla's falling attack, which is also what makes a hit a strong attack. It
+  works for everyone from the start and is always **x1.5**; Crit Damage doesn't change it.
 - **Condition crit** - a charged hit while a crit condition is true. It adds your **Crit
   Damage**, which starts at **50%** (provisional) and is raised by perks and gear.
 
@@ -721,7 +743,8 @@ The last level costs about **1,140** XP, less than a vanilla 0-to-30 bar (1,395)
 Each level after the first grants **1** skill point: you start at level 1 with none. The points
 you have to spend are simply your level minus one, minus the perks you've already learned, so
 there's no hidden bank - what you've earned is what you see. A full run to 60 yields **59** points,
-one per perk, so every perk is eventually learnable and there is no respec. Your build is not what
+one per perk, so every perk is eventually learnable and there is no respec. The rework targets
+**15** perks per tab, with one tab at **14**, so the **59** perks match the 59 points. Your build is not what
 you learned but what you equip: twelve slots, opened by level (see below), against a growing pool
 of learned perks. Past level 28 every slot is open and levels stop adding power; they add options,
 more perks to swap in for a given fight.
@@ -1262,7 +1285,7 @@ drinking any potion also heals **10%** of max health.
 | **Black Blood** | +**20** | Reflects **15%** of damage taken from Necrophages and Vampires back at the attacker |
 | **Cat** | +**10** | Collapses your view to high-contrast monochrome so dark terrain becomes readable, at the cost of being blinded by daylight; outlines every monster within **50** blocks with a glow, even through walls |
 | **Killer Whale** | +**20** | Underwater sight and breath (effect still being finalized) |
-| **Golden Oriole** | +**15** | Cures and protects against vanilla Poison; does not affect Venom (effect still being finalized) |
+| **Golden Oriole** | +**15** | Cures vanilla Poison and keeps you immune to it for the potion's duration; does not affect Venom |
 | **Tawny Owl** | +**0** | Passive stamina regeneration (currently applies no Toxicity - likely an oversight) |
 | **White Raffard's Decoction** | +**25** | Instant heal for **50%** of max health |
 | **White Honey** | +**0** | Clears all potion and decoction effects and resets Toxicity to **0** |
@@ -1277,7 +1300,7 @@ Every decoction costs **50** Toxicity.
 | Decoction | Effect |
 |-----------|--------|
 | **Ekimmara** | +**10%** life steal |
-| **Katakan** | Condition crits for **3** seconds after a kill |
+| **Katakan** | Condition crits for **3** seconds after a kill. *Not built yet* - the old +**10** crit chance is removed, so it currently does nothing |
 | **Foglet** | +**25** Sign Intensity while raining |
 | **Leshen** | *Rework pending* - was +**20** reflect damage, which is cut |
 | **Wyvern** | Increased damage builds +**1%** per hit landed in combat, up to +**10%**; resets when you leave combat |
@@ -1327,6 +1350,9 @@ Payload magnitudes other than Dimeritium's are still being tuned.
 ### Perks
 
 A work-in-progress snapshot of the skill tree; perks and their values are still being finalized.
+The rework follows Witcher 3's next-gen trees, built on [fast and strong attacks](#fast-and-strong-attacks).
+Where the original perk rolls a chance, we prefer a deterministic trigger (every Nth hit, the
+hit after X); a chance roll is allowed, but it needs a reason.
 Perks are switches the combat, Sign, and alchemy systems read live (see
 [Character Progression](#how-perks-work)).
 

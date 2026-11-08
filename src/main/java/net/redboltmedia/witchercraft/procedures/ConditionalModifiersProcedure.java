@@ -33,18 +33,6 @@ public class ConditionalModifiersProcedure {
 		if (entity == null)
 			return;
 		if (!world.isClientSide()) {
-			if (entity instanceof LivingEntity _livEnt1 && _livEnt1.hasEffect(WitchercraftModMobEffects.THUNDERBOLT_EFFECT) && world instanceof Level _lvl2 && _lvl2.isThundering()) {
-				if (entity instanceof LivingEntity _entity) {
-					AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:effect_thunderbolt_storm"), 100, AttributeModifier.Operation.ADD_VALUE);
-					if (!_entity.getAttribute(WitchercraftModAttributes.CRIT_CHANCE).hasModifier(modifier.id())) {
-						_entity.getAttribute(WitchercraftModAttributes.CRIT_CHANCE).addTransientModifier(modifier);
-					}
-				}
-			} else {
-				if (entity instanceof LivingEntity _entity) {
-					_entity.getAttribute(WitchercraftModAttributes.CRIT_CHANCE).removeModifier(Identifier.parse("witchercraft:effect_thunderbolt_storm"));
-				}
-			}
 			if (entity instanceof LivingEntity _livEnt5 && _livEnt5.hasEffect(WitchercraftModMobEffects.WATER_HAG_DECOCTION_EFFECT)
 					&& (entity instanceof LivingEntity _livEnt ? _livEnt.getHealth() : -1) == (entity instanceof LivingEntity _livEnt ? _livEnt.getMaxHealth() : -1)) {
 				if (entity instanceof LivingEntity _entity) {

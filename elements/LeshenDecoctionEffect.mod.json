@@ -14,12 +14,6 @@
     "renderStatusInInventory": true,
     "renderStatusInHUD": true,
     "isCuredbyHoney": false,
-    "modifiers": [
-      {
-        "attribute": "CUSTOM:ReflectDamage",
-        "amount": 20.0,
-        "operation": "ADD_VALUE"
-      }
-    ]
+    "modifiers": []
   }
 }
