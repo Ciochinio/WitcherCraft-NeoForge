@@ -16,15 +16,15 @@
       "path": "~/Structures"
     },
     {
-      "name": "WitcherGuiScreen",
+      "name": "WitchercraftGuiScreen",
       "type": "code",
       "compiles": true,
       "locked_code": true,
-      "registry_name": "witcher_gui_screen",
+      "registry_name": "witchercraft_gui_screen",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/WitcherGuiScreen.java",
-          "src/main/java/net/redboltmedia/witchercraft/WitcherGuiDamageInterrupt.java"
+          "src/main/java/net/redboltmedia/witchercraft/WitchercraftGuiScreen.java",
+          "src/main/java/net/redboltmedia/witchercraft/WitchercraftGuiDamageInterrupt.java"
         ]
       },
       "path": "~/NAVBAR"
@@ -69,27 +69,27 @@
       "path": "~/NAVBAR"
     },
     {
-      "name": "WitcherGuiPages",
+      "name": "WitchercraftGuiPages",
       "type": "code",
       "compiles": true,
       "locked_code": true,
-      "registry_name": "witcher_gui_pages",
+      "registry_name": "witchercraft_gui_pages",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/WitcherGuiPages.java"
+          "src/main/java/net/redboltmedia/witchercraft/WitchercraftGuiPages.java"
         ]
       },
       "path": "~/NAVBAR"
     },
     {
-      "name": "WitcherGuiLayout",
+      "name": "WitchercraftGuiLayout",
       "type": "code",
       "compiles": true,
       "locked_code": true,
-      "registry_name": "witcher_gui_layout",
+      "registry_name": "witchercraft_gui_layout",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/WitcherGuiLayout.java"
+          "src/main/java/net/redboltmedia/witchercraft/WitchercraftGuiLayout.java"
         ]
       },
       "path": "~/NAVBAR"
@@ -368,14 +368,14 @@
       "path": "~/Pause Menu"
     },
     {
-      "name": "WitcherGuiKeybind",
+      "name": "WitchercraftGuiKeybind",
       "type": "code",
       "compiles": true,
       "locked_code": true,
-      "registry_name": "witcher_gui_keybind",
+      "registry_name": "witchercraft_gui_keybind",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/WitcherGuiKeybind.java"
+          "src/main/java/net/redboltmedia/witchercraft/WitchercraftGuiKeybind.java"
         ]
       },
       "path": "~/NAVBAR"
@@ -4512,14 +4512,14 @@
       "path": "~/Alchemy/Toxicity"
     },
     {
-      "name": "WitcherHud",
+      "name": "WitchercraftHud",
       "type": "code",
       "compiles": true,
       "locked_code": true,
-      "registry_name": "witcher_hud",
+      "registry_name": "witchercraft_hud",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/WitcherHud.java"
+          "src/main/java/net/redboltmedia/witchercraft/WitchercraftHud.java"
         ]
       },
       "path": "~/HUD"
@@ -5750,56 +5750,6 @@
       "path": "~/Admin/Calc"
     },
     {
-      "name": "DamageCalculator",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "damage_calculator",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "sourceentity",
-            "type": "entity"
-          },
-          {
-            "name": "amount",
-            "type": "number"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/DamageCalculatorProcedure.java"
-        ]
-      },
-      "path": "~/Admin/Calc"
-    },
-    {
-      "name": "DodgeCalculator",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "dodge_calculator",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/DodgeCalculatorProcedure.java"
-        ]
-      },
-      "path": "~/Admin/Calc"
-    },
-    {
       "name": "PotionDuration",
       "type": "attribute",
       "compiles": true,
@@ -5961,33 +5911,6 @@
       "path": "~/Admin"
     },
     {
-      "name": "InsectoidOilHit",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "insectoid_oil_hit",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "sourceentity",
-            "type": "entity"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/InsectoidOilHitProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Oils/InsectoidOil"
-    },
-    {
       "name": "InsectoidOilApply",
       "type": "procedure",
       "compiles": true,
@@ -6009,37 +5932,6 @@
         ]
       },
       "path": "~/Alchemy/Oils/InsectoidOil"
-    },
-    {
-      "name": "DamageCalculatorWait",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "damage_calculator_wait",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "sourceentity",
-            "type": "entity"
-          },
-          {
-            "name": "amount",
-            "type": "number"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/DamageCalculatorWaitProcedure.java"
-        ]
-      },
-      "path": "~/Admin/Calc"
     },
     {
       "name": "CorrectOil",
@@ -6430,249 +6322,6 @@
       "path": "~/Alchemy/Oils/CursedOil"
     },
     {
-      "name": "NecrophageOilHit",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "necrophage_oil_hit",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "sourceentity",
-            "type": "entity"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/NecrophageOilHitProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Oils/NecrophageOil"
-    },
-    {
-      "name": "VampireOilHit",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "vampire_oil_hit",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "sourceentity",
-            "type": "entity"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/VampireOilHitProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Oils/VampireOil"
-    },
-    {
-      "name": "HangedMansVenomHit",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "hanged_mans_venom_hit",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "sourceentity",
-            "type": "entity"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/HangedMansVenomHitProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Oils/HangedMansVenom"
-    },
-    {
-      "name": "SpecterOilHit",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "specter_oil_hit",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "sourceentity",
-            "type": "entity"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/SpecterOilHitProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Oils/SpecterOil"
-    },
-    {
-      "name": "OgroidOilHit",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "ogroid_oil_hit",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "sourceentity",
-            "type": "entity"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/OgroidOilHitProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Oils/OgroidOil"
-    },
-    {
-      "name": "BeastOilHit",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "beast_oil_hit",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "sourceentity",
-            "type": "entity"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/BeastOilHitProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Oils/BeastOil"
-    },
-    {
-      "name": "DraconidOilHit",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "draconid_oil_hit",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "sourceentity",
-            "type": "entity"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/DraconidOilHitProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Oils/DraconidOil"
-    },
-    {
-      "name": "RelictOilHit",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "relict_oil_hit",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "sourceentity",
-            "type": "entity"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/RelictOilHitProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Oils/RelictOil"
-    },
-    {
-      "name": "CursedOilHit",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "cursed_oil_hit",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "sourceentity",
-            "type": "entity"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/CursedOilHitProcedure.java"
-        ]
-      },
-      "path": "~/Alchemy/Oils/CursedOil"
-    },
-    {
       "name": "OilDamage",
       "type": "attribute",
       "compiles": true,
@@ -6905,37 +6554,6 @@
         ]
       },
       "path": "~/Character Stats/Stats/Gui"
-    },
-    {
-      "name": "ReflectCalculator",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "reflect_calculator",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "sourceentity",
-            "type": "entity"
-          },
-          {
-            "name": "amount",
-            "type": "number"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/ReflectCalculatorProcedure.java"
-        ]
-      },
-      "path": "~/Admin/Calc"
     },
     {
       "name": "LeshenDecoction",
@@ -8717,37 +8335,6 @@
       "path": "~/Admin"
     },
     {
-      "name": "InstantKillCalculator",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "instant_kill_calculator",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "damagesource",
-            "type": "damagesource"
-          },
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "sourceentity",
-            "type": "entity"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/InstantKillCalculatorProcedure.java"
-        ]
-      },
-      "path": "~/Admin/Calc"
-    },
-    {
       "name": "Alghoul",
       "type": "livingentity",
       "compiles": true,
@@ -9777,14 +9364,14 @@
       "path": "~/World Map/Fast Travel"
     },
     {
-      "name": "WitcherLevelReset",
+      "name": "WitchercraftLevelReset",
       "type": "procedure",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "witcher_level_reset",
+      "registry_name": "witchercraft_level_reset",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/WitcherLevelResetProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftLevelResetProcedure.java"
         ],
         "dependencies": [
           {
@@ -10010,6 +9597,227 @@
         ]
       },
       "path": "~/Glossary/Tutorials"
+    },
+    {
+      "name": "WitchercraftCritCondition",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "witchercraft_crit_condition",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "sourceentity",
+            "type": "entity"
+          },
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftCritConditionProcedure.java"
+        ],
+        "return_type": "logic"
+      },
+      "path": "~/Admin/Calc"
+    },
+    {
+      "name": "WitchercraftOilMatches",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "witchercraft_oil_matches",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "sourceentity",
+            "type": "entity"
+          },
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftOilMatchesProcedure.java"
+        ],
+        "return_type": "logic"
+      },
+      "path": "~/Admin/Calc"
+    },
+    {
+      "name": "WitchercraftExecuteEnabled",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "witchercraft_execute_enabled",
+      "metadata": {
+        "dependencies": [],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftExecuteEnabledProcedure.java"
+        ],
+        "return_type": "logic"
+      },
+      "path": "~/Admin/Calc"
+    },
+    {
+      "name": "IsFullyChargedAttack",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "is_fully_charged_attack",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "sourceentity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/IsFullyChargedAttackProcedure.java"
+        ],
+        "return_type": "logic"
+      },
+      "path": "~/Admin/Calc"
+    },
+    {
+      "name": "IsCritArrow",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "is_crit_arrow",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "immediatesourceentity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/IsCritArrowProcedure.java"
+        ],
+        "return_type": "logic"
+      },
+      "path": "~/Admin/Calc"
+    },
+    {
+      "name": "WitchercraftMeleeCrit",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "witchercraft_melee_crit",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "sourceentity",
+            "type": "entity"
+          },
+          {
+            "name": "isvanillacritical",
+            "type": "logic"
+          },
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftMeleeCritProcedure.java"
+        ]
+      },
+      "path": "~/Admin/Calc"
+    },
+    {
+      "name": "WitchercraftIncomingDamage",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "witchercraft_incoming_damage",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "damagesource",
+            "type": "damagesource"
+          },
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "immediatesourceentity",
+            "type": "entity"
+          },
+          {
+            "name": "sourceentity",
+            "type": "entity"
+          },
+          {
+            "name": "amount",
+            "type": "number"
+          },
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftIncomingDamageProcedure.java"
+        ]
+      },
+      "path": "~/Admin/Calc"
+    },
+    {
+      "name": "WitchercraftAfterDamage",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "witchercraft_after_damage",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "damagesource",
+            "type": "damagesource"
+          },
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "sourceentity",
+            "type": "entity"
+          },
+          {
+            "name": "amount",
+            "type": "number"
+          },
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftAfterDamageProcedure.java"
+        ]
+      },
+      "path": "~/Admin/Calc"
+    },
+    {
+      "name": "WitchercraftAfterDamageBridge",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "witchercraft_after_damage_bridge",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WitchercraftAfterDamageBridge.java"
+        ]
+      },
+      "path": "~/Admin/Calc"
     }
   ],
   "variable_elements": [
@@ -10813,6 +10621,11 @@
     }
   ],
   "tag_elements": {
+    "ENTITIES:mod:execute_immune": [
+      "EntityDragon",
+      "EntityWither",
+      "EntityWarden"
+    ],
     "ENTITIES:mod:necrophage": [
       "EntityZombie",
       "CUSTOM:Alghoul",
@@ -11494,24 +11307,24 @@
   "metadata": {
     "files": [
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModAttributes.java",
-      "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModScreens.java",
-      "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModMenus.java",
       "src/main/java/net/redboltmedia/witchercraft/network/MenuStateUpdateMessage.java",
+      "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModMenus.java",
+      "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModScreens.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModKeyMappings.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModParticles.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModParticleTypes.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModMobEffects.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModBlocks.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModItems.java",
-      "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModEntityRenderers.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModEntities.java",
-      "src/main/java/net/redboltmedia/witchercraft/WitchercraftMod.java",
+      "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModEntityRenderers.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModSounds.java",
+      "src/main/java/net/redboltmedia/witchercraft/network/WitchercraftModVariables.java",
       "src/main/resources/META-INF/accesstransformer.cfg",
-      "src/main/resources/pack.mcmeta",
+      "src/main/java/net/redboltmedia/witchercraft/WitchercraftMod.java",
       "src/main/resources/META-INF/neoforge.mods.toml",
       "src/main/resources/assets/witchercraft/sounds.json",
-      "src/main/java/net/redboltmedia/witchercraft/network/WitchercraftModVariables.java",
+      "src/main/resources/pack.mcmeta",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModTabs.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModModels.java"
     ]

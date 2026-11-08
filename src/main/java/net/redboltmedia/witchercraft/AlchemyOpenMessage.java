@@ -20,7 +20,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 /**
  * SERVERBOUND: open the Alchemy tab. The shell routes every way of reaching the
  * Alchemy tab (nav click, P/J keys, pause menu) through
- * {@link WitcherGuiPages#open}, which sends this. The server opens
+ * {@link WitchercraftGuiPages#open}, which sends this. The server opens
  * {@link AlchemyMenu}; the client then shows {@link AlchemyScreen} in place of
  * whatever screen was open.
  *

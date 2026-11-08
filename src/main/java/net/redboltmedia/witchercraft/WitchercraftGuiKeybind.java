@@ -14,23 +14,23 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 
 /**
- * Client-only keybinds that open the {@link WitcherGuiScreen} shell.
+ * Client-only keybinds that open the {@link WitchercraftGuiScreen} shell.
  *
  * Hand-written (no MCreator element): auto-registered via {@code @EventBusSubscriber}.
  * Unlike the MCreator GUI keybinds (which send a server message to open a
  * container menu), the shell is a plain client Screen, so these go through
- * {@link WitcherGuiPages#open}: a direct {@code Minecraft.setScreen}, except for
+ * {@link WitchercraftGuiPages#open}: a direct {@code Minecraft.setScreen}, except for
  * container tabs (Alchemy), which ask the server to open their menu.
  *
  * - {@link #OPEN_SHELL} (default key P) opens the shell on its default tab.
  * - One keybind per navbar page ({@link #PAGE_KEYS}, built from
- *   {@link WitcherGuiLayout#NAV}) opens the shell straight onto that tab. These
+ *   {@link WitchercraftGuiLayout#NAV}) opens the shell straight onto that tab. These
  *   are UNBOUND by default (GLFW_KEY_UNKNOWN) so nothing clashes with vanilla or
  *   other mods - assign them in the Controls menu. Adding a nav tab in the tool
  *   automatically gets it a keybind here.
  */
 @EventBusSubscriber(Dist.CLIENT)
-public class WitcherGuiKeybind {
+public class WitchercraftGuiKeybind {
 
 	public static final KeyMapping OPEN_SHELL = new KeyMapping("key.witchercraft.open_shell", GLFW.GLFW_KEY_P, WitchercraftModKeyMappings.CATEGORY_WITCHERCRAFT);
 
@@ -50,11 +50,11 @@ public class WitcherGuiKeybind {
 			"meditation", GLFW.GLFW_KEY_U);
 
 	static {
-		int n = WitcherGuiLayout.NAV.length;
+		int n = WitchercraftGuiLayout.NAV.length;
 		PAGE_KEYS = new KeyMapping[n];
 		PAGE_IDS = new String[n];
 		for (int i = 0; i < n; i++) {
-			String pid = WitcherGuiLayout.NAV[i].pageId;
+			String pid = WitchercraftGuiLayout.NAV[i].pageId;
 			PAGE_IDS[i] = pid;
 			int def = DEFAULT_KEYS.getOrDefault(pid, GLFW.GLFW_KEY_UNKNOWN);
 			PAGE_KEYS[i] = new KeyMapping("key.witchercraft.open_shell." + pid, def, WitchercraftModKeyMappings.CATEGORY_WITCHERCRAFT);
@@ -74,12 +74,12 @@ public class WitcherGuiKeybind {
 		public static void onClientTick(ClientTickEvent.Post event) {
 			String target = null;
 			while (OPEN_SHELL.consumeClick())
-				target = WitcherGuiPages.defaultPageId();
+				target = WitchercraftGuiPages.defaultPageId();
 			for (int i = 0; i < PAGE_KEYS.length; i++)
 				while (PAGE_KEYS[i].consumeClick())
 					target = PAGE_IDS[i];
 			if (target != null && Minecraft.getInstance().screen == null && Minecraft.getInstance().player != null)
-				WitcherGuiPages.open(target);
+				WitchercraftGuiPages.open(target);
 		}
 	}
 }

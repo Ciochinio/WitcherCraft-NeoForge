@@ -2,9 +2,9 @@ package net.redboltmedia.witchercraft.client.gui;
 
 import net.redboltmedia.witchercraft.world.inventory.PauseMenuGuiMenu;
 import net.redboltmedia.witchercraft.init.WitchercraftModScreens;
-import net.redboltmedia.witchercraft.WitcherGuiPages;
+import net.redboltmedia.witchercraft.WitchercraftGuiPages;
 import net.redboltmedia.witchercraft.ShellChrome;
-import net.redboltmedia.witchercraft.WitcherGuiLayout;
+import net.redboltmedia.witchercraft.WitchercraftGuiLayout;
 import net.redboltmedia.witchercraft.PauseMenuLayout;
 
 import net.minecraft.world.level.Level;
@@ -37,7 +37,7 @@ import com.mojang.blaze3d.platform.InputConstants;
  *
  * All geometry, background and the tab list live in {@link PauseMenuLayout}
  * (data-driven, edited in tools/pause-menu-creator.html); this class is just
- * render + input. Clicking a tab opens it through {@code WitcherGuiPages.open(pageId)}
+ * render + input. Clicking a tab opens it through {@code WitchercraftGuiPages.open(pageId)}
  * (client-side for plain shell tabs; a container tab such as Alchemy asks the
  * server to open its menu).
  * The old Alchemy/Glossary/Character/Bestiary container GUIs are reached via
@@ -183,7 +183,7 @@ public class PauseMenuGuiScreen extends AbstractContainerScreen<PauseMenuGuiMenu
 				int ty = PauseMenuLayout.NAV_Y;
 				if (dmx >= tx && dmx < tx + PauseMenuLayout.NAV_TAB_W && dmy >= ty && dmy < ty + PauseMenuLayout.NAV_H) {
 					// opening a screen is not server-authoritative state (see TDD 3.9)
-					WitcherGuiPages.open(PauseMenuLayout.NAV[i].pageId);
+					WitchercraftGuiPages.open(PauseMenuLayout.NAV[i].pageId);
 					return true;
 				}
 			}

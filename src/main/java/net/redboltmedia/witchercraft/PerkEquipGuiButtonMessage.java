@@ -94,7 +94,7 @@ public record PerkEquipGuiButtonMessage(int buttonID, int x, int y, int z) imple
 		// buttonID 0: reserved no-op. Any state-changing action recomputes the
 		// active perk effects here (server-authoritative). This replaces the old
 		// PerkEquipGuiMenu.removed() hook, retired with the container screen when
-		// the perk UI became a page in WitcherGuiScreen.
+		// the perk UI became a page in WitchercraftGuiScreen.
 		if (buttonID != 0)
 			RecomputeEquippedPerksProcedure.execute(entity);
 	}

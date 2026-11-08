@@ -25,11 +25,11 @@ import net.minecraft.world.entity.player.Player;
  * The decorated vanilla inventory ({@link InventoryShell}) is closed on the client
  * the way E closes it, which tells the server to return the crafting grid.
  *
- * HAND-MAINTAINED: tracked by the locked WitcherGuiScreen code element.
+ * HAND-MAINTAINED: tracked by the locked WitchercraftGuiScreen code element.
  */
 @EventBusSubscriber
-public final class WitcherGuiDamageInterrupt {
-	private WitcherGuiDamageInterrupt() {
+public final class WitchercraftGuiDamageInterrupt {
+	private WitchercraftGuiDamageInterrupt() {
 	}
 
 	@SubscribeEvent
@@ -48,7 +48,7 @@ public final class WitcherGuiDamageInterrupt {
 
 	public record CloseMessage() implements CustomPacketPayload {
 		private static final CloseMessage INSTANCE = new CloseMessage();
-		private static final Type<CloseMessage> TYPE = new Type<>(Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "witcher_gui_damage_interrupt"));
+		private static final Type<CloseMessage> TYPE = new Type<>(Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "witchercraft_gui_damage_interrupt"));
 		private static final StreamCodec<RegistryFriendlyByteBuf, CloseMessage> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
 		@Override
@@ -60,7 +60,7 @@ public final class WitcherGuiDamageInterrupt {
 			if (context.flow() == PacketFlow.CLIENTBOUND) {
 				context.enqueueWork(() -> {
 					Minecraft minecraft = Minecraft.getInstance();
-					if (minecraft.screen instanceof WitcherGuiScreen screen)
+					if (minecraft.screen instanceof WitchercraftGuiScreen screen)
 						screen.onClose();
 					else
 						InventoryShell.close(); // the decorated vanilla inventory, closed like E

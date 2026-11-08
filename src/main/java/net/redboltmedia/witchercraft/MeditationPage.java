@@ -14,7 +14,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 
 /**
- * The meditation clock, a {@link GuiPage} inside {@link WitcherGuiScreen}.
+ * The meditation clock, a {@link GuiPage} inside {@link WitchercraftGuiScreen}.
  *
  * A smooth 24-hour dial: click anywhere on the ring and the nearest hour becomes
  * the target (no per-hour buttons, no slider). A dim hand shows the CURRENT world
@@ -102,7 +102,7 @@ public class MeditationPage implements GuiPage {
 		};
 		if (mc.player != null)
 			mc.gui.setOverlayMessage(Component.translatable(key), false); // action bar
-		if (mc.screen instanceof WitcherGuiScreen)
+		if (mc.screen instanceof WitchercraftGuiScreen)
 			mc.setScreen(null);
 	}
 

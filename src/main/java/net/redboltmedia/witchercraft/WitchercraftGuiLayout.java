@@ -8,7 +8,7 @@ package net.redboltmedia.witchercraft;
  * content REGION (the whole area below the navbar) to fill however it likes.
  *
  * The shell renders against a FIXED VIRTUAL DESIGN CANVAS (DESIGN_W x DESIGN_H,
- * 16:9) which WitcherGuiScreen scales uniformly to fit the real screen - so the
+ * 16:9) which WitchercraftGuiScreen scales uniformly to fit the real screen - so the
  * UI is independent of Minecraft's GUI scale and never distorted; non-16:9
  * screens get black letterbox bars. ALL coords are DESIGN-canvas pixels.
  *
@@ -16,8 +16,8 @@ package net.redboltmedia.witchercraft;
  * over the file wholesale. Keep it a dumb data holder so the tool can overwrite
  * it freely.
  */
-public final class WitcherGuiLayout {
-	private WitcherGuiLayout() {
+public final class WitchercraftGuiLayout {
+	private WitchercraftGuiLayout() {
 	}
 
 	// --- virtual design canvas (16:9); the shell scales this to fit the screen -

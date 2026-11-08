@@ -55,10 +55,10 @@ public record PauseMenuGuiButtonMessage(int buttonID, int x, int y, int z) imple
 			CharacterGuiOpenProcedure.execute(world, x, y, z, entity);
 		}
 		// buttonID 2 ("Alchemy") retired in the alchemy redesign (slice 2): the client no
-		// longer sends it; the Alchemy tab opens through WitcherGuiPages.open. The old
+		// longer sends it; the Alchemy tab opens through WitchercraftGuiPages.open. The old
 		// AlchemyGui elements were moved to trash/ in slice 6.
 		// buttonIDs 3 ("Glossary") and 4 ("Bestiary") retired with the Glossary book: the client
-		// no longer sends them, the Glossary tab opens through WitcherGuiPages.open. The old
+		// no longer sends them, the Glossary tab opens through WitchercraftGuiPages.open. The old
 		// GlossaryMenuGui / BestiaryMenuGui / per-monster GUIs were moved to trash/.
 		// buttonID 5 ("Skill Tree", used to open the now-retired old tab GUI)
 		// retired: the client no longer sends it, PauseMenuGuiScreen now opens the

@@ -24,7 +24,7 @@ import net.minecraft.world.item.ItemStack;
 
 /**
  * The perk tree + equip grid, ported from the retired PerkEquipGuiScreen into a
- * {@link GuiPage} inside {@link WitcherGuiScreen}.
+ * {@link GuiPage} inside {@link WitchercraftGuiScreen}.
  *
  * Behaviour is unchanged: left half = the perk TREE for the active branch
  * (right-click to learn, left-click a learned node to hold), right half = the

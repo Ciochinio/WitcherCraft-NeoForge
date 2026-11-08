@@ -88,7 +88,8 @@ power, and you can raise that ceiling through the Alchemy tree.
 #### A Custom Combat Model
 
 WitcherCraft runs its own damage math instead of vanilla's: flat bonus damage, percent
-increased damage, crit chance and crit multiplier, life steal, and status effects like Bleed.
+increased damage, crits you earn by timing or by setting the target up, life steal, an execute, and
+status effects like Bleed and Venom. Nothing in it is a dice roll.
 Oils feed extra damage into that math when they match the target's category.
 
 #### Persistent Character Building
@@ -461,24 +462,78 @@ WitcherCraft doesn't leave combat to vanilla's math. When you land a melee hit, 
 your weapon's base damage and runs it through its own model, so every witcher stat - crits,
 life steal, oils, perks - actually changes the number that lands.
 
+Nothing in the model is random. There is no crit chance, no dodge chance and no instant-kill
+chance: every bonus comes from something the player did - timed a jump, set the target up with a
+Sign, coated the right oil, drank the right brew.
+
 ### The core formula
 
-On a hit, the weapon's base damage is combined with your stats:
+On a melee hit, the weapon's base damage is combined with your stats:
 
 ```
-hit         = (base + AdditionalDamage) x (1 + IncreasedDamage%)
-on crit     = hit x CritDamage%            (crit if roll of 1-100 <= CritChance)
-life steal  = damage dealt x LifeSteal%    (healed back to the attacker)
+hit         = (base + AdditionalDamage + oil bonus) x (1 + IncreasedDamage%)
+on crit     = hit x (1 + crit bonus)       (see Crits)
+life steal  = damage dealt x LifeSteal%    (damage actually dealt, after armor)
 ```
 
 - **Additional Damage** - flat damage added before the percentage multiplier.
 - **Increased Damage** - a percentage multiplier applied to the total.
-- **Crit Chance** - rolled **1-100** on every hit; a roll at or under your chance is a crit.
-- **Crit Damage** - the multiplier a crit applies, written as a percent (e.g. **150** means x1.5).
-- **Life Steal** - the percentage of damage dealt that returns to you as health.
+- **Crit Damage** - the bonus a condition crit adds (see [Crits](#crits)).
+- **Life Steal** - the percentage of damage actually dealt, after the target's armor, that returns
+  to you as health.
 
-The result lands as a normal player attack. (One guard: the Ender Dragon is skipped, because it
-doesn't take this damage type correctly.)
+The witcher stats apply to **melee only**. Signs scale with [Sign Intensity](#sign-intensity),
+bombs will get their own scaling, and arrows keep vanilla damage (they take part only in crits,
+below). The result is the hit itself - it is changed in place, lands once, and keeps you as the
+attacker, so kill credit, XP and loot work normally.
+
+### Crits
+
+A crit needs a **fully charged** swing (or a **fully drawn** bow). Spam-clicking never crits.
+There are two kinds, and they add together:
+
+- **Jump crit** - vanilla's falling attack. It works for everyone from the start and is always
+  **x1.5**; Crit Damage doesn't change it.
+- **Condition crit** - a charged hit while a crit condition is true. It adds your **Crit
+  Damage**, which starts at **50%** (provisional) and is raised by perks and gear.
+
+```
+                          multiplier
+normal hit                x1.0
+jump crit                 x1.5    1 + 50%
+condition crit            x1.5    1 + Crit Damage (50%)
+jump + condition          x2.0    1 + 50% + Crit Damage
+```
+
+- Several conditions at once still count as one condition crit.
+- The base kit has jump crits only. **Conditions come from perks, potions and set effects** -
+  buying conditions is what a crit build is.
+- Bows have no jump crit. A fully drawn arrow keeps vanilla's own bonus, and Crit Damage applies
+  only when a condition is true.
+- Crits look and sound like vanilla crits.
+
+Crit conditions (which perk carries which is settled in the perk rework):
+
+| Condition | Source |
+|---|---|
+| A thunderstorm | **Thunderbolt** potion |
+| Target slowed by Yrden | perk |
+| Target charmed by Axii | perk |
+| Target knocked back by Aard, within about **1** second | perk |
+| Target burning | perk |
+| Target bleeding | bow perk |
+| Target hasn't noticed you | bow perk |
+| Within **3** seconds of a kill | **Katakan** decoction |
+
+A venomed target is deliberately **not** a condition - Toxic Shock already rewards critting a
+venomed target (see [Venom](#venom)), and venom granting crits as well would make that loop free.
+
+### Execute
+
+The pinnacle of the Combat tree: **any crit** on a target below **20%** of its maximum health kills
+it outright. There is no roll - the crit is the condition. Bosses are immune through the
+`witchercraft:execute_immune` tag (the Ender Dragon, the Wither, the Warden, and future bosses).
+Execute doesn't work on players.
 
 ### Stats are always live
 
@@ -488,26 +543,28 @@ and active potions or decoctions - the same live-aggregation model as
 bonus applies the moment its source does and disappears the moment the source does, with no
 recalculation step in between and nothing to fall out of sync. A few current examples:
 
-- **Precise Blows** adds **12** crit chance, **Crushing Blows** adds **8**, and **Anatomical
-  Knowledge** adds **10** while you're holding a bow or crossbow.
-- **Katakan Decoction** adds **10** crit chance. **Thunderbolt** during a thunderstorm sets crit
-  chance to **100** - every hit crits.
 - **Muscle Memory** adds **3** flat damage. **Cold Blood** adds **5** while no enemy is near;
   **Flood of Anger** adds **5** while one is.
+- **Water Hag Decoction** adds **40%** increased damage while you're at full health.
+- **Thunderbolt** turns every charged hit into a condition crit during a thunderstorm.
 
 The character screen surfaces the full stat line:
 
 | Stat | What it does |
 |------|--------------|
-| Additional Damage | Flat damage added before multipliers |
-| Increased Damage | Percentage multiplier on total damage |
-| Crit Chance | Percent chance a hit crits |
-| Crit Damage | The crit multiplier, as a percent |
-| Life Steal | Percent of damage dealt healed back |
+| Additional Damage | Flat melee damage added before multipliers |
+| Increased Damage | Percentage multiplier on total melee damage |
+| Crit Damage | The bonus a condition crit adds |
+| Life Steal | Percent of melee damage dealt healed back |
 | Oil Damage | Scales the bonus from a correctly matched oil |
-| Attack Speed | How fast the weapon swings |
-| Dodge Chance | Percent chance to fully negate an incoming hit |
-| Reflect Damage | Returns a share of damage taken to the attacker |
+| Sign Intensity | Strength of every Sign |
+| Potion Duration | How long potions and decoctions last |
+| Overdose Threshold | Toxicity you can carry before it hurts |
+| Health / Stamina regeneration | Passive per-second regeneration |
+| Armor, Armor Toughness, Attack Speed | Vanilla, shown for completeness |
+
+There is no Crit Chance, Dodge Chance, Reflect Damage or Instant Kill Chance. Content that used
+them is being reworked (marked in the [Content Appendix](#10-content-appendix)).
 
 ### Passive regeneration
 
@@ -537,16 +594,10 @@ figures it shows are the actual per-second rates, combat multiplier included.
 ### Oils in combat
 
 This is where the oils from [Alchemy](#oils) pay off. When you hit a monster whose category
-matches the oil on your blade, a short-lived "correct oil" flag is set. While it's up, your
-Additional Damage gains **+4 x (1 + Oil Damage%)** - so the oil bonus rides on top of the normal
-formula, and the Oil Damage stat (from perks and gear like the Viper School) scales how big it
-gets. Hit the wrong category and the flag never sets, so the bonus is zero.
-
-### Dodge
-
-When something hits you, the mod rolls **1-100** against your Dodge Chance. Beat the roll and the
-hit is cancelled outright - no damage taken - and dodge goes on a **60-tick (3-second)** cooldown
-so it can't fire on every incoming blow.
+matches the oil on your blade, that hit gains **+4 x (1 + Oil Damage%)** flat damage - so the oil
+bonus rides on top of the normal formula, and the Oil Damage stat (from perks and gear like the
+Viper School) scales how big it gets. The bonus belongs to the matching hit only; it never carries
+over to the next thing you hit. Hit the wrong category and the bonus is zero.
 
 ### Bleed and status effects
 
@@ -559,10 +610,27 @@ it rides on the status effect itself, Bleed works identically on monsters and on
 combat statuses come from their own sources: burning from Igni, slows from Yrden and Axii, and the
 payloads of individual bombs and decoctions.
 
-### Reflect
+### Venom
 
-Reflect Damage returns a portion of the damage you take to whoever dealt it, giving tank-leaning
-builds a way to punish being hit.
+Venom is the witcher's own poison. Vanilla Poison stays as it is - monsters and vanilla sources use
+it, and Golden Oriole cures it - while Venom is a separate effect that only the player inflicts.
+Golden Oriole does not cure Venom.
+
+- **How it differs from Poison:** Venom can kill, and it works on undead, so necrophages are not
+  safe from it. Specters are immune.
+- **Refreshes, never stacks.** Applying Venom again restarts its clock, the same as Bleed.
+- **Delivered through oils.** Oiled hits apply Venom through an Alchemy perk line, adapted from
+  The Witcher 3:
+  - **Poisoned Blades** - oiled hits apply Venom.
+  - **Toxic Shock** - a crit on a venomed target consumes the Venom for a burst of extra damage,
+    a share of the hit. Once every **5** seconds.
+  - **Debilitating Poison** - venomed targets deal less damage.
+  - **Potent Sting** - extra damage with an oiled blade, doubled against targets immune to Venom,
+    so the build isn't dead against specters.
+- **Not on players.** Venom doesn't affect players; PvP is out of scope for now.
+
+Still open: Venom's damage and duration, whether it also stops the target's regeneration, whether
+it ignores armor, how much venom each oiled hit applies, and the perk values.
 
 ### Chain Hook
 
@@ -662,7 +730,7 @@ more perks to swap in for a given fight.
 
 Perks are split across four tabs, each pointed at one side of the witcher kit:
 
-- **Combat** - damage, crits, bleed, and dodge. Precise Blows, Crushing Blows, Muscle Memory,
+- **Combat** - damage, crit conditions, bleed, and the execute. Precise Blows, Crushing Blows, Muscle Memory,
   Cold Blood, Flood of Anger, Crippling Strikes, Anatomical Knowledge, and so on.
 - **Signs** - Sign intensity and cost, plus the alternate Sign forms (Far-Reaching Aard, Fire
   Stream, Magic Trap, Exploding Shield).
@@ -832,7 +900,7 @@ School at a time, so the set you wear is a commitment that should match how you'
 | School | Set effect |
 |--------|-----------|
 | **Wolven** | Balanced - modest combat and Sign bonuses, the generalist set |
-| **Feline** | +**50%** critical hit damage - a glass-cannon crit set |
+| **Feline** | The glass-cannon crit set. *Rework pending* - was +**50%** crit damage, which does nothing without a crit condition |
 | **Griffin** | +**20%** Sign Intensity and reduced Sign cooldown - the Sign set |
 | **Ursine** | +**20%** maximum health - the survivability set |
 | **Viper** | Stronger oils - raises the Oil Damage that scales matched-oil hits |
@@ -1188,13 +1256,13 @@ drinking any potion also heals **10%** of max health.
 |--------|----------|--------|
 | **Swallow** | +**25** | Passive health regeneration |
 | **Petri's Philter** | +**20** | +**20** Sign Intensity |
-| **Thunderbolt** | +**25** | +**20%** increased damage; sets crit chance to **100** (guaranteed crits) during a thunderstorm |
+| **Thunderbolt** | +**25** | +**20%** increased damage; during a thunderstorm every charged hit is a condition crit |
 | **Full Moon** | +**25** | +**4** maximum health (2 hearts) |
-| **Blizzard** | +**15** | +**55%** attack speed and +**5** dodge chance |
-| **Black Blood** | +**20** | Reflects damage to attackers as thorns; +**15%** extra reflected against Necrophages and Vampires |
+| **Blizzard** | +**15** | +**55%** attack speed. *Rework pending* - its +**5** dodge chance is cut |
+| **Black Blood** | +**20** | Reflects **15%** of damage taken from Necrophages and Vampires back at the attacker |
 | **Cat** | +**10** | Collapses your view to high-contrast monochrome so dark terrain becomes readable, at the cost of being blinded by daylight; outlines every monster within **50** blocks with a glow, even through walls |
 | **Killer Whale** | +**20** | Underwater sight and breath (effect still being finalized) |
-| **Golden Oriole** | +**15** | Poison and toxin resistance (effect still being finalized) |
+| **Golden Oriole** | +**15** | Cures and protects against vanilla Poison; does not affect Venom (effect still being finalized) |
 | **Tawny Owl** | +**0** | Passive stamina regeneration (currently applies no Toxicity - likely an oversight) |
 | **White Raffard's Decoction** | +**25** | Instant heal for **50%** of max health |
 | **White Honey** | +**0** | Clears all potion and decoction effects and resets Toxicity to **0** |
@@ -1209,9 +1277,9 @@ Every decoction costs **50** Toxicity.
 | Decoction | Effect |
 |-----------|--------|
 | **Ekimmara** | +**10%** life steal |
-| **Katakan** | +**10** crit chance |
+| **Katakan** | Condition crits for **3** seconds after a kill |
 | **Foglet** | +**25** Sign Intensity while raining |
-| **Leshen** | +**20** reflect damage (returns **20%** of damage taken as thorns) |
+| **Leshen** | *Rework pending* - was +**20** reflect damage, which is cut |
 | **Wyvern** | Increased damage builds +**1%** per hit landed in combat, up to +**10%**; resets when you leave combat |
 | **Succubus** | Increased damage builds +**1%** every **2 seconds** in combat, up to +**10%**; resets when you leave combat |
 | **Water Hag** | +**40%** increased damage while at full health |
@@ -1267,9 +1335,12 @@ Perks are switches the combat, Sign, and alchemy systems read live (see
 | Perk | Effect |
 |------|--------|
 | **Muscle Memory** | +**3** Additional Damage |
-| **Precise Blows** | +**12** crit chance |
-| **Crushing Blows** | +**8** crit chance |
-| **Anatomical Knowledge** | +**10** crit chance while holding a bow or crossbow |
+| **Precise Blows** | *Rework pending* - was +**12** crit chance and +**75** crit damage; becomes a crit condition plus Crit Damage |
+| **Crushing Blows** | *Rework pending* - was +**8** crit chance and +**50** crit damage; becomes a crit condition plus Crit Damage |
+| **Anatomical Knowledge** | *Rework pending* - was +**10** crit chance with a bow; becomes a bow crit condition |
+| **Crippling Shot** | *Rework pending* - was +**50** crit damage with a bow; becomes a bow crit condition |
+| **Deadly Precision** | *Rework pending* - was +**1%** instant-kill chance; candidate to carry the [Execute](#execute) |
+| **Razor Focus** | *Rework pending* - was +**10** dodge chance, which is cut |
 | **Cold Blood** | +**5** Additional Damage while no enemy is near |
 | **Flood of Anger** | +**5** Additional Damage while an enemy is near |
 | **Crippling Strikes** | Applies Bleed on hit (**100** ticks / **5** seconds) |

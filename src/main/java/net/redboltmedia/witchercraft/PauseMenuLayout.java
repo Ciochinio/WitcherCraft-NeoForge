@@ -5,7 +5,7 @@ package net.redboltmedia.witchercraft;
  *
  * The pause menu works just like the shell navbar - a centred group of
  * fixed-width tabs - only BIGGER, drawn over its own background. Each tab opens
- * the shell on the matching page ({@code new WitcherGuiScreen(pageId)}), so its
+ * the shell on the matching page ({@code new WitchercraftGuiScreen(pageId)}), so its
  * tab set mirrors the navbar. It renders against the shell's virtual design
  * canvas and also draws the same level/XP readout
  * ({@link ShellChrome#drawLevelReadout}), which is edited in the navbar
@@ -37,7 +37,7 @@ public final class PauseMenuLayout {
 	public static final int NAV_ICON = 28;
 
 	// ==========================================================================
-	//  A pause tab. pageId is the shell page it opens (new WitcherGuiScreen(id)).
+	//  A pause tab. pageId is the shell page it opens (new WitchercraftGuiScreen(id)).
 	//  Positions are computed (centred) by the screen, so there is no rect here.
 	// ==========================================================================
 	public static final class Nav {

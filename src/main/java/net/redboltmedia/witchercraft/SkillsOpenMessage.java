@@ -20,7 +20,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 /**
  * SERVERBOUND: open the Skills tab. The shell routes every way of reaching the
  * Skills tab (nav click, P/K keys, pause menu) through
- * {@link WitcherGuiPages#open}, which sends this. The server opens
+ * {@link WitchercraftGuiPages#open}, which sends this. The server opens
  * {@link SkillsMenu}; the client then shows {@link SkillsScreen} in place of
  * whatever screen was open.
  *

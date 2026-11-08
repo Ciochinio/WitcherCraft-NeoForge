@@ -11,7 +11,7 @@ import net.minecraft.network.chat.Component;
  * A not-yet-built tab: draws a centred "&lt;Name&gt; - coming soon" in the content
  * region. Used for every navbar page that has no bespoke {@link GuiPage} yet.
  * When a real page is built (its own class + its own placer tool, like Skills),
- * register it in {@link WitcherGuiPages} and this stops being used for that id.
+ * register it in {@link WitchercraftGuiPages} and this stops being used for that id.
  */
 public class PlaceholderPage implements GuiPage {
 

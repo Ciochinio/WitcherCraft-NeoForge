@@ -1,6 +1,6 @@
 package net.redboltmedia.witchercraft.command;
 
-import net.redboltmedia.witchercraft.procedures.WitcherLevelResetProcedure;
+import net.redboltmedia.witchercraft.procedures.WitchercraftLevelResetProcedure;
 
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.common.util.FakePlayerFactory;
@@ -31,7 +31,7 @@ public class ResetWitcherLevelCommand {
 					if (entity != null)
 						direction = entity.getDirection();
 
-					WitcherLevelResetProcedure.execute(entity);
+					WitchercraftLevelResetProcedure.execute(entity);
 					return 0;
 				}));
 	}

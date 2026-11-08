@@ -14,7 +14,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 /**
  * The GUI shell - a persistent, client-only, FULLSCREEN Screen.
  *
- * It renders against a fixed virtual design canvas ({@link WitcherGuiLayout#DESIGN_W}
+ * It renders against a fixed virtual design canvas ({@link WitchercraftGuiLayout#DESIGN_W}
  * x {@code DESIGN_H}) which is scaled UNIFORMLY to fit the real screen, then drawn
  * centred with black letterbox bars filling any leftover (non-16:9) space. This
  * makes the UI independent of Minecraft's GUI-scale setting (it always fills the
@@ -26,24 +26,24 @@ import com.mojang.blaze3d.platform.InputConstants;
  *
  * HAND-MAINTAINED: no MCreator element, never regenerated.
  */
-public class WitcherGuiScreen extends Screen {
+public class WitchercraftGuiScreen extends Screen {
 
 	private String activeTabId;
 
-	public WitcherGuiScreen() {
-		this(WitcherGuiPages.defaultPageId());
+	public WitchercraftGuiScreen() {
+		this(WitchercraftGuiPages.defaultPageId());
 	}
 
 	/** Open directly on a specific tab (falls back to the default if unknown). */
-	public WitcherGuiScreen(String pageId) {
+	public WitchercraftGuiScreen(String pageId) {
 		super(Component.translatable("gui.witchercraft.shell.title"));
-		this.activeTabId = isKnownTab(pageId) ? pageId : WitcherGuiPages.defaultPageId();
+		this.activeTabId = isKnownTab(pageId) ? pageId : WitchercraftGuiPages.defaultPageId();
 	}
 
 	private static boolean isKnownTab(String pageId) {
 		if (pageId == null)
 			return false;
-		for (WitcherGuiLayout.Nav n : WitcherGuiLayout.NAV)
+		for (WitchercraftGuiLayout.Nav n : WitchercraftGuiLayout.NAV)
 			if (n.pageId.equals(pageId))
 				return true;
 		return false;
@@ -56,7 +56,7 @@ public class WitcherGuiScreen extends Screen {
 	}
 
 	private GuiPage activePage() {
-		return WitcherGuiPages.forId(activeTabId);
+		return WitchercraftGuiPages.forId(activeTabId);
 	}
 
 	// ---- design-canvas <-> screen transform (shared with container tabs) ------
@@ -112,7 +112,7 @@ public class WitcherGuiScreen extends Screen {
 		// "reserved") so page content never covers the tabs. A page that wants the
 		// world visible (meditation spin) also suppresses the navbar for the
 		// F1-clean look.
-		activePage().render(g, WitcherGuiLayout.contentX(), WitcherGuiLayout.contentY(), WitcherGuiLayout.contentW(), WitcherGuiLayout.contentH(), dmx, dmy, partial);
+		activePage().render(g, WitchercraftGuiLayout.contentX(), WitchercraftGuiLayout.contentY(), WitchercraftGuiLayout.contentW(), WitchercraftGuiLayout.contentH(), dmx, dmy, partial);
 		if (!activePage().wantsWorldVisible())
 			ShellChrome.drawNavbar(g, this.font, activeTabId);
 		g.pose().popMatrix();
@@ -140,9 +140,9 @@ public class WitcherGuiScreen extends Screen {
 		if (event.button() == 0 && !activePage().wantsWorldVisible()) {
 			String pid = ShellChrome.navTabAt(dmx, dmy);
 			if (pid != null) {
-				if (WitcherGuiPages.hasOwnScreen(pid)) {
+				if (WitchercraftGuiPages.hasOwnScreen(pid)) {
 					// a container tab (the server opens its menu) or the vanilla inventory
-					WitcherGuiPages.open(pid);
+					WitchercraftGuiPages.open(pid);
 				} else if (!pid.equals(activeTabId)) {
 					activePage().onHidden();
 					activeTabId = pid;
@@ -151,7 +151,7 @@ public class WitcherGuiScreen extends Screen {
 				return true;
 			}
 		}
-		if (activePage().mouseClicked(WitcherGuiLayout.contentX(), WitcherGuiLayout.contentY(), WitcherGuiLayout.contentW(), WitcherGuiLayout.contentH(), dmx, dmy, event.button(), doubleClick))
+		if (activePage().mouseClicked(WitchercraftGuiLayout.contentX(), WitchercraftGuiLayout.contentY(), WitchercraftGuiLayout.contentW(), WitchercraftGuiLayout.contentH(), dmx, dmy, event.button(), doubleClick))
 			return true;
 		return super.mouseClicked(event, doubleClick);
 	}
@@ -161,7 +161,7 @@ public class WitcherGuiScreen extends Screen {
 		float s = layoutScale();
 		float ox = offsetX(s), oy = offsetY(s);
 		int dmx = toDesignX(event.x(), ox, s), dmy = toDesignY(event.y(), oy, s);
-		if (activePage().mouseReleased(WitcherGuiLayout.contentX(), WitcherGuiLayout.contentY(), WitcherGuiLayout.contentW(), WitcherGuiLayout.contentH(), dmx, dmy, event.button()))
+		if (activePage().mouseReleased(WitchercraftGuiLayout.contentX(), WitchercraftGuiLayout.contentY(), WitchercraftGuiLayout.contentW(), WitchercraftGuiLayout.contentH(), dmx, dmy, event.button()))
 			return true;
 		return super.mouseReleased(event);
 	}
@@ -171,7 +171,7 @@ public class WitcherGuiScreen extends Screen {
 		float s = layoutScale();
 		float ox = offsetX(s), oy = offsetY(s);
 		int dmx = toDesignX(event.x(), ox, s), dmy = toDesignY(event.y(), oy, s);
-		if (activePage().mouseDragged(WitcherGuiLayout.contentX(), WitcherGuiLayout.contentY(), WitcherGuiLayout.contentW(), WitcherGuiLayout.contentH(), dmx, dmy, event.button(), dragX / s, dragY / s))
+		if (activePage().mouseDragged(WitchercraftGuiLayout.contentX(), WitchercraftGuiLayout.contentY(), WitchercraftGuiLayout.contentW(), WitchercraftGuiLayout.contentH(), dmx, dmy, event.button(), dragX / s, dragY / s))
 			return true;
 		return super.mouseDragged(event, dragX, dragY);
 	}
@@ -181,7 +181,7 @@ public class WitcherGuiScreen extends Screen {
 		float s = layoutScale();
 		float ox = offsetX(s), oy = offsetY(s);
 		int dmx = toDesignX(mouseX, ox, s), dmy = toDesignY(mouseY, oy, s);
-		if (activePage().mouseScrolled(WitcherGuiLayout.contentX(), WitcherGuiLayout.contentY(), WitcherGuiLayout.contentW(), WitcherGuiLayout.contentH(), dmx, dmy, scrollX, scrollY))
+		if (activePage().mouseScrolled(WitchercraftGuiLayout.contentX(), WitchercraftGuiLayout.contentY(), WitchercraftGuiLayout.contentW(), WitchercraftGuiLayout.contentH(), dmx, dmy, scrollX, scrollY))
 			return true;
 		return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
 	}

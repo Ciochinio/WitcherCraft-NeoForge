@@ -132,13 +132,13 @@ The visibility check lives inside the wrapped layer, not around the event, and t
 javadoc says so explicitly. Vanilla gates health, armor, food, and air on
 `gameMode.canHurtPlayer() && !options.hideGui`, so in creative, in spectator, or with the HUD hidden
 by F1, nothing advances the cursors, they stay at 39, and an unguarded bar lands on top of the
-hotbar. `WitcherHud` replicates that gate at the top of the handler. Do not remove it.
+hotbar. `WitchercraftHud` replicates that gate at the top of the handler. Do not remove it.
 
 ### 1.4 The pieces
 
 | Element | Type | MCreator path | Role |
 |---|---|---|---|
-| [WitcherHud](../src/main/java/net/redboltmedia/witchercraft/WitcherHud.java) | code (locked) | `~/Gui` | The renderer. Decides where a bar goes and blits it. Nothing else. |
+| [WitchercraftHud](../src/main/java/net/redboltmedia/witchercraft/WitchercraftHud.java) | code (locked) | `~/Gui` | The renderer. Decides where a bar goes and blits it. Nothing else. |
 | [QuenHudShow](../elements/QuenHudShow.mod.json) | procedure, logic | `~/Signs/Quen` | Is the Quen bar visible: `witchercraftQuenShield > 0` |
 | [QuenHudPool](../elements/QuenHudPool.mod.json) | procedure, number | `~/Signs/Quen` | The raw remaining pool in points. The icon maths lives beside the rendering. |
 | [ToxicityHudFill](../elements/ToxicityHudFill.mod.json) | procedure, number | `~/Alchemy/ Toxicity` | Fill fraction 0..1: `witchercraftToxicity / 100` |
@@ -341,12 +341,12 @@ maths - no entity lookups, no effect queries.
 the debug resource reload (F3+T by default) picks up the new texture without a restart, so art
 iteration does not need a rebuild.
 
-**Change what one Quen icon is worth.** `POINTS_PER_ICON` in `WitcherHud`. This is a balance-visible
+**Change what one Quen icon is worth.** `POINTS_PER_ICON` in `WitchercraftHud`. This is a balance-visible
 number: at **2** it matches a heart, and lowering it makes Quen look bigger and reach a second row
 sooner.
 
 **Change bar or icon geometry.** `BAR_W`, `BAR_H`, `ICON`, `ICON_STEP`, `ICONS_PER_ROW`, and `ROW` in
-`WitcherHud`. Textures must change with them. Keep `ROW` at `10` unless you have a reason: it is
+`WitchercraftHud`. Textures must change with them. Keep `ROW` at `10` unless you have a reason: it is
 vanilla's row pitch, and other mods stacking on the same cursor assume that grid.
 
 **Add a colour state to a bar.** Add a row to its PNG, bump the `*_TEX_ROWS` constant, add a
@@ -364,7 +364,7 @@ and it is exactly how the Quen branch behaves.
 `rightHeight` and the x anchor (`guiWidth() / 2 - 91` on the left, `guiWidth() / 2 + 91 - BAR_W` on
 the right).
 
-**Move the medallion.** `MEDALLION_X_OFFSET` and `MEDALLION_Y_ORIGIN` in `WitcherHud`, and nothing
+**Move the medallion.** `MEDALLION_X_OFFSET` and `MEDALLION_Y_ORIGIN` in `WitchercraftHud`, and nothing
 else. x is an offset from screen centre; y counts up from the bottom edge on the same origin the
 cursors use, so **39** puts its base level with the top of the health row. Expect to need this:
 Tough As Nails draws an icon in the same centre channel.
@@ -376,7 +376,7 @@ procedures, editable in MCreator. What counts as a monster is the two tags plus
 **Add a medallion.** Three places, and they must agree:
 
 1. Append a 20x20 cell to the bottom of `medallion.png`.
-2. Bump `MEDALLION_VARIANTS` in `WitcherHud`. This is the texture height the blit divides by, so a
+2. Bump `MEDALLION_VARIANTS` in `WitchercraftHud`. This is the texture height the blit divides by, so a
    value that disagrees with the PNG makes **every** row sample wrong, not just the new one.
 3. Bump the wrap number in [MedallionCycle](../elements/MedallionCycle.mod.json), or `/medallion`
    will never reach the new row.
@@ -429,7 +429,7 @@ something killed them.
 
 ### 2.1 What the system is for
 
-Every character stat - crit chance, life steal, potion duration, passive regeneration and the rest -
+Every character stat - crit damage, life steal, potion duration, passive regeneration and the rest -
 is a **real Minecraft attribute**, not a number the mod recomputes. A source declares what it
 contributes, the game aggregates and caches, and everything that needs the value reads it back.
 
@@ -461,10 +461,15 @@ crit chance, crit damage, additional damage, increased damage, life steal, oil d
 potion duration, sign intensity, instant kill chance, reflect damage, toxicity overdose threshold,
 passive health regeneration, passive stamina regeneration.
 
+Four of them - **crit chance, dodge chance, instant kill chance and reflect damage** - are cut from
+the design (GDD 5). Nothing in combat reads them any more. They stay registered only so the perks and
+effects that still add modifiers to them (Precise Blows, Katakan, Blizzard, Leshen, Thunderbolt's storm
+modifier, ...) keep compiling; the perk rework removes those sources and then the attributes.
+
 Health, movement speed and attack speed use **vanilla** `MAX_HEALTH`, `MOVEMENT_SPEED` and
 `ATTACK_SPEED`. Nothing is registered for them; only their sources live here.
 
-A stat's **base value is the attribute's `defaultValue`** - crit chance **5**, crit damage **115**,
+A stat's **base value is the attribute's `defaultValue`** - crit chance **5**, crit damage **50**,
 toxicity overdose threshold **70**, everything else **0**. These are *contract*: there is no longer a
 "base stats" procedure, and nothing seeds them at login or respawn.
 
@@ -498,13 +503,12 @@ knowledge of which code paths clear attributes.
 
 **A computed local cannot be read inside a `wait` block.** MCreator emits procedure-locals as
 `double x = 0;` followed by reassignment, and `wait` compiles to `queueServerWork(n, () -> {...})`.
-Java refuses to capture a reassigned local in a lambda. `DamageCalculator` wraps its damage
-application in `wait(1)`, so anything it needs must come from an attribute, a player variable, or a
-procedure dependency - never a local. This is why the oil bonus is an attribute modifier rather than
-a term computed in the damage procedure.
+Java refuses to capture a reassigned local in a lambda, so anything a `wait` body needs must come from
+an attribute, a player variable, or a procedure dependency - never a local. (The damage pipeline no
+longer waits at all, see 2.7.)
 
-**`RangedAttribute` clamps to min/max.** This is load-bearing for Thunderbolt: "crit chance becomes
-100 during a storm" is expressed as **+100 clamped to a max of 100**, not as an assignment.
+**`RangedAttribute` clamps to min/max.** A "+100 clamped to 100" modifier is how an attribute is
+forced to its ceiling without an assignment.
 
 **Effect modifiers scale with amplifier** - `amount * (amplifier + 1)`. Every decoction here is
 applied at level 0, so declared amounts carry through unchanged. Applying one at a higher level
@@ -529,8 +533,7 @@ or the `sync(...)` line in the relevant watcher. Nothing else needs touching.
 
 **Change a base value.** Edit the attribute element's **default value**. That is the whole knob.
 
-**Change a stat's ceiling.** Edit the attribute's min/max. Remember Thunderbolt relies on crit
-chance's max being exactly **100**.
+**Change a stat's ceiling.** Edit the attribute's min/max.
 
 **Add a source to an existing stat.** Pick the lowest-numbered option in 2.3 that fits. If it is an
 effect with an unconditional flat bonus, add a `modifiers` row and write no code.
@@ -545,20 +548,79 @@ character sheet - the attributes are syncable, so the client already has the val
 
 ### 2.6 Known limitations
 
-- **The oil bonus is still routed through a status effect.** `CorrectOil` is a 10-tick flag that the
-  oil-hit procedures set to signal "that hit was oil-matched". It works, but it depends on event
-  ordering between separately registered handlers, and the bonus can leak onto a different target
-  inside its window. `NOTES-oil-consolidation.txt` in the repo root has the full write-up and the
-  intended fix.
-- **`OilDamage` is read by `CorrectOilStart` at the moment the effect starts.** If oil damage changes
-  while `CorrectOil` is already active, the modifier keeps the old value until the effect is
-  re-applied. Harmless in practice, since the only source is the Luck effect.
-- **Six element files use unicode escapes and a BOM** (`AltQuenCast`, `QuenActiveShieldAura`,
-  `QuenActiveShieldTick`, `QuenBlock`, `SignCastHold`, `SignCastHoldCost`). They store `<` as a
+- **Dead leftovers from the old damage pipeline.** Nothing applies the `CorrectOil`, `DamageBlocked` or
+  `DodgeCooldown` effects any more, so those three effects and the `CorrectOilStart` / `CorrectOilEnd`
+  procedures are dead. They are left in place for the perk-rework cleanup, together with the four cut
+  attributes (2.3), so that pass removes them all at once.
+- **Five element files use unicode escapes and a BOM** (`AltQuenCast`, `QuenActiveShieldAura`,
+  `QuenActiveShieldTick`, `SignCastHold`, `SignCastHoldCost`). They store `<` as a
   literal escape sequence rather than the character, so ordinary text search and replace will not
   match them. MCreator reads them fine; only tooling is affected.
 - **Armour is no longer tracked.** The old `witchercraftArmor` variable was written and never read,
   and went with the base-stats procedure.
+
+### 2.7 The damage pipeline
+
+The combat model in GDD 5 (melee formula, crits, execute, life steal, Black Blood) lives in a small
+set of procedures in `~/Admin/Calc`. It replaced the old `DamageCalculatorWait` + `DamageCalculator`
+pair, `DodgeCalculator`, `ReflectCalculator`, `InstantKillCalculator` and the ten `*OilHit`
+procedures, all moved to `trash/` with their elements.
+
+**Why it was rewritten.** The old calculator never changed the hit. It waited two ticks and hit the
+target a second time with the recomputed amount, and only the part above the first hit landed,
+because of vanilla's invulnerability frames. Every special case grew out of that: shields were
+bypassed (a full block counts as 0 taken, so the whole second hit landed), oils needed a 10-tick flag
+that leaked onto the next target, dodge and Quen needed a `DamageBlocked` marker to stop the re-hit,
+and the re-hit had no attacker attached. The new pipeline changes the hit in place, once.
+
+**The pieces.**
+
+| Element | Trigger | Job |
+|---|---|---|
+| `WitchercraftMeleeCrit` | Player critical hit | Works out the crit bonus: +0.5 for a vanilla jump crit, + Crit Damage when a condition is true on a charged swing. Forces the crit (vanilla stars and sound), sets vanilla's multiplier to 1, and stores the bonus on the attacker. |
+| `WitchercraftIncomingDamage` | Entity attacked | Melee: `(amount + flat + oil) x (1 + %) x (1 + crit bonus)`, then execute, then sets the incoming damage amount. Arrows: a fully drawn arrow on a condition gets `x (1 + Crit Damage)`. |
+| `WitchercraftAfterDamage` | none (called by the bridge) | Life steal and Black Blood, from the damage that actually reached health. |
+| `WitchercraftCritCondition` | none, returns logic | The list of crit conditions. Only Thunderbolt in a storm today. |
+| `WitchercraftOilMatches` | none, returns logic | Main-hand oil enchantment vs the target's category tag, for all ten oils. |
+| `WitchercraftExecuteEnabled` | none, returns logic | Seam: `false` until a perk carries Execute. |
+| `IsFullyChargedAttack` | none, returns logic, **locked** | Attack strength above 0.9. Blockly has no block for it. |
+| `IsCritArrow` | none, returns logic, **locked** | `AbstractArrow.isCritArrow()`. Blockly has no block for it. |
+| `WitchercraftAfterDamageBridge` | code element, **locked** | Subscribes to `LivingDamageEvent.Post` (no Blockly trigger exists) and calls `WitchercraftAfterDamage` with `getHealthDamage()`. |
+
+Plus the `witchercraft:execute_immune` entity tag (Ender Dragon, Wither, Warden).
+
+**The crit handoff.** Vanilla fires the critical-hit event before the hit is dealt, in the same tick.
+`WitchercraftMeleeCrit` writes `witchercraftCritBonus` and `witchercraftCritTick` (the attacker's
+`tickCount`) into the attacker's persistent NBT; `WitchercraftIncomingDamage` uses the bonus only if the
+stamp matches the current tick, and zeroes it. The stamp is what stops a crit from a swing that never
+landed (cancelled, invulnerable target) being used by a later hit. NBT is used instead of a player
+variable because a player variable write ships the whole variable blob to the client (2.2).
+
+Vanilla's x1.5 is set to 1 in the crit event, because vanilla only multiplies the weapon's base
+damage. The witcher bonus is applied in `WitchercraftIncomingDamage` to the whole hit, so flat damage,
+oil and % damage are crit too.
+
+**Melee** means the attacker is also the direct source (`sourceentity == immediatesourceentity`)
+and the damage is not thorns. Only entities with the witcher attributes (players) get any of it.
+
+**Locked helpers.** The two `Is*` procedures and the bridge are `locked_code`: MCreator keeps the
+hand-written Java. Their blocks are placeholders with a comment saying so. If MCreator ever reorders
+`WitchercraftAfterDamage`'s dependencies, the call in `WitchercraftAfterDamageBridge.java` has to follow; its
+current order matches the generated `(world, damagesource, entity, sourceentity, amount)`.
+
+**How to change things.**
+- *Add a crit condition:* one more OR branch in `WitchercraftCritCondition`. `entity` is the target,
+  `sourceentity` the attacker. It applies to melee and to fully drawn arrows at once.
+- *Add an oil:* one more OR branch in `WitchercraftOilMatches`.
+- *Give Execute to a perk:* make `WitchercraftExecuteEnabled` return that perk's equipped variable. The 20%
+  threshold is in `WitchercraftIncomingDamage`.
+- *Debug a hit:* give yourself the `DevLog` effect. Every melee hit prints one line per part (`base`, `flat +`, `oil +`, `damage +%`, `crit +%`, `=`), arrows print `arrow`, `crit +%`, `=`, and the after-armor step adds `after armor` and `life steal +`. Values are rounded to 3 decimals by storing `round(x * 1000)` in a number variable and dividing that by 1000; dividing the round block directly would do integer division, because MCreator writes `1000` as an int literal.
+
+**Known limitations.**
+- Sweep-attack targets also get flat, oil and % damage. A crit never sweeps, so they never get the crit.
+- `WyvernDecoctionHit` still updates its % damage stack in its own handler on the same event, with no
+  fixed order against `WitchercraftIncomingDamage`, so a stack can apply one hit late.
+- PvP: the stats apply between players, but Execute never targets a player.
 
 ---
 
@@ -608,7 +670,7 @@ small helpers may remain unowned. MCreator does not regenerate either form:
   another screen, disconnect). It is the reliable place to end page-scoped modes such as map travel. The shell
   hands every page the **content region** - the whole area below the navbar - as a design-coords rect;
   the page fills it however it likes. All coords are design-canvas pixels (see 3.3a).
-- **`WitcherGuiScreen`** - the shell. Renders against a **fixed virtual design canvas**
+- **`WitchercraftGuiScreen`** - the shell. Renders against a **fixed virtual design canvas**
   (`DESIGN_W`x`DESIGN_H`, 16:9) scaled uniformly to fit the real screen (see 3.3a). `extractBackground`
   paints opaque black over the whole (gui-scaled) screen, then - inside the `pose().pushMatrix()` /
   `translate` / `scale` transform - blits the **active tab's own background** (`backgroundFor(activeTabId)`)
@@ -618,22 +680,22 @@ small helpers may remain unowned. MCreator does not regenerate either form:
   page content never covers the tabs, then pops the transform and renders the page's tooltip
   (`pollTooltip`) in screen space at the real cursor. Input is transformed screen->design before
   hit-testing. Drag deltas are divided by the same shell scale. A
-  `WitcherGuiScreen(String pageId)` constructor opens straight onto a tab. `isPauseScreen()` always
+  `WitchercraftGuiScreen(String pageId)` constructor opens straight onto a tab. `isPauseScreen()` always
   returns false. Every page therefore has the same live-world behavior in single-player and multiplayer.
-- **`WitcherGuiDamageInterrupt`** - the server listens to `LivingDamageEvent.Post`, after reductions
+- **`WitchercraftGuiDamageInterrupt`** - the server listens to `LivingDamageEvent.Post`, after reductions
   and health application. Positive health damage closes the shell only when `DamageSource.getEntity()`
   is an `Enemy` or a player. This includes owned projectiles while excluding fire, lava, falls,
   drowning, poison ticks, and other environmental sources. A clientbound packet calls the shell's
   `onClose()` instead of clearing the screen directly, so an active meditation sends its normal cancel
   request and restores the hidden HUD.
-- **`WitcherGuiLayout`** - the tool-generated data holder for shell **chrome only** (no page content).
+- **`WitchercraftGuiLayout`** - the tool-generated data holder for shell **chrome only** (no page content).
   The **design canvas** (`DESIGN_W/H`), a `BG` fallback texture, navbar sizing (`NAV_Y/H`,
   `NAV_TAB_W`, `NAV_GAP`, `NAV_ICON`), a `CONTENT_MARGIN`, a `NAV[]` of tabs (each `pageId` + label key
   + **icon texture**; positions computed, no rect), and a `BACKGROUNDS[]` of `(pageId, texture)` pairs
   - `backgroundFor(pageId)` returns a page's own background, or `BG` if it has none. Helpers give the
   navbar tab rects and the **content region** (`contentX/Y/W/H()` = the whole area below the navbar).
   All coords are design-canvas pixels.
-- **`WitcherGuiPages`** - the route table: `forId(pageId)` returns the handling page; an id with no
+- **`WitchercraftGuiPages`** - the route table: `forId(pageId)` returns the handling page; an id with no
   bespoke class falls back to a cached `PlaceholderPage`. Bespoke pages register in the `CUSTOM` map.
 - **`PlaceholderPage`** - a not-yet-built tab: centres a "&lt;Name&gt; - coming soon" in the content
   region. Every navbar page with no bespoke `GuiPage` uses it, until that page gets its own class +
@@ -648,11 +710,11 @@ small helpers may remain unowned. MCreator does not regenerate either form:
 - **`GlossaryPage`** - the Glossary tab: Bestiary and Tutorials sub-tabs (see 3.3f). Content comes from
   `GlossaryBestiary` (tag-driven categories, dolls, stats) and `GlossaryTutorials`; geometry and
   colours from the tool-generated `GlossaryLayout` (`tools/glossary-layout-creator.html`).
-- **`WitcherGuiKeybind`** - a hand-written `@EventBusSubscriber(Dist.CLIENT)` that registers the **P**
+- **`WitchercraftGuiKeybind`** - a hand-written `@EventBusSubscriber(Dist.CLIENT)` that registers the **P**
   mapping plus one **per-page** mapping built from `NAV[]` (`key.witchercraft.open_shell.<pageId>`; the
   six known pages get conflict-free defaults - I / K / J / N / M / G - via a `DEFAULT_KEYS` map, any
   other tab stays unbound; all rebindable in Controls), and opens the matching tab on a client tick
-  (`ClientTickEvent.Post`, game bus) through `WitcherGuiPages.open` (3.3b). No server message except
+  (`ClientTickEvent.Post`, game bus) through `WitchercraftGuiPages.open` (3.3b). No server message except
   for container tabs, no MCreator keybind
   element; auto-detected by FML like the HUD overlay classes. Adding a nav tab in the tool
   automatically gets it a keybind.
@@ -695,11 +757,11 @@ vanilla slot code assumes normal GUI pixels, not the scaled design canvas. Such 
 `AbstractContainerScreen` that draws the same chrome, so to the player it is just another tab. Alchemy
 is the first (built in the alchemy redesign's step 0; see `ALCHEMY_REDESIGN_PLAN.md`).
 
-- **`ShellChrome`** - the chrome extracted from `WitcherGuiScreen`: the design-canvas transform, the
+- **`ShellChrome`** - the chrome extracted from `WitchercraftGuiScreen`: the design-canvas transform, the
   letterboxed per-tab background, the navbar with the level readout, a navbar hit-test
   (`navTabAt`), and the content region in **screen** pixels (`contentScreenX/Y/W/H`). Both the shell
   and container tabs draw through it; the pause menu uses its `drawLevelReadout`.
-- **One routing point.** `WitcherGuiPages.open(pageId)` is how every entry point (nav click, P, per-tab
+- **One routing point.** `WitchercraftGuiPages.open(pageId)` is how every entry point (nav click, P, per-tab
   keys, pause menu) opens a tab. `isContainerTab(pageId)` (`alchemy` and `skills`) makes it send a
   serverbound open packet (`AlchemyOpenMessage` / `SkillsOpenMessage`) instead of calling `setScreen`. Inside the shell, a
   nav click on a container tab goes through the same call. `FastTravelClient` still opens the map
@@ -709,7 +771,7 @@ is the first (built in the alchemy redesign's step 0; see `ALCHEMY_REDESIGN_PLAN
   the container-based pause menu) is swapped straight for the new one. A client-side close first would
   drop to the world for a frame and re-centre the cursor.
 - **Leaving to another tab.** The container screen sends `ServerboundContainerClosePacket`, resets the
-  client's `containerMenu`, and opens the target tab through `WitcherGuiPages.open` (the shell, the
+  client's `containerMenu`, and opens the target tab through `WitchercraftGuiPages.open` (the shell, the
   vanilla inventory, or another container tab), for the same no-flash reason.
   The server's `removed()` returns the grid. The release of a navbar click is swallowed so vanilla does
   not treat it as a click outside the GUI and throw the carried item.
@@ -746,7 +808,7 @@ is the first (built in the alchemy redesign's step 0; see `ALCHEMY_REDESIGN_PLAN
   attached to the mod bus in `WitchercraftMod`'s "mod init" user code block; `AlchemyScreen` binds
   itself in `RegisterMenuScreensEvent`. A fake MCreator `gui` element would register a menu class
   MCreator does not own and break the build.
-- **Damage interrupt.** `WitcherGuiDamageInterrupt` closes an open `AlchemyMenu` or `SkillsMenu` on
+- **Damage interrupt.** `WitchercraftGuiDamageInterrupt` closes an open `AlchemyMenu` or `SkillsMenu` on
   the server (`player.closeContainer()`), which returns Alchemy's items, in addition to the shell's
   clientbound close.
 - **No item-list overlays.** Container tabs report the whole screen from `getLeftPos`/`getTopPos`/
@@ -760,10 +822,10 @@ unchanged as the owner of the tree, equip grid and socket frames; what changed i
 
 - **Pieces.** `SkillsMenu` (4 mutagen slots + 36 inventory slots, own `MENUS` register attached in the
   "mod init" user code block), `SkillsScreen` (an `AbstractContainerScreen` that draws `ShellChrome`
-  and calls `PerkPage.render` inside the design transform, exactly as `WitcherGuiScreen` did),
+  and calls `PerkPage.render` inside the design transform, exactly as `WitchercraftGuiScreen` did),
   `SkillsOpenMessage` (copy of `AlchemyOpenMessage`), `MutagenSlots` (the storage),
   `MutagenEffects` (item queries + applying effects). `PerkPage` stays registered in
-  `WitcherGuiPages.CUSTOM` as a singleton so its sub-tab and held-perk state survive reopening;
+  `WitchercraftGuiPages.CUSTOM` as a singleton so its sub-tab and held-perk state survive reopening;
   `SkillsScreen` fetches it from there.
 - **The panel is 1:1 GUI pixels, every cell a vanilla slot.** Only the chrome (background, navbar)
   scales with the design canvas. The 360x200 perk panel is drawn unscaled, centred in the content
@@ -872,7 +934,7 @@ unchanged as the owner of the tree, equip grid and socket frames; what changed i
   `witchercraftPlayerExperienceRequirement` to 25 in `witchercraft.mcreator`. The generator writes
   these as field initialisers only (the NBT read still falls back to 0), so they apply to new players.
   Existing saves were not migrated. `/resetwitcherlevel` (`ResetWitcherLevel` command calling the
-  `WitcherLevelReset` procedure) puts the caller back to level 1, 0 XP, requirement 25 for curve
+  `WitchercraftLevelReset` procedure) puts the caller back to level 1, 0 XP, requirement 25 for curve
   testing, and resets all perks: learned flags (via `PerkUnlearnAll`, see 3.10), `witchercraftPerksLearned`
   and the branch counters, and the 12 perk sockets, then recomputes. Keep its values in sync with the
   defaults. (Before this it left perks learned, so `level - 1 - learned` stayed at 0 SP until the player
@@ -916,13 +978,13 @@ is decorated (`InventoryShell.isDecorated`: `getClass() == InventoryScreen.class
   tab is cancelled, the matching release is swallowed (so vanilla does not treat it as a click
   outside and throw the carried item), and switching sends `ServerboundContainerClosePacket` for
   `inventoryMenu` (the server's `InventoryMenu.removed` returns the crafting grid and carried item),
-  resets the client's `containerMenu`, then `WitcherGuiPages.open`.
-- **Opening.** `WitcherGuiPages.open("inventory")` calls `InventoryShell.open`, a copy of vanilla's E
+  resets the client's `containerMenu`, then `WitchercraftGuiPages.open`.
+- **Opening.** `WitchercraftGuiPages.open("inventory")` calls `InventoryShell.open`, a copy of vanilla's E
   handling (`sendOpenInventory` when `isServerControlledInventory`, e.g. riding a horse; otherwise the
-  tutorial hook and `setScreen(new InventoryScreen(player))`). `WitcherGuiPages.hasOwnScreen` (container
-  tabs plus inventory) is what `WitcherGuiScreen` checks before switching pages in place. Alchemy and
-  Skills leave through `WitcherGuiPages.open` for every target.
-- **Damage interrupt.** The clientbound close in `WitcherGuiDamageInterrupt` calls
+  tutorial hook and `setScreen(new InventoryScreen(player))`). `WitchercraftGuiPages.hasOwnScreen` (container
+  tabs plus inventory) is what `WitchercraftGuiScreen` checks before switching pages in place. Alchemy and
+  Skills leave through `WitchercraftGuiPages.open` for every target.
+- **Damage interrupt.** The clientbound close in `WitchercraftGuiDamageInterrupt` calls
   `InventoryShell.close()`, i.e. `player.closeContainer()` on a decorated inventory, the same path as
   pressing E. This is the reason the background is opaque-safe.
 - **Item-list overlay mods (JEI, EMI, REI).** There is no shared way to reserve screen space: each
@@ -1048,7 +1110,7 @@ the category.
   folder tree with them. Their menu and screen registrations were removed from `WitchercraftModMenus` /
   `WitchercraftModScreens` (MCreator regenerates the same result from the registry), and
   `PauseMenuGuiButtonMessage`'s buttonID 3/4 branches went (the pause screen already opened the Glossary
-  tab through `WitcherGuiPages.open`). `PauseMenuGui.mod.json` still names the old open procedures in two
+  tab through `WitchercraftGuiPages.open`). `PauseMenuGui.mod.json` still names the old open procedures in two
   `onClick` fields, like the earlier retirements; its code is locked, so nothing uses them. Their textures
   (`book.png`, still used by the Glossary, the face and bookmark PNGs) and their `gui.witchercraft.*` lang
   keys were left in place.
@@ -1061,10 +1123,10 @@ would get its own. `tools/gui-layout-creator.html` is deliberately **not** one o
 shell **chrome only**: the design canvas, the navbar (tab order / `pageId` / label / icon, add /
 delete / reorder), and each tab's **own background texture** (a `background` field per tab; blank
 falls back to the shared `BG`). It shows the content region as a greyed "reserved" box (a reminder
-that pages are laid out by their own tools) and **regenerates `WitcherGuiLayout.java` live -> copy ->
+that pages are laid out by their own tools) and **regenerates `WitchercraftGuiLayout.java` live -> copy ->
 paste over the file**. Seeded with the current layout, so `Reset` reproduces the checked-in file. It
 also carries a collapsible **"How to add and connect a new GUI"** section - the step-by-step checklist
-(add the tab, art, page class, register in `WitcherGuiPages`, optional dedicated placer tool, optional
+(add the tab, art, page class, register in `WitchercraftGuiPages`, optional dedicated placer tool, optional
 keybind default, lang keys) for turning a placeholder tab into a real page, including the client-only
 constraint from 3.9.
 
@@ -1120,7 +1182,7 @@ their `Menu`/`ButtonMessage`/`GuiOpenProcedure`/`GuiSkillPointsUsedProcedure`) w
 the Phase 1/2 work (TDD 3.5-3.6 predate this) because the Pause Menu's "Skill Tree" button still
 opened `CharacterAbilitiesGeneralGuiOpenProcedure` directly - a live, reachable path into the old
 screen even after `PerkPage` fully replaced its function. That's fixed now: `PauseMenuGuiScreen`'s
-Skill Tree button opens `WitcherGuiScreen("skills")` directly (client-only `Minecraft.setScreen`, no
+Skill Tree button opens `WitchercraftGuiScreen("skills")` directly (client-only `Minecraft.setScreen`, no
 network message - opening a screen isn't server-authoritative state, see 3.9), and
 `PauseMenuGuiButtonMessage` no longer has a buttonID 5 branch. `PauseMenuGui` was marked
 `locked_code: true` in `witchercraft.mcreator` so this hand-edit survives MCreator resaving the
@@ -1152,13 +1214,13 @@ divergence risk the way the `en_us.json` gotcha (3.11) is.
 ### 3.7 How to change things
 
 - **Rearrange the navbar / chrome** - open `tools/gui-layout-creator.html`, edit, copy
-  `WitcherGuiLayout.java` over the file.
+  `WitchercraftGuiLayout.java` over the file.
 - **Add a real page** - implement `GuiPage` (its own class; fill the content region), register its
-  singleton in `WitcherGuiPages.CUSTOM` under its `pageId`, add a `NAV[]` entry with that `pageId`,
+  singleton in `WitchercraftGuiPages.CUSTOM` under its `pageId`, add a `NAV[]` entry with that `pageId`,
   and give it its own placer tool if it needs authored geometry (the Skills pattern). Until then the
   `pageId` shows a `PlaceholderPage`.
 - **Change an open key** - normal keybinds; rebind in Controls, or change the defaults in
-  `WitcherGuiKeybind` (`OPEN_SHELL` / `DEFAULT_KEYS`).
+  `WitchercraftGuiKeybind` (`OPEN_SHELL` / `DEFAULT_KEYS`).
 
 ### 3.8 Known limitations
 
@@ -1278,7 +1340,7 @@ client and the integrated server never mix scans). Names are cached globally. Us
   that id flagged so only that perk's `PerkLearnRequested` is true. The skill-point check and spend stay
   in the perk's own Blockly.
 - **Perk reset.** `PerkUnlearnAll` (locked) runs `AllPerks` with the unlearn flag, so every perk's
-  `PerkUnlearnRequested` is true and each clears its own learned var. `WitcherLevelReset` zeroes
+  `PerkUnlearnRequested` is true and each clears its own learned var. `WitchercraftLevelReset` zeroes
   `witchercraftPerksLearned`, the three branch counters and the 12 perk sockets in Blockly, then calls
   `PerkUnlearnAll` and `RecomputeEquippedPerks`. New perks need nothing extra beyond their own part 3.
 
@@ -1374,7 +1436,7 @@ done in both `en_us.json` and `witchercraft.mcreator`'s `language_map`, or MCrea
 The shell's `PerkPage` reads `PerkCatalog` / `PerkEquipVars` directly instead, so all 45 per-perk
 `*Show` procedures were dead (zero references, verified by grep) and were moved to `trash/` (Java +
 `elements/*.mod.json`) with their `mod_elements` entries removed from `witchercraft.mcreator`. The two
-non-perk `*Show` procedures - `MedallionShow` and `QuenHudShow` - are still read by `WitcherHud` and stay.
+non-perk `*Show` procedures - `MedallionShow` and `QuenHudShow` - are still read by `WitchercraftHud` and stay.
 The live `<Perk>Effect` procedures were kept; they are now the perk procedures of 3.10.
 
 ---
@@ -2013,7 +2075,7 @@ The client cache also owns one temporary navigation target per dimension. Placin
 dimension replaces it. Targets survive closing the map but clear on connection change. They are not sent to the
 server, saved to disk, or counted against the personal-waypoint limit.
 
-`WitcherGuiScreen` forwards Minecraft's double-click classification and Unicode character input through the
+`WitchercraftGuiScreen` forwards Minecraft's double-click classification and Unicode character input through the
 `GuiPage` contract. `MapPage` reserves left drag for panning. A right-click on empty map space starts a
 300-millisecond pending action; if no second click arrives, it places a temporary target at the transformed
 world X/Z. A double right-click cancels that action and opens the modal waypoint-creation panel at the same
@@ -2568,7 +2630,7 @@ Stage 4 connects the travel service to the sign and the map.
 `openFromSign` resolves the lower half (the clicked block, or the one below it), calls `startSession` (which now
 returns a `Result`), and answers either with `FastTravelOpenMessage` or with a `FastTravelResultMessage` giving the
 reason (`DISABLED`, `BUSY`, `NO_SESSION`). `FastTravelClient.open` sets travel mode and opens
-`WitcherGuiScreen` on the map tab; nothing else enters travel mode.
+`WitchercraftGuiScreen` on the map tab; nothing else enters travel mode.
 
 `MapPage` in travel mode:
 

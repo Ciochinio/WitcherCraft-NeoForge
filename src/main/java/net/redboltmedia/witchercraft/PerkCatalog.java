@@ -87,7 +87,7 @@ public final class PerkCatalog {
 		run(player, perkId, false);
 	}
 
-	/** Server: run every perk's unlearn block (a full perk reset, see WitcherLevelReset). */
+	/** Server: run every perk's unlearn block (a full perk reset, see WitchercraftLevelReset). */
 	public static void unlearnAll(Player player) {
 		run(player, 0, true);
 	}

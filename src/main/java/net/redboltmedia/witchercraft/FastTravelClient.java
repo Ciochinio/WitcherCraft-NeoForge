@@ -41,7 +41,7 @@ public final class FastTravelClient {
 		originX = x;
 		originZ = z;
 		originPresentation = presentation;
-		Minecraft.getInstance().setScreen(new WitcherGuiScreen("map"));
+		Minecraft.getInstance().setScreen(new WitchercraftGuiScreen("map"));
 	}
 
 	public static boolean active() {
@@ -128,7 +128,7 @@ public final class FastTravelClient {
 	/** Handles a {@link FastTravelResultMessage}. */
 	public static void onResult(FastTravel.Result result, int price) {
 		Minecraft minecraft = Minecraft.getInstance();
-		boolean mapOpen = minecraft.screen instanceof WitcherGuiScreen;
+		boolean mapOpen = minecraft.screen instanceof WitchercraftGuiScreen;
 		switch (result) {
 			case TRAVELLING -> {
 				return;

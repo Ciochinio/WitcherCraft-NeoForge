@@ -10,17 +10,17 @@ import net.minecraft.client.Minecraft;
 /**
  * The "route table": maps a pageId to the {@link GuiPage} that renders it.
  *
- * The navbar is driven by {@link WitcherGuiLayout#NAV} (order + visuals); this
+ * The navbar is driven by {@link WitchercraftGuiLayout#NAV} (order + visuals); this
  * class only answers "given a pageId, which page object handles it?". Any nav
  * pageId without a dedicated page class falls back to a generic
- * {@link LayoutPage} that renders that page's {@link WitcherGuiLayout} boxes -
+ * {@link LayoutPage} that renders that page's {@link WitchercraftGuiLayout} boxes -
  * so adding a placeholder tab is a one-line edit in the tool, no new class.
  *
  * To add a real (custom-rendered) page: implement {@link GuiPage} (its own class
  * + its own placer tool, like Skills) and register its singleton in {@link #CUSTOM}.
  */
-public final class WitcherGuiPages {
-	private WitcherGuiPages() {
+public final class WitchercraftGuiPages {
+	private WitchercraftGuiPages() {
 	}
 
 	/** Bespoke pages keyed by id. Everything else is a "coming soon" placeholder. */
@@ -31,7 +31,7 @@ public final class WitcherGuiPages {
 
 	static {
 		// The perk tree + equip grid. "skills" is a container tab, so SkillsScreen
-		// (not WitcherGuiScreen) draws this page around the real mutagen slots.
+		// (not WitchercraftGuiScreen) draws this page around the real mutagen slots.
 		PerkPage perk = new PerkPage("skills");
 		CUSTOM.put(perk.id(), perk);
 
@@ -57,7 +57,7 @@ public final class WitcherGuiPages {
 
 	/** The first navbar tab's pageId, used as the default active tab. */
 	public static String defaultPageId() {
-		return WitcherGuiLayout.NAV.length > 0 ? WitcherGuiLayout.NAV[0].pageId : "";
+		return WitchercraftGuiLayout.NAV.length > 0 ? WitchercraftGuiLayout.NAV[0].pageId : "";
 	}
 
 	/**
@@ -71,7 +71,7 @@ public final class WitcherGuiPages {
 
 	/**
 	 * Tabs that are a screen of their own rather than a page inside
-	 * {@link WitcherGuiScreen}: the container tabs, plus Inventory, which is the
+	 * {@link WitchercraftGuiScreen}: the container tabs, plus Inventory, which is the
 	 * decorated vanilla {@link net.minecraft.client.gui.screens.inventory.InventoryScreen}
 	 * ({@link InventoryShell}).
 	 */
@@ -83,7 +83,7 @@ public final class WitcherGuiPages {
 	 * THE routing point for opening the shell on a tab (nav clicks, P, per-tab
 	 * keys, the pause menu). A container tab asks the server to open its menu,
 	 * Inventory opens the vanilla inventory, and any other tab opens
-	 * {@link WitcherGuiScreen} directly.
+	 * {@link WitchercraftGuiScreen} directly.
 	 */
 	public static void open(String pageId) {
 		if (InventoryShell.TAB_ID.equals(pageId))
@@ -93,6 +93,6 @@ public final class WitcherGuiPages {
 		else if ("skills".equals(pageId))
 			ClientPacketDistributor.sendToServer(SkillsOpenMessage.INSTANCE);
 		else
-			Minecraft.getInstance().setScreen(new WitcherGuiScreen(pageId));
+			Minecraft.getInstance().setScreen(new WitchercraftGuiScreen(pageId));
 	}
 }

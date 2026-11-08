@@ -7,21 +7,21 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
 /**
- * One "page" (React-style component) rendered inside {@link WitcherGuiScreen}.
+ * One "page" (React-style component) rendered inside {@link WitchercraftGuiScreen}.
  *
  * The shell stays mounted and owns the navbar + frame; it swaps which page's
  * {@link #render} fills the CONTENT REGION - the whole area below the navbar -
  * based on its {@code activeTab} state. Switching tabs is pure client state.
  *
  * Every page is handed the content region as (regionX, regionY, regionW, regionH)
- * in DESIGN-canvas coordinates (see {@link WitcherGuiLayout}). A page draws
+ * in DESIGN-canvas coordinates (see {@link WitchercraftGuiLayout}). A page draws
  * itself within that box however it wants - a bespoke page (like {@link PerkPage})
  * maps its own fixed layout onto the region; a trivial page just centres text.
  * All rendering happens inside the shell's design->screen scale transform.
  */
 public interface GuiPage {
 
-	/** Stable id; must equal a {@link WitcherGuiLayout.Nav#pageId} to be reachable. */
+	/** Stable id; must equal a {@link WitchercraftGuiLayout.Nav#pageId} to be reachable. */
 	String id();
 
 	/** Navbar label (fallback when the layout supplies none). */

@@ -48,7 +48,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.Util;
 
 @EventBusSubscriber(Dist.CLIENT)
-public class WitcherHud {
+public class WitchercraftHud {
 
 	private static final Identifier QUEN_ICONS = Identifier.parse("witchercraft:textures/screens/quen_icons.png");
 	private static final Identifier TOXICITY_BAR = Identifier.parse("witchercraft:textures/screens/toxicity_bar.png");

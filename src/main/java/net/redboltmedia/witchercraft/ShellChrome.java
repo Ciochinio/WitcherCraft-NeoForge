@@ -12,11 +12,11 @@ import net.minecraft.resources.Identifier;
 /**
  * The GUI shell's CHROME, shared by every screen that presents itself as a shell
  * tab: the design-canvas transform, the letterboxed per-tab background, and the
- * navbar (with the level readout). {@link WitcherGuiScreen} draws its client-only
+ * navbar (with the level readout). {@link WitchercraftGuiScreen} draws its client-only
  * pages with it; container-backed tabs such as {@link AlchemyScreen} draw the same
  * chrome around real item slots, so to the player every tab looks alike.
  *
- * All navbar geometry is DESIGN-canvas pixels ({@link WitcherGuiLayout}); callers
+ * All navbar geometry is DESIGN-canvas pixels ({@link WitchercraftGuiLayout}); callers
  * pass the real (gui-scaled) screen size and this class maps between the two.
  *
  * HAND-MAINTAINED: locked code element, never regenerated.
@@ -38,15 +38,15 @@ public final class ShellChrome {
 
 	/** Uniform scale to fit the 16:9 design canvas inside the (gui-scaled) screen. */
 	public static float layoutScale(int width, int height) {
-		return Math.min((float) width / WitcherGuiLayout.DESIGN_W, (float) height / WitcherGuiLayout.DESIGN_H);
+		return Math.min((float) width / WitchercraftGuiLayout.DESIGN_W, (float) height / WitchercraftGuiLayout.DESIGN_H);
 	}
 
 	public static float offsetX(int width, float s) {
-		return (width - WitcherGuiLayout.DESIGN_W * s) / 2f;
+		return (width - WitchercraftGuiLayout.DESIGN_W * s) / 2f;
 	}
 
 	public static float offsetY(int height, float s) {
-		return (height - WitcherGuiLayout.DESIGN_H * s) / 2f;
+		return (height - WitchercraftGuiLayout.DESIGN_H * s) / 2f;
 	}
 
 	public static int toDesignX(double sx, float ox, float s) {
@@ -74,9 +74,9 @@ public final class ShellChrome {
 	public static void drawBackground(GuiGraphicsExtractor g, int width, int height, String tabId) {
 		g.fill(0, 0, width, height, LETTERBOX);
 		pushDesignTransform(g, width, height);
-		String bg = WitcherGuiLayout.backgroundFor(tabId);
-		g.blit(RenderPipelines.GUI_TEXTURED, Identifier.parse(bg), 0, 0, 0, 0, WitcherGuiLayout.DESIGN_W, WitcherGuiLayout.DESIGN_H, WitcherGuiLayout.DESIGN_W, WitcherGuiLayout.DESIGN_H);
-		g.fill(0, 0, WitcherGuiLayout.DESIGN_W, WitcherGuiLayout.DESIGN_H, PANEL_DIM);
+		String bg = WitchercraftGuiLayout.backgroundFor(tabId);
+		g.blit(RenderPipelines.GUI_TEXTURED, Identifier.parse(bg), 0, 0, 0, 0, WitchercraftGuiLayout.DESIGN_W, WitchercraftGuiLayout.DESIGN_H, WitchercraftGuiLayout.DESIGN_W, WitchercraftGuiLayout.DESIGN_H);
+		g.fill(0, 0, WitchercraftGuiLayout.DESIGN_W, WitchercraftGuiLayout.DESIGN_H, PANEL_DIM);
 		g.pose().popMatrix();
 	}
 
@@ -85,21 +85,21 @@ public final class ShellChrome {
 	/** Draw the navbar and level readout. Design coords: call inside the design transform. */
 	public static void drawNavbar(GuiGraphicsExtractor g, Font font, String activeTabId) {
 		drawLevelReadout(g, font);
-		int count = WitcherGuiLayout.NAV.length;
+		int count = WitchercraftGuiLayout.NAV.length;
 		for (int i = 0; i < count; i++) {
-			WitcherGuiLayout.Nav nav = WitcherGuiLayout.NAV[i];
+			WitchercraftGuiLayout.Nav nav = WitchercraftGuiLayout.NAV[i];
 			boolean active = nav.pageId.equals(activeTabId);
-			int tx = WitcherGuiLayout.navTabX(count, i);
-			int ty = WitcherGuiLayout.NAV_Y;
-			int tw = WitcherGuiLayout.NAV_TAB_W, th = WitcherGuiLayout.NAV_H;
+			int tx = WitchercraftGuiLayout.navTabX(count, i);
+			int ty = WitchercraftGuiLayout.NAV_Y;
+			int tw = WitchercraftGuiLayout.NAV_TAB_W, th = WitchercraftGuiLayout.NAV_H;
 
 			g.fill(tx, ty, tx + tw, ty + th, active ? TAB_BG_ACTIVE : TAB_BG);
 			g.fill(tx, ty, tx + tw, ty + 1, TAB_BORDER);
 			g.fill(tx, ty + th - 1, tx + tw, ty + th, TAB_BORDER);
 
 			if (nav.icon != null && !nav.icon.isEmpty()) {
-				int ix = tx + (tw - WitcherGuiLayout.NAV_ICON) / 2;
-				g.blit(RenderPipelines.GUI_TEXTURED, Identifier.parse(nav.icon), ix, ty + 2, 0, 0, WitcherGuiLayout.NAV_ICON, WitcherGuiLayout.NAV_ICON, WitcherGuiLayout.NAV_ICON, WitcherGuiLayout.NAV_ICON);
+				int ix = tx + (tw - WitchercraftGuiLayout.NAV_ICON) / 2;
+				g.blit(RenderPipelines.GUI_TEXTURED, Identifier.parse(nav.icon), ix, ty + 2, 0, 0, WitchercraftGuiLayout.NAV_ICON, WitchercraftGuiLayout.NAV_ICON, WitchercraftGuiLayout.NAV_ICON, WitchercraftGuiLayout.NAV_ICON);
 			}
 
 			Component label = navLabel(nav);
@@ -111,20 +111,20 @@ public final class ShellChrome {
 		}
 	}
 
-	private static Component navLabel(WitcherGuiLayout.Nav nav) {
+	private static Component navLabel(WitchercraftGuiLayout.Nav nav) {
 		if (nav.labelKey != null && !nav.labelKey.isEmpty())
 			return Component.translatable(nav.labelKey);
-		return WitcherGuiPages.forId(nav.pageId).navLabel();
+		return WitchercraftGuiPages.forId(nav.pageId).navLabel();
 	}
 
 	/** The pageId of the navbar tab under a DESIGN-coords point, or null. */
 	public static String navTabAt(int dmx, int dmy) {
-		int count = WitcherGuiLayout.NAV.length;
+		int count = WitchercraftGuiLayout.NAV.length;
 		for (int i = 0; i < count; i++) {
-			int tx = WitcherGuiLayout.navTabX(count, i);
-			int ty = WitcherGuiLayout.NAV_Y;
-			if (dmx >= tx && dmx < tx + WitcherGuiLayout.NAV_TAB_W && dmy >= ty && dmy < ty + WitcherGuiLayout.NAV_H)
-				return WitcherGuiLayout.NAV[i].pageId;
+			int tx = WitchercraftGuiLayout.navTabX(count, i);
+			int ty = WitchercraftGuiLayout.NAV_Y;
+			if (dmx >= tx && dmx < tx + WitchercraftGuiLayout.NAV_TAB_W && dmy >= ty && dmy < ty + WitchercraftGuiLayout.NAV_H)
+				return WitchercraftGuiLayout.NAV[i].pageId;
 		}
 		return null;
 	}
@@ -147,7 +147,7 @@ public final class ShellChrome {
 	}
 
 	private static int compactTabW(int w) {
-		int n = WitcherGuiLayout.NAV.length;
+		int n = WitchercraftGuiLayout.NAV.length;
 		return n <= 0 ? 0 : (w - COMPACT_LEVEL_W - COMPACT_GAP - (n - 1) * COMPACT_GAP) / n;
 	}
 
@@ -158,9 +158,9 @@ public final class ShellChrome {
 	public static void drawCompactNavbar(GuiGraphicsExtractor g, Font font, String activeTabId, int x, int y, int w, int mouseX, int mouseY) {
 		drawCompactLevel(g, font, x, y);
 		int tw = compactTabW(w), th = COMPACT_H;
-		WitcherGuiLayout.Nav[] navs = WitcherGuiLayout.NAV;
+		WitchercraftGuiLayout.Nav[] navs = WitchercraftGuiLayout.NAV;
 		for (int i = 0; i < navs.length; i++) {
-			WitcherGuiLayout.Nav nav = navs[i];
+			WitchercraftGuiLayout.Nav nav = navs[i];
 			boolean active = nav.pageId.equals(activeTabId);
 			int tx = compactTabX(x, w, i);
 			g.fill(tx, y, tx + tw, y + th, active ? TAB_BG_ACTIVE : TAB_BG);
@@ -180,10 +180,10 @@ public final class ShellChrome {
 		if (my < y || my >= y + COMPACT_H)
 			return null;
 		int tw = compactTabW(w);
-		for (int i = 0; i < WitcherGuiLayout.NAV.length; i++) {
+		for (int i = 0; i < WitchercraftGuiLayout.NAV.length; i++) {
 			int tx = compactTabX(x, w, i);
 			if (mx >= tx && mx < tx + tw)
-				return WitcherGuiLayout.NAV[i].pageId;
+				return WitchercraftGuiLayout.NAV[i].pageId;
 		}
 		return null;
 	}
@@ -201,12 +201,12 @@ public final class ShellChrome {
 		int w = COMPACT_LEVEL_W, h = COMPACT_H;
 		g.fill(x, y, x + w, y + h, COMPACT_LEVEL_BG);
 		Component num = Component.literal(Integer.toString(level));
-		g.text(font, num, x + (w - font.width(num)) / 2, y + 3, WitcherGuiLayout.LEVEL_TEXT_COLOR, true);
+		g.text(font, num, x + (w - font.width(num)) / 2, y + 3, WitchercraftGuiLayout.LEVEL_TEXT_COLOR, true);
 		int bx = x + 2, by = y + h - 5, bw = w - 4;
-		g.fill(bx, by, bx + bw, by + 2, WitcherGuiLayout.XP_BAR_BG_COLOR);
+		g.fill(bx, by, bx + bw, by + 2, WitchercraftGuiLayout.XP_BAR_BG_COLOR);
 		int filled = (int) Math.round(frac * bw);
 		if (filled > 0)
-			g.fill(bx, by, bx + filled, by + 2, WitcherGuiLayout.XP_BAR_FILL_COLOR);
+			g.fill(bx, by, bx + filled, by + 2, WitchercraftGuiLayout.XP_BAR_FILL_COLOR);
 	}
 
 	/**
@@ -227,23 +227,23 @@ public final class ShellChrome {
 
 		// level number (scaled)
 		g.pose().pushMatrix();
-		g.pose().translate(WitcherGuiLayout.LEVEL_X, WitcherGuiLayout.LEVEL_Y);
-		g.pose().scale(WitcherGuiLayout.LEVEL_SCALE, WitcherGuiLayout.LEVEL_SCALE);
-		g.text(font, Component.literal(Integer.toString(level)), 0, 0, WitcherGuiLayout.LEVEL_TEXT_COLOR, true);
+		g.pose().translate(WitchercraftGuiLayout.LEVEL_X, WitchercraftGuiLayout.LEVEL_Y);
+		g.pose().scale(WitchercraftGuiLayout.LEVEL_SCALE, WitchercraftGuiLayout.LEVEL_SCALE);
+		g.text(font, Component.literal(Integer.toString(level)), 0, 0, WitchercraftGuiLayout.LEVEL_TEXT_COLOR, true);
 		g.pose().popMatrix();
 
 		// xp progress bar (empty track + left-anchored fill)
-		int bx = WitcherGuiLayout.XP_BAR_X, by = WitcherGuiLayout.XP_BAR_Y;
-		int bw = WitcherGuiLayout.XP_BAR_W, bh = WitcherGuiLayout.XP_BAR_H;
-		g.fill(bx, by, bx + bw, by + bh, WitcherGuiLayout.XP_BAR_BG_COLOR);
+		int bx = WitchercraftGuiLayout.XP_BAR_X, by = WitchercraftGuiLayout.XP_BAR_Y;
+		int bw = WitchercraftGuiLayout.XP_BAR_W, bh = WitchercraftGuiLayout.XP_BAR_H;
+		g.fill(bx, by, bx + bw, by + bh, WitchercraftGuiLayout.XP_BAR_BG_COLOR);
 		int filled = (int) Math.round(frac * bw);
 		if (filled > 0)
-			g.fill(bx, by, bx + filled, by + bh, WitcherGuiLayout.XP_BAR_FILL_COLOR);
+			g.fill(bx, by, bx + filled, by + bh, WitchercraftGuiLayout.XP_BAR_FILL_COLOR);
 
 		// exp/req caption
 		java.text.DecimalFormat fmt = new java.text.DecimalFormat("0.##");
 		Component caption = Component.literal(fmt.format(xp) + "/" + fmt.format(req));
-		g.text(font, caption, WitcherGuiLayout.XP_TEXT_X, WitcherGuiLayout.XP_TEXT_Y, WitcherGuiLayout.XP_TEXT_COLOR, false);
+		g.text(font, caption, WitchercraftGuiLayout.XP_TEXT_X, WitchercraftGuiLayout.XP_TEXT_Y, WitchercraftGuiLayout.XP_TEXT_COLOR, false);
 	}
 
 	// ---- content region in SCREEN coords ---------------------------------------
@@ -252,19 +252,19 @@ public final class ShellChrome {
 
 	public static int contentScreenX(int width, int height) {
 		float s = layoutScale(width, height);
-		return Math.round(offsetX(width, s) + WitcherGuiLayout.contentX() * s);
+		return Math.round(offsetX(width, s) + WitchercraftGuiLayout.contentX() * s);
 	}
 
 	public static int contentScreenY(int width, int height) {
 		float s = layoutScale(width, height);
-		return Math.round(offsetY(height, s) + WitcherGuiLayout.contentY() * s);
+		return Math.round(offsetY(height, s) + WitchercraftGuiLayout.contentY() * s);
 	}
 
 	public static int contentScreenW(int width, int height) {
-		return Math.round(WitcherGuiLayout.contentW() * layoutScale(width, height));
+		return Math.round(WitchercraftGuiLayout.contentW() * layoutScale(width, height));
 	}
 
 	public static int contentScreenH(int width, int height) {
-		return Math.round(WitcherGuiLayout.contentH() * layoutScale(width, height));
+		return Math.round(WitchercraftGuiLayout.contentH() * layoutScale(width, height));
 	}
 }

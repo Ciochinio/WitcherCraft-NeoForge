@@ -28,7 +28,7 @@ import net.minecraft.network.protocol.game.ServerboundContainerClosePacket;
  *   an item-list overlay mod owns the side strips (client config
  *   {@code inventory.navbar}; see {@link #compact()}).
  * - Navbar clicks: {@link ScreenEvent.MouseButtonPressed.Pre} here.
- * - Damage interrupt: {@link WitcherGuiDamageInterrupt} closes it like E does.
+ * - Damage interrupt: {@link WitchercraftGuiDamageInterrupt} closes it like E does.
  *
  * Only the exact InventoryScreen class is decorated; creative and subclasses
  * from other mods are left alone.
@@ -79,7 +79,7 @@ public final class InventoryShell {
 	private static int compactY(AbstractContainerScreen<?> screen) {
 		// at the top like the full navbar, but never lower than just above the panel
 		float s = ShellChrome.layoutScale(screen.width, screen.height);
-		int top = Math.round(ShellChrome.offsetY(screen.height, s) + WitcherGuiLayout.NAV_Y * s);
+		int top = Math.round(ShellChrome.offsetY(screen.height, s) + WitchercraftGuiLayout.NAV_Y * s);
 		int abovePanel = screen.getTopPos() - ShellChrome.COMPACT_GAP - ShellChrome.COMPACT_H;
 		return Math.max(0, Math.min(top, abovePanel));
 	}
@@ -170,7 +170,7 @@ public final class InventoryShell {
 			Minecraft mc = Minecraft.getInstance();
 			mc.getConnection().send(new ServerboundContainerClosePacket(mc.player.inventoryMenu.containerId));
 			mc.player.containerMenu = mc.player.inventoryMenu;
-			WitcherGuiPages.open(pageId);
+			WitchercraftGuiPages.open(pageId);
 		}
 	}
 }

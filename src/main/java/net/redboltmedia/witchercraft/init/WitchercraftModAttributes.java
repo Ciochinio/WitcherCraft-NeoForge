@@ -20,7 +20,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 public class WitchercraftModAttributes {
 	public static final DeferredRegister<Attribute> REGISTRY = DeferredRegister.create(BuiltInRegistries.ATTRIBUTE, WitchercraftMod.MODID);
 	public static final DeferredHolder<Attribute, Attribute> CRIT_CHANCE = REGISTRY.register("crit_chance", () -> new RangedAttribute("attribute.witchercraft.crit_chance", 5d, 0d, 100d).setSyncable(true));
-	public static final DeferredHolder<Attribute, Attribute> CRIT_DAMAGE = REGISTRY.register("crit_damage", () -> new RangedAttribute("attribute.witchercraft.crit_damage", 115d, 0d, 1000d).setSyncable(true));
+	public static final DeferredHolder<Attribute, Attribute> CRIT_DAMAGE = REGISTRY.register("crit_damage", () -> new RangedAttribute("attribute.witchercraft.crit_damage", 50d, 0d, 1000d).setSyncable(true));
 	public static final DeferredHolder<Attribute, Attribute> PASSIVE_HEALTH_REGEN = REGISTRY.register("passive_health_regen", () -> new RangedAttribute("attribute.witchercraft.passive_health_regen", 0d, 0d, 100d).setSyncable(true));
 	public static final DeferredHolder<Attribute, Attribute> PASSIVE_STAMINA_REGEN = REGISTRY.register("passive_stamina_regen", () -> new RangedAttribute("attribute.witchercraft.passive_stamina_regen", 0d, 0d, 100d).setSyncable(true));
 	public static final DeferredHolder<Attribute, Attribute> TOXICITY_OVERDOSE_THRESHOLD = REGISTRY.register("toxicity_overdose_threshold",

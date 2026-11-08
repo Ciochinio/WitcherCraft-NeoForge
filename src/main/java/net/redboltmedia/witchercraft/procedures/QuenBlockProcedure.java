@@ -60,8 +60,6 @@ public class QuenBlockProcedure {
 					_vars.witchercraftQuenShield = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftQuenShield - amount;
 					_vars.markSyncDirty();
 				}
-				if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
-					_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.DAMAGE_BLOCKED, 3, 0));
 				if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftQuenShield <= 0) {
 					if (entity instanceof LivingEntity _entity)
 						_entity.removeEffect(WitchercraftModMobEffects.QUEN_EFFECT);
@@ -77,10 +75,7 @@ public class QuenBlockProcedure {
 					}
 				}
 			} else {
-				if (event instanceof ICancellableEvent _cancellable) {
-					_cancellable.setCanceled(true);
-				}
-				overflow = amount - entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftQuenShield;
+				overflow =amount - entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftQuenShield;
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 					_vars.witchercraftQuenShield = 0;
@@ -88,13 +83,8 @@ public class QuenBlockProcedure {
 				}
 				if (entity instanceof LivingEntity _entity)
 					_entity.removeEffect(WitchercraftModMobEffects.QUEN_EFFECT);
-				if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
-					_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.DAMAGE_BLOCKED, 3, 0));
-				{
-					Entity _ent = entity;
-					if (_ent.level() instanceof ServerLevel _serverLevel) {
-						_ent.hurtServer(_serverLevel, damagesource, (float) overflow);
-					}
+				if (event instanceof LivingIncomingDamageEvent _event) {
+					_event.setAmount((float) overflow);
 				}
 			}
 		}

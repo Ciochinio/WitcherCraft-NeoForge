@@ -29,7 +29,7 @@ import java.util.List;
 
 /**
  * The Alchemy tab. A vanilla container screen for {@link AlchemyMenu} that draws
- * the same shell chrome as {@link WitcherGuiScreen} (letterboxed per-tab
+ * the same shell chrome as {@link WitchercraftGuiScreen} (letterboxed per-tab
  * background and navbar, through {@link ShellChrome}), so to the player it is
  * just another tab.
  *
@@ -531,7 +531,7 @@ public class AlchemyScreen extends AbstractContainerScreen<AlchemyMenu> {
 		this.minecraft.getConnection().send(new ServerboundContainerClosePacket(this.menu.containerId));
 		this.minecraft.player.containerMenu = this.minecraft.player.inventoryMenu;
 		// another container tab: the server replaces this screen; otherwise the
-		// inventory or a WitcherGuiScreen page opens directly
-		WitcherGuiPages.open(pageId);
+		// inventory or a WitchercraftGuiScreen page opens directly
+		WitchercraftGuiPages.open(pageId);
 	}
 }

@@ -50,10 +50,6 @@ public class CharacterExperienceCalculatorProcedure {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 					_vars.witchercraftPlayerExperience = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerExperience - entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerExperienceRequirement;
-					_vars.markSyncDirty();
-				}
-				{
-					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 					_vars.witchercraftPlayerLevel = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPlayerLevel + 1;
 					_vars.markSyncDirty();
 				}
