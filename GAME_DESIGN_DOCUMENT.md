@@ -190,6 +190,11 @@ A few things that feed it today:
 
 It shows on the character screen, so a Sign build can see what it's actually getting.
 
+**Places of Power** (*planned*) will be world structures that grant a timed boost to one Sign when
+you visit them, the way Witcher 3's do. They are designed together with the structures that hold
+them, in their own pass. A per-Sign boost shows in the Sign menu, not on the stat sheet, since the
+stat sheet only carries the shared Sign Intensity.
+
 ### The Five Signs
 
 Each Sign owns one job.
@@ -471,13 +476,17 @@ Sign, coated the right oil, drank the right brew.
 On a melee hit, the weapon's base damage is combined with your stats:
 
 ```
-hit         = (base + AdditionalDamage + oil bonus) x (1 + IncreasedDamage%)
+hit         = (base + AdditionalDamage + oil bonus) x (1 + IncreasedDamage% + hit bonus% + taken%)
 on crit     = hit x (1 + crit bonus)       (see Crits)
 life steal  = damage dealt x LifeSteal%    (damage actually dealt, after armor)
 ```
 
 - **Additional Damage** - flat damage added before the percentage multiplier.
 - **Increased Damage** - a percentage multiplier applied to the total.
+- **Hit bonus** - extra % for this one hit from perks (e.g. "the next strong attack deals +45%").
+- **Taken** - extra % the target takes from debuffs on it (e.g. Sunder Armor, Crippling Strike).
+- All percentages are **added together** before multiplying, so stacking more of them grows damage
+  linearly. Only the crit multiplies on top.
 - **Crit Damage** - the bonus a condition crit adds (see [Crits](#crits)).
 - **Life Steal** - the percentage of damage actually dealt, after the target's armor, that returns
   to you as health.
@@ -694,7 +703,19 @@ It cannot latch onto blocks.
 ### Swords
 
 Unique named swords each get their own 3D model, and in time their own behavior. Every sword takes
-oils. What separates steel swords from silver swords is not designed yet.
+oils.
+
+**Steel and silver** are a property of the weapon, and the split is by what you're fighting:
+
+- **Silver swords** are strong against the monster categories (necrophages, specters, vampires and
+  the rest of the [Bestiary](#categories-and-weaknesses)).
+- **Steel swords** are strong against humans and beasts.
+- **Vanilla swords** are the neutral middle ground - no bonus, no penalty - so a player who never
+  touches witcher gear still fights normally.
+
+*Not built yet.* Still open: the size of the bonus (and whether the wrong metal gets a penalty), how
+a sword is marked steel or silver, and whether it rides on the hit-bonus hook from
+[the core formula](#the-core-formula).
 
 **Aerondight** is a legendary silver sword: a long blade engraved with runes, a crossguard swept
 toward the tip with one spike on each arm, a brown leather grip between two silver rings, and a dark
@@ -1351,6 +1372,9 @@ Payload magnitudes other than Dimeritium's are still being tuned.
 
 A work-in-progress snapshot of the skill tree; perks and their values are still being finalized.
 The rework follows Witcher 3's next-gen trees, built on [fast and strong attacks](#fast-and-strong-attacks).
+Two parts of those trees are left out on purpose: **adrenaline** (no third resource next to stamina
+and toxicity; perks that only feed or spend it are cut or reworked), and the **per-tab passive** that
+every equipped perk adds (with mutagens already giving their colour's stat, it would stack too fast).
 Where the original perk rolls a chance, we prefer a deterministic trigger (every Nth hit, the
 hit after X); a chance roll is allowed, but it needs a reason.
 Perks are switches the combat, Sign, and alchemy systems read live (see
@@ -1361,12 +1385,12 @@ Perks are switches the combat, Sign, and alchemy systems read live (see
 | Perk | Effect |
 |------|--------|
 | **Muscle Memory** | +**3** Additional Damage |
-| **Precise Blows** | *Rework pending* - was +**12** crit chance and +**75** crit damage; becomes a crit condition plus Crit Damage |
-| **Crushing Blows** | *Rework pending* - was +**8** crit chance and +**50** crit damage; becomes a crit condition plus Crit Damage |
-| **Anatomical Knowledge** | *Rework pending* - was +**10** crit chance with a bow; becomes a bow crit condition |
-| **Crippling Shot** | *Rework pending* - was +**50** crit damage with a bow; becomes a bow crit condition |
-| **Deadly Precision** | *Rework pending* - was +**1%** instant-kill chance; candidate to carry the [Execute](#execute) |
-| **Razor Focus** | *Rework pending* - was +**10** dodge chance, which is cut |
+| **Precise Blows** | *Rework pending* - was +**12** crit chance and +**75** crit damage; only the Crit Damage half is left, so it rarely matters. Becomes Three Strikes in the next-gen Combat tree |
+| **Crushing Blows** | *Rework pending* - was +**8** crit chance and +**50** crit damage; only the Crit Damage half is left. Next-gen version: strong attacks charge the next strong attacks |
+| **Anatomical Knowledge** | *Rework pending* - was +**10** crit chance with a bow, which is cut; currently does nothing |
+| **Crippling Shot** | *Rework pending* - was +**50** crit damage with a bow; next-gen version (Maiming Shot) triggers after a crit |
+| **Deadly Precision** | *Rework pending* - was +**1%** instant-kill chance, which is cut; currently does nothing. Candidate to carry the [Execute](#execute) |
+| **Razor Focus** | *Rework pending* - was +**10** dodge chance, which is cut; currently does nothing. Its next-gen version fed adrenaline, which is skipped |
 | **Cold Blood** | +**5** Additional Damage while no enemy is near |
 | **Flood of Anger** | +**5** Additional Damage while an enemy is near |
 | **Crippling Strikes** | Applies Bleed on hit (**100** ticks / **5** seconds) |

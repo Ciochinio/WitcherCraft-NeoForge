@@ -43,11 +43,29 @@ public class WitchercraftIncomingDamageProcedure {
 		double oil = 0;
 		double r = 0;
 		double hitType = 0;
+		double hitBonus = 0;
+		double takenBonus = 0;
 		if (sourceentity instanceof LivingEntity _livingEntity0 && _livingEntity0.getAttributes().hasAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE)) {
 			if (sourceentity == immediatesourceentity && !damagesource.is(DamageTypes.THORNS)) {
 				if (sourceentity instanceof LivingEntity _livEntS && _livEntS.hasEffect(WitchercraftModMobEffects.DEV_LOG)) {
 					if (sourceentity instanceof ServerPlayer _player)
 						_player.sendSystemMessage(Component.literal("\u00A76----------------------------------------------"), false);
+				}
+				critBonus = 0;
+				hitType = 0;
+				if (sourceentity.getPersistentData().getDoubleOr("witchercraftHitTick", 0) == sourceentity.tickCount) {
+					critBonus = sourceentity.getPersistentData().getDoubleOr("witchercraftCritBonus", 0);
+					hitType = sourceentity.getPersistentData().getDoubleOr("witchercraftHitType", 0);
+				}
+				sourceentity.getPersistentData().putDouble("witchercraftCritBonus", 0);
+				sourceentity.getPersistentData().putDouble("witchercraftHitType", hitType);
+				if (hitType > 0) {
+					if (hitType == sourceentity.getPersistentData().getDoubleOr("witchercraftLastHitType", 0)) {
+						sourceentity.getPersistentData().putDouble("witchercraftHitStreak", (sourceentity.getPersistentData().getDoubleOr("witchercraftHitStreak", 0) + 1));
+					} else {
+						sourceentity.getPersistentData().putDouble("witchercraftHitStreak", 1);
+					}
+					sourceentity.getPersistentData().putDouble("witchercraftLastHitType", hitType);
 				}
 				hit = amount + (sourceentity instanceof LivingEntity _livingEntity3 && _livingEntity3.getAttributes().hasAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE)
 						? _livingEntity3.getAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE).getValue()
@@ -59,17 +77,11 @@ public class WitchercraftIncomingDamageProcedure {
 							: 0) * 0.01);
 				}
 				hit = hit + oil;
-				hit = hit * (1 + (sourceentity instanceof LivingEntity _livingEntity5 && _livingEntity5.getAttributes().hasAttribute(WitchercraftModAttributes.INCREASED_DAMAGE)
+				hitBonus = WitchercraftHitBonusProcedure.execute();
+				takenBonus = WitchercraftDamageTakenBonusProcedure.execute();
+				hit = hit * (1 + ((sourceentity instanceof LivingEntity _livingEntity5 && _livingEntity5.getAttributes().hasAttribute(WitchercraftModAttributes.INCREASED_DAMAGE)
 						? _livingEntity5.getAttribute(WitchercraftModAttributes.INCREASED_DAMAGE).getValue()
-						: 0) * 0.01);
-				critBonus = 0;
-				hitType = 0;
-				if (sourceentity.getPersistentData().getDoubleOr("witchercraftHitTick", 0) == sourceentity.tickCount) {
-					critBonus = sourceentity.getPersistentData().getDoubleOr("witchercraftCritBonus", 0);
-					hitType = sourceentity.getPersistentData().getDoubleOr("witchercraftHitType", 0);
-				}
-				sourceentity.getPersistentData().putDouble("witchercraftCritBonus", 0);
-				sourceentity.getPersistentData().putDouble("witchercraftHitType", 0);
+						: 0) + hitBonus + takenBonus) * 0.01);
 				hit = hit * (1 + critBonus);
 				if (critBonus > 0 && WitchercraftExecuteEnabledProcedure.execute() && !entity.is(TagKey.create(Registries.ENTITY_TYPE, Identifier.parse("witchercraft:execute_immune"))) && !(entity instanceof Player)
 						&& (entity instanceof LivingEntity _livEnt ? _livEnt.getHealth() : -1) < (entity instanceof LivingEntity _livEnt ? _livEnt.getMaxHealth() : -1) * 0.2) {
@@ -82,14 +94,7 @@ public class WitchercraftIncomingDamageProcedure {
 				if (event instanceof LivingIncomingDamageEvent _event) {
 					_event.setAmount((float) hit);
 				}
-				if (hitType > 0) {
-					if (hitType == sourceentity.getPersistentData().getDoubleOr("witchercraftLastHitType", 0)) {
-						sourceentity.getPersistentData().putDouble("witchercraftHitStreak", (sourceentity.getPersistentData().getDoubleOr("witchercraftHitStreak", 0) + 1));
-					} else {
-						sourceentity.getPersistentData().putDouble("witchercraftHitStreak", 1);
-					}
-					sourceentity.getPersistentData().putDouble("witchercraftLastHitType", hitType);
-				}
+				sourceentity.getPersistentData().putDouble("witchercraftHitType", 0);
 				if (sourceentity instanceof LivingEntity _livEnt17 && _livEnt17.hasEffect(WitchercraftModMobEffects.DEV_LOG)) {
 					if (hitType == 1) {
 						if (sourceentity instanceof ServerPlayer _player)
@@ -119,6 +124,12 @@ public class WitchercraftIncomingDamageProcedure {
 							: 0) * 1000);
 					if (sourceentity instanceof ServerPlayer _player)
 						_player.sendSystemMessage(Component.literal(("damage +" + r / 1000 + "%")), false);
+					r = Math.round(hitBonus * 1000);
+					if (sourceentity instanceof ServerPlayer _player)
+						_player.sendSystemMessage(Component.literal(("hit bonus +" + r / 1000 + "%")), false);
+					r = Math.round(takenBonus * 1000);
+					if (sourceentity instanceof ServerPlayer _player)
+						_player.sendSystemMessage(Component.literal(("taken +" + r / 1000 + "%")), false);
 					r = Math.round(critBonus * 100 * 1000);
 					if (sourceentity instanceof ServerPlayer _player)
 						_player.sendSystemMessage(Component.literal(("crit +" + r / 1000 + "%")), false);

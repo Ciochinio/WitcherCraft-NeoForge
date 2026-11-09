@@ -580,6 +580,7 @@ and the re-hit had no attacker attached. The new pipeline changes the hit in pla
 | `WitchercraftMeleeCrit` | Player critical hit (every swing) | Works out the crit bonus (+0.5 for a vanilla jump crit, + Crit Damage when a condition is true on a charged swing) and the hit type (1 fast, 2 strong, 0 uncharged). Forces the crit (vanilla stars and sound) when there is a bonus, sets vanilla's multiplier to 1, and stores bonus and type on the attacker. |
 | `WitchercraftIncomingDamage` | Entity attacked | Melee: `(amount + flat + oil) x (1 + %) x (1 + crit bonus)`, then execute, then sets the incoming damage amount, updates the hit memory and calls the fast/strong hook. Arrows: a fully drawn arrow on a condition gets `x (1 + Crit Damage)`. |
 | `WitchercraftOnFastHit`, `WitchercraftOnStrongHit` | none (called by IncomingDamage) | Perk hooks, empty for now. Run after a typed hit has landed. |
+| `WitchercraftHitBonus`, `WitchercraftDamageTakenBonus` | none, returns number | Perk hooks, return 0 for now. Percent bonus for this hit (attacker perks) and for this target (debuffs), summed with Increased Damage. |
 | `WitchercraftAfterDamage` | none (called by the bridge) | Life steal and Black Blood, from the damage that actually reached health. |
 | `WitchercraftCritCondition` | none, returns logic | The list of crit conditions. Only Thunderbolt in a storm today. |
 | `WitchercraftOilMatches` | none, returns logic | Main-hand oil enchantment vs the target's category tag, for all ten oils. |
@@ -602,6 +603,11 @@ ships the whole variable blob to the client (2.2).
 **Hit memory.** On a typed hit, `WitchercraftIncomingDamage` keeps `witchercraftLastHitType` and
 `witchercraftHitStreak` (same type in a row) in the attacker's NBT, for perks like Three Strikes.
 Uncharged hits leave it untouched; whether they should break a streak is for the perk that reads it.
+The memory is updated *before* the damage math, and `witchercraftHitType` holds this hit's type (0
+when stale or uncharged) until the hit is set, so the bonus hooks can read both. It is zeroed after
+the hit, which also keeps sweep targets untyped. Order inside a melee hit: read crit and type, update
+memory, base + flat + oil, bonus hooks, percentages, crit, execute, set amount, clear type, log,
+fast/strong hook.
 
 Vanilla's x1.5 is set to 1 in the crit event, because vanilla only multiplies the weapon's base
 damage. The witcher bonus is applied in `WitchercraftIncomingDamage` to the whole hit, so flat damage,
@@ -621,7 +627,7 @@ current order matches the generated `(world, damagesource, entity, sourceentity,
 - *Add an oil:* one more OR branch in `WitchercraftOilMatches`.
 - *Give Execute to a perk:* make `WitchercraftExecuteEnabled` return that perk's equipped variable. The 20%
   threshold is in `WitchercraftIncomingDamage`.
-- *Debug a hit:* give yourself the `DevLog` effect. Every melee hit prints one line per part (`base`, `flat +`, `oil +`, `damage +%`, `crit +%`, `=`), arrows print `arrow`, `crit +%`, `=`, and the after-armor step adds `after armor` and `life steal +`. Values are rounded to 3 decimals by storing `round(x * 1000)` in a number variable and dividing that by 1000; dividing the round block directly would do integer division, because MCreator writes `1000` as an int literal.
+- *Debug a hit:* give yourself the `DevLog` effect. Every hit starts with a gold dashed line (a Blockly text block starting with the section-sign colour code `6`). A melee hit then prints its type (`fast xN`, `strong xN` or `no type`) and one line per part (`base`, `flat +`, `oil +`, `damage +%`, `hit bonus +%`, `taken +%`, `crit +%`, `=`); arrows print `arrow`, `crit +%`, `=`; the after-armor step adds `after armor` and `life steal +`. Values are rounded to 3 decimals by storing `round(x * 1000)` in a number variable and dividing that by 1000; dividing the round block directly would do integer division, because MCreator writes `1000` as an int literal.
 
 **Known limitations.**
 - Sweep-attack targets also get flat, oil and % damage. A crit never sweeps, so they never get the crit.

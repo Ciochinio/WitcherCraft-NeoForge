@@ -1,0 +1,8 @@
+{
+  "_fv": 89,
+  "_type": "procedure",
+  "definition": {
+    "procedurexml": "<xml xmlns=\"https://developers.google.com/blockly/xml\"><block type=\"event_trigger\" deletable=\"false\" x=\"40\" y=\"40\"><field name=\"trigger\">no_ext_trigger</field><comment pinned=\"false\" h=\"140\" w=\"400\">Perk hook: returns the attacker's bonus damage from perks, in percent. It is added to Increased Damage for this melee hit (GDD 5, additive). Called by WitchercraftIncomingDamage before the damage math; entity = target, sourceentity = attacker, and the attacker's NBT already holds this hit: witchercraftHitType (0 none, 1 fast, 2 strong) and witchercraftHitStreak. Returns 0 until the perk rework adds to it.</comment><next><block type=\"return_number\"><value name=\"return\"><block type=\"math_number\"><field name=\"NUM\">0</field></block></value></block></next></block></xml>",
+    "skipDependencyNullCheck": false
+  }
+}

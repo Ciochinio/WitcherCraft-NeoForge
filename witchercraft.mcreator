@@ -9610,6 +9610,36 @@
         ]
       },
       "path": "~/Admin/Calc"
+    },
+    {
+      "name": "WitchercraftHitBonus",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "witchercraft_hit_bonus",
+      "metadata": {
+        "dependencies": [],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftHitBonusProcedure.java"
+        ],
+        "return_type": "number"
+      },
+      "path": "~/Admin/Calc"
+    },
+    {
+      "name": "WitchercraftDamageTakenBonus",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "witchercraft_damage_taken_bonus",
+      "metadata": {
+        "dependencies": [],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftDamageTakenBonusProcedure.java"
+        ],
+        "return_type": "number"
+      },
+      "path": "~/Admin/Calc"
     }
   ],
   "variable_elements": [
