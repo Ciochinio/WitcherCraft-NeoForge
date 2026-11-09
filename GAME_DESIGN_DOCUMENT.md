@@ -491,8 +491,8 @@ arrow       = vanilla damage x (1 + arrow bonus%) x (1 + crit bonus)
   attack deals +30%").
 - **Taken** - extra % the target takes from debuffs on it (Sundered from Sunder Armor, Crippled
   from Crippling Strikes).
-- **Arrow bonus** - extra % on a fully drawn arrow or any crossbow bolt, from bow perks (Cold Blood,
-  Anatomical Knowledge). The melee stats never touch arrows.
+- **Arrow bonus** - extra % on a fully drawn arrow or any crossbow bolt, from bow perks (Cold
+  Blood). The melee stats never touch arrows.
 - All percentages are **added together** before multiplying, so stacking more of them grows damage
   linearly. Only the crit multiplies on top.
 - **Crit Damage** - the bonus a crit adds (see [Crits](#crits)).
@@ -526,6 +526,49 @@ uncharged (spam)      no type - never triggers a perk, never crits
   type. A thunderstorm with Thunderbolt doesn't turn fast attacks into strong ones.
 - Attack speed is not changed for strong attacks. If they turn out too spammable, the fix is a
   short recovery after a strong attack, not a global attack-speed change.
+
+### The combat line
+
+Perk charges ("your next strong attack is buffed") are quick information, not buffs, so they are
+not status effects. They show on one line of small pixel icons **centred just under the crosshair**,
+below vanilla's attack indicator, where the eye already is during a fight. They are grouped by
+**what attack to throw next**, not by which perk armed them. (Under test; the fallback is the
+actionbar.)
+
+**One icon per attack, its colour is its state.** There are three icons: a slim sword (fast), an
+upright greatsword (strong) and a shield (either attack). Each comes in three states:
+
+| State | Looks | Means |
+|---|---|---|
+| to do | dark grey | a streak slot still ahead |
+| done | silver | a hit already landed in the streak |
+| buffed | **burning** | throwing this attack now pays off |
+
+```
+Three Strikes, hit 1:         fast  ·  ·
+Three Strikes, hit 2:         fast fast  ·
+Three Strikes, hit 3:         [fast, burning]       the slots collapse into one buffed hit: the strike
+Strength Training armed:      [strong, burning]
+Crushing Blows armed:         [strong, burning] [strong, burning]
+Muscle Memory armed:          [fast, burning] x3
+Counterattack armed:          [shield, burning]
+```
+
+- The streak sits together, charges follow after a gap, so "finish the streak with a strong, and
+  Strength Training is armed too" reads at a glance.
+- A burning icon always means the same thing, whichever perk lit it: one burning icon is one
+  buffed hit of that attack.
+- Only what is armed appears; with nothing armed the line is empty. A charge disappears the moment
+  it is spent or runs out.
+- **A hit that spends a charge ends a phrase, it doesn't start one**: the strong attack that spends
+  Strength Training (and later Crushing Blows or Counterattack) does not count for Three Strikes,
+  the next hit starts the streak at 1. Muscle Memory's buffed fast hits are the exception, they
+  still count, so a Muscle Memory run feeds a fast streak.
+- A **ready chime** plays whenever a new charge arms. The line shows which one.
+- There is no separate timing bar: vanilla's attack indicator already shows when the next charged
+  swing is ready.
+
+Built so far: the Three Strikes streak and Strength Training's charge. The icons are first drafts.
 
 ### Crits
 
@@ -805,9 +848,9 @@ Perks are split across four tabs, each pointed at one side of the witcher kit:
 - **Combat** - **15** perks built on [fast and strong attacks](#fast-and-strong-attacks), in three
   lines: fast (Muscle Memory, Flood of Anger, Three Strikes, Crippling Strikes, Fleet Footed),
   strong (Strength Training, Crushing Blows, Sunder Armor, Undying, Deadly Precision with the
-  [Execute](#execute)), and shield and bow (Counterattack, Arrow Deflection, Cold Blood, Anatomical
-  Knowledge, Maiming Shot). Follows Witcher 3's next-gen Combat tree; see the
-  [Perks table](#perks).
+  [Execute](#execute)), and shield, bow and last stand (Counterattack, Arrow Deflection, Cold Blood,
+  Maiming Shot, Bloody Rage). Built on Witcher 3's next-gen Combat tree, with perks from the rest
+  of the saga where they add a decision; see the [Perks table](#perks).
 - **Signs** - Sign intensity and cost, plus the alternate Sign forms (Far-Reaching Aard, Fire
   Stream, Magic Trap, Exploding Shield).
 - **Alchemy** - the Toxicity ceiling, potion duration and strength, and Refreshment (the heal on
@@ -1425,7 +1468,7 @@ Reflexes (slow-motion aiming and headshots). The old **Defence** perk (+4 max he
 |------|--------|--------|
 | **Muscle Memory** | After **3 s** without taking damage, your next **3** fast attacks in a row deal +**30%**. A strong attack or taking damage ends the run; uncharged hits are ignored. A fully blocked hit is not damage taken | *Not built* - today +**3** Additional Damage |
 | **Flood of Anger** | +**10%** Increased Damage for each hostile within **5** blocks beyond the first, up to +**30%** | *Not built* - today +**5** Additional Damage while an enemy is near |
-| **Three Strikes** | Every **4th** typed hit of the same type in a row deals +**50%**. The streak resets after **4 s** without a typed hit. While equipped, the actionbar shows the combo (`Fast x3`, the bonus hit in gold) | *Not built* - replaces Precise Blows |
+| **Three Strikes** | Every **4th** typed hit of the same type in a row deals +**50%**. The streak resets after **4 s** without a typed hit. While equipped, three slots of the streak's attack icon on the [combat line](#the-combat-line) show the combo. On the 3rd hit they collapse into one burning icon and the ready chime plays: the next hit is the strike. A hit that spends another perk's charge does not count toward the streak | Built - replaces Precise Blows |
 | **Crippling Strikes** | A fast crit **Cripples** the target: +**20%** damage taken for **5 s** | *Not built* - today applies Bleed on hit |
 | **Fleet Footed** | +**15%** movement speed | Built |
 
@@ -1439,14 +1482,14 @@ Reflexes (slow-motion aiming and headshots). The old **Defence** perk (+4 max he
 | **Undying** | When killed, restore to **50%** health. Once every **15** minutes | Built |
 | **Deadly Precision** | [Execute](#execute): a strong attack kills a target below **20%** health. Bosses are immune | *Not built* |
 
-*Shield and bow*
+*Shield, bow and last stand*
 
 | Perk | Effect | Status |
 |------|--------|--------|
 | **Counterattack** | After you block a hit with a shield, your next charged attack within **3 s** deals +**50%**. One charge; blocking again refreshes it | *Not built* - new |
 | **Arrow Deflection** | An arrow, bolt or trident blocked within **0.5 s** of the shield going up flies back at the shooter for the damage it would have dealt. It counts as your shot and can't be picked up | *Not built* - new, replaces Razor Focus |
 | **Cold Blood** | Fully drawn arrows and crossbow bolts deal +**25%** while no hostile is within **5** blocks of you | *Not built* - today +**5** Additional Damage while no enemy is near |
-| **Anatomical Knowledge** | Fully drawn arrows and crossbow bolts deal +**15%** | *Not built* - today does nothing |
+| **Bloody Rage** | +**40%** damage on melee hits while you are below **30%** health. Taken from Witcher 1: the tree's frame is Witcher 3, but perks may come from the whole saga when they add a decision | *Not built* - replaces Anatomical Knowledge |
 | **Maiming Shot** | After a melee crit, your next fully drawn arrow or bolt within **5 s** **Maims** the target for **4 s**: a crit condition. Crits that only happened because of Maimed don't re-arm it | *Not built* - replaces Crippling Shot |
 
 **Signs**

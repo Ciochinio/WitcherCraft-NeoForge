@@ -103,6 +103,7 @@ layer order is `HOTBAR, PLAYER_HEALTH, ARMOR_LEVEL, FOOD_LEVEL, VEHICLE_HEALTH, 
 | Quen | `VanillaGuiLayers.ARMOR_LEVEL` | `guiHeight() - gui.leftHeight` | `gui.leftHeight += (rows - 1) * rowHeight + 10` |
 | Toxicity | `VanillaGuiLayers.VEHICLE_HEALTH` | `guiHeight() - gui.rightHeight` | `gui.rightHeight += 10` |
 | Medallion | `VanillaGuiLayers.AIR_LEVEL` | `guiHeight() - 39 - 20`, fixed | nothing - it is not on a cursor |
+| Combat line | `VanillaGuiLayers.CROSSHAIR` | centred, `guiHeight() / 2 + 17` (a gap under the attack indicator), drawn at `COMBAT_LINE_SCALE` 0.75 | nothing - text from `witchercraftComboLine`, see 2.7 |
 
 **The medallion is the exception, and it is allowed to be.** Both bar columns are 81 pixels wide
 and anchored at their outer edge: hearts and armor run right from `guiWidth() / 2 - 91`, food and
@@ -579,8 +580,11 @@ and the re-hit had no attacker attached. The new pipeline changes the hit in pla
 |---|---|---|
 | `WitchercraftMeleeCrit` | Player critical hit (every swing) | Works out the crit bonus (+0.5 for a vanilla jump crit, + Crit Damage when a condition is true on a charged swing) and the hit type (1 fast, 2 strong, 0 uncharged). Forces the crit (vanilla stars and sound) when there is a bonus, sets vanilla's multiplier to 1, and stores bonus and type on the attacker. |
 | `WitchercraftIncomingDamage` | Entity attacked | Melee: `(amount + flat + oil) x (1 + %) x (1 + crit bonus)`, then execute, then sets the incoming damage amount, updates the hit memory and calls the fast/strong hook. Arrows: a fully drawn arrow on a condition gets `x (1 + Crit Damage)`. |
-| `WitchercraftOnFastHit`, `WitchercraftOnStrongHit` | none (called by IncomingDamage) | Perk hooks, empty for now. Run after a typed hit has landed. |
-| `WitchercraftHitBonus`, `WitchercraftDamageTakenBonus` | none, returns number | Perk hooks, return 0 for now. Percent bonus for this hit (attacker perks) and for this target (debuffs), summed with Increased Damage. |
+| `WitchercraftOnFastHit`, `WitchercraftOnStrongHit` | none (called by IncomingDamage) | Perk hooks `(world, sourceentity)`. Run after a typed hit has landed: arm or spend charges, play the ready chime, then refresh the combat line. |
+| `WitchercraftHitBonus` | none, returns number | Perk hook `(sourceentity)`. Percent bonus for this hit from attacker perks (Strength Training, Three Strikes so far), summed with Increased Damage. |
+| `WitchercraftDamageTakenBonus` | none, returns number | Perk hook, returns 0 for now. Percent bonus for this target from debuffs. |
+| `WitchercraftComboLine` | none `(entity)`, called every tick by `WitchercraftComboLineTick` (player ticks, server only) | Builds the combat line (GDD 5) from the player's charges into the synced player text variable `witchercraftComboLine`; `WitchercraftHud` draws it centred under the crosshair. A number `sig` encodes what is on the line and is kept in NBT (`witchercraftComboSig`), so the variable, and with it the sync packet, is only written when the line actually changes. Running per tick is what makes expired charges vanish without a timer. The icons are font glyphs (see below). |
+| `WitchercraftReadyChime` | none | The single "a charge armed" sound, so every perk uses the same cue. |
 | `WitchercraftAfterDamage` | none (called by the bridge) | Life steal and Black Blood, from the damage that actually reached health. |
 | `WitchercraftCritCondition` | none, returns logic | The list of crit conditions. Only Thunderbolt in a storm today. |
 | `WitchercraftOilMatches` | none, returns logic | Main-hand oil enchantment vs the target's category tag, for all ten oils. |
@@ -590,6 +594,24 @@ and the re-hit had no attacker attached. The new pipeline changes the hit in pla
 | `WitchercraftAfterDamageBridge` | code element, **locked** | Subscribes to `LivingDamageEvent.Post` (no Blockly trigger exists) and calls `WitchercraftAfterDamage` with `getHealthDamage()`. |
 
 Plus the `witchercraft:execute_immune` entity tag (Ender Dragon, Wither, Warden).
+
+**Combat line icons.** The icons are bitmap glyphs added to the vanilla font, so the Blockly text
+blocks just contain the characters and no Java is needed to draw them.
+`assets/minecraft/font/default.json` (hand-written, not an MCreator element) adds providers for
+private-use characters; Minecraft stacks font providers from every resource pack, so this extends
+the vanilla font instead of replacing it. The PNGs are 11x11 in `assets/witchercraft/textures/font/`.
+
+| Char | File | Use |
+|---|---|---|
+| U+E7A0 | `combat_fast.png` | fast, grayscale, tinted by the text colour (white = done, dark grey = to do) |
+| U+E7A1 | `combat_strong.png` | strong, grayscale, tinted |
+| U+E7A2 | `combat_either.png` | shield (Counterattack), grayscale, tinted |
+| U+E7A3 | `combat_fast_lit.png` | fast, burning, full colour, always drawn with white text |
+| U+E7A4 | `combat_strong_lit.png` | strong, burning, full colour |
+| U+E7A5 | `combat_either_lit.png` | shield, burning, full colour |
+
+To redraw an icon, replace the PNG; keep the size or change `height` and `ascent` in the font file
+to match.
 
 **The crit handoff.** Vanilla fires the critical-hit event before the hit is dealt, in the same tick.
 `WitchercraftMeleeCrit` writes `witchercraftCritBonus`, `witchercraftHitType` and `witchercraftHitTick`
@@ -602,7 +624,8 @@ ships the whole variable blob to the client (2.2).
 
 **Hit memory.** On a typed hit, `WitchercraftIncomingDamage` keeps `witchercraftLastHitType` and
 `witchercraftHitStreak` (same type in a row) in the attacker's NBT, for perks like Three Strikes.
-Uncharged hits leave it untouched; whether they should break a streak is for the perk that reads it.
+Uncharged hits leave it untouched. The streak resets to 1 when the type changes or when the last
+typed hit (`witchercraftLastTypedHitTick`) is more than 80 ticks (4 s) old.
 The memory is updated *before* the damage math, and `witchercraftHitType` holds this hit's type (0
 when stale or uncharged) until the hit is set, so the bonus hooks can read both. It is zeroed after
 the hit, which also keeps sweep targets untyped. Order inside a melee hit: read crit and type, update
@@ -627,7 +650,7 @@ current order matches the generated `(world, damagesource, entity, sourceentity,
 - *Add an oil:* one more OR branch in `WitchercraftOilMatches`.
 - *Give Execute to a perk:* make `WitchercraftExecuteEnabled` return that perk's equipped variable. The 20%
   threshold is in `WitchercraftIncomingDamage`.
-- *Debug a hit:* give yourself the `DevLog` effect. Every hit starts with a gold dashed line (a Blockly text block starting with the section-sign colour code `6`). A melee hit then prints its type (`fast xN`, `strong xN` or `no type`) and one line per part (`base`, `flat +`, `oil +`, `damage +%`, `hit bonus +%`, `taken +%`, `crit +%`, `=`); arrows print `arrow`, `crit +%`, `=`; the after-armor step adds `after armor` and `life steal +`. Values are rounded to 3 decimals by storing `round(x * 1000)` in a number variable and dividing that by 1000; dividing the round block directly would do integer division, because MCreator writes `1000` as an int literal.
+- *Debug a hit:* give yourself the `DevLog` effect. Every hit starts with a gold dashed line (a Blockly text block starting with the section-sign colour code `6`). A melee hit then prints its type (`fast xN`, `strong xN` or `no type`) and one line per part (`base`, `flat +`, `oil +`, `damage +%`, `hit bonus +%` with the perks that gave it in brackets, from `witchercraftHitBonusLog` written by `WitchercraftHitBonus`, `taken +%`, `strong +50%` on strong attacks only, `crit +%` for Crit Damage alone, `=`); arrows print `arrow`, `crit +%`, `=`; the after-armor step adds `after armor` and `life steal +`. Values are rounded to 3 decimals by storing `round(x * 1000)` in a number variable and dividing that by 1000; dividing the round block directly would do integer division, because MCreator writes `1000` as an int literal.
 
 **Combat perk rework (planned, not built yet).** GDD 10 has the agreed 15 Combat perks. What it
 changes here:
@@ -641,7 +664,7 @@ changes here:
   arrows.
 - *Arrows* get a new hook, `WitchercraftArrowBonus` (returns %, `~/Admin/Calc`), so the arrow
   branch becomes `amount x (1 + arrow bonus) x (1 + crit)`. Every crossbow bolt counts as fully
-  drawn. Cold Blood and Anatomical Knowledge add to it.
+  drawn. Cold Blood adds to it.
 - *Target debuffs* are mob effects (Crippled, Sundered with amplifier = stacks - 1, Maimed), read
   by `WitchercraftDamageTakenBonus` and `WitchercraftCritCondition`. Applied to the main target
   only, which the zeroed hit type already guarantees for sweep targets.

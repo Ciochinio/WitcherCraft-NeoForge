@@ -25,6 +25,7 @@ import net.redboltmedia.witchercraft.procedures.MedallionStepMidProcedure;
 import net.redboltmedia.witchercraft.procedures.MedallionShowProcedure;
 import net.redboltmedia.witchercraft.procedures.MedallionSenseRangeProcedure;
 import net.redboltmedia.witchercraft.procedures.MedallionSenseAllHostilesProcedure;
+import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
 
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
@@ -176,6 +177,34 @@ public class WitchercraftHud {
 		}
 	}
 
+	/**
+	 * The combat line (GDD 5): perk charges and the Three Strikes streak as font-glyph icons,
+	 * centred just under vanilla's attack indicator. The text is built on the server by the
+	 * WitchercraftComboLine procedure into the synced player variable witchercraftComboLine;
+	 * this only draws it. Not gated on canHurtPlayer: it is not a bar and does not use the cursors.
+	 */
+	private static final int COMBAT_LINE_Y_BELOW_CENTRE = 17;
+	/** Below 1 the icons shrink; pixels only stay crisp where scale x gui scale is a whole number. */
+	private static final float COMBAT_LINE_SCALE = 0.75f;
+
+	@SubscribeEvent
+	public static void onRenderCombatLine(RenderGuiLayerEvent.Post event) {
+		if (!event.getName().equals(VanillaGuiLayers.CROSSHAIR))
+			return;
+		Minecraft minecraft = Minecraft.getInstance();
+		Player player = minecraft.player;
+		if (player == null || minecraft.options.hideGui)
+			return;
+		String line = player.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftComboLine;
+		if (line == null || line.isEmpty())
+			return;
+		GuiGraphicsExtractor graphics = event.getGuiGraphics();
+		graphics.pose().pushMatrix();
+		graphics.pose().translate(graphics.guiWidth() / 2f, graphics.guiHeight() / 2f + COMBAT_LINE_Y_BELOW_CENTRE);
+		graphics.pose().scale(COMBAT_LINE_SCALE, COMBAT_LINE_SCALE);
+		graphics.text(minecraft.font, line, -minecraft.font.width(line) / 2, 0, -1, true);
+		graphics.pose().popMatrix();
+	}
 	/**
 	 * The medallion is not a bar and deliberately does not take part in the cursor protocol. It
 	 * lives in the 20 pixel channel between the health and hunger columns, at a fixed height, so

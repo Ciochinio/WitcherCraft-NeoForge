@@ -60,12 +60,15 @@ public class WitchercraftIncomingDamageProcedure {
 				sourceentity.getPersistentData().putDouble("witchercraftCritBonus", 0);
 				sourceentity.getPersistentData().putDouble("witchercraftHitType", hitType);
 				if (hitType > 0) {
-					if (hitType == sourceentity.getPersistentData().getDoubleOr("witchercraftLastHitType", 0)) {
+					if (hitType == sourceentity.getPersistentData().getDoubleOr("witchercraftLastHitType", 0) && (sourceentity.getPersistentData().getDoubleOr("witchercraftLastTypedHitTick", 0) > 0
+							&& (sourceentity.tickCount - sourceentity.getPersistentData().getDoubleOr("witchercraftLastTypedHitTick", 0) >= 0
+									&& sourceentity.tickCount - sourceentity.getPersistentData().getDoubleOr("witchercraftLastTypedHitTick", 0) <= 80))) {
 						sourceentity.getPersistentData().putDouble("witchercraftHitStreak", (sourceentity.getPersistentData().getDoubleOr("witchercraftHitStreak", 0) + 1));
 					} else {
 						sourceentity.getPersistentData().putDouble("witchercraftHitStreak", 1);
 					}
 					sourceentity.getPersistentData().putDouble("witchercraftLastHitType", hitType);
+					sourceentity.getPersistentData().putDouble("witchercraftLastTypedHitTick", (sourceentity.tickCount));
 				}
 				hit = amount + (sourceentity instanceof LivingEntity _livingEntity3 && _livingEntity3.getAttributes().hasAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE)
 						? _livingEntity3.getAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE).getValue()
@@ -126,10 +129,15 @@ public class WitchercraftIncomingDamageProcedure {
 						_player.sendSystemMessage(Component.literal(("damage +" + r / 1000 + "%")), false);
 					r = Math.round(hitBonus * 1000);
 					if (sourceentity instanceof ServerPlayer _player)
-						_player.sendSystemMessage(Component.literal(("hit bonus +" + r / 1000 + "%")), false);
+						_player.sendSystemMessage(Component.literal(("hit bonus +" + r / 1000 + ("%" + (sourceentity.getPersistentData().getStringOr("witchercraftHitBonusLog", ""))))), false);
 					r = Math.round(takenBonus * 1000);
 					if (sourceentity instanceof ServerPlayer _player)
 						_player.sendSystemMessage(Component.literal(("taken +" + r / 1000 + "%")), false);
+					if (hitType == 2) {
+						if (sourceentity instanceof ServerPlayer _player)
+							_player.sendSystemMessage(Component.literal("strong +50%"), false);
+						critBonus = critBonus - 0.5;
+					}
 					r = Math.round(critBonus * 100 * 1000);
 					if (sourceentity instanceof ServerPlayer _player)
 						_player.sendSystemMessage(Component.literal(("crit +" + r / 1000 + "%")), false);
@@ -139,9 +147,9 @@ public class WitchercraftIncomingDamageProcedure {
 				}
 				if (hitType > 0) {
 					if (hitType == 1) {
-						WitchercraftOnFastHitProcedure.execute(sourceentity);
+						WitchercraftOnFastHitProcedure.execute(world, sourceentity);
 					} else {
-						WitchercraftOnStrongHitProcedure.execute(sourceentity);
+						WitchercraftOnStrongHitProcedure.execute(world, sourceentity);
 					}
 				}
 			} else {
@@ -164,6 +172,11 @@ public class WitchercraftIncomingDamageProcedure {
 					r = Math.round(amount * 1000);
 					if (sourceentity instanceof ServerPlayer _player)
 						_player.sendSystemMessage(Component.literal(("arrow " + r / 1000)), false);
+					if (hitType == 2) {
+						if (sourceentity instanceof ServerPlayer _player)
+							_player.sendSystemMessage(Component.literal("strong +50%"), false);
+						critBonus = critBonus - 0.5;
+					}
 					r = Math.round(critBonus * 100 * 1000);
 					if (sourceentity instanceof ServerPlayer _player)
 						_player.sendSystemMessage(Component.literal(("crit +" + r / 1000 + "%")), false);

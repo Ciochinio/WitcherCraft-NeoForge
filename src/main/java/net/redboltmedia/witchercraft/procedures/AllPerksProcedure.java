@@ -16,7 +16,7 @@ public class AllPerksProcedure {
 		FleetFootedEffectProcedure.execute(entity);
 		FloodOfAngerEffectProcedure.execute(entity);
 		MuscleMemoryEffectProcedure.execute(entity);
-		PreciseBlowsEffectProcedure.execute(entity);
+		ThreeStrikesEffectProcedure.execute(entity);
 		RazorFocusEffectProcedure.execute(entity);
 		StrengthTrainingEffectProcedure.execute(entity);
 		SunderArmorEffectProcedure.execute(entity);

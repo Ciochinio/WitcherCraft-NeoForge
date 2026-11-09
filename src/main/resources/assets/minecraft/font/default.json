@@ -1,0 +1,46 @@
+{
+  "providers": [
+    {
+      "type": "bitmap",
+      "file": "witchercraft:font/combat_fast.png",
+      "ascent": 9,
+      "height": 11,
+      "chars": ["\uE7A0"]
+    },
+    {
+      "type": "bitmap",
+      "file": "witchercraft:font/combat_strong.png",
+      "ascent": 9,
+      "height": 11,
+      "chars": ["\uE7A1"]
+    },
+    {
+      "type": "bitmap",
+      "file": "witchercraft:font/combat_either.png",
+      "ascent": 9,
+      "height": 11,
+      "chars": ["\uE7A2"]
+    },
+    {
+      "type": "bitmap",
+      "file": "witchercraft:font/combat_fast_lit.png",
+      "ascent": 9,
+      "height": 11,
+      "chars": ["\uE7A3"]
+    },
+    {
+      "type": "bitmap",
+      "file": "witchercraft:font/combat_strong_lit.png",
+      "ascent": 9,
+      "height": 11,
+      "chars": ["\uE7A4"]
+    },
+    {
+      "type": "bitmap",
+      "file": "witchercraft:font/combat_either_lit.png",
+      "ascent": 9,
+      "height": 11,
+      "chars": ["\uE7A5"]
+    }
+  ]
+}

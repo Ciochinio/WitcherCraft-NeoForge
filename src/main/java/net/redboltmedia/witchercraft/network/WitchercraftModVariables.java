@@ -97,7 +97,7 @@ public class WitchercraftModVariables {
 		clone.witchercraftEquippedPerkFleetFooted = original.witchercraftEquippedPerkFleetFooted;
 		clone.witchercraftEquippedPerkFloodOfAnger = original.witchercraftEquippedPerkFloodOfAnger;
 		clone.witchercraftEquippedPerkMuscleMemory = original.witchercraftEquippedPerkMuscleMemory;
-		clone.witchercraftEquippedPerkPreciseBlows = original.witchercraftEquippedPerkPreciseBlows;
+		clone.witchercraftEquippedPerkThreeStrikes = original.witchercraftEquippedPerkThreeStrikes;
 		clone.witchercraftEquippedPerkRazorFocus = original.witchercraftEquippedPerkRazorFocus;
 		clone.witchercraftEquippedPerkStrengthTraining = original.witchercraftEquippedPerkStrengthTraining;
 		clone.witchercraftEquippedPerkSunderArmor = original.witchercraftEquippedPerkSunderArmor;
@@ -162,7 +162,7 @@ public class WitchercraftModVariables {
 		clone.witchercraftPerksAxiiIntensity = original.witchercraftPerksAxiiIntensity;
 		clone.witchercraftPerksDomination = original.witchercraftPerksDomination;
 		clone.witchercraftPerksMuscleMemory = original.witchercraftPerksMuscleMemory;
-		clone.witchercraftPerksPreciseBlows = original.witchercraftPerksPreciseBlows;
+		clone.witchercraftPerksThreeStrikes = original.witchercraftPerksThreeStrikes;
 		clone.witchercraftPerksCripplingStrikes = original.witchercraftPerksCripplingStrikes;
 		clone.witchercraftPerksStrengthTraining = original.witchercraftPerksStrengthTraining;
 		clone.witchercraftPerksCrushingBlows = original.witchercraftPerksCrushingBlows;
@@ -189,6 +189,7 @@ public class WitchercraftModVariables {
 			clone.witchercraftEnemyNearby = original.witchercraftEnemyNearby;
 			clone.witchercraftQuenShield = original.witchercraftQuenShield;
 			clone.witchercraftQuenShieldMax = original.witchercraftQuenShieldMax;
+			clone.witchercraftComboLine = original.witchercraftComboLine;
 			clone.witchercraftWyvernDecoctionHit = original.witchercraftWyvernDecoctionHit;
 			clone.witchercraftSuccubusDecoctionTick = original.witchercraftSuccubusDecoctionTick;
 			clone.witchercraftGraveHagDecoctionKill = original.witchercraftGraveHagDecoctionKill;
@@ -227,7 +228,7 @@ public class WitchercraftModVariables {
 		public boolean witchercraftEquippedPerkFleetFooted = false;
 		public boolean witchercraftEquippedPerkFloodOfAnger = false;
 		public boolean witchercraftEquippedPerkMuscleMemory = false;
-		public boolean witchercraftEquippedPerkPreciseBlows = false;
+		public boolean witchercraftEquippedPerkThreeStrikes = false;
 		public boolean witchercraftEquippedPerkRazorFocus = false;
 		public boolean witchercraftEquippedPerkStrengthTraining = false;
 		public boolean witchercraftEquippedPerkSunderArmor = false;
@@ -292,7 +293,7 @@ public class WitchercraftModVariables {
 		public boolean witchercraftPerksAxiiIntensity = false;
 		public boolean witchercraftPerksDomination = false;
 		public boolean witchercraftPerksMuscleMemory = false;
-		public boolean witchercraftPerksPreciseBlows = false;
+		public boolean witchercraftPerksThreeStrikes = false;
 		public boolean witchercraftPerksCripplingStrikes = false;
 		public boolean witchercraftPerksStrengthTraining = false;
 		public boolean witchercraftPerksCrushingBlows = false;
@@ -318,6 +319,7 @@ public class WitchercraftModVariables {
 		public boolean witchercraftEnemyNearby = false;
 		public double witchercraftQuenShield = 0;
 		public double witchercraftQuenShieldMax = 0;
+		public String witchercraftComboLine = "";
 		public double witchercraftWyvernDecoctionHit = 0;
 		public double witchercraftSuccubusDecoctionTick = 0;
 		public double witchercraftGraveHagDecoctionKill = 0;
@@ -353,7 +355,7 @@ public class WitchercraftModVariables {
 			output.putBoolean("witchercraftEquippedPerkFleetFooted", witchercraftEquippedPerkFleetFooted);
 			output.putBoolean("witchercraftEquippedPerkFloodOfAnger", witchercraftEquippedPerkFloodOfAnger);
 			output.putBoolean("witchercraftEquippedPerkMuscleMemory", witchercraftEquippedPerkMuscleMemory);
-			output.putBoolean("witchercraftEquippedPerkPreciseBlows", witchercraftEquippedPerkPreciseBlows);
+			output.putBoolean("witchercraftEquippedPerkThreeStrikes", witchercraftEquippedPerkThreeStrikes);
 			output.putBoolean("witchercraftEquippedPerkRazorFocus", witchercraftEquippedPerkRazorFocus);
 			output.putBoolean("witchercraftEquippedPerkStrengthTraining", witchercraftEquippedPerkStrengthTraining);
 			output.putBoolean("witchercraftEquippedPerkSunderArmor", witchercraftEquippedPerkSunderArmor);
@@ -418,7 +420,7 @@ public class WitchercraftModVariables {
 			output.putBoolean("witchercraftPerksAxiiIntensity", witchercraftPerksAxiiIntensity);
 			output.putBoolean("witchercraftPerksDomination", witchercraftPerksDomination);
 			output.putBoolean("witchercraftPerksMuscleMemory", witchercraftPerksMuscleMemory);
-			output.putBoolean("witchercraftPerksPreciseBlows", witchercraftPerksPreciseBlows);
+			output.putBoolean("witchercraftPerksThreeStrikes", witchercraftPerksThreeStrikes);
 			output.putBoolean("witchercraftPerksCripplingStrikes", witchercraftPerksCripplingStrikes);
 			output.putBoolean("witchercraftPerksStrengthTraining", witchercraftPerksStrengthTraining);
 			output.putBoolean("witchercraftPerksCrushingBlows", witchercraftPerksCrushingBlows);
@@ -444,6 +446,7 @@ public class WitchercraftModVariables {
 			output.putBoolean("witchercraftEnemyNearby", witchercraftEnemyNearby);
 			output.putDouble("witchercraftQuenShield", witchercraftQuenShield);
 			output.putDouble("witchercraftQuenShieldMax", witchercraftQuenShieldMax);
+			output.putString("witchercraftComboLine", witchercraftComboLine);
 			output.putDouble("witchercraftWyvernDecoctionHit", witchercraftWyvernDecoctionHit);
 			output.putDouble("witchercraftSuccubusDecoctionTick", witchercraftSuccubusDecoctionTick);
 			output.putDouble("witchercraftGraveHagDecoctionKill", witchercraftGraveHagDecoctionKill);
@@ -480,7 +483,7 @@ public class WitchercraftModVariables {
 			witchercraftEquippedPerkFleetFooted = input.getBooleanOr("witchercraftEquippedPerkFleetFooted", false);
 			witchercraftEquippedPerkFloodOfAnger = input.getBooleanOr("witchercraftEquippedPerkFloodOfAnger", false);
 			witchercraftEquippedPerkMuscleMemory = input.getBooleanOr("witchercraftEquippedPerkMuscleMemory", false);
-			witchercraftEquippedPerkPreciseBlows = input.getBooleanOr("witchercraftEquippedPerkPreciseBlows", false);
+			witchercraftEquippedPerkThreeStrikes = input.getBooleanOr("witchercraftEquippedPerkThreeStrikes", false);
 			witchercraftEquippedPerkRazorFocus = input.getBooleanOr("witchercraftEquippedPerkRazorFocus", false);
 			witchercraftEquippedPerkStrengthTraining = input.getBooleanOr("witchercraftEquippedPerkStrengthTraining", false);
 			witchercraftEquippedPerkSunderArmor = input.getBooleanOr("witchercraftEquippedPerkSunderArmor", false);
@@ -545,7 +548,7 @@ public class WitchercraftModVariables {
 			witchercraftPerksAxiiIntensity = input.getBooleanOr("witchercraftPerksAxiiIntensity", false);
 			witchercraftPerksDomination = input.getBooleanOr("witchercraftPerksDomination", false);
 			witchercraftPerksMuscleMemory = input.getBooleanOr("witchercraftPerksMuscleMemory", false);
-			witchercraftPerksPreciseBlows = input.getBooleanOr("witchercraftPerksPreciseBlows", false);
+			witchercraftPerksThreeStrikes = input.getBooleanOr("witchercraftPerksThreeStrikes", false);
 			witchercraftPerksCripplingStrikes = input.getBooleanOr("witchercraftPerksCripplingStrikes", false);
 			witchercraftPerksStrengthTraining = input.getBooleanOr("witchercraftPerksStrengthTraining", false);
 			witchercraftPerksCrushingBlows = input.getBooleanOr("witchercraftPerksCrushingBlows", false);
@@ -571,6 +574,7 @@ public class WitchercraftModVariables {
 			witchercraftEnemyNearby = input.getBooleanOr("witchercraftEnemyNearby", false);
 			witchercraftQuenShield = input.getDoubleOr("witchercraftQuenShield", 0);
 			witchercraftQuenShieldMax = input.getDoubleOr("witchercraftQuenShieldMax", 0);
+			witchercraftComboLine = input.getStringOr("witchercraftComboLine", "");
 			witchercraftWyvernDecoctionHit = input.getDoubleOr("witchercraftWyvernDecoctionHit", 0);
 			witchercraftSuccubusDecoctionTick = input.getDoubleOr("witchercraftSuccubusDecoctionTick", 0);
 			witchercraftGraveHagDecoctionKill = input.getDoubleOr("witchercraftGraveHagDecoctionKill", 0);

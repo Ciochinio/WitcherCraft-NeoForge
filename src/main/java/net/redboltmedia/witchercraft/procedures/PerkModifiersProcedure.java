@@ -25,18 +25,6 @@ public class PerkModifiersProcedure {
 				_entity.getAttribute(WitchercraftModAttributes.POTION_DURATION).removeModifier(Identifier.parse("witchercraft:perk_griffin_school"));
 			}
 		}
-		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkPreciseBlows == true) {
-			if (entity instanceof LivingEntity _entity) {
-				AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:perk_precise_blows"), 75, AttributeModifier.Operation.ADD_VALUE);
-				if (!_entity.getAttribute(WitchercraftModAttributes.CRIT_DAMAGE).hasModifier(modifier.id())) {
-					_entity.getAttribute(WitchercraftModAttributes.CRIT_DAMAGE).addTransientModifier(modifier);
-				}
-			}
-		} else {
-			if (entity instanceof LivingEntity _entity) {
-				_entity.getAttribute(WitchercraftModAttributes.CRIT_DAMAGE).removeModifier(Identifier.parse("witchercraft:perk_precise_blows"));
-			}
-		}
 		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkCrushingBlows == true) {
 			if (entity instanceof LivingEntity _entity) {
 				AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:perk_crushing_blows"), 50, AttributeModifier.Operation.ADD_VALUE);

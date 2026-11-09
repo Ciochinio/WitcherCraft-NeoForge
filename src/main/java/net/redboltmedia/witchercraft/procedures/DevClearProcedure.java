@@ -41,7 +41,7 @@ public class DevClearProcedure {
 			_vars.witchercraftPerksAxiiIntensity = false;
 			_vars.witchercraftPerksDomination = false;
 			_vars.witchercraftPerksMuscleMemory = false;
-			_vars.witchercraftPerksPreciseBlows = false;
+			_vars.witchercraftPerksThreeStrikes = false;
 			_vars.witchercraftPerksCripplingStrikes = false;
 			_vars.witchercraftPerksStrengthTraining = false;
 			_vars.witchercraftPerksCrushingBlows = false;

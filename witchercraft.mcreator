@@ -3773,14 +3773,14 @@
       "path": "~/Character Abilities/CombatPerks/Muscle Memory"
     },
     {
-      "name": "PreciseBlowsEffect",
+      "name": "ThreeStrikesEffect",
       "type": "procedure",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "precise_blows_effect",
+      "registry_name": "three_strikes_effect",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/PreciseBlowsEffectProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/ThreeStrikesEffectProcedure.java"
         ],
         "dependencies": [
           {
@@ -3789,7 +3789,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/Precise Blows"
+      "path": "~/Character Abilities/CombatPerks/Three Strikes"
     },
     {
       "name": "CripplingStrikesEffect",
@@ -9594,10 +9594,79 @@
           {
             "name": "sourceentity",
             "type": "entity"
+          },
+          {
+            "name": "world",
+            "type": "world"
           }
         ],
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftOnFastHitProcedure.java"
+        ]
+      },
+      "path": "~/Admin/Calc"
+    },
+    {
+      "name": "WitchercraftComboLineTick",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "witchercraft_combo_line_tick",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftComboLineTickProcedure.java"
+        ]
+      },
+      "path": "~/Admin/Calc"
+    },
+    {
+      "name": "WitchercraftComboLine",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "witchercraft_combo_line",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftComboLineProcedure.java"
+        ]
+      },
+      "path": "~/Admin/Calc"
+    },
+    {
+      "name": "WitchercraftReadyChime",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "witchercraft_ready_chime",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "sourceentity",
+            "type": "entity"
+          },
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftReadyChimeProcedure.java"
         ]
       },
       "path": "~/Admin/Calc"
@@ -9613,6 +9682,10 @@
           {
             "name": "sourceentity",
             "type": "entity"
+          },
+          {
+            "name": "world",
+            "type": "world"
           }
         ],
         "files": [
@@ -9803,7 +9876,7 @@
       "value": "false"
     },
     {
-      "name": "witchercraftEquippedPerkPreciseBlows",
+      "name": "witchercraftEquippedPerkThreeStrikes",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
@@ -10193,7 +10266,7 @@
       "value": "false"
     },
     {
-      "name": "witchercraftPerksPreciseBlows",
+      "name": "witchercraftPerksThreeStrikes",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
@@ -10347,6 +10420,12 @@
       "type": "number",
       "scope": "player_lifetime",
       "value": "0"
+    },
+    {
+      "name": "witchercraftComboLine",
+      "type": "string",
+      "scope": "player_lifetime",
+      "value": ""
     },
     {
       "name": "witchercraftWyvernDecoctionHit",
@@ -10549,8 +10628,8 @@
       "perk.witchercraft.floodofanger.desc": "If someone nearby (5 blocks) add +5 to damage.",
       "perk.witchercraft.musclememory.name": "Muscle Memory",
       "perk.witchercraft.musclememory.desc": "Add +3 to damage dealt.",
-      "perk.witchercraft.preciseblows.name": "Precise Blows",
-      "perk.witchercraft.preciseblows.desc": "Increase crit rate by 12% and crit damage by 75%.",
+      "perk.witchercraft.threestrikes.name": "Three Strikes",
+      "perk.witchercraft.threestrikes.desc": "Every 4th charged hit of the same type in a row deals +50% damage. The streak resets after 4 s without a charged hit.",
       "perk.witchercraft.razorfocus.name": "Razor Focus",
       "perk.witchercraft.razorfocus.desc": "Add 10% chance to dodge attack.",
       "perk.witchercraft.strengthtraining.name": "Strength Training",
@@ -11474,7 +11553,7 @@
                 "children": []
               },
               {
-                "name": "Precise Blows",
+                "name": "Three Strikes",
                 "children": []
               },
               {
