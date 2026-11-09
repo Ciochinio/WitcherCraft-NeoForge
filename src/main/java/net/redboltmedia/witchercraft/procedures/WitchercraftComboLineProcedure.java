@@ -13,6 +13,7 @@ public class WitchercraftComboLineProcedure {
 		String lit = "";
 		double parts = 0;
 		double sig = 0;
+		double n = 0;
 		line = "";
 		parts = 0;
 		sig = 0;
@@ -48,13 +49,38 @@ public class WitchercraftComboLineProcedure {
 				sig = sig + (entity.getPersistentData().getDoubleOr("witchercraftLastHitType", 0) * 3 + 3);
 			}
 		}
-		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkStrengthTraining && (entity.getPersistentData().getDoubleOr("witchercraftStrengthTrainingTick", 0) > 0 && (entity.tickCount - entity.getPersistentData().getDoubleOr("witchercraftStrengthTrainingTick", 0) >= 0 && entity.tickCount - entity.getPersistentData().getDoubleOr("witchercraftStrengthTrainingTick", 0) <= 80))) {
-			if (parts > 0) {
-				line = line + "   ";
+		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkStrengthTraining && (entity.getPersistentData().getDoubleOr("witchercraftStrengthTrainingTick", 0) > 0 && (entity.tickCount - entity.getPersistentData().getDoubleOr("witchercraftStrengthTrainingTick", 0) >= 0 && entity.tickCount - entity.getPersistentData().getDoubleOr("witchercraftStrengthTrainingTick", 0) <= 80)) || entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkCrushingBlows && (entity.getPersistentData().getDoubleOr("witchercraftCrushingBlowsCharges", 0) > 0 && (entity.getPersistentData().getDoubleOr("witchercraftCrushingBlowsTick", 0) > 0 && (entity.tickCount - entity.getPersistentData().getDoubleOr("witchercraftCrushingBlowsTick", 0) >= 0 && entity.tickCount - entity.getPersistentData().getDoubleOr("witchercraftCrushingBlowsTick", 0) <= 120)))) {
+			n = 0;
+			if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkStrengthTraining && (entity.getPersistentData().getDoubleOr("witchercraftStrengthTrainingTick", 0) > 0 && (entity.tickCount - entity.getPersistentData().getDoubleOr("witchercraftStrengthTrainingTick", 0) >= 0 && entity.tickCount - entity.getPersistentData().getDoubleOr("witchercraftStrengthTrainingTick", 0) <= 80))) {
+				n = n + 1;
 			}
-			line = line + "§f";
-			parts = parts + 1;
-			sig = sig + 10;
+			if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkCrushingBlows && (entity.getPersistentData().getDoubleOr("witchercraftCrushingBlowsCharges", 0) > 0 && (entity.getPersistentData().getDoubleOr("witchercraftCrushingBlowsTick", 0) > 0 && (entity.tickCount - entity.getPersistentData().getDoubleOr("witchercraftCrushingBlowsTick", 0) >= 0 && entity.tickCount - entity.getPersistentData().getDoubleOr("witchercraftCrushingBlowsTick", 0) <= 120)))) {
+				n = n + entity.getPersistentData().getDoubleOr("witchercraftCrushingBlowsCharges", 0);
+			}
+			if (n == 1) {
+				if (parts > 0) {
+					line = line + "   ";
+				}
+				line = line + "\u00A7f\uE7A4";
+				parts = parts + 1;
+				sig = sig + 10;
+			}
+			if (n == 2) {
+				if (parts > 0) {
+					line = line + "   ";
+				}
+				line = line + "\u00A7f\uE7A4 \u00A7f\uE7A4";
+				parts = parts + 1;
+				sig = sig + 20;
+			}
+			if (n > 2) {
+				if (parts > 0) {
+					line = line + "   ";
+				}
+				line = line + "\u00A7f\uE7A4 \u00A7f\uE7A4 \u00A7f\uE7A4";
+				parts = parts + 1;
+				sig = sig + 30;
+			}
 		}
 		if (sig != entity.getPersistentData().getDoubleOr("witchercraftComboSig", 0)) {
 			{

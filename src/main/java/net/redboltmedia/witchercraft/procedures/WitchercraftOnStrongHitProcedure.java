@@ -13,6 +13,18 @@ public class WitchercraftOnStrongHitProcedure {
 			sourceentity.getPersistentData().putDouble("witchercraftHitStreak", 0);
 		}
 		sourceentity.getPersistentData().putDouble("witchercraftStrengthTrainingTick", 0);
+		if (sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkCrushingBlows) {
+			if ((sourceentity.getPersistentData().getDoubleOr("witchercraftCrushingBlowsCharges", 0) > 0 && (sourceentity.getPersistentData().getDoubleOr("witchercraftCrushingBlowsTick", 0) > 0 && (sourceentity.tickCount - sourceentity.getPersistentData().getDoubleOr("witchercraftCrushingBlowsTick", 0) >= 0 && sourceentity.tickCount - sourceentity.getPersistentData().getDoubleOr("witchercraftCrushingBlowsTick", 0) <= 120)))) {
+				sourceentity.getPersistentData().putDouble("witchercraftCrushingBlowsCharges", (sourceentity.getPersistentData().getDoubleOr("witchercraftCrushingBlowsCharges", 0) - 1));
+				sourceentity.getPersistentData().putDouble("witchercraftHitStreak", 0);
+			} else {
+				if (sourceentity.getPersistentData().getDoubleOr("witchercraftHitCrit", 0) == 1) {
+					sourceentity.getPersistentData().putDouble("witchercraftCrushingBlowsCharges", 2);
+					sourceentity.getPersistentData().putDouble("witchercraftCrushingBlowsTick", (sourceentity.tickCount));
+					WitchercraftReadyChimeProcedure.execute(world, sourceentity);
+				}
+			}
+		}
 		if (sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkThreeStrikes && sourceentity.getPersistentData().getDoubleOr("witchercraftHitStreak", 0) % 4 == 3) {
 			WitchercraftReadyChimeProcedure.execute(world, sourceentity);
 		}

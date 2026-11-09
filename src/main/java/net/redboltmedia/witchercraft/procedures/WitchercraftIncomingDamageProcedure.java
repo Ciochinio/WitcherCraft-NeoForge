@@ -70,6 +70,11 @@ public class WitchercraftIncomingDamageProcedure {
 					sourceentity.getPersistentData().putDouble("witchercraftLastHitType", hitType);
 					sourceentity.getPersistentData().putDouble("witchercraftLastTypedHitTick", (sourceentity.tickCount));
 				}
+				if (hitType == 2 && critBonus > 0.5 || hitType != 2 && critBonus > 0) {
+					sourceentity.getPersistentData().putDouble("witchercraftHitCrit", 1);
+				} else {
+					sourceentity.getPersistentData().putDouble("witchercraftHitCrit", 0);
+				}
 				hit = amount + (sourceentity instanceof LivingEntity _livingEntity3 && _livingEntity3.getAttributes().hasAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE)
 						? _livingEntity3.getAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE).getValue()
 						: 0);

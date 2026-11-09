@@ -8,7 +8,7 @@
   "perk.witchercraft.cripplingstrikes.name": "Crippling Strikes",
   "perk.witchercraft.cripplingstrikes.desc": "Apply bleed effect on hit.",
   "perk.witchercraft.crushingblows.name": "Crushing Blows",
-  "perk.witchercraft.crushingblows.desc": "Increase crit rate by 8% and crit damage by 50%.",
+  "perk.witchercraft.crushingblows.desc": "A strong crit charges your next 2 strong attacks within 6 s: each deals +40% damage. Spending them cannot re-charge it.",
   "perk.witchercraft.deadlyprecision.name": "Deadly Precision",
   "perk.witchercraft.deadlyprecision.desc": "Add 1% chance to instantly kill.",
   "perk.witchercraft.defence.name": "Defence",
