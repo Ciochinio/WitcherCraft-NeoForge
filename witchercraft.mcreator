@@ -9590,7 +9590,12 @@
       "locked_code": false,
       "registry_name": "witchercraft_on_fast_hit",
       "metadata": {
-        "dependencies": [],
+        "dependencies": [
+          {
+            "name": "sourceentity",
+            "type": "entity"
+          }
+        ],
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftOnFastHitProcedure.java"
         ]
@@ -9604,7 +9609,12 @@
       "locked_code": false,
       "registry_name": "witchercraft_on_strong_hit",
       "metadata": {
-        "dependencies": [],
+        "dependencies": [
+          {
+            "name": "sourceentity",
+            "type": "entity"
+          }
+        ],
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftOnStrongHitProcedure.java"
         ]
@@ -9618,7 +9628,12 @@
       "locked_code": false,
       "registry_name": "witchercraft_hit_bonus",
       "metadata": {
-        "dependencies": [],
+        "dependencies": [
+          {
+            "name": "sourceentity",
+            "type": "entity"
+          }
+        ],
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftHitBonusProcedure.java"
         ],
@@ -10539,7 +10554,7 @@
       "perk.witchercraft.razorfocus.name": "Razor Focus",
       "perk.witchercraft.razorfocus.desc": "Add 10% chance to dodge attack.",
       "perk.witchercraft.strengthtraining.name": "Strength Training",
-      "perk.witchercraft.strengthtraining.desc": "Add +10% to damage dealt.",
+      "perk.witchercraft.strengthtraining.desc": "A fast attack charges your next strong attack within 4 s: it deals +30% damage.",
       "perk.witchercraft.sunderarmor.name": "Sunder Armor",
       "perk.witchercraft.sunderarmor.desc": "Add +20% to damage dealt.",
       "perk.witchercraft.undying.name": "Undying",

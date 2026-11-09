@@ -88,8 +88,8 @@ power, and you can raise that ceiling through the Alchemy tree.
 #### A Custom Combat Model
 
 WitcherCraft runs its own damage math instead of vanilla's: flat bonus damage, percent
-increased damage, crits you earn by timing or by setting the target up, life steal, an execute, and
-status effects like Bleed and Venom. Nothing in it is a dice roll.
+increased damage, fast and strong attacks, crits you earn by setting the target up, life steal, an
+execute, and debuffs and Venom on the target. Nothing in it is a dice roll.
 Oils feed extra damage into that math when they match the target's category.
 
 #### Persistent Character Building
@@ -477,23 +477,31 @@ On a melee hit, the weapon's base damage is combined with your stats:
 
 ```
 hit         = (base + AdditionalDamage + oil bonus) x (1 + IncreasedDamage% + hit bonus% + taken%)
-on crit     = hit x (1 + crit bonus)       (see Crits)
+strong      = hit x (1 + 50% + crit bonus) (see Fast and strong attacks, Crits)
+fast        = hit x (1 + crit bonus)
 life steal  = damage dealt x LifeSteal%    (damage actually dealt, after armor)
+arrow       = vanilla damage x (1 + arrow bonus%) x (1 + crit bonus)
 ```
 
-- **Additional Damage** - flat damage added before the percentage multiplier.
+- **Additional Damage** - flat damage added before the percentage multiplier. After the Combat perk
+  rework no perk grants it any more (Muscle Memory, Cold Blood and Flood of Anger became
+  percentages); it stays in the formula for gear and potions to use later.
 - **Increased Damage** - a percentage multiplier applied to the total.
-- **Hit bonus** - extra % for this one hit from perks (e.g. "the next strong attack deals +45%").
-- **Taken** - extra % the target takes from debuffs on it (e.g. Sunder Armor, Crippling Strike).
+- **Hit bonus** - extra % for this one hit from perks (e.g. Strength Training's "the next strong
+  attack deals +30%").
+- **Taken** - extra % the target takes from debuffs on it (Sundered from Sunder Armor, Crippled
+  from Crippling Strikes).
+- **Arrow bonus** - extra % on a fully drawn arrow or any crossbow bolt, from bow perks (Cold Blood,
+  Anatomical Knowledge). The melee stats never touch arrows.
 - All percentages are **added together** before multiplying, so stacking more of them grows damage
   linearly. Only the crit multiplies on top.
-- **Crit Damage** - the bonus a condition crit adds (see [Crits](#crits)).
+- **Crit Damage** - the bonus a crit adds (see [Crits](#crits)).
 - **Life Steal** - the percentage of damage actually dealt, after the target's armor, that returns
   to you as health.
 
 The witcher stats apply to **melee only**. Signs scale with [Sign Intensity](#sign-intensity),
-bombs will get their own scaling, and arrows keep vanilla damage (they take part only in crits,
-below). The result is the hit itself - it is changed in place, lands once, and keeps you as the
+bombs will get their own scaling, and arrows keep vanilla damage, changed only by crits and by
+bow perks through the arrow bonus. The result is the hit itself - it is changed in place, lands once, and keeps you as the
 attacker, so kill credit, XP and loot work normally.
 
 ### Fast and strong attacks
@@ -503,47 +511,55 @@ builds on fast and strong attacks, without any new key.
 
 ```
                       on the ground (charged)    jumping (charged)
-no condition          FAST        x1.0           STRONG      x1.5
-condition true        FAST + crit x1+CD          STRONG + crit  x1.5+CD
-uncharged (spam)      no type - never triggers a perk
+no condition          fast attack  x1.0          strong attack  x1.5
+condition true        fast crit    x1+CD         strong crit    x1.5+CD
+uncharged (spam)      no type - never triggers a perk, never crits
 ```
 
 - **Fast attack** - a fully charged hit from the ground. Vanilla's sweep only happens on these, so
   fast attacks are the ones that hit groups.
-- **Strong attack** - a fully charged jump crit. One target, more damage, and the jump is its
-  commitment.
+- **Strong attack** - a fully charged jump hit (vanilla's falling attack). It is always **x1.5**,
+  for everyone from the start. One target, more damage, and the jump is its commitment. Vanilla
+  still shows its crit stars on it, but in WitcherCraft terms it is a strong attack, **not a crit**.
 - **Uncharged hits have no type**, so spam-clicking can't build streaks or stacks.
-- The type is about *how* you swing; a condition crit (below) is a separate layer that can land on
-  either type. A thunderstorm with Thunderbolt doesn't turn fast attacks into strong ones.
+- The type is about *how* you swing; a crit (below) is a separate layer that can land on either
+  type. A thunderstorm with Thunderbolt doesn't turn fast attacks into strong ones.
 - Attack speed is not changed for strong attacks. If they turn out too spammable, the fix is a
   short recovery after a strong attack, not a global attack-speed change.
 
 ### Crits
 
-A crit needs a **fully charged** swing (or a **fully drawn** bow). Spam-clicking never crits.
-There are two kinds, and they add together:
-
-- **Jump crit** - vanilla's falling attack, which is also what makes a hit a strong attack. It
-  works for everyone from the start and is always **x1.5**; Crit Damage doesn't change it.
-- **Condition crit** - a charged hit while a crit condition is true. It adds your **Crit
-  Damage**, which starts at **50%** (provisional) and is raised by perks and gear.
+**"Crit" always means a condition crit**: a fully charged swing (or a fully drawn arrow, or any
+crossbow bolt) while a crit condition is true. Spam-clicking never crits. A crit adds your **Crit
+Damage**, which starts at **50%** (provisional) and is raised by perks and gear. On a strong attack
+it adds on top of the strong attack's own +50%.
 
 ```
                           multiplier
-normal hit                x1.0
-jump crit                 x1.5    1 + 50%
-condition crit            x1.5    1 + Crit Damage (50%)
-jump + condition          x2.0    1 + 50% + Crit Damage
+fast attack               x1.0
+strong attack             x1.5    1 + 50%
+fast crit                 x1.5    1 + Crit Damage (50%)
+strong crit               x2.0    1 + 50% + Crit Damage
 ```
 
-- Several conditions at once still count as one condition crit.
-- The base kit has jump crits only. **Conditions come from perks, potions and set effects** -
-  buying conditions is what a crit build is.
-- Bows have no jump crit. A fully drawn arrow keeps vanilla's own bonus, and Crit Damage applies
-  only when a condition is true.
-- Crits look and sound like vanilla crits.
+- Several conditions at once still count as one crit.
+- The base kit has no crits. **Conditions come from perks, potions and set effects** - buying
+  conditions is what a crit build is.
+- A fully drawn arrow keeps vanilla's own bonus, and Crit Damage applies only when a condition is
+  true. Every crossbow bolt counts as fully drawn.
+- **How a crit looks** - so you can tell your condition fired, as opposed to a plain strong attack:
 
-Crit conditions (which perk carries which is settled in the perk rework):
+  ```
+  fast attack     nothing extra
+  strong attack   vanilla crit stars           + vanilla crit sound
+  fast crit       blue enchanted-hit sparks    + crit sound, higher pitch
+  strong crit     vanilla stars + blue sparks  + crit sound, higher pitch
+  crit arrow      blue sparks at the impact point
+  ```
+
+  *Not built yet* - today a crit shows vanilla's stars and sound.
+
+Crit conditions:
 
 | Condition | Source |
 |---|---|
@@ -552,19 +568,23 @@ Crit conditions (which perk carries which is settled in the perk rework):
 | Target charmed by Axii | perk |
 | Target knocked back by Aard, within about **1** second | perk |
 | Target burning | perk |
-| Target bleeding | bow perk |
-| Target hasn't noticed you | bow perk |
+| Target Maimed | **Maiming Shot** perk |
+| Target hasn't noticed you | bow perk, not assigned yet |
 | Within **3** seconds of a kill | **Katakan** decoction |
 
 A venomed target is deliberately **not** a condition - Toxic Shock already rewards critting a
 venomed target (see [Venom](#venom)), and venom granting crits as well would make that loop free.
+Maimed is guarded the same way: a crit that only happened because the target was Maimed does not
+re-arm Maiming Shot.
 
 ### Execute
 
-The pinnacle of the Combat tree: **any crit** on a target below **20%** of its maximum health kills
-it outright. There is no roll - the crit is the condition. Bosses are immune through the
-`witchercraft:execute_immune` tag (the Ender Dragon, the Wither, the Warden, and future bosses).
-Execute doesn't work on players.
+The pinnacle of the strong-attack line, carried by **Deadly Precision**: a **strong attack** on a
+target below **20%** of its maximum health kills it outright. There is no roll - the strong attack
+is the condition. Bosses are immune through the `witchercraft:execute_immune` tag (the Ender Dragon,
+the Wither, the Warden, and future bosses). Execute doesn't work on players. *Not built yet* - the
+seam exists but is off, and today it checks for any crit bonus (which the strong attack's +50%
+counts as) instead of the hit type.
 
 ### Stats are always live
 
@@ -574,10 +594,10 @@ and active potions or decoctions - the same live-aggregation model as
 bonus applies the moment its source does and disappears the moment the source does, with no
 recalculation step in between and nothing to fall out of sync. A few current examples:
 
-- **Muscle Memory** adds **3** flat damage. **Cold Blood** adds **5** while no enemy is near;
-  **Flood of Anger** adds **5** while one is.
+- **Flood of Anger** adds **10%** increased damage for each hostile within 5 blocks beyond the
+  first, up to **30%**, rising and falling as enemies come and go.
 - **Water Hag Decoction** adds **40%** increased damage while you're at full health.
-- **Thunderbolt** turns every charged hit into a condition crit during a thunderstorm.
+- **Thunderbolt** turns every charged hit into a crit during a thunderstorm.
 
 The character screen surfaces the full stat line:
 
@@ -585,7 +605,7 @@ The character screen surfaces the full stat line:
 |------|--------------|
 | Additional Damage | Flat melee damage added before multipliers |
 | Increased Damage | Percentage multiplier on total melee damage |
-| Crit Damage | The bonus a condition crit adds |
+| Crit Damage | The bonus a crit adds |
 | Life Steal | Percent of melee damage dealt healed back |
 | Oil Damage | Scales the bonus from a correctly matched oil |
 | Sign Intensity | Strength of every Sign |
@@ -630,16 +650,24 @@ bonus rides on top of the normal formula, and the Oil Damage stat (from perks an
 Viper School) scales how big it gets. The bonus belongs to the matching hit only; it never carries
 over to the next thing you hit. Hit the wrong category and the bonus is zero.
 
-### Bleed and status effects
+### Status effects
 
-Bleed is a damage-over-time status that ticks on its own, independent of your swings. It's applied
-on hit by certain sources - for example the **Crippling Strikes** perk bleeds the target for
-**100 ticks (5 seconds)** - and deals `1 + level` magic damage once per second for as long as it
-lasts. The damage is driven by the status's own remaining duration, so re-applying Bleed mid-fight
-refreshes the wound and restarts its clock rather than stacking a second source of damage. Because
-it rides on the status effect itself, Bleed works identically on monsters and on players. Other
-combat statuses come from their own sources: burning from Igni, slows from Yrden and Axii, and the
-payloads of individual bombs and decoctions.
+There is **no Bleed**. The witcher's damage over time is [Venom](#venom), and Witcher 3's
+next-gen Combat tree has no bleed either. The old Bleed effect (applied by Crippling Strikes) is
+removed. *Removal not built yet.*
+
+The Combat perks put three visible debuffs on the target, all on the **main target only** (sweep
+targets are never affected):
+
+| Debuff | From | Effect | Lasts |
+|---|---|---|---|
+| **Crippled** | Crippling Strikes (fast crit) | Takes **+20%** damage | **5 s**, refreshed, doesn't stack |
+| **Sundered** | Sunder Armor (strong attack) | Takes **+10%** damage per stack, up to **3** | **8 s**, each stack restarts it |
+| **Maimed** | Maiming Shot (arrow after a melee crit) | Every charged hit on it is a crit | **4 s** |
+
+Crippled and Sundered add together into the target's "taken" percentage, so a target can take up
+to **+50%**. All three are *not built yet*. Other combat statuses come from their own sources:
+burning from Igni, slows from Yrden and Axii, and the payloads of individual bombs and decoctions.
 
 ### Venom
 
@@ -649,7 +677,7 @@ Golden Oriole does not cure Venom.
 
 - **How it differs from Poison:** Venom can kill, and it works on undead, so necrophages are not
   safe from it. Specters are immune.
-- **Refreshes, never stacks.** Applying Venom again restarts its clock, the same as Bleed.
+- **Refreshes, never stacks.** Applying Venom again restarts its clock.
 - **Delivered through oils.** Oiled hits apply Venom through an Alchemy perk line, adapted from
   The Witcher 3:
   - **Poisoned Blades** - oiled hits apply Venom.
@@ -774,8 +802,12 @@ more perks to swap in for a given fight.
 
 Perks are split across four tabs, each pointed at one side of the witcher kit:
 
-- **Combat** - damage, crit conditions, bleed, and the execute. Precise Blows, Crushing Blows, Muscle Memory,
-  Cold Blood, Flood of Anger, Crippling Strikes, Anatomical Knowledge, and so on.
+- **Combat** - **15** perks built on [fast and strong attacks](#fast-and-strong-attacks), in three
+  lines: fast (Muscle Memory, Flood of Anger, Three Strikes, Crippling Strikes, Fleet Footed),
+  strong (Strength Training, Crushing Blows, Sunder Armor, Undying, Deadly Precision with the
+  [Execute](#execute)), and shield and bow (Counterattack, Arrow Deflection, Cold Blood, Anatomical
+  Knowledge, Maiming Shot). Follows Witcher 3's next-gen Combat tree; see the
+  [Perks table](#perks).
 - **Signs** - Sign intensity and cost, plus the alternate Sign forms (Far-Reaching Aard, Fire
   Stream, Magic Trap, Exploding Shield).
 - **Alchemy** - the Toxicity ceiling, potion duration and strength, and Refreshment (the heal on
@@ -793,8 +825,8 @@ now costs exactly the points its own chain requires, not a flat tab-wide toll on
 
 Buying a perk flips its switch, and the combat, Sign, and alchemy systems check those switches
 live, every tick. That's why a freshly bought perk changes your stats immediately, and why
-situational perks like Cold Blood (bonus damage only when no enemy is near) can turn themselves on
-and off as the fight moves. All of your character's power flows through this - levels into perks,
+situational perks like Flood of Anger (bonus damage that grows with the enemies around you) can
+turn themselves on and off as the fight moves. All of your character's power flows through this - levels into perks,
 perks into the live stats above - rather than through a separate pool of attribute points.
 
 ### Where you manage it - the WitcherCraft menu
@@ -1382,19 +1414,40 @@ Perks are switches the combat, Sign, and alchemy systems read live (see
 
 **Combat**
 
-| Perk | Effect |
-|------|--------|
-| **Muscle Memory** | +**3** Additional Damage |
-| **Precise Blows** | *Rework pending* - was +**12** crit chance and +**75** crit damage; only the Crit Damage half is left, so it rarely matters. Becomes Three Strikes in the next-gen Combat tree |
-| **Crushing Blows** | *Rework pending* - was +**8** crit chance and +**50** crit damage; only the Crit Damage half is left. Next-gen version: strong attacks charge the next strong attacks |
-| **Anatomical Knowledge** | *Rework pending* - was +**10** crit chance with a bow, which is cut; currently does nothing |
-| **Crippling Shot** | *Rework pending* - was +**50** crit damage with a bow; next-gen version (Maiming Shot) triggers after a crit |
-| **Deadly Precision** | *Rework pending* - was +**1%** instant-kill chance, which is cut; currently does nothing. Candidate to carry the [Execute](#execute) |
-| **Razor Focus** | *Rework pending* - was +**10** dodge chance, which is cut; currently does nothing. Its next-gen version fed adrenaline, which is skipped |
-| **Cold Blood** | +**5** Additional Damage while no enemy is near |
-| **Flood of Anger** | +**5** Additional Damage while an enemy is near |
-| **Crippling Strikes** | Applies Bleed on hit (**100** ticks / **5** seconds) |
-| **Sunder Armor** | Armor-shredding on-hit effect |
+**15** perks in three lines. Every value is **provisional** until a balance pass. Grid positions and
+prerequisite lines are not set yet. Cut from Witcher 3's 20: Whirl and Rend (special moves on
+adrenaline), Cold Blood's bolt version, Resolve and Razor Focus (pure adrenaline), and Lightning
+Reflexes (slow-motion aiming and headshots). The old **Defence** perk (+4 max health) is removed.
+
+*Fast*
+
+| Perk | Effect | Status |
+|------|--------|--------|
+| **Muscle Memory** | After **3 s** without taking damage, your next **3** fast attacks in a row deal +**30%**. A strong attack or taking damage ends the run; uncharged hits are ignored. A fully blocked hit is not damage taken | *Not built* - today +**3** Additional Damage |
+| **Flood of Anger** | +**10%** Increased Damage for each hostile within **5** blocks beyond the first, up to +**30%** | *Not built* - today +**5** Additional Damage while an enemy is near |
+| **Three Strikes** | Every **4th** typed hit of the same type in a row deals +**50%**. The streak resets after **4 s** without a typed hit. While equipped, the actionbar shows the combo (`Fast x3`, the bonus hit in gold) | *Not built* - replaces Precise Blows |
+| **Crippling Strikes** | A fast crit **Cripples** the target: +**20%** damage taken for **5 s** | *Not built* - today applies Bleed on hit |
+| **Fleet Footed** | +**15%** movement speed | Built |
+
+*Strong*
+
+| Perk | Effect | Status |
+|------|--------|--------|
+| **Strength Training** | A fast attack charges the next strong attack within **4 s** with +**30%**. Each fast attack restarts the 4 s; it doesn't stack | Built |
+| **Crushing Blows** | A strong crit charges the next **2** strong attacks within **6 s** with +**40%**. Strong attacks that spend the charge can't re-charge it | *Not built* - today +**50** Crit Damage |
+| **Sunder Armor** | Each strong attack adds a **Sundered** stack: +**10%** damage taken per stack, up to **3**, for **8 s** | *Not built* - today +**20%** Increased Damage |
+| **Undying** | When killed, restore to **50%** health. Once every **15** minutes | Built |
+| **Deadly Precision** | [Execute](#execute): a strong attack kills a target below **20%** health. Bosses are immune | *Not built* |
+
+*Shield and bow*
+
+| Perk | Effect | Status |
+|------|--------|--------|
+| **Counterattack** | After you block a hit with a shield, your next charged attack within **3 s** deals +**50%**. One charge; blocking again refreshes it | *Not built* - new |
+| **Arrow Deflection** | An arrow, bolt or trident blocked within **0.5 s** of the shield going up flies back at the shooter for the damage it would have dealt. It counts as your shot and can't be picked up | *Not built* - new, replaces Razor Focus |
+| **Cold Blood** | Fully drawn arrows and crossbow bolts deal +**25%** while no hostile is within **5** blocks of you | *Not built* - today +**5** Additional Damage while no enemy is near |
+| **Anatomical Knowledge** | Fully drawn arrows and crossbow bolts deal +**15%** | *Not built* - today does nothing |
+| **Maiming Shot** | After a melee crit, your next fully drawn arrow or bolt within **5 s** **Maims** the target for **4 s**: a crit condition. Crits that only happened because of Maimed don't re-arm it | *Not built* - replaces Crippling Shot |
 
 **Signs**
 

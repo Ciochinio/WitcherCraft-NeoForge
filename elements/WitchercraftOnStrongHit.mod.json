@@ -2,7 +2,7 @@
   "_fv": 89,
   "_type": "procedure",
   "definition": {
-    "procedurexml": "<xml xmlns=\"https://developers.google.com/blockly/xml\"><block type=\"event_trigger\" deletable=\"false\" x=\"40\" y=\"40\"><field name=\"trigger\">no_ext_trigger</field><comment pinned=\"false\" h=\"120\" w=\"380\">Perk hook: runs after every strong attack lands, called by WitchercraftIncomingDamage. entity = target, sourceentity = attacker, and the attacker's NBT holds witchercraftLastHitType and witchercraftHitStreak. Empty until the perk rework adds to it.</comment></block></xml>",
+    "procedurexml": "<xml xmlns=\"https://developers.google.com/blockly/xml\"><block type=\"event_trigger\" deletable=\"false\" x=\"40\" y=\"40\"><field name=\"trigger\">no_ext_trigger</field><comment pinned=\"false\" h=\"140\" w=\"400\">Perk hook: runs after every strong attack lands, called by WitchercraftIncomingDamage. sourceentity = attacker, whose NBT holds witchercraftLastHitType and witchercraftHitStreak. Spends the Strength Training charge (its +30% was already added by WitchercraftHitBonus).</comment><next><block type=\"entity_nbt_num_set\"><value name=\"tagName\"><block type=\"text\"><field name=\"TEXT\">witchercraftStrengthTrainingTick</field></block></value><value name=\"tagValue\"><block type=\"math_number\"><field name=\"NUM\">0</field></block></value><value name=\"entity\"><block type=\"source_entity_from_deps\"></block></value></block></next></block></xml>",
     "skipDependencyNullCheck": false
   }
 }

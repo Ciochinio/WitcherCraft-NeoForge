@@ -77,7 +77,7 @@ public class WitchercraftIncomingDamageProcedure {
 							: 0) * 0.01);
 				}
 				hit = hit + oil;
-				hitBonus = WitchercraftHitBonusProcedure.execute();
+				hitBonus = WitchercraftHitBonusProcedure.execute(sourceentity);
 				takenBonus = WitchercraftDamageTakenBonusProcedure.execute();
 				hit = hit * (1 + ((sourceentity instanceof LivingEntity _livingEntity5 && _livingEntity5.getAttributes().hasAttribute(WitchercraftModAttributes.INCREASED_DAMAGE)
 						? _livingEntity5.getAttribute(WitchercraftModAttributes.INCREASED_DAMAGE).getValue()
@@ -139,9 +139,9 @@ public class WitchercraftIncomingDamageProcedure {
 				}
 				if (hitType > 0) {
 					if (hitType == 1) {
-						WitchercraftOnFastHitProcedure.execute();
+						WitchercraftOnFastHitProcedure.execute(sourceentity);
 					} else {
-						WitchercraftOnStrongHitProcedure.execute();
+						WitchercraftOnStrongHitProcedure.execute(sourceentity);
 					}
 				}
 			} else {

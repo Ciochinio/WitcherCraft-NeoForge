@@ -629,6 +629,31 @@ current order matches the generated `(world, damagesource, entity, sourceentity,
   threshold is in `WitchercraftIncomingDamage`.
 - *Debug a hit:* give yourself the `DevLog` effect. Every hit starts with a gold dashed line (a Blockly text block starting with the section-sign colour code `6`). A melee hit then prints its type (`fast xN`, `strong xN` or `no type`) and one line per part (`base`, `flat +`, `oil +`, `damage +%`, `hit bonus +%`, `taken +%`, `crit +%`, `=`); arrows print `arrow`, `crit +%`, `=`; the after-armor step adds `after armor` and `life steal +`. Values are rounded to 3 decimals by storing `round(x * 1000)` in a number variable and dividing that by 1000; dividing the round block directly would do integer division, because MCreator writes `1000` as an int literal.
 
+**Combat perk rework (planned, not built yet).** GDD 10 has the agreed 15 Combat perks. What it
+changes here:
+- *Words.* "Crit" means a condition crit only. The jump's +0.5 is the strong attack's bonus, not a
+  crit. `witchercraftCritBonus` keeps holding both summed, so the math doesn't change, but any check
+  for "was this a crit" must test the condition, not `critBonus > 0`.
+- *Execute* moves from `critBonus > 0` to `hitType == 2` (strong), with the same 20% threshold and
+  tag. `WitchercraftExecuteEnabled` returns Deadly Precision's equipped variable.
+- *Crit look.* `WitchercraftMeleeCrit` forces vanilla's crit only for the strong attack. A
+  condition crit adds enchanted-hit particles and the crit sound at a higher pitch, on melee and on
+  arrows.
+- *Arrows* get a new hook, `WitchercraftArrowBonus` (returns %, `~/Admin/Calc`), so the arrow
+  branch becomes `amount x (1 + arrow bonus) x (1 + crit)`. Every crossbow bolt counts as fully
+  drawn. Cold Blood and Anatomical Knowledge add to it.
+- *Target debuffs* are mob effects (Crippled, Sundered with amplifier = stacks - 1, Maimed), read
+  by `WitchercraftDamageTakenBonus` and `WitchercraftCritCondition`. Applied to the main target
+  only, which the zeroed hit type already guarantees for sweep targets.
+- *Attacker timers and charges* live in the attacker's persistent NBT, the same as the hit memory
+  (2.2: no player-variable sync): the last-damage-taken tick (Muscle Memory), the last typed hit tick
+  (the streak's 4 s reset), and a charge count plus expiry tick each for Muscle Memory, Strength
+  Training, Crushing Blows, Counterattack and Maiming Shot. Expiries are compared with `tickCount`,
+  so no per-tick countdown runs.
+- *Shield blocks* (Counterattack, Arrow Deflection) need a block event. If Blockly has no trigger
+  for it, a locked bridge like `WitchercraftAfterDamageBridge` calls a Blockly procedure.
+- *Removed.* Bleed (`Bleed`, `BleedHit`, `BleedTick`) and the Defence perk.
+
 **Known limitations.**
 - Sweep-attack targets also get flat, oil and % damage. A crit never sweeps, so they never get the crit.
 - `WyvernDecoctionHit` still updates its % damage stack in its own handler on the same event, with no
