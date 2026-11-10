@@ -709,7 +709,8 @@ targets are never affected):
 | **Maimed** | Maiming Shot (arrow after a melee crit) | Every charged hit on it is a crit | **4 s** |
 
 Crippled and Sundered add together into the target's "taken" percentage, so a target can take up
-to **+50%**. All three are *not built yet*. Other combat statuses come from their own sources:
+to **+50%**. Sundered is built (a steel-grey effect with swirl particles on the mob); Crippled and
+Maimed are *not built yet*. Other combat statuses come from their own sources:
 burning from Igni, slows from Yrden and Axii, and the payloads of individual bombs and decoctions.
 
 ### Venom
@@ -1478,7 +1479,7 @@ Reflexes (slow-motion aiming and headshots). The old **Defence** perk (+4 max he
 |------|--------|--------|
 | **Strength Training** | A fast attack charges the next strong attack within **4 s** with +**30%**. Each fast attack restarts the 4 s; it doesn't stack | Built |
 | **Crushing Blows** | A strong crit charges the next **2** strong attacks within **6 s** with +**40%**. Strong attacks that spend the charge can't re-charge it, and they don't count for Three Strikes | Built |
-| **Sunder Armor** | Each strong attack adds a **Sundered** stack: +**10%** damage taken per stack, up to **3**, for **8 s** | *Not built* - today +**20%** Increased Damage |
+| **Sunder Armor** | Each strong attack adds a **Sundered** stack: +**10%** damage taken per stack, up to **3**, for **8 s**; each stack restarts the 8 s. Main target only | Built |
 | **Undying** | When killed, restore to **50%** health. Once every **15** minutes | Built |
 | **Deadly Precision** | [Execute](#execute): a strong attack kills a target below **20%** health. Bosses are immune | *Not built* |
 

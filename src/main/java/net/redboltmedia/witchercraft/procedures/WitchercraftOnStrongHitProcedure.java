@@ -1,14 +1,18 @@
 package net.redboltmedia.witchercraft.procedures;
 
 import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
+import net.redboltmedia.witchercraft.init.WitchercraftModMobEffects;
 
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.effect.MobEffectInstance;
 
 public class WitchercraftOnStrongHitProcedure {
-	public static void execute(LevelAccessor world, Entity sourceentity) {
-		if (sourceentity == null)
+	public static void execute(LevelAccessor world, Entity entity, Entity sourceentity) {
+		if (entity == null || sourceentity == null)
 			return;
+		double amp = 0;
 		if (sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkStrengthTraining && (sourceentity.getPersistentData().getDoubleOr("witchercraftStrengthTrainingTick", 0) > 0 && (sourceentity.tickCount - sourceentity.getPersistentData().getDoubleOr("witchercraftStrengthTrainingTick", 0) >= 0 && sourceentity.tickCount - sourceentity.getPersistentData().getDoubleOr("witchercraftStrengthTrainingTick", 0) <= 80))) {
 			sourceentity.getPersistentData().putDouble("witchercraftHitStreak", 0);
 		}
@@ -24,6 +28,17 @@ public class WitchercraftOnStrongHitProcedure {
 					WitchercraftReadyChimeProcedure.execute(world, sourceentity);
 				}
 			}
+		}
+		if (sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkSunderArmor) {
+			amp = 0;
+			if (entity instanceof LivingEntity _livEnt0 && _livEnt0.hasEffect(WitchercraftModMobEffects.SUNDERED)) {
+				amp = (entity instanceof LivingEntity _livEnt && _livEnt.hasEffect(WitchercraftModMobEffects.SUNDERED) ? _livEnt.getEffect(WitchercraftModMobEffects.SUNDERED).getAmplifier() : 0) + 1;
+			}
+			if (amp > 2) {
+				amp = 2;
+			}
+			if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
+				_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.SUNDERED, 160, (int) amp));
 		}
 		if (sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkThreeStrikes && sourceentity.getPersistentData().getDoubleOr("witchercraftHitStreak", 0) % 4 == 3) {
 			WitchercraftReadyChimeProcedure.execute(world, sourceentity);

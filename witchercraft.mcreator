@@ -5090,6 +5090,19 @@
       "path": "~/Character Abilities/SignsPerks"
     },
     {
+      "name": "Sundered",
+      "type": "potioneffect",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "sundered",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/potion/SunderedMobEffect.java"
+        ]
+      },
+      "path": "~/StatusEffects"
+    },
+    {
       "name": "Bleed",
       "type": "potioneffect",
       "compiles": true,
@@ -9680,6 +9693,10 @@
       "metadata": {
         "dependencies": [
           {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
             "name": "sourceentity",
             "type": "entity"
           },
@@ -9721,7 +9738,12 @@
       "locked_code": false,
       "registry_name": "witchercraft_damage_taken_bonus",
       "metadata": {
-        "dependencies": [],
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftDamageTakenBonusProcedure.java"
         ],
@@ -10635,7 +10657,7 @@
       "perk.witchercraft.strengthtraining.name": "Strength Training",
       "perk.witchercraft.strengthtraining.desc": "A fast attack charges your next strong attack within 4 s: it deals +30% damage.",
       "perk.witchercraft.sunderarmor.name": "Sunder Armor",
-      "perk.witchercraft.sunderarmor.desc": "Add +20% to damage dealt.",
+      "perk.witchercraft.sunderarmor.desc": "Each strong attack sunders the target: +10% damage taken per stack, up to 3 stacks, for 8 s.",
       "perk.witchercraft.undying.name": "Undying",
       "perk.witchercraft.undying.desc": "If killed, restore HP to 50% once every 15 minutes.",
       "perk.witchercraft.clusterbombs.name": "Cluster Bombs",
@@ -10845,6 +10867,7 @@
       "item.witchercraft.insectoid_oil": "Insectoid Oil",
       "item.witchercraft.grapeshot": "Grapeshot",
       "effect.witchercraft.dev_log": "Dev Log",
+      "effect.witchercraft.sundered": "Sundered",
       "gui.witchercraft.character_gui.label_passivehealthregen": "HealthRegen",
       "gui.witchercraft.character_gui.label_staminaregen": "StaminaRegen",
       "gui.witchercraft.player_stats_overlay.label_staminaregen": "StaminaRegen",
