@@ -43,6 +43,7 @@ public class DevClearProcedure {
 			_vars.witchercraftPerksMuscleMemory = false;
 			_vars.witchercraftPerksThreeStrikes = false;
 			_vars.witchercraftPerksCripplingStrikes = false;
+			_vars.witchercraftPerksCounterattack = false;
 			_vars.witchercraftPerksStrengthTraining = false;
 			_vars.witchercraftPerksCrushingBlows = false;
 			_vars.witchercraftPerksSunderArmor = false;

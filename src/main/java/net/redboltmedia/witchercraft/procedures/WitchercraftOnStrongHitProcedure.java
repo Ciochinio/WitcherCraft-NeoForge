@@ -13,6 +13,10 @@ public class WitchercraftOnStrongHitProcedure {
 		if (entity == null || sourceentity == null)
 			return;
 		double amp = 0;
+		if (sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkCounterattack && (sourceentity.getPersistentData().getDoubleOr("witchercraftCounterattackTick", 0) > 0 && (sourceentity.tickCount - sourceentity.getPersistentData().getDoubleOr("witchercraftCounterattackTick", 0) >= 0 && sourceentity.tickCount - sourceentity.getPersistentData().getDoubleOr("witchercraftCounterattackTick", 0) <= 60))) {
+			sourceentity.getPersistentData().putDouble("witchercraftCounterattackTick", 0);
+			sourceentity.getPersistentData().putDouble("witchercraftHitStreak", 0);
+		}
 		if (sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkStrengthTraining && (sourceentity.getPersistentData().getDoubleOr("witchercraftStrengthTrainingTick", 0) > 0 && (sourceentity.tickCount - sourceentity.getPersistentData().getDoubleOr("witchercraftStrengthTrainingTick", 0) >= 0 && sourceentity.tickCount - sourceentity.getPersistentData().getDoubleOr("witchercraftStrengthTrainingTick", 0) <= 80))) {
 			sourceentity.getPersistentData().putDouble("witchercraftHitStreak", 0);
 		}

@@ -82,6 +82,14 @@ public class WitchercraftComboLineProcedure {
 				sig = sig + 30;
 			}
 		}
+		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkCounterattack && (entity.getPersistentData().getDoubleOr("witchercraftCounterattackTick", 0) > 0 && (entity.tickCount - entity.getPersistentData().getDoubleOr("witchercraftCounterattackTick", 0) >= 0 && entity.tickCount - entity.getPersistentData().getDoubleOr("witchercraftCounterattackTick", 0) <= 60))) {
+			if (parts > 0) {
+				line = line + "   ";
+			}
+			line = line + "\u00A7f\uE7A5";
+			parts = parts + 1;
+			sig = sig + 1000;
+		}
 		if (sig != entity.getPersistentData().getDoubleOr("witchercraftComboSig", 0)) {
 			{
 				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);

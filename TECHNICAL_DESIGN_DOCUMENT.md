@@ -586,10 +586,10 @@ and the re-hit had no attacker attached. The new pipeline changes the hit in pla
 | `WitchercraftDamageTakenBonus` | none, returns number | Perk hook `(entity)` = target. Percent bonus for this target from debuffs: `Sundered` gives 10 per stack (effect level 0..2 = 1..3 stacks). `WitchercraftOnStrongHit` `(world, entity, sourceentity)` applies the stacks. |
 | `WitchercraftComboLine` | none `(entity)`, called every tick by `WitchercraftComboLineTick` (player ticks, server only) | Builds the combat line (GDD 5) from the player's charges into the synced player text variable `witchercraftComboLine`; `WitchercraftHud` draws it centred under the crosshair. A number `sig` encodes what is on the line and is kept in NBT (`witchercraftComboSig`), so the variable, and with it the sync packet, is only written when the line actually changes. Running per tick is what makes expired charges vanish without a timer. The icons are font glyphs (see below). |
 | `WitchercraftReadyChime` | none | The single "a charge armed" sound, so every perk uses the same cue. |
-| `WitchercraftAfterDamage` | none (called by the bridge) | Life steal and Black Blood, from the damage that actually reached health. |
+| `WitchercraftAfterDamage` | none (called by the bridge) | Life steal and Black Blood, from the damage that actually reached health. Life steal uses `clamp(amount, 0, witchercraftLifeStealCap)`. `WitchercraftDamageCalculator` stores that cap on the target just before a melee hit lands: the target's health, or on an Execute `clamp(normalHit, 0, health)`, where `normalHit` is the hit before it became 9999 (before armor, so very slightly generous). Also stamps `witchercraftLastHurtTick` on players (Muscle Memory). |
 | `WitchercraftCritCondition` | none, returns logic | The list of crit conditions. Only Thunderbolt in a storm today. |
 | `WitchercraftOilMatches` | none, returns logic | Main-hand oil enchantment vs the target's category tag, for all ten oils. |
-| `WitchercraftExecuteEnabled` | none, returns logic | Seam: `false` until a perk carries Execute. |
+| `WitchercraftExecuteEnabled` | none, returns logic | `(sourceentity)`: true while the attacker has Deadly Precision equipped. |
 | `IsFullyChargedAttack` | none, returns logic, **locked** | Attack strength above 0.9. Blockly has no block for it. |
 | `IsCritArrow` | none, returns logic, **locked** | `AbstractArrow.isCritArrow()`. Blockly has no block for it. |
 | `WitchercraftAfterDamageBridge` | code element, **locked** | Subscribes to `LivingDamageEvent.Post` (no Blockly trigger exists) and calls `WitchercraftAfterDamage` with `getHealthDamage()`. |
@@ -649,7 +649,7 @@ current order matches the generated `(world, damagesource, entity, sourceentity,
 - *Add a crit condition:* one more OR branch in `WitchercraftCritCondition`. `entity` is the target,
   `sourceentity` the attacker. It applies to melee and to fully drawn arrows at once.
 - *Add an oil:* one more OR branch in `WitchercraftOilMatches`.
-- *Give Execute to a perk:* make `WitchercraftExecuteEnabled` return that perk's equipped variable. The 20%
+- *Move Execute to another perk:* make `WitchercraftExecuteEnabled` return that perk's equipped variable (today Deadly Precision). The 20%
   threshold is in `WitchercraftDamageCalculator`.
 - *Debug a hit:* give yourself the `DevLog` effect. All printing is in `WitchercraftDamageLog`. Every hit starts with a gold dashed line (a Blockly text block starting with the section-sign colour code `6`). A melee hit then prints its type (`fast xN`, `strong xN` or `no type`) and one line per part (`base`, `flat +`, `oil +`, `damage +%`, `hit bonus +%` with the perks that gave it in brackets, from `witchercraftHitBonusLog` written by `WitchercraftHitBonus`, `taken +%`, `strong +50%` on strong attacks only, `crit +%` for Crit Damage alone, `=`, then `execute!` when Execute fired); arrows print `arrow`, `crit +%`, `=`; the after-armor step adds `after armor` and `life steal +`. Values are rounded to 3 decimals by storing `round(x * 1000)` in a number variable and dividing that by 1000; dividing the round block directly would do integer division, because MCreator writes `1000` as an int literal.
 
@@ -658,8 +658,12 @@ changes here:
 - *Words.* "Crit" means a condition crit only. The jump's +0.5 is the strong attack's bonus, not a
   crit. `witchercraftCritBonus` keeps holding both summed, so the math doesn't change, but any check
   for "was this a crit" must test the condition, not `critBonus > 0`.
-- *Execute* moves from `critBonus > 0` to `hitType == 2` (strong), with the same 20% threshold and
-  tag. `WitchercraftExecuteEnabled` returns Deadly Precision's equipped variable.
+- *Execute* (built) checks `hitType == 2` (strong), not `critBonus > 0`, with the 20% threshold and the
+  tag, and plays `item.mace.smash_ground_heavy` (pitch 1.2) on the target. An Execute sets the hit to a flat 9999. The execute marker, four red diagonal ticks around the crosshair
+  (`textures/screens/execute_marker.png`, 11x11, blitted 1:1 centred on vanilla's crosshair; the earlier
+  skull and X font-glyph drafts are in `textures/font/_unused`), is drawn client-side by `WitchercraftHud.isExecutable`,
+  which tests `Minecraft.crosshairPickEntity` with the same rules (keep the two in step) and calls
+  `WitchercraftExecuteEnabled` for the perk. Blockly has no block for the crosshair entity, hence Java.
 - *Crit look.* `WitchercraftMeleeCrit` forces vanilla's crit only for the strong attack. A
   condition crit adds enchanted-hit particles and the crit sound at a higher pitch, on melee and on
   arrows.
@@ -674,12 +678,25 @@ changes here:
   dealtMult` only when it is below 1. Applied to the main target
   only, which the zeroed hit type already guarantees for sweep targets.
 - *Attacker timers and charges* live in the attacker's persistent NBT, the same as the hit memory
-  (2.2: no player-variable sync): the last-damage-taken tick (Muscle Memory), the last typed hit tick
-  (the streak's 4 s reset), and a charge count plus expiry tick each for Muscle Memory, Strength
-  Training, Crushing Blows, Counterattack and Maiming Shot. Expiries are compared with `tickCount`,
+  (2.2: no player-variable sync): the last-damage-taken tick `witchercraftLastHurtTick` (Muscle
+  Memory; set in `WitchercraftAfterDamage` for players, which only runs for health damage from an
+  attacker), the last typed hit tick (the streak's 4 s reset), and a charge count plus expiry tick each
+  for Strength Training, Crushing Blows, Counterattack and Maiming Shot. Expiries are compared with `tickCount`,
   so no per-tick countdown runs.
-- *Shield blocks* (Counterattack, Arrow Deflection) need a block event. If Blockly has no trigger
-  for it, a locked bridge like `WitchercraftAfterDamageBridge` calls a Blockly procedure.
+- *Muscle Memory* is the `MuscleMemoryActive` effect (+0.2 `ATTACK_SPEED`, `ADD_MULTIPLIED_BASE`).
+  `PerkModifiersConditional` adds it every tick it is missing while the perk is equipped and the
+  last hurt is 60+ ticks old (infinite duration so the HUD icon never blinks; ambient + particles on,
+  because vanilla ties the HUD icon to the particle flag) and removes it otherwise;
+  `WitchercraftAfterDamage` also removes it the moment you are hurt.
+- *Shield blocks* use MCreator's own `entity_blocks` trigger (NeoForge `LivingShieldBlockEvent`), so no bridge
+  is needed. `WitchercraftOnShieldBlock` (`~/Admin/Calc`) stamps `witchercraftCounterattackTick` on the blocking
+  player and plays the ready chime itself (`WitchercraftReadyChime` plays at `sourceentity`, which on this trigger is
+  the attacker). `WitchercraftHitBonus` adds +50 on a typed hit within 60 ticks; `WitchercraftOnFastHit` /
+  `WitchercraftOnStrongHit` zero the stamp and the streak; `WitchercraftComboLine` draws the burning shield (sig 1000).
+  Arrow Deflection will hang off the same trigger.
+- *Counterattack perk (slot 107):* `CounterattackEffect` (`~/Character Abilities/CombatPerks/Counterattack`), player
+  variables `witchercraftPerksCounterattack` / `witchercraftEquippedPerkCounterattack`, calls in `AllPerks` and
+  `DevClear`, icons `textures/screens/counterattack_*.png`.
 - *Removed (done).* Bleed (`Bleed`, `BleedHit`, `BleedTick`) and the Defence perk (`DefenceEffect`, its two player variables, its AllPerks, DevClear and PerkModifiers blocks). All moved to `trash/`; art to `_unused/` folders.
 
 **Known limitations.**

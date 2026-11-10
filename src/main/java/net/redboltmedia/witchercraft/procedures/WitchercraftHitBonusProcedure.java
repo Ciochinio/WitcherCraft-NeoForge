@@ -60,6 +60,13 @@ public class WitchercraftHitBonusProcedure {
 				bonus = bonus + 10 * (foes - 1);
 			}
 		}
+		if (sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkCounterattack && (sourceentity.getPersistentData().getDoubleOr("witchercraftHitType", 0) > 0 && (sourceentity.getPersistentData().getDoubleOr("witchercraftCounterattackTick", 0) > 0 && (sourceentity.tickCount - sourceentity.getPersistentData().getDoubleOr("witchercraftCounterattackTick", 0) >= 0 && sourceentity.tickCount - sourceentity.getPersistentData().getDoubleOr("witchercraftCounterattackTick", 0) <= 60)))) {
+			if (bonus > 0) {
+				sourceentity.getPersistentData().putString("witchercraftHitBonusLog", ((sourceentity.getPersistentData().getStringOr("witchercraftHitBonusLog", "")) + ", "));
+			}
+			sourceentity.getPersistentData().putString("witchercraftHitBonusLog", ((sourceentity.getPersistentData().getStringOr("witchercraftHitBonusLog", "")) + "Counterattack +50"));
+			bonus = bonus + 50;
+		}
 		if (bonus > 0) {
 			sourceentity.getPersistentData().putString("witchercraftHitBonusLog", (" (" + (sourceentity.getPersistentData().getStringOr("witchercraftHitBonusLog", "")) + ")"));
 		}

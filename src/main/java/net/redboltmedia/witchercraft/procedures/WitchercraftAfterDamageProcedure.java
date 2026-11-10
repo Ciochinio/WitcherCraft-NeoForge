@@ -4,6 +4,8 @@ import net.redboltmedia.witchercraft.init.WitchercraftModMobEffects;
 import net.redboltmedia.witchercraft.init.WitchercraftModAttributes;
 
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -20,19 +22,26 @@ public class WitchercraftAfterDamageProcedure {
 		if (damagesource == null || entity == null || sourceentity == null)
 			return;
 		double r = 0;
+		double stolen = 0;
+		if (entity instanceof Player) {
+			entity.getPersistentData().putDouble("witchercraftLastHurtTick", (entity.tickCount));
+			if (entity instanceof LivingEntity _entity)
+				_entity.removeEffect(WitchercraftModMobEffects.MUSCLE_MEMORY_ACTIVE);
+		}
 		if (sourceentity instanceof LivingEntity _livEnt0 && _livEnt0.hasEffect(WitchercraftModMobEffects.DEV_LOG)) {
 			r = Math.round(amount * 1000);
 			if (sourceentity instanceof ServerPlayer _player)
 				_player.sendSystemMessage(Component.literal(("after armor " + r / 1000)), false);
 		}
+		stolen = Mth.clamp(amount, 0, entity.getPersistentData().getDoubleOr("witchercraftLifeStealCap", 0));
 		if (sourceentity instanceof LivingEntity _livingEntity2 && _livingEntity2.getAttributes().hasAttribute(WitchercraftModAttributes.LIFE_STEAL) && sourceentity == (damagesource.getDirectEntity())
 				&& (sourceentity instanceof LivingEntity _livingEntity5 && _livingEntity5.getAttributes().hasAttribute(WitchercraftModAttributes.LIFE_STEAL) ? _livingEntity5.getAttribute(WitchercraftModAttributes.LIFE_STEAL).getValue() : 0) > 0) {
 			if (sourceentity instanceof LivingEntity _entity)
-				_entity.setHealth((float) ((sourceentity instanceof LivingEntity _livEnt ? _livEnt.getHealth() : -1) + amount
+				_entity.setHealth((float) ((sourceentity instanceof LivingEntity _livEnt ? _livEnt.getHealth() : -1) + stolen
 						* (sourceentity instanceof LivingEntity _livingEntity7 && _livingEntity7.getAttributes().hasAttribute(WitchercraftModAttributes.LIFE_STEAL) ? _livingEntity7.getAttribute(WitchercraftModAttributes.LIFE_STEAL).getValue() : 0)
 						* 0.01));
 			if (sourceentity instanceof LivingEntity _livEnt9 && _livEnt9.hasEffect(WitchercraftModMobEffects.DEV_LOG)) {
-				r = Math.round(amount
+				r = Math.round(stolen
 						* (sourceentity instanceof LivingEntity _livingEntity10 && _livingEntity10.getAttributes().hasAttribute(WitchercraftModAttributes.LIFE_STEAL) ? _livingEntity10.getAttribute(WitchercraftModAttributes.LIFE_STEAL).getValue() : 0)
 						* 0.01 * 1000);
 				if (sourceentity instanceof ServerPlayer _player)

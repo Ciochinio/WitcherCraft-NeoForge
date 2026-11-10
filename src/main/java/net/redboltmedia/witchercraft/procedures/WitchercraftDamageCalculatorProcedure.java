@@ -9,6 +9,11 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.bus.api.Event;
 
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.util.Mth;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
@@ -44,6 +49,7 @@ public class WitchercraftDamageCalculatorProcedure {
 		double takenBonus = 0;
 		double dealtMult = 0;
 		double executed = 0;
+		double normalHit = 0;
 		dealtMult = 1;
 		if (sourceentity instanceof LivingEntity _livEnt0 && _livEnt0.hasEffect(WitchercraftModMobEffects.CRIPPLED)) {
 			dealtMult = 0.8;
@@ -91,10 +97,22 @@ public class WitchercraftDamageCalculatorProcedure {
 						: 0) + hitBonus + takenBonus) * 0.01);
 				hit = hit * (1 + critBonus);
 				hit = hit * dealtMult;
-				if (critBonus > 0 && WitchercraftExecuteEnabledProcedure.execute() && !entity.is(TagKey.create(Registries.ENTITY_TYPE, Identifier.parse("witchercraft:execute_immune"))) && !(entity instanceof Player)
+				if (hitType == 2 && WitchercraftExecuteEnabledProcedure.execute(sourceentity) && !entity.is(TagKey.create(Registries.ENTITY_TYPE, Identifier.parse("witchercraft:execute_immune"))) && !(entity instanceof Player)
 						&& (entity instanceof LivingEntity _livEnt ? _livEnt.getHealth() : -1) < (entity instanceof LivingEntity _livEnt ? _livEnt.getMaxHealth() : -1) * 0.2) {
-					hit = (entity instanceof LivingEntity _livEnt ? _livEnt.getMaxHealth() : -1) * 100 + 100;
+					normalHit = hit;
+					hit = 9999;
 					executed = 1;
+					if (world instanceof Level _level) {
+						if (!_level.isClientSide()) {
+							_level.playSound(null, BlockPos.containing(entity.getX(), entity.getY(), entity.getZ()), BuiltInRegistries.SOUND_EVENT.getValue(Identifier.parse("item.mace.smash_ground_heavy")), SoundSource.PLAYERS, 1, (float) 1.2);
+						} else {
+							_level.playLocalSound((entity.getX()), (entity.getY()), (entity.getZ()), BuiltInRegistries.SOUND_EVENT.getValue(Identifier.parse("item.mace.smash_ground_heavy")), SoundSource.PLAYERS, 1, (float) 1.2, false);
+						}
+					}
+				}
+				entity.getPersistentData().putDouble("witchercraftLifeStealCap", (entity instanceof LivingEntity _livEnt ? _livEnt.getHealth() : -1));
+				if (executed == 1) {
+					entity.getPersistentData().putDouble("witchercraftLifeStealCap", Mth.clamp(normalHit, 0, entity instanceof LivingEntity _livEnt ? _livEnt.getHealth() : -1));
 				}
 				if (event instanceof LivingIncomingDamageEvent _event) {
 					_event.setAmount((float) hit);

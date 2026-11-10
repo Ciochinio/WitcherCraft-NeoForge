@@ -12,6 +12,10 @@ public class WitchercraftOnFastHitProcedure {
 	public static void execute(LevelAccessor world, Entity entity, Entity sourceentity) {
 		if (entity == null || sourceentity == null)
 			return;
+		if (sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkCounterattack && (sourceentity.getPersistentData().getDoubleOr("witchercraftCounterattackTick", 0) > 0 && (sourceentity.tickCount - sourceentity.getPersistentData().getDoubleOr("witchercraftCounterattackTick", 0) >= 0 && sourceentity.tickCount - sourceentity.getPersistentData().getDoubleOr("witchercraftCounterattackTick", 0) <= 60))) {
+			sourceentity.getPersistentData().putDouble("witchercraftCounterattackTick", 0);
+			sourceentity.getPersistentData().putDouble("witchercraftHitStreak", 0);
+		}
 		if (sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkStrengthTraining) {
 			if (!(sourceentity.getPersistentData().getDoubleOr("witchercraftStrengthTrainingTick", 0) > 0 && (sourceentity.tickCount - sourceentity.getPersistentData().getDoubleOr("witchercraftStrengthTrainingTick", 0) >= 0 && sourceentity.tickCount - sourceentity.getPersistentData().getDoubleOr("witchercraftStrengthTrainingTick", 0) <= 80))) {
 				WitchercraftReadyChimeProcedure.execute(world, sourceentity);

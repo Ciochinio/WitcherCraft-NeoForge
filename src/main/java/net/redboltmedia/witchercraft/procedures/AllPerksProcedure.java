@@ -10,6 +10,7 @@ public class AllPerksProcedure {
 		ColdBloodEffectProcedure.execute(entity);
 		CripplingShotEffectProcedure.execute(entity);
 		CripplingStrikesEffectProcedure.execute(entity);
+		CounterattackEffectProcedure.execute(entity);
 		CrushingBlowsEffectProcedure.execute(entity);
 		DeadlyPrecisionEffectProcedure.execute(entity);
 		FleetFootedEffectProcedure.execute(entity);

@@ -1,0 +1,25 @@
+{
+  "_fv": 89,
+  "_type": "potioneffect",
+  "definition": {
+    "effectName": "Muscle Memory",
+    "icon": "muscle_memory_active",
+    "color": {
+      "value": -7351297,
+      "falpha": 0.0
+    },
+    "onAddedSound": "",
+    "isInstant": false,
+    "mobEffectCategory": "BENEFICIAL",
+    "renderStatusInInventory": true,
+    "renderStatusInHUD": true,
+    "isCuredbyHoney": false,
+    "modifiers": [
+      {
+        "attribute": "ATTACK_SPEED",
+        "amount": 0.2,
+        "operation": "ADD_MULTIPLIED_BASE"
+      }
+    ]
+  }
+}

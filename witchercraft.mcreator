@@ -3811,6 +3811,24 @@
       "path": "~/Character Abilities/CombatPerks/Crippling Strikes"
     },
     {
+      "name": "CounterattackEffect",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "counterattack_effect",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/CounterattackEffectProcedure.java"
+        ],
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ]
+      }
+    },
+    {
       "name": "StrengthTrainingEffect",
       "type": "procedure",
       "compiles": true,
@@ -5092,6 +5110,19 @@
       "metadata": {
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/potion/CrippledMobEffect.java"
+        ]
+      },
+      "path": "~/StatusEffects"
+    },
+    {
+      "name": "MuscleMemoryActive",
+      "type": "potioneffect",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "muscle_memory_active",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/potion/MuscleMemoryActiveMobEffect.java"
         ]
       },
       "path": "~/StatusEffects"
@@ -9369,7 +9400,12 @@
       "locked_code": false,
       "registry_name": "witchercraft_execute_enabled",
       "metadata": {
-        "dependencies": [],
+        "dependencies": [
+          {
+            "name": "sourceentity",
+            "type": "entity"
+          }
+        ],
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftExecuteEnabledProcedure.java"
         ],
@@ -9534,6 +9570,29 @@
         ],
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftDamageLogProcedure.java"
+        ]
+      },
+      "path": "~/Admin/Calc"
+    },
+    {
+      "name": "WitchercraftOnShieldBlock",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "witchercraft_on_shield_block",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftOnShieldBlockProcedure.java"
         ]
       },
       "path": "~/Admin/Calc"
@@ -9849,6 +9908,12 @@
     },
     {
       "name": "witchercraftEquippedPerkCripplingShot",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
+      "name": "witchercraftEquippedPerkCounterattack",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
@@ -10286,6 +10351,12 @@
       "value": "false"
     },
     {
+      "name": "witchercraftPerksCounterattack",
+      "type": "logic",
+      "scope": "player_persistent",
+      "value": "false"
+    },
+    {
       "name": "witchercraftPerksCripplingStrikes",
       "type": "logic",
       "scope": "player_persistent",
@@ -10622,18 +10693,20 @@
       "perk.witchercraft.coldblood.desc": "If no one nearby (5 blocks) add +5 to damage.",
       "perk.witchercraft.cripplingshot.name": "Crippling Shot",
       "perk.witchercraft.cripplingshot.desc": "If main hand weapon ranged, add 50% to crit damage.",
+      "perk.witchercraft.counterattack.name": "Counterattack",
+      "perk.witchercraft.counterattack.desc": "After a shield block, your next charged attack within 3 s deals +50% damage.",
       "perk.witchercraft.cripplingstrikes.name": "Crippling Strikes",
       "perk.witchercraft.cripplingstrikes.desc": "Fast crits cripple the target: it deals 20% less damage for 3 s.",
       "perk.witchercraft.crushingblows.name": "Crushing Blows",
       "perk.witchercraft.crushingblows.desc": "A strong crit charges your next 2 strong attacks within 6 s: each deals +40% damage. Spending them cannot re-charge it.",
       "perk.witchercraft.deadlyprecision.name": "Deadly Precision",
-      "perk.witchercraft.deadlyprecision.desc": "Add 1% chance to instantly kill.",
+      "perk.witchercraft.deadlyprecision.desc": "Strong attacks instantly kill enemies below 20% health. Bosses and players are immune.",
       "perk.witchercraft.fleetfooted.name": "Fleet Footed",
       "perk.witchercraft.fleetfooted.desc": "Add movement speed.",
       "perk.witchercraft.floodofanger.name": "Flood Of Anger",
       "perk.witchercraft.floodofanger.desc": "+10% melee damage for each monster within 5 blocks after the first, up to +30%.",
       "perk.witchercraft.musclememory.name": "Muscle Memory",
-      "perk.witchercraft.musclememory.desc": "Add +3 to damage dealt.",
+      "perk.witchercraft.musclememory.desc": "While you have not taken damage for 3 s: +20% attack speed.",
       "perk.witchercraft.threestrikes.name": "Three Strikes",
       "perk.witchercraft.threestrikes.desc": "Every 4th charged hit of the same type in a row deals +50% damage. The streak resets after 4 s without a charged hit.",
       "perk.witchercraft.razorfocus.name": "Razor Focus",
@@ -10853,6 +10926,7 @@
       "effect.witchercraft.dev_log": "Dev Log",
       "effect.witchercraft.sundered": "Sundered",
       "effect.witchercraft.crippled": "Crippled",
+      "effect.witchercraft.muscle_memory_active": "Muscle Memory",
       "gui.witchercraft.character_gui.label_passivehealthregen": "HealthRegen",
       "gui.witchercraft.character_gui.label_staminaregen": "StaminaRegen",
       "gui.witchercraft.player_stats_overlay.label_staminaregen": "StaminaRegen",

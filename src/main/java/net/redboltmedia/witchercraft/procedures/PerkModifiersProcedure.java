@@ -25,18 +25,6 @@ public class PerkModifiersProcedure {
 				_entity.getAttribute(WitchercraftModAttributes.POTION_DURATION).removeModifier(Identifier.parse("witchercraft:perk_griffin_school"));
 			}
 		}
-		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkMuscleMemory == true) {
-			if (entity instanceof LivingEntity _entity) {
-				AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:perk_muscle_memory"), 3, AttributeModifier.Operation.ADD_VALUE);
-				if (!_entity.getAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE).hasModifier(modifier.id())) {
-					_entity.getAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE).addTransientModifier(modifier);
-				}
-			}
-		} else {
-			if (entity instanceof LivingEntity _entity) {
-				_entity.getAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE).removeModifier(Identifier.parse("witchercraft:perk_muscle_memory"));
-			}
-		}
 		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkGourmet == true) {
 			if (entity instanceof LivingEntity _entity) {
 				AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:perk_gourmet"), 0.3333, AttributeModifier.Operation.ADD_VALUE);

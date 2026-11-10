@@ -15,6 +15,7 @@
 
 package net.redboltmedia.witchercraft;
 
+import net.redboltmedia.witchercraft.procedures.WitchercraftExecuteEnabledProcedure;
 import net.redboltmedia.witchercraft.procedures.ToxicityHudOverdoseProcedure;
 import net.redboltmedia.witchercraft.procedures.ToxicityHudFillProcedure;
 import net.redboltmedia.witchercraft.procedures.QuenHudShowProcedure;
@@ -195,15 +196,33 @@ public class WitchercraftHud {
 		Player player = minecraft.player;
 		if (player == null || minecraft.options.hideGui)
 			return;
-		String line = player.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftComboLine;
-		if (line == null || line.isEmpty())
-			return;
 		GuiGraphicsExtractor graphics = event.getGuiGraphics();
-		graphics.pose().pushMatrix();
-		graphics.pose().translate(graphics.guiWidth() / 2f, graphics.guiHeight() / 2f + COMBAT_LINE_Y_BELOW_CENTRE);
-		graphics.pose().scale(COMBAT_LINE_SCALE, COMBAT_LINE_SCALE);
-		graphics.text(minecraft.font, line, -minecraft.font.width(line) / 2, 0, -1, true);
-		graphics.pose().popMatrix();
+		String line = player.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftComboLine;
+		if (line != null && !line.isEmpty()) {
+			graphics.pose().pushMatrix();
+			graphics.pose().translate(graphics.guiWidth() / 2f, graphics.guiHeight() / 2f + COMBAT_LINE_Y_BELOW_CENTRE);
+			graphics.pose().scale(COMBAT_LINE_SCALE, COMBAT_LINE_SCALE);
+			graphics.text(minecraft.font, line, -minecraft.font.width(line) / 2, 0, -1, true);
+			graphics.pose().popMatrix();
+		}
+		if (isExecutable(player, minecraft.crosshairPickEntity))
+			graphics.blit(RenderPipelines.GUI_TEXTURED, EXECUTE_MARKER, (graphics.guiWidth() - EXECUTE_MARKER_SIZE) / 2, (graphics.guiHeight() - EXECUTE_MARKER_SIZE) / 2, 0, 0, EXECUTE_MARKER_SIZE, EXECUTE_MARKER_SIZE, EXECUTE_MARKER_SIZE, EXECUTE_MARKER_SIZE);
+	}
+
+	/**
+	 * Execute marker: four red diagonal ticks around the crosshair, turning it into an 8-point reticle, while
+	 * the entity under it would die to a strong attack (GDD 5, Execute). Mirrors the check in WitchercraftDamageCalculator; keep the two in step.
+	 * crosshairPickEntity is vanilla's own pick at the player's interaction range, and mob health is
+	 * synced to clients, so this needs no server help.
+	 */
+	/** Odd size, so its centre pixel lands on vanilla's crosshair centre ((gui - 15) / 2 + 7) at any gui width. */
+	private static final Identifier EXECUTE_MARKER = Identifier.parse("witchercraft:textures/screens/execute_marker.png");
+	private static final int EXECUTE_MARKER_SIZE = 11;
+	private static final TagKey<EntityType<?>> EXECUTE_IMMUNE = TagKey.create(Registries.ENTITY_TYPE, Identifier.parse("witchercraft:execute_immune"));
+
+	private static boolean isExecutable(Player player, Entity target) {
+		return target instanceof LivingEntity living && !(target instanceof Player) && living.isAlive() && living.getHealth() < living.getMaxHealth() * 0.2f
+				&& !target.is(EXECUTE_IMMUNE) && WitchercraftExecuteEnabledProcedure.execute(player);
 	}
 	/**
 	 * The medallion is not a bar and deliberately does not take part in the cursor protocol. It

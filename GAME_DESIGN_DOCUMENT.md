@@ -479,13 +479,13 @@ On a melee hit, the weapon's base damage is combined with your stats:
 hit         = (base + AdditionalDamage + oil bonus) x (1 + IncreasedDamage% + hit bonus% + taken%)
 strong      = hit x (1 + 50% + crit bonus) (see Fast and strong attacks, Crits)
 fast        = hit x (1 + crit bonus)
-life steal  = damage dealt x LifeSteal%    (damage actually dealt, after armor)
+life steal  = damage dealt x LifeSteal%    (damage actually dealt, after armor, capped at the target's health)
 arrow       = vanilla damage x (1 + arrow bonus%) x (1 + crit bonus)
 crippled    = anything a Crippled entity deals x 0.8, after the steps above, before armor
 ```
 
 - **Additional Damage** - flat damage added before the percentage multiplier. After the Combat perk
-  rework no perk grants it any more (Muscle Memory, Cold Blood and Flood of Anger became
+  rework no perk grants it any more (Muscle Memory became attack speed; Cold Blood and Flood of Anger became
   percentages); it stays in the formula for gear and potions to use later.
 - **Increased Damage** - a percentage multiplier applied to the total.
 - **Hit bonus** - extra % for this one hit from perks (e.g. Strength Training's "the next strong
@@ -498,7 +498,8 @@ crippled    = anything a Crippled entity deals x 0.8, after the steps above, bef
   linearly. Only the crit multiplies on top.
 - **Crit Damage** - the bonus a crit adds (see [Crits](#crits)).
 - **Life Steal** - the percentage of damage actually dealt, after the target's armor, that returns
-  to you as health.
+  to you as health. It can't steal more than the target had left, so overkill hits and Executes
+  heal only for the health they actually took. An Execute heals as the normal hit would have.
 
 The witcher stats apply to **melee only**. Signs scale with [Sign Intensity](#sign-intensity),
 bombs will get their own scaling, and arrows keep vanilla damage, changed only by crits and by
@@ -551,7 +552,6 @@ Three Strikes, hit 2:         fast fast  ·
 Three Strikes, hit 3:         [fast, burning]       the slots collapse into one buffed hit: the strike
 Strength Training armed:      [strong, burning]
 Crushing Blows armed:         [strong, burning] [strong, burning]
-Muscle Memory armed:          [fast, burning] x3
 Counterattack armed:          [shield, burning]
 ```
 
@@ -562,14 +562,15 @@ Counterattack armed:          [shield, burning]
 - Only what is armed appears; with nothing armed the line is empty. A charge disappears the moment
   it is spent or runs out.
 - **A hit that spends a charge ends a phrase, it doesn't start one**: the strong attack that spends
-  Strength Training (and later Crushing Blows or Counterattack) does not count for Three Strikes,
-  the next hit starts the streak at 1. Muscle Memory's buffed fast hits are the exception, they
-  still count, so a Muscle Memory run feeds a fast streak.
+  Strength Training, Crushing Blows or Counterattack does not count for Three Strikes,
+  the next hit starts the streak at 1.
+- **States are not charges.** A perk that is simply on or off (Muscle Memory's attack speed) shows
+  as a status effect icon in the effect HUD, never on the combat line.
 - A **ready chime** plays whenever a new charge arms. The line shows which one.
 - There is no separate timing bar: vanilla's attack indicator already shows when the next charged
   swing is ready.
 
-Built so far: the Three Strikes streak and the strong charges (Strength Training, Crushing Blows). The icons are first drafts.
+Built so far: the Three Strikes streak, the strong charges (Strength Training, Crushing Blows) and the Counterattack shield. The icons are first drafts.
 
 ### Crits
 
@@ -624,11 +625,13 @@ re-arm Maiming Shot.
 ### Execute
 
 The pinnacle of the strong-attack line, carried by **Deadly Precision**: a **strong attack** on a
-target below **20%** of its maximum health kills it outright. There is no roll - the strong attack
+target below **20%** of its maximum health kills it outright (the hit becomes a flat **9999** damage). There is no roll - the strong attack
 is the condition. Bosses are immune through the `witchercraft:execute_immune` tag (the Ender Dragon,
-the Wither, the Warden, and future bosses). Execute doesn't work on players. *Not built yet* - the
-seam exists but is off, and today it checks for any crit bonus (which the strong attack's +50%
-counts as) instead of the hit type.
+the Wither, the Warden, and future bosses). Execute doesn't work on players. An Execute plays a heavy mace smash on the target, so you can tell
+it from a normal kill. While you aim at a target you could execute right now (in reach, below 20%,
+not immune, Deadly Precision equipped), the crosshair grows **four red diagonal ticks** (an 8-point reticle), so you never have
+to guess its health. Life steal treats an Execute as the normal hit it replaced (capped at the health
+the target had), so it never heals more than that hit would have. Built; the reticle is a first draft.
 
 ### Stats are always live
 
@@ -1475,7 +1478,7 @@ Reflexes (slow-motion aiming and headshots). The old **Defence** perk (+4 max he
 
 | Perk | Effect | Status |
 |------|--------|--------|
-| **Muscle Memory** | After **3 s** without taking damage, your next **3** fast attacks in a row deal +**30%**. A strong attack or taking damage ends the run; uncharged hits are ignored. A fully blocked hit is not damage taken | *Not built* - today +**3** Additional Damage |
+| **Muscle Memory** | While no attacker has hurt you for **3 s**, +**20%** attack speed (faster recharge for every swing). Shown as the **Muscle Memory** status effect (faint ambient particles, no expiry). Only health damage from an attacker breaks it: blocked, Quen'd and dodged hits don't, and neither do fall, fire, drowning or poison | Built - reworked from the 3 buffed fast hits, which re-armed instantly and cluttered the combat line |
 | **Flood of Anger** | +**10%** melee damage for each monster within **5** blocks after the first, up to +**30%** (4 monsters). Any living Monster counts, idle zombified piglins and endermen too; slimes, magma cubes, ghasts, phantoms, shulkers and hoglins are not Monsters in vanilla and don't. Counted when the hit lands; every melee hit, charged or not | Built |
 | **Three Strikes** | Every **4th** typed hit of the same type in a row deals +**50%**. The streak resets after **4 s** without a typed hit. While equipped, three slots of the streak's attack icon on the [combat line](#the-combat-line) show the combo. On the 3rd hit they collapse into one burning icon and the ready chime plays: the next hit is the strike. A hit that spends another perk's charge does not count toward the streak | Built - replaces Precise Blows |
 | **Crippling Strikes** | A fast crit **Cripples** the target: it deals -**20%** damage for **3 s**; another fast crit restarts it, no stacking. Main target only | Built |
@@ -1489,13 +1492,13 @@ Reflexes (slow-motion aiming and headshots). The old **Defence** perk (+4 max he
 | **Crushing Blows** | A strong crit charges the next **2** strong attacks within **6 s** with +**40%**. Strong attacks that spend the charge can't re-charge it, and they don't count for Three Strikes | Built |
 | **Sunder Armor** | Each strong attack adds a **Sundered** stack: +**10%** damage taken per stack, up to **3**, for **8 s**; each stack restarts the 8 s. Main target only | Built |
 | **Undying** | When killed, restore to **50%** health. Once every **15** minutes | Built |
-| **Deadly Precision** | [Execute](#execute): a strong attack kills a target below **20%** health. Bosses are immune | *Not built* |
+| **Deadly Precision** | [Execute](#execute): a strong attack kills a target below **20%** health, with a heavy mace smash. Bosses and players are immune | Built |
 
 *Shield, bow and last stand*
 
 | Perk | Effect | Status |
 |------|--------|--------|
-| **Counterattack** | After you block a hit with a shield, your next charged attack within **3 s** deals +**50%**. One charge; blocking again refreshes it | *Not built* - new |
+| **Counterattack** | After you block a hit with a shield (melee or projectile), your next charged attack, fast or strong, within **3 s** deals +**50%**. One charge; blocking again refreshes it. Uncharged hits don't spend it; the spending hit resets the Three Strikes streak | Built - new perk in slot 107; tree icons are placeholder copies of the old Defence art |
 | **Arrow Deflection** | An arrow, bolt or trident blocked within **0.5 s** of the shield going up flies back at the shooter for the damage it would have dealt. It counts as your shot and can't be picked up | *Not built* - new, replaces Razor Focus |
 | **Cold Blood** | Fully drawn arrows and crossbow bolts deal +**25%** while no hostile is within **5** blocks of you | *Not built* - today +**5** Additional Damage while no enemy is near |
 | **Bloody Rage** | +**40%** damage on melee hits while you are below **30%** health. Taken from Witcher 1: the tree's frame is Witcher 3, but perks may come from the whole saga when they add a decision | *Not built* - replaces Anatomical Knowledge |
