@@ -9445,11 +9445,11 @@
       "path": "~/Admin/Calc"
     },
     {
-      "name": "WitchercraftIncomingDamage",
+      "name": "WitchercraftDamageCalculator",
       "type": "procedure",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "witchercraft_incoming_damage",
+      "registry_name": "witchercraft_damage_calculator",
       "metadata": {
         "dependencies": [
           {
@@ -9478,7 +9478,62 @@
           }
         ],
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftIncomingDamageProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftDamageCalculatorProcedure.java"
+        ]
+      },
+      "path": "~/Admin/Calc"
+    },
+    {
+      "name": "WitchercraftDamageLog",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "witchercraft_damage_log",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "sourceentity",
+            "type": "entity"
+          },
+          {
+            "name": "kind",
+            "type": "number"
+          },
+          {
+            "name": "amount",
+            "type": "number"
+          },
+          {
+            "name": "hit",
+            "type": "number"
+          },
+          {
+            "name": "crit",
+            "type": "number"
+          },
+          {
+            "name": "oil",
+            "type": "number"
+          },
+          {
+            "name": "hitBonus",
+            "type": "number"
+          },
+          {
+            "name": "takenBonus",
+            "type": "number"
+          },
+          {
+            "name": "hitType",
+            "type": "number"
+          },
+          {
+            "name": "executed",
+            "type": "number"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftDamageLogProcedure.java"
         ]
       },
       "path": "~/Admin/Calc"
@@ -9661,6 +9716,10 @@
           {
             "name": "sourceentity",
             "type": "entity"
+          },
+          {
+            "name": "world",
+            "type": "world"
           }
         ],
         "files": [
@@ -10572,7 +10631,7 @@
       "perk.witchercraft.fleetfooted.name": "Fleet Footed",
       "perk.witchercraft.fleetfooted.desc": "Add movement speed.",
       "perk.witchercraft.floodofanger.name": "Flood Of Anger",
-      "perk.witchercraft.floodofanger.desc": "If someone nearby (5 blocks) add +5 to damage.",
+      "perk.witchercraft.floodofanger.desc": "+10% melee damage for each monster within 5 blocks after the first, up to +30%.",
       "perk.witchercraft.musclememory.name": "Muscle Memory",
       "perk.witchercraft.musclememory.desc": "Add +3 to damage dealt.",
       "perk.witchercraft.threestrikes.name": "Three Strikes",

@@ -638,10 +638,12 @@ and active potions or decoctions - the same live-aggregation model as
 bonus applies the moment its source does and disappears the moment the source does, with no
 recalculation step in between and nothing to fall out of sync. A few current examples:
 
-- **Flood of Anger** adds **10%** increased damage for each hostile within 5 blocks beyond the
-  first, up to **30%**, rising and falling as enemies come and go.
 - **Water Hag Decoction** adds **40%** increased damage while you're at full health.
 - **Thunderbolt** turns every charged hit into a crit during a thunderstorm.
+
+Combat perks that depend on the moment of the hit are the exception: they are worked out when the
+hit lands and show in the hit bonus, not on the character screen. **Flood of Anger** is one: it
+counts the monsters around you at that instant.
 
 The character screen surfaces the full stat line:
 
@@ -1474,7 +1476,7 @@ Reflexes (slow-motion aiming and headshots). The old **Defence** perk (+4 max he
 | Perk | Effect | Status |
 |------|--------|--------|
 | **Muscle Memory** | After **3 s** without taking damage, your next **3** fast attacks in a row deal +**30%**. A strong attack or taking damage ends the run; uncharged hits are ignored. A fully blocked hit is not damage taken | *Not built* - today +**3** Additional Damage |
-| **Flood of Anger** | +**10%** Increased Damage for each hostile within **5** blocks beyond the first, up to +**30%** | *Not built* - today +**5** Additional Damage while an enemy is near |
+| **Flood of Anger** | +**10%** melee damage for each monster within **5** blocks after the first, up to +**30%** (4 monsters). Any living Monster counts, idle zombified piglins and endermen too; slimes, magma cubes, ghasts, phantoms, shulkers and hoglins are not Monsters in vanilla and don't. Counted when the hit lands; every melee hit, charged or not | Built |
 | **Three Strikes** | Every **4th** typed hit of the same type in a row deals +**50%**. The streak resets after **4 s** without a typed hit. While equipped, three slots of the streak's attack icon on the [combat line](#the-combat-line) show the combo. On the 3rd hit they collapse into one burning icon and the ready chime plays: the next hit is the strike. A hit that spends another perk's charge does not count toward the streak | Built - replaces Precise Blows |
 | **Crippling Strikes** | A fast crit **Cripples** the target: it deals -**20%** damage for **3 s**; another fast crit restarts it, no stacking. Main target only | Built |
 | **Fleet Footed** | +**15%** movement speed | Built |

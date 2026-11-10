@@ -15,15 +15,13 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.tags.TagKey;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.resources.Identifier;
-import net.minecraft.network.chat.Component;
 import net.minecraft.core.registries.Registries;
 
 import javax.annotation.Nullable;
 
 @EventBusSubscriber
-public class WitchercraftIncomingDamageProcedure {
+public class WitchercraftDamageCalculatorProcedure {
 	@SubscribeEvent
 	public static void onEntityAttacked(LivingIncomingDamageEvent event) {
 		if (event.getEntity() != null) {
@@ -41,21 +39,17 @@ public class WitchercraftIncomingDamageProcedure {
 		double hit = 0;
 		double critBonus = 0;
 		double oil = 0;
-		double r = 0;
 		double hitType = 0;
 		double hitBonus = 0;
 		double takenBonus = 0;
 		double dealtMult = 0;
+		double executed = 0;
 		dealtMult = 1;
 		if (sourceentity instanceof LivingEntity _livEnt0 && _livEnt0.hasEffect(WitchercraftModMobEffects.CRIPPLED)) {
 			dealtMult = 0.8;
 		}
 		if (sourceentity instanceof LivingEntity _livingEntity0 && _livingEntity0.getAttributes().hasAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE)) {
 			if (sourceentity == immediatesourceentity && !damagesource.is(DamageTypes.THORNS)) {
-				if (sourceentity instanceof LivingEntity _livEntS && _livEntS.hasEffect(WitchercraftModMobEffects.DEV_LOG)) {
-					if (sourceentity instanceof ServerPlayer _player)
-						_player.sendSystemMessage(Component.literal("\u00A76----------------------------------------------"), false);
-				}
 				critBonus = 0;
 				hitType = 0;
 				if (sourceentity.getPersistentData().getDoubleOr("witchercraftHitTick", 0) == sourceentity.tickCount) {
@@ -90,7 +84,7 @@ public class WitchercraftIncomingDamageProcedure {
 							: 0) * 0.01);
 				}
 				hit = hit + oil;
-				hitBonus = WitchercraftHitBonusProcedure.execute(sourceentity);
+				hitBonus = WitchercraftHitBonusProcedure.execute(world, sourceentity);
 				takenBonus = WitchercraftDamageTakenBonusProcedure.execute(entity);
 				hit = hit * (1 + ((sourceentity instanceof LivingEntity _livingEntity5 && _livingEntity5.getAttributes().hasAttribute(WitchercraftModAttributes.INCREASED_DAMAGE)
 						? _livingEntity5.getAttribute(WitchercraftModAttributes.INCREASED_DAMAGE).getValue()
@@ -100,62 +94,13 @@ public class WitchercraftIncomingDamageProcedure {
 				if (critBonus > 0 && WitchercraftExecuteEnabledProcedure.execute() && !entity.is(TagKey.create(Registries.ENTITY_TYPE, Identifier.parse("witchercraft:execute_immune"))) && !(entity instanceof Player)
 						&& (entity instanceof LivingEntity _livEnt ? _livEnt.getHealth() : -1) < (entity instanceof LivingEntity _livEnt ? _livEnt.getMaxHealth() : -1) * 0.2) {
 					hit = (entity instanceof LivingEntity _livEnt ? _livEnt.getMaxHealth() : -1) * 100 + 100;
-					if (sourceentity instanceof LivingEntity _livEnt15 && _livEnt15.hasEffect(WitchercraftModMobEffects.DEV_LOG)) {
-						if (sourceentity instanceof ServerPlayer _player)
-							_player.sendSystemMessage(Component.literal("execute!"), false);
-					}
+					executed = 1;
 				}
 				if (event instanceof LivingIncomingDamageEvent _event) {
 					_event.setAmount((float) hit);
 				}
 				sourceentity.getPersistentData().putDouble("witchercraftHitType", 0);
-				if (sourceentity instanceof LivingEntity _livEnt17 && _livEnt17.hasEffect(WitchercraftModMobEffects.DEV_LOG)) {
-					if (hitType == 1) {
-						if (sourceentity instanceof ServerPlayer _player)
-							_player.sendSystemMessage(Component.literal(("fast x" + Math.round(sourceentity.getPersistentData().getDoubleOr("witchercraftHitStreak", 0)))), false);
-					}
-					if (hitType == 2) {
-						if (sourceentity instanceof ServerPlayer _player)
-							_player.sendSystemMessage(Component.literal(("strong x" + Math.round(sourceentity.getPersistentData().getDoubleOr("witchercraftHitStreak", 0)))), false);
-					}
-					if (hitType == 0) {
-						if (sourceentity instanceof ServerPlayer _player)
-							_player.sendSystemMessage(Component.literal("no type"), false);
-					}
-					r = Math.round(amount * 1000);
-					if (sourceentity instanceof ServerPlayer _player)
-						_player.sendSystemMessage(Component.literal(("base " + r / 1000)), false);
-					r = Math.round((sourceentity instanceof LivingEntity _livingEntity19 && _livingEntity19.getAttributes().hasAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE)
-							? _livingEntity19.getAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE).getValue()
-							: 0) * 1000);
-					if (sourceentity instanceof ServerPlayer _player)
-						_player.sendSystemMessage(Component.literal(("flat +" + r / 1000)), false);
-					r = Math.round(oil * 1000);
-					if (sourceentity instanceof ServerPlayer _player)
-						_player.sendSystemMessage(Component.literal(("oil +" + r / 1000)), false);
-					r = Math.round((sourceentity instanceof LivingEntity _livingEntity22 && _livingEntity22.getAttributes().hasAttribute(WitchercraftModAttributes.INCREASED_DAMAGE)
-							? _livingEntity22.getAttribute(WitchercraftModAttributes.INCREASED_DAMAGE).getValue()
-							: 0) * 1000);
-					if (sourceentity instanceof ServerPlayer _player)
-						_player.sendSystemMessage(Component.literal(("damage +" + r / 1000 + "%")), false);
-					r = Math.round(hitBonus * 1000);
-					if (sourceentity instanceof ServerPlayer _player)
-						_player.sendSystemMessage(Component.literal(("hit bonus +" + r / 1000 + ("%" + (sourceentity.getPersistentData().getStringOr("witchercraftHitBonusLog", ""))))), false);
-					r = Math.round(takenBonus * 1000);
-					if (sourceentity instanceof ServerPlayer _player)
-						_player.sendSystemMessage(Component.literal(("taken +" + r / 1000 + "%")), false);
-					if (hitType == 2) {
-						if (sourceentity instanceof ServerPlayer _player)
-							_player.sendSystemMessage(Component.literal("strong +50%"), false);
-						critBonus = critBonus - 0.5;
-					}
-					r = Math.round(critBonus * 100 * 1000);
-					if (sourceentity instanceof ServerPlayer _player)
-						_player.sendSystemMessage(Component.literal(("crit +" + r / 1000 + "%")), false);
-					r = Math.round(hit * 1000);
-					if (sourceentity instanceof ServerPlayer _player)
-						_player.sendSystemMessage(Component.literal(("= " + r / 1000)), false);
-				}
+				WitchercraftDamageLogProcedure.execute(sourceentity, 1, amount, hit, critBonus, oil, hitBonus, takenBonus, hitType, executed);
 				if (hitType > 0) {
 					if (hitType == 1) {
 						WitchercraftOnFastHitProcedure.execute(world, entity, sourceentity);
@@ -164,10 +109,6 @@ public class WitchercraftIncomingDamageProcedure {
 					}
 				}
 			} else {
-				if (sourceentity instanceof LivingEntity _livEntA && _livEntA.hasEffect(WitchercraftModMobEffects.DEV_LOG)) {
-					if (sourceentity instanceof ServerPlayer _player)
-						_player.sendSystemMessage(Component.literal("\u00A76----------------------------------------------"), false);
-				}
 				hit = amount;
 				critBonus = 0;
 				if (IsCritArrowProcedure.execute(immediatesourceentity) && WitchercraftCritConditionProcedure.execute(world, sourceentity)) {
@@ -180,22 +121,7 @@ public class WitchercraftIncomingDamageProcedure {
 				if (event instanceof LivingIncomingDamageEvent _event) {
 					_event.setAmount((float) hit);
 				}
-				if (sourceentity instanceof LivingEntity _livEnt27 && _livEnt27.hasEffect(WitchercraftModMobEffects.DEV_LOG)) {
-					r = Math.round(amount * 1000);
-					if (sourceentity instanceof ServerPlayer _player)
-						_player.sendSystemMessage(Component.literal(("arrow " + r / 1000)), false);
-					if (hitType == 2) {
-						if (sourceentity instanceof ServerPlayer _player)
-							_player.sendSystemMessage(Component.literal("strong +50%"), false);
-						critBonus = critBonus - 0.5;
-					}
-					r = Math.round(critBonus * 100 * 1000);
-					if (sourceentity instanceof ServerPlayer _player)
-						_player.sendSystemMessage(Component.literal(("crit +" + r / 1000 + "%")), false);
-					r = Math.round(hit * 1000);
-					if (sourceentity instanceof ServerPlayer _player)
-						_player.sendSystemMessage(Component.literal(("= " + r / 1000)), false);
-				}
+				WitchercraftDamageLogProcedure.execute(sourceentity, 2, amount, hit, critBonus, 0, 0, 0, 0, 0);
 			}
 		} else {
 			if (dealtMult < 1) {

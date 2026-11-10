@@ -59,18 +59,6 @@ public class PerkModifiersConditionalProcedure {
 					_entity.getAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE).removeModifier(Identifier.parse("witchercraft:perk_cold_blood"));
 				}
 			}
-			if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkFloodOfAnger == true && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEnemyNearby == true) {
-				if (entity instanceof LivingEntity _entity) {
-					AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:perk_flood_of_anger"), 5, AttributeModifier.Operation.ADD_VALUE);
-					if (!_entity.getAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE).hasModifier(modifier.id())) {
-						_entity.getAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE).addTransientModifier(modifier);
-					}
-				}
-			} else {
-				if (entity instanceof LivingEntity _entity) {
-					_entity.getAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE).removeModifier(Identifier.parse("witchercraft:perk_flood_of_anger"));
-				}
-			}
 			if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkSunAndStars == true && world instanceof Level _lvl17 && _lvl17.isBrightOutside()) {
 				if (entity instanceof LivingEntity _entity) {
 					AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:perk_sun_and_stars_day"), 0.3333, AttributeModifier.Operation.ADD_VALUE);
