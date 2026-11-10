@@ -481,6 +481,7 @@ strong      = hit x (1 + 50% + crit bonus) (see Fast and strong attacks, Crits)
 fast        = hit x (1 + crit bonus)
 life steal  = damage dealt x LifeSteal%    (damage actually dealt, after armor)
 arrow       = vanilla damage x (1 + arrow bonus%) x (1 + crit bonus)
+crippled    = anything a Crippled entity deals x 0.8, after the steps above, before armor
 ```
 
 - **Additional Damage** - flat damage added before the percentage multiplier. After the Combat perk
@@ -489,8 +490,8 @@ arrow       = vanilla damage x (1 + arrow bonus%) x (1 + crit bonus)
 - **Increased Damage** - a percentage multiplier applied to the total.
 - **Hit bonus** - extra % for this one hit from perks (e.g. Strength Training's "the next strong
   attack deals +30%").
-- **Taken** - extra % the target takes from debuffs on it (Sundered from Sunder Armor, Crippled
-  from Crippling Strikes).
+- **Taken** - extra % the target takes from debuffs on it (Sundered from Sunder Armor). Counts
+  only for your own melee hits.
 - **Arrow bonus** - extra % on a fully drawn arrow or any crossbow bolt, from bow perks (Cold
   Blood). The melee stats never touch arrows.
 - All percentages are **added together** before multiplying, so stacking more of them grows damage
@@ -696,21 +697,26 @@ over to the next thing you hit. Hit the wrong category and the bonus is zero.
 ### Status effects
 
 There is **no Bleed**. The witcher's damage over time is [Venom](#venom), and Witcher 3's
-next-gen Combat tree has no bleed either. The old Bleed effect (applied by Crippling Strikes) is
-removed. *Removal not built yet.*
+next-gen Combat tree has no bleed either. The old Bleed effect (applied by Crippling Strikes) is removed; its elements are in `trash/` and its icons in
+`textures/mob_effect/_unused/`.
 
 The Combat perks put three visible debuffs on the target, all on the **main target only** (sweep
 targets are never affected):
 
 | Debuff | From | Effect | Lasts |
 |---|---|---|---|
-| **Crippled** | Crippling Strikes (fast crit) | Takes **+20%** damage | **5 s**, refreshed, doesn't stack |
+| **Crippled** | Crippling Strikes (fast crit) | Deals **-20%** damage | **3 s**, refreshed, doesn't stack |
 | **Sundered** | Sunder Armor (strong attack) | Takes **+10%** damage per stack, up to **3** | **8 s**, each stack restarts it |
 | **Maimed** | Maiming Shot (arrow after a melee crit) | Every charged hit on it is a crit | **4 s** |
 
-Crippled and Sundered add together into the target's "taken" percentage, so a target can take up
-to **+50%**. Sundered is built (a steel-grey effect with swirl particles on the mob); Crippled and
-Maimed are *not built yet*. Other combat statuses come from their own sources:
+Crippled is defensive, so it never overlaps with Sundered: Sunder Armor makes the target take
+more, Crippling Strikes makes it deal less. The -20% covers everything the Crippled entity deals
+(melee, arrows, explosions, spells), against anyone, and is applied after crits and before armor.
+Bosses are not special-cased. A slow was tried first and dropped: in Minecraft a melee mob's only
+threat is reaching you, so a slow on top of knockback locked mobs in place.
+
+Sundered is built (a steel-grey effect with swirl particles on the mob). Crippled is built (a
+snapped-bone icon, dark-red particles). Maimed is *not built yet*. Other combat statuses come from their own sources:
 burning from Igni, slows from Yrden and Axii, and the payloads of individual bombs and decoctions.
 
 ### Venom
@@ -1461,7 +1467,7 @@ Perks are switches the combat, Sign, and alchemy systems read live (see
 **15** perks in three lines. Every value is **provisional** until a balance pass. Grid positions and
 prerequisite lines are not set yet. Cut from Witcher 3's 20: Whirl and Rend (special moves on
 adrenaline), Cold Blood's bolt version, Resolve and Razor Focus (pure adrenaline), and Lightning
-Reflexes (slow-motion aiming and headshots). The old **Defence** perk (+4 max health) is removed.
+Reflexes (slow-motion aiming and headshots). The old **Defence** perk (+4 max health) is removed (elements in `trash/`, icons in `textures/screens/_unused/`; its slot 107 is free).
 
 *Fast*
 
@@ -1470,7 +1476,7 @@ Reflexes (slow-motion aiming and headshots). The old **Defence** perk (+4 max he
 | **Muscle Memory** | After **3 s** without taking damage, your next **3** fast attacks in a row deal +**30%**. A strong attack or taking damage ends the run; uncharged hits are ignored. A fully blocked hit is not damage taken | *Not built* - today +**3** Additional Damage |
 | **Flood of Anger** | +**10%** Increased Damage for each hostile within **5** blocks beyond the first, up to +**30%** | *Not built* - today +**5** Additional Damage while an enemy is near |
 | **Three Strikes** | Every **4th** typed hit of the same type in a row deals +**50%**. The streak resets after **4 s** without a typed hit. While equipped, three slots of the streak's attack icon on the [combat line](#the-combat-line) show the combo. On the 3rd hit they collapse into one burning icon and the ready chime plays: the next hit is the strike. A hit that spends another perk's charge does not count toward the streak | Built - replaces Precise Blows |
-| **Crippling Strikes** | A fast crit **Cripples** the target: +**20%** damage taken for **5 s** | *Not built* - today applies Bleed on hit |
+| **Crippling Strikes** | A fast crit **Cripples** the target: it deals -**20%** damage for **3 s**; another fast crit restarts it, no stacking. Main target only | Built |
 | **Fleet Footed** | +**15%** movement speed | Built |
 
 *Strong*

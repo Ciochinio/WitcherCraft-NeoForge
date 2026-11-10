@@ -61,18 +61,6 @@ public class PerkModifiersProcedure {
 				_entity.getAttribute(Attributes.MAX_HEALTH).removeModifier(Identifier.parse("witchercraft:perk_survival_instinct"));
 			}
 		}
-		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkDefence == true) {
-			if (entity instanceof LivingEntity _entity) {
-				AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:perk_defence"), 4, AttributeModifier.Operation.ADD_VALUE);
-				if (!_entity.getAttribute(Attributes.MAX_HEALTH).hasModifier(modifier.id())) {
-					_entity.getAttribute(Attributes.MAX_HEALTH).addTransientModifier(modifier);
-				}
-			}
-		} else {
-			if (entity instanceof LivingEntity _entity) {
-				_entity.getAttribute(Attributes.MAX_HEALTH).removeModifier(Identifier.parse("witchercraft:perk_defence"));
-			}
-		}
 		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkFleetFooted == true) {
 			if (entity instanceof LivingEntity _entity) {
 				AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:perk_fleet_footed"), 0.15, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);

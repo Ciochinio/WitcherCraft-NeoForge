@@ -3887,25 +3887,6 @@
       "path": "~/Character Abilities/CombatPerks/Fleet Footed"
     },
     {
-      "name": "DefenceEffect",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "defence_effect",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/DefenceEffectProcedure.java"
-        ],
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ]
-      },
-      "path": "~/Character Abilities/CombatPerks/Defence"
-    },
-    {
       "name": "DeadlyPrecisionEffect",
       "type": "procedure",
       "compiles": true,
@@ -5103,63 +5084,17 @@
       "path": "~/StatusEffects"
     },
     {
-      "name": "Bleed",
+      "name": "Crippled",
       "type": "potioneffect",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "bleed",
+      "registry_name": "crippled",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/potion/BleedMobEffect.java"
+          "src/main/java/net/redboltmedia/witchercraft/potion/CrippledMobEffect.java"
         ]
       },
-      "path": "~/StatusEffects/Bleed"
-    },
-    {
-      "name": "BleedTick",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "bleed_tick",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/BleedTickProcedure.java"
-        ]
-      },
-      "path": "~/StatusEffects/Bleed"
-    },
-    {
-      "name": "BleedHit",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "bleed_hit",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "sourceentity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/BleedHitProcedure.java"
-        ]
-      },
-      "path": "~/StatusEffects/Bleed"
+      "path": "~/StatusEffects"
     },
     {
       "name": "EnemyNearby",
@@ -9605,6 +9540,10 @@
       "metadata": {
         "dependencies": [
           {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
             "name": "sourceentity",
             "type": "entity"
           },
@@ -9869,12 +9808,6 @@
     },
     {
       "name": "witchercraftEquippedPerkDeadlyPrecision",
-      "type": "logic",
-      "scope": "player_persistent",
-      "value": "false"
-    },
-    {
-      "name": "witchercraftEquippedPerkDefence",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
@@ -10324,12 +10257,6 @@
       "value": "false"
     },
     {
-      "name": "witchercraftPerksDefence",
-      "type": "logic",
-      "scope": "player_persistent",
-      "value": "false"
-    },
-    {
       "name": "witchercraftPerksDeadlyPrecision",
       "type": "logic",
       "scope": "player_persistent",
@@ -10637,13 +10564,11 @@
       "perk.witchercraft.cripplingshot.name": "Crippling Shot",
       "perk.witchercraft.cripplingshot.desc": "If main hand weapon ranged, add 50% to crit damage.",
       "perk.witchercraft.cripplingstrikes.name": "Crippling Strikes",
-      "perk.witchercraft.cripplingstrikes.desc": "Apply bleed effect on hit.",
+      "perk.witchercraft.cripplingstrikes.desc": "Fast crits cripple the target: it deals 20% less damage for 3 s.",
       "perk.witchercraft.crushingblows.name": "Crushing Blows",
       "perk.witchercraft.crushingblows.desc": "A strong crit charges your next 2 strong attacks within 6 s: each deals +40% damage. Spending them cannot re-charge it.",
       "perk.witchercraft.deadlyprecision.name": "Deadly Precision",
       "perk.witchercraft.deadlyprecision.desc": "Add 1% chance to instantly kill.",
-      "perk.witchercraft.defence.name": "Defence",
-      "perk.witchercraft.defence.desc": "Add +4 to max HP.",
       "perk.witchercraft.fleetfooted.name": "Fleet Footed",
       "perk.witchercraft.fleetfooted.desc": "Add movement speed.",
       "perk.witchercraft.floodofanger.name": "Flood Of Anger",
@@ -10868,6 +10793,7 @@
       "item.witchercraft.grapeshot": "Grapeshot",
       "effect.witchercraft.dev_log": "Dev Log",
       "effect.witchercraft.sundered": "Sundered",
+      "effect.witchercraft.crippled": "Crippled",
       "gui.witchercraft.character_gui.label_passivehealthregen": "HealthRegen",
       "gui.witchercraft.character_gui.label_staminaregen": "StaminaRegen",
       "gui.witchercraft.player_stats_overlay.label_staminaregen": "StaminaRegen",
@@ -10880,7 +10806,6 @@
       "gui.witchercraft.player_stats_overlay.label_maxtoxicity": "MaxToxicity",
       "gui.witchercraft.player_stats_overlay.label_additionaldamage": "IncreasedDamage",
       "gui.witchercraft.player_stats_overlay.label_additionaldamgeflat": "AdditionalDamge",
-      "effect.witchercraft.bleed": "Bleed",
       "attribute.witchercraft.life_steal": "Life Steal",
       "attribute.witchercraft.potion_duration": "Potion Duration",
       "attribute.witchercraft.crit_damage": "Crit Damage",
@@ -11560,10 +11485,6 @@
                 "children": []
               },
               {
-                "name": "Defence",
-                "children": []
-              },
-              {
                 "name": "Fleet Footed",
                 "children": []
               },
@@ -11817,12 +11738,7 @@
       },
       {
         "name": "StatusEffects",
-        "children": [
-          {
-            "name": "Bleed",
-            "children": []
-          }
-        ]
+        "children": []
       },
       {
         "name": "Weapons",

@@ -45,6 +45,11 @@ public class WitchercraftIncomingDamageProcedure {
 		double hitType = 0;
 		double hitBonus = 0;
 		double takenBonus = 0;
+		double dealtMult = 0;
+		dealtMult = 1;
+		if (sourceentity instanceof LivingEntity _livEnt0 && _livEnt0.hasEffect(WitchercraftModMobEffects.CRIPPLED)) {
+			dealtMult = 0.8;
+		}
 		if (sourceentity instanceof LivingEntity _livingEntity0 && _livingEntity0.getAttributes().hasAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE)) {
 			if (sourceentity == immediatesourceentity && !damagesource.is(DamageTypes.THORNS)) {
 				if (sourceentity instanceof LivingEntity _livEntS && _livEntS.hasEffect(WitchercraftModMobEffects.DEV_LOG)) {
@@ -91,6 +96,7 @@ public class WitchercraftIncomingDamageProcedure {
 						? _livingEntity5.getAttribute(WitchercraftModAttributes.INCREASED_DAMAGE).getValue()
 						: 0) + hitBonus + takenBonus) * 0.01);
 				hit = hit * (1 + critBonus);
+				hit = hit * dealtMult;
 				if (critBonus > 0 && WitchercraftExecuteEnabledProcedure.execute() && !entity.is(TagKey.create(Registries.ENTITY_TYPE, Identifier.parse("witchercraft:execute_immune"))) && !(entity instanceof Player)
 						&& (entity instanceof LivingEntity _livEnt ? _livEnt.getHealth() : -1) < (entity instanceof LivingEntity _livEnt ? _livEnt.getMaxHealth() : -1) * 0.2) {
 					hit = (entity instanceof LivingEntity _livEnt ? _livEnt.getMaxHealth() : -1) * 100 + 100;
@@ -152,7 +158,7 @@ public class WitchercraftIncomingDamageProcedure {
 				}
 				if (hitType > 0) {
 					if (hitType == 1) {
-						WitchercraftOnFastHitProcedure.execute(world, sourceentity);
+						WitchercraftOnFastHitProcedure.execute(world, entity, sourceentity);
 					} else {
 						WitchercraftOnStrongHitProcedure.execute(world, entity, sourceentity);
 					}
@@ -169,9 +175,10 @@ public class WitchercraftIncomingDamageProcedure {
 							? _livingEntity26.getAttribute(WitchercraftModAttributes.CRIT_DAMAGE).getValue()
 							: 0) * 0.01;
 					hit = amount * (1 + critBonus);
-					if (event instanceof LivingIncomingDamageEvent _event) {
-						_event.setAmount((float) hit);
-					}
+				}
+				hit = hit * dealtMult;
+				if (event instanceof LivingIncomingDamageEvent _event) {
+					_event.setAmount((float) hit);
 				}
 				if (sourceentity instanceof LivingEntity _livEnt27 && _livEnt27.hasEffect(WitchercraftModMobEffects.DEV_LOG)) {
 					r = Math.round(amount * 1000);
@@ -188,6 +195,12 @@ public class WitchercraftIncomingDamageProcedure {
 					r = Math.round(hit * 1000);
 					if (sourceentity instanceof ServerPlayer _player)
 						_player.sendSystemMessage(Component.literal(("= " + r / 1000)), false);
+				}
+			}
+		} else {
+			if (dealtMult < 1) {
+				if (event instanceof LivingIncomingDamageEvent _event) {
+					_event.setAmount((float) (amount * dealtMult));
 				}
 			}
 		}

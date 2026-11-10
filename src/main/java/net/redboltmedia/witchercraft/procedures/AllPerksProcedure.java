@@ -12,7 +12,6 @@ public class AllPerksProcedure {
 		CripplingStrikesEffectProcedure.execute(entity);
 		CrushingBlowsEffectProcedure.execute(entity);
 		DeadlyPrecisionEffectProcedure.execute(entity);
-		DefenceEffectProcedure.execute(entity);
 		FleetFootedEffectProcedure.execute(entity);
 		FloodOfAngerEffectProcedure.execute(entity);
 		MuscleMemoryEffectProcedure.execute(entity);

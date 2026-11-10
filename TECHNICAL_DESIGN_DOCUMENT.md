@@ -580,7 +580,7 @@ and the re-hit had no attacker attached. The new pipeline changes the hit in pla
 |---|---|---|
 | `WitchercraftMeleeCrit` | Player critical hit (every swing) | Works out the crit bonus (+0.5 for a vanilla jump crit, + Crit Damage when a condition is true on a charged swing) and the hit type (1 fast, 2 strong, 0 uncharged). Forces the crit (vanilla stars and sound) when there is a bonus, sets vanilla's multiplier to 1, and stores bonus and type on the attacker. |
 | `WitchercraftIncomingDamage` | Entity attacked | Melee: `(amount + flat + oil) x (1 + %) x (1 + crit bonus)`, then execute, then sets the incoming damage amount, updates the hit memory and calls the fast/strong hook. Arrows: a fully drawn arrow on a condition gets `x (1 + Crit Damage)`. |
-| `WitchercraftOnFastHit`, `WitchercraftOnStrongHit` | none (called by IncomingDamage) | Perk hooks `(world, sourceentity)`. Run after a typed hit has landed: arm or spend charges, play the ready chime, then refresh the combat line. |
+| `WitchercraftOnFastHit`, `WitchercraftOnStrongHit` | none (called by IncomingDamage) | Perk hooks `(world, entity, sourceentity)`, entity = target. Run after a typed hit has landed: arm or spend charges, play the ready chime, apply on-hit debuffs (Crippled on a fast crit, Sundered on a strong attack). The combat line refreshes itself every tick. |
 | `WitchercraftHitBonus` | none, returns number | Perk hook `(sourceentity)`. Percent bonus for this hit from attacker perks (Strength Training, Three Strikes, Crushing Blows so far), summed with Increased Damage. Reads `witchercraftHitCrit`, which `WitchercraftIncomingDamage` sets before the hooks: 1 when the hit is a condition crit (crit bonus above the strong attack's own 0.5). |
 | `WitchercraftDamageTakenBonus` | none, returns number | Perk hook `(entity)` = target. Percent bonus for this target from debuffs: `Sundered` gives 10 per stack (effect level 0..2 = 1..3 stacks). `WitchercraftOnStrongHit` `(world, entity, sourceentity)` applies the stacks. |
 | `WitchercraftComboLine` | none `(entity)`, called every tick by `WitchercraftComboLineTick` (player ticks, server only) | Builds the combat line (GDD 5) from the player's charges into the synced player text variable `witchercraftComboLine`; `WitchercraftHud` draws it centred under the crosshair. A number `sig` encodes what is on the line and is kept in NBT (`witchercraftComboSig`), so the variable, and with it the sync packet, is only written when the line actually changes. Running per tick is what makes expired charges vanish without a timer. The icons are font glyphs (see below). |
@@ -665,8 +665,12 @@ changes here:
 - *Arrows* get a new hook, `WitchercraftArrowBonus` (returns %, `~/Admin/Calc`), so the arrow
   branch becomes `amount x (1 + arrow bonus) x (1 + crit)`. Every crossbow bolt counts as fully
   drawn. Cold Blood adds to it.
-- *Target debuffs* are mob effects (Crippled, Sundered with amplifier = stacks - 1, Maimed), read
-  by `WitchercraftDamageTakenBonus` and `WitchercraftCritCondition`. Applied to the main target
+- *Target debuffs* are mob effects: Sundered (amplifier = stacks - 1) read by
+  `WitchercraftDamageTakenBonus`, Maimed read by `WitchercraftCritCondition`, and Crippled read on
+  the *attacker* at the top of `WitchercraftIncomingDamage` (local `dealtMult` = 0.8, else 1). Player
+  melee and arrows multiply `hit` by it after the crit step; any other attacker (no
+  `AdditionalDamage` attribute) goes to the outer else, which sets the amount to `amount x
+  dealtMult` only when it is below 1. Applied to the main target
   only, which the zeroed hit type already guarantees for sweep targets.
 - *Attacker timers and charges* live in the attacker's persistent NBT, the same as the hit memory
   (2.2: no player-variable sync): the last-damage-taken tick (Muscle Memory), the last typed hit tick
@@ -675,7 +679,7 @@ changes here:
   so no per-tick countdown runs.
 - *Shield blocks* (Counterattack, Arrow Deflection) need a block event. If Blockly has no trigger
   for it, a locked bridge like `WitchercraftAfterDamageBridge` calls a Blockly procedure.
-- *Removed.* Bleed (`Bleed`, `BleedHit`, `BleedTick`) and the Defence perk.
+- *Removed (done).* Bleed (`Bleed`, `BleedHit`, `BleedTick`) and the Defence perk (`DefenceEffect`, its two player variables, its AllPerks, DevClear and PerkModifiers blocks). All moved to `trash/`; art to `_unused/` folders.
 
 **Known limitations.**
 - Sweep-attack targets also get flat, oil and % damage. A crit never sweeps, so they never get the crit.
