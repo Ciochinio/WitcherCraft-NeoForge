@@ -8,7 +8,7 @@ public class AllPerksProcedure {
 			return;
 		AnatomicalKnowledgeEffectProcedure.execute(entity);
 		ColdBloodEffectProcedure.execute(entity);
-		CripplingShotEffectProcedure.execute(entity);
+		MaimingShotEffectProcedure.execute(entity);
 		CripplingStrikesEffectProcedure.execute(entity);
 		CounterattackEffectProcedure.execute(entity);
 		CrushingBlowsEffectProcedure.execute(entity);

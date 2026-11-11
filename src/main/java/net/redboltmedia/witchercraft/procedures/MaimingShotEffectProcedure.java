@@ -4,16 +4,16 @@ import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
 
 import net.minecraft.world.entity.Entity;
 
-public class CripplingShotEffectProcedure {
+public class MaimingShotEffectProcedure {
 	public static void execute(Entity entity) {
 		if (entity == null)
 			return;
-		PerkDefineProcedure.execute(103, "CripplingShot", entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksCripplingShot);
+		PerkDefineProcedure.execute(103, "MaimingShot", entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftPerksMaimingShot);
 		if (PerkLearnRequestedProcedure.execute(entity, 103)) {
 			if (CharacterAbilitiesSkillPointCheckProcedure.execute(entity)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-					_vars.witchercraftPerksCripplingShot = true;
+					_vars.witchercraftPerksMaimingShot = true;
 					_vars.markSyncDirty();
 				}
 				CharacterAbilitiesCombatSkillPointsUsedProcedure.execute(entity);
@@ -22,13 +22,13 @@ public class CripplingShotEffectProcedure {
 		if (PerkUnlearnRequestedProcedure.execute(entity, 103)) {
 			{
 				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-				_vars.witchercraftPerksCripplingShot = false;
+				_vars.witchercraftPerksMaimingShot = false;
 				_vars.markSyncDirty();
 			}
 		}
 		{
 			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-			_vars.witchercraftEquippedPerkCripplingShot = PerkSocketedProcedure.execute(entity, 103);
+			_vars.witchercraftEquippedPerkMaimingShot = PerkSocketedProcedure.execute(entity, 103);
 			_vars.markSyncDirty();
 		}
 	}

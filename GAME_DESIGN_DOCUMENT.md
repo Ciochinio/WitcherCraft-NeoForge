@@ -613,14 +613,13 @@ Crit conditions:
 | Target charmed by Axii | perk |
 | Target knocked back by Aard, within about **1** second | perk |
 | Target burning | perk |
-| Target Maimed | **Maiming Shot** perk |
+| Target Maimed (melee hits only, next **2** charged hits) | **Maiming Shot** perk |
 | Target hasn't noticed you | bow perk, not assigned yet |
 | Within **3** seconds of a kill | **Katakan** decoction |
 
 A venomed target is deliberately **not** a condition - Toxic Shock already rewards critting a
 venomed target (see [Venom](#venom)), and venom granting crits as well would make that loop free.
-Maimed is guarded the same way: a crit that only happened because the target was Maimed does not
-re-arm Maiming Shot.
+Maimed is guarded differently: it only makes **melee** hits crit, so the bow can't set itself up; cashing it in always needs the swap to the sword.
 
 ### Blocking and parrying
 
@@ -780,7 +779,7 @@ targets are never affected):
 |---|---|---|---|
 | **Crippled** | Crippling Strikes (fast crit) | Deals **-20%** damage | **3 s**, refreshed, doesn't stack |
 | **Sundered** | Sunder Armor (strong attack) | Takes **+10%** damage per stack, up to **3** | **8 s**, each stack restarts it |
-| **Maimed** | Maiming Shot (arrow after a melee crit) | Every charged hit on it is a crit | **4 s** |
+| **Maimed** | Maiming Shot (fully drawn arrow or bolt) | Your next **2** charged melee hits on it are crits; arrows never crit from it | **4 s**, or until the 2 hits are spent; every shot refreshes it |
 
 Crippled is defensive, so it never overlaps with Sundered: Sunder Armor makes the target take
 more, Crippling Strikes makes it deal less. The -20% covers everything the Crippled entity deals
@@ -789,7 +788,7 @@ Bosses are not special-cased. A slow was tried first and dropped: in Minecraft a
 threat is reaching you, so a slow on top of knockback locked mobs in place.
 
 Sundered is built (a steel-grey effect with swirl particles on the mob). Crippled is built (a
-snapped-bone icon, dark-red particles). Maimed is *not built yet*. Other combat statuses come from their own sources:
+snapped-bone icon, dark-red particles). Maimed is built (an arrow-stuck icon, dark-red particles; icon is a first draft). Other combat statuses come from their own sources:
 burning from Igni, slows from Yrden and Axii, and the payloads of individual bombs and decoctions.
 
 ### Venom
@@ -1566,6 +1565,8 @@ Reflexes (slow-motion aiming and headshots). The old **Defence** perk (+4 max he
 
 Ranged is a **tool for the sword build**, not a build of its own: the bow perks make your bow matter
 inside a sword fight (openers, set-ups, finishers), the way the crossbow is a utility for Geralt.
+Arrows take crits, the arrow bonus (Cold Blood) and the target's damage-taken bonuses (Sundered),
+but not Increased Damage, Additional Damage or oils: those are sword stats.
 
 | Perk | Effect | Status |
 |------|--------|--------|
@@ -1573,7 +1574,7 @@ inside a sword fight (openers, set-ups, finishers), the way the crossbow is a ut
 | **Arrow Deflection** | Lets you block with a sword. An arrow, crossbow bolt or trident coming at your front that reaches you within **0.5 s** of [raising your block](#blocking-and-parrying) (sword or shield; the 1 s re-raise lockout applies) is caught and flies back at the shooter at full-bow speed, with the damage it would have dealt you. Raise when you hear the shot. A block held longer is a plain block and returns nothing. During the window the catch zone is your body grown by **1** block on every side, front half only, so near misses are caught too; shots from behind still hit. The return **homes** hard (turns **30%** toward the shooter each tick, up to **3 s**; a visible curve is fine). With no shooter (dead, gone, dispenser) it flies along your crosshair. A catch plays the parry clang and sparks, then a bow shot. It counts as your shot and can't be picked up; a returned trident loses its enchantments; piercing arrows can't be caught (as in vanilla). With a sword this makes arrows 100% blocked instead of 50%. Works without Counterattack equipped (Counterattack is only its tree prerequisite). Tooltip has a grey how-to line | Built - slot 112 (was Razor Focus); icons are copies of the Razor Focus art, originals in `textures/screens/_unused/` |
 | **Cold Blood** | Fully drawn arrows and crossbow bolts deal +**25%** when **fired** while no hostile is within **5** blocks of you (a sphere). Decided at the release, so the target itself, or a mob that walks up during the flight, doesn't cancel it. "Fully drawn" is vanilla's crit flag: a bow at full draw; a player's crossbow bolts always count. Hostile = vanilla's Enemy type (monsters, slimes, ghasts, phantoms, hoglins, shulkers), so animals, villagers and players don't count; neutral endermen and zombified piglins do. Applied after the crit, multiplicative. Arrows sent back by Arrow Deflection aren't crits and never get it | Built - replaces the old +5 Additional Damage, which only ever reached melee |
 | **Bloody Rage** | +**40%** damage on melee hits while you are below **30%** health. Taken from Witcher 1: the tree's frame is Witcher 3, but perks may come from the whole saga when they add a decision | *Not built* - replaces Anatomical Knowledge |
-| **Maiming Shot** | After a melee crit, your next fully drawn arrow or bolt within **5 s** **Maims** the target for **4 s**: a crit condition. Crits that only happened because of Maimed don't re-arm it | *Not built* - replaces Crippling Shot |
+| **Maiming Shot** | The bow as the sword's crit opener: a fully drawn arrow or crossbow bolt that hits **Maims** the target. While Maimed, your next **2** charged **melee** hits on it are crits, for up to **4 s**. Every shot refreshes it (back to 2 hits and 4 s). Arrows never crit from Maimed, so the bow can't set itself up: the payoff always needs the swap to the sword. Maimed crits trigger crit perks (Crippling Strikes, Crushing Blows) like any crit. Tooltip has a grey how-to line | Built - slot 103 (was Crippling Shot); icons are copies of the Crippling Shot art, originals in `textures/screens/_unused/` |
 
 **Signs**
 

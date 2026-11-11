@@ -143,6 +143,7 @@ public class WitchercraftDamageCalculatorProcedure {
 					_event.setAmount((float) hit);
 				}
 				WitchercraftDamageLogProcedure.execute(sourceentity, 2, amount, hit, critBonus, 0, hitBonus, takenBonus, 0, 0);
+				WitchercraftOnArrowHitProcedure.execute(entity, immediatesourceentity, sourceentity);
 			}
 		} else {
 			if (dealtMult < 1) {

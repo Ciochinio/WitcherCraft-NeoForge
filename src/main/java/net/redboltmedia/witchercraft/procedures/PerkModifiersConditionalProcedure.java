@@ -36,19 +36,6 @@ public class PerkModifiersConditionalProcedure {
 		if (entity == null)
 			return;
 		if (!world.isClientSide()) {
-			if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkCripplingShot == true && ((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY).getItem() == Items.CROSSBOW
-					|| (entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY).getItem() == Items.BOW)) {
-				if (entity instanceof LivingEntity _entity) {
-					AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:perk_crippling_shot"), 50, AttributeModifier.Operation.ADD_VALUE);
-					if (!_entity.getAttribute(WitchercraftModAttributes.CRIT_DAMAGE).hasModifier(modifier.id())) {
-						_entity.getAttribute(WitchercraftModAttributes.CRIT_DAMAGE).addTransientModifier(modifier);
-					}
-				}
-			} else {
-				if (entity instanceof LivingEntity _entity) {
-					_entity.getAttribute(WitchercraftModAttributes.CRIT_DAMAGE).removeModifier(Identifier.parse("witchercraft:perk_crippling_shot"));
-				}
-			}
 			if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkSunAndStars == true && world instanceof Level _lvl17 && _lvl17.isBrightOutside()) {
 				if (entity instanceof LivingEntity _entity) {
 					AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:perk_sun_and_stars_day"), 0.3333, AttributeModifier.Operation.ADD_VALUE);

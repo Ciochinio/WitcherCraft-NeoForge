@@ -51,7 +51,7 @@ public class DevClearProcedure {
 			_vars.witchercraftPerksDeadlyPrecision = false;
 			_vars.witchercraftPerksColdBlood = false;
 			_vars.witchercraftPerksAnatomicalKnowledge = false;
-			_vars.witchercraftPerksCripplingShot = false;
+			_vars.witchercraftPerksMaimingShot = false;
 			_vars.witchercraftPerksFloodOfAnger = false;
 			_vars.witchercraftPerksArrowDeflection = false;
 			_vars.witchercraftPerksUndying = false;
