@@ -14,6 +14,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -81,6 +82,19 @@ public class PerkModifiersConditionalProcedure {
 				if (entity instanceof LivingEntity _livEnt24 && _livEnt24.hasEffect(WitchercraftModMobEffects.BLOODY_RAGE_ACTIVE)) {
 					if (entity instanceof LivingEntity _entity)
 						_entity.removeEffect(WitchercraftModMobEffects.BLOODY_RAGE_ACTIVE);
+				}
+			}
+			if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkFleetFooted
+					&& !(entity instanceof LivingEntity _livEnt25 && _livEnt25.hasEffect(WitchercraftModMobEffects.IN_COMBAT))) {
+				if (entity instanceof LivingEntity _entity) {
+					AttributeModifier modifier = new AttributeModifier(Identifier.parse("witchercraft:perk_fleet_footed"), 0.15, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+					if (!_entity.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(modifier.id())) {
+						_entity.getAttribute(Attributes.MOVEMENT_SPEED).addTransientModifier(modifier);
+					}
+				}
+			} else {
+				if (entity instanceof LivingEntity _entity) {
+					_entity.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(Identifier.parse("witchercraft:perk_fleet_footed"));
 				}
 			}
 		}

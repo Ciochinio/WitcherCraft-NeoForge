@@ -5188,12 +5188,63 @@
       "metadata": {
         "dependencies": [
           {
+            "name": "damagesource",
+            "type": "damagesource"
+          },
+          {
             "name": "entity",
             "type": "entity"
           }
         ],
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/procedures/UndyingEffectActiveProcedure.java"
+        ]
+      },
+      "path": "~/Character Abilities/CombatPerks/Undying"
+    },
+    {
+      "name": "UndyingSigil",
+      "type": "item",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "undying_sigil",
+      "metadata": {
+        "files": [
+          "src/main/resources/assets/witchercraft/items/undying_sigil.json",
+          "src/main/java/net/redboltmedia/witchercraft/item/UndyingSigilItem.java",
+          "src/main/resources/assets/witchercraft/models/item/undying_sigil.json"
+        ]
+      },
+      "path": "~/Character Abilities/CombatPerks/Undying"
+    },
+    {
+      "name": "WitchercraftUndyingPopup",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "witchercraft_undying_popup",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftUndyingPopupProcedure.java"
+        ]
+      },
+      "path": "~/Character Abilities/CombatPerks/Undying"
+    },
+    {
+      "name": "WitchercraftUndyingMessage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "witchercraft_undying_message",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WitchercraftUndyingMessage.java"
         ]
       },
       "path": "~/Character Abilities/CombatPerks/Undying"
@@ -11014,6 +11065,7 @@
       "gui.witchercraft.graveir_gui.label_drowner": "Graveir",
       "gui.witchercraft.bestiary_menu_gui.button_back": "Back",
       "item.witchercraft.aether": "Aether",
+      "item.witchercraft.undying_sigil": "Undying Sigil",
       "item.witchercraft.beast_oil": "Beast Oil",
       "effect.witchercraft.axii_sign": "Axii Sign",
       "gui.witchercraft.rotfiend_gui.label_health_40": "Health: 40",

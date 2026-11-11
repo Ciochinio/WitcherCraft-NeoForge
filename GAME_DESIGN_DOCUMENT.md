@@ -1535,7 +1535,7 @@ Reflexes (slow-motion aiming and headshots). The old **Defence** perk (+4 max he
 | **Flood of Anger** | +**10%** melee damage for each monster within **5** blocks after the first, up to +**30%** (4 monsters). Any living Monster counts, idle zombified piglins and endermen too; slimes, magma cubes, ghasts, phantoms, shulkers and hoglins are not Monsters in vanilla and don't. Counted when the hit lands; every melee hit, charged or not | Built |
 | **Three Strikes** | Every **4th** typed hit of the same type in a row deals +**50%**. The streak resets after **4 s** without a typed hit. While equipped, three slots of the streak's attack icon on the [combat line](#the-combat-line) show the combo. On the 3rd hit they collapse into one burning icon and the ready chime plays: the next hit is the strike. A hit that spends another perk's charge does not count toward the streak | Built - replaces Precise Blows |
 | **Crippling Strikes** | A Precise fast attack **Cripples** the target: it deals -**20%** damage for **3 s**; another Precise fast attack restarts it, no stacking. Main target only | Built |
-| **Fleet Footed** | +**15%** movement speed | Built |
+| **Fleet Footed** | +**15%** movement speed while not In Combat (a travel perk) | Built |
 
 *Strong*
 
@@ -1544,7 +1544,7 @@ Reflexes (slow-motion aiming and headshots). The old **Defence** perk (+4 max he
 | **Strength Training** | A fast attack charges the next strong attack within **4 s** with +**30%**. Each fast attack restarts the 4 s; it doesn't stack | Built |
 | **Crushing Blows** | A Precise strong attack charges the next **2** strong attacks within **6 s** with +**40%**. Strong attacks that spend the charge can't re-charge it, and they don't count for Three Strikes | Built |
 | **Sunder Armor** | Each strong attack adds a **Sundered** stack: +**10%** damage taken per stack, up to **3**, for **8 s**; each stack restarts the 8 s. Main target only. The extra damage taken applies to your arrows and bolts too, added to their arrow bonus (Cold Blood) | Built |
-| **Undying** | When killed, restore to **50%** health. Once every **15** minutes | Built |
+| **Undying** | When killed, restore to **50%** health with **1 s** of immunity (fire put out). Once every **15** minutes, shown by a totem-style pop-up of the Undying Sigil; void and `/kill` deaths don't use it | Built |
 | **Deadly Precision** | [Execute](#execute): a strong attack kills a target below **20%** health, with a heavy mace smash. Bosses and players are immune | Built |
 
 *Shield, bow and last stand*

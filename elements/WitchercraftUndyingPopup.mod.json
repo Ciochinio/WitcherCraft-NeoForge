@@ -1,0 +1,8 @@
+{
+  "_fv": 89,
+  "_type": "procedure",
+  "definition": {
+    "procedurexml": "<xml xmlns=\"https://developers.google.com/blockly/xml\"><block type=\"event_trigger\" deletable=\"false\" x=\"40\" y=\"40\"><field name=\"trigger\">no_ext_trigger</field><comment pinned=\"false\" h=\"140\" w=\"400\">LOCKED CODE. The real logic is hand-written Java: sends WitchercraftUndyingMessage to the saved player (entity), which plays the totem pop-up with the Undying Sigil on their screen. Blockly cannot send a custom packet.</comment></block></xml>",
+    "skipDependencyNullCheck": false
+  }
+}
