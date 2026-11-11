@@ -50,6 +50,7 @@ public class WitchercraftModMobEffects {
 	public static final DeferredHolder<MobEffect, MobEffect> CRIPPLED = REGISTRY.register("crippled", CrippledMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> MAIMED = REGISTRY.register("maimed", MaimedMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> MUSCLE_MEMORY_ACTIVE = REGISTRY.register("muscle_memory_active", MuscleMemoryActiveMobEffect::new);
+	public static final DeferredHolder<MobEffect, MobEffect> BLOODY_RAGE_ACTIVE = REGISTRY.register("bloody_rage_active", BloodyRageActiveMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> ENEMY_NEARBY = REGISTRY.register("enemy_nearby", EnemyNearbyMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> UNDYING_COOLDOWN = REGISTRY.register("undying_cooldown", UndyingCooldownMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> PETRIS_PHILTER_EFFECT = REGISTRY.register("petris_philter_effect", PetrisPhilterEffectMobEffect::new);

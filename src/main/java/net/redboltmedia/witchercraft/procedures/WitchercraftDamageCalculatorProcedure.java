@@ -14,6 +14,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
@@ -77,6 +79,15 @@ public class WitchercraftDamageCalculatorProcedure {
 				}
 				if (hitType == 2 && critBonus > 0.5 || hitType != 2 && critBonus > 0) {
 					sourceentity.getPersistentData().putDouble("witchercraftHitCrit", 1);
+					if (world instanceof ServerLevel _level)
+						_level.sendParticles(ParticleTypes.ENCHANTED_HIT, (entity.getX()), (entity.getY() + 1), (entity.getZ()), 14, 0.3, 0.4, 0.3, 0.3);
+					if (world instanceof Level _level) {
+						if (!_level.isClientSide()) {
+							_level.playSound(null, BlockPos.containing(entity.getX(), entity.getY() + 1, entity.getZ()), BuiltInRegistries.SOUND_EVENT.getValue(Identifier.parse("entity.player.attack.crit")), SoundSource.PLAYERS, 1, (float) 1.6);
+						} else {
+							_level.playLocalSound((entity.getX()), (entity.getY() + 1), (entity.getZ()), BuiltInRegistries.SOUND_EVENT.getValue(Identifier.parse("entity.player.attack.crit")), SoundSource.PLAYERS, 1, (float) 1.6, false);
+						}
+					}
 				} else {
 					sourceentity.getPersistentData().putDouble("witchercraftHitCrit", 0);
 				}
@@ -129,12 +140,6 @@ public class WitchercraftDamageCalculatorProcedure {
 			} else {
 				hit = amount;
 				critBonus = 0;
-				if (IsCritArrowProcedure.execute(immediatesourceentity) && WitchercraftCritConditionProcedure.execute(world, sourceentity)) {
-					critBonus = (sourceentity instanceof LivingEntity _livingEntity26 && _livingEntity26.getAttributes().hasAttribute(WitchercraftModAttributes.CRIT_DAMAGE)
-							? _livingEntity26.getAttribute(WitchercraftModAttributes.CRIT_DAMAGE).getValue()
-							: 0) * 0.01;
-					hit = amount * (1 + critBonus);
-				}
 				hitBonus = WitchercraftArrowBonusProcedure.execute(immediatesourceentity, sourceentity);
 				takenBonus = WitchercraftDamageTakenBonusProcedure.execute(entity);
 				hit = hit * (1 + (hitBonus + takenBonus) * 0.01);

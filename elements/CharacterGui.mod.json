@@ -99,7 +99,7 @@
         "data": {
           "name": "label_crit_damage",
           "text": {
-            "fixedValue": "Crit Damage"
+            "fixedValue": "Precise Hit Damage"
           },
           "color": {
             "value": -12829636,

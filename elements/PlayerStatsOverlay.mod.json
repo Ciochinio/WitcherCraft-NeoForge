@@ -45,7 +45,7 @@
         "data": {
           "name": "label_critdamage",
           "text": {
-            "fixedValue": "CritDamage"
+            "fixedValue": "Precise Hit Damage"
           },
           "color": {
             "value": -1,

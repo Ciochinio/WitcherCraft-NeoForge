@@ -3943,14 +3943,14 @@
       "path": "~/Character Abilities/CombatPerks/Cold Blood"
     },
     {
-      "name": "AnatomicalKnowledgeEffect",
+      "name": "BloodyRageEffect",
       "type": "procedure",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "anatomical_knowledge_effect",
+      "registry_name": "bloody_rage_effect",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/AnatomicalKnowledgeEffectProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/BloodyRageEffectProcedure.java"
         ],
         "dependencies": [
           {
@@ -3959,7 +3959,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/Anatomical Knowledge"
+      "path": "~/Character Abilities/CombatPerks/Bloody Rage"
     },
     {
       "name": "FloodOfAngerEffect",
@@ -5136,6 +5136,19 @@
       "metadata": {
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/potion/MuscleMemoryActiveMobEffect.java"
+        ]
+      },
+      "path": "~/StatusEffects"
+    },
+    {
+      "name": "BloodyRageActive",
+      "type": "potioneffect",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "bloody_rage_active",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/potion/BloodyRageActiveMobEffect.java"
         ]
       },
       "path": "~/StatusEffects"
@@ -10008,7 +10021,7 @@
       "value": "0"
     },
     {
-      "name": "witchercraftEquippedPerkAnatomicalKnowledge",
+      "name": "witchercraftEquippedPerkBloodyRage",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
@@ -10512,7 +10525,7 @@
       "value": "false"
     },
     {
-      "name": "witchercraftPerksAnatomicalKnowledge",
+      "name": "witchercraftPerksBloodyRage",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
@@ -10821,20 +10834,21 @@
   "tab_element_order": {},
   "language_map": {
     "en_us": {
-      "perk.witchercraft.anatomicalknowledge.name": "Anatomical Knowledge",
-      "perk.witchercraft.anatomicalknowledge.desc": "If main hand weapon ranged, add 10% to crit rate.",
+      "perk.witchercraft.bloodyrage.name": "Bloody Rage",
+      "perk.witchercraft.bloodyrage.desc": "+40% damage on melee hits while you are below 30% health.",
+      "perk.witchercraft.bloodyrage.usage": "The Bloody Rage icon shows while it is active. Quen and parries keep you alive down there.",
       "perk.witchercraft.coldblood.name": "Cold Blood",
       "perk.witchercraft.coldblood.desc": "Fully drawn arrows and crossbow bolts deal +25% damage when fired with no hostile within 5 blocks of you.",
       "perk.witchercraft.maimingshot.name": "Maiming Shot",
-      "perk.witchercraft.maimingshot.desc": "A fully drawn arrow or crossbow bolt Maims the target for 4 s: your next 2 charged melee hits on it are crits. Every shot refreshes it. Arrows never crit from Maimed.",
+      "perk.witchercraft.maimingshot.desc": "A fully drawn arrow or crossbow bolt Maims the target for 4 s: your next 2 charged melee hits on it are Precise hits. Every shot refreshes it. Arrows never become Precise hits from Maimed.",
       "perk.witchercraft.maimingshot.usage": "Open with a fully drawn shot, then switch to your sword and strike with charged attacks.",
       "perk.witchercraft.counterattack.name": "Counterattack",
       "perk.witchercraft.counterattack.desc": "Lets you block with a sword and parry. A perfect parry staggers the attacker for 1 s and makes your next charged attack within 3 s deal +50% damage.",
       "perk.witchercraft.counterattack.usage": "Right-click with a sword (empty off-hand) or a shield to block. When a melee attack is coming, a mark closes on your crosshair: block while it\u0027s yellow to parry.",
       "perk.witchercraft.cripplingstrikes.name": "Crippling Strikes",
-      "perk.witchercraft.cripplingstrikes.desc": "Fast crits cripple the target: it deals 20% less damage for 3 s.",
+      "perk.witchercraft.cripplingstrikes.desc": "Precise hits with a fast attack cripple the target: it deals 20% less damage for 3 s.",
       "perk.witchercraft.crushingblows.name": "Crushing Blows",
-      "perk.witchercraft.crushingblows.desc": "A strong crit charges your next 2 strong attacks within 6 s: each deals +40% damage. Spending them cannot re-charge it.",
+      "perk.witchercraft.crushingblows.desc": "A Precise strong attack charges your next 2 strong attacks within 6 s: each deals +40% damage. Spending them cannot re-charge it.",
       "perk.witchercraft.deadlyprecision.name": "Deadly Precision",
       "perk.witchercraft.deadlyprecision.desc": "Strong attacks instantly kill enemies below 20% health. Bosses and players are immune.",
       "perk.witchercraft.fleetfooted.name": "Fleet Footed",
@@ -10905,7 +10919,7 @@
       "perk.witchercraft.bearschool.name": "Bear School",
       "perk.witchercraft.bearschool.desc": "While School of the Bear effect, increase max HP by 20%.",
       "perk.witchercraft.catschool.name": "Cat School",
-      "perk.witchercraft.catschool.desc": "While School of the Cat effect, crit damage increases by 50%.",
+      "perk.witchercraft.catschool.desc": "While School of the Cat effect, Precise Hit Damage increases by 50%.",
       "perk.witchercraft.gourmet.name": "Gourmet",
       "perk.witchercraft.gourmet.desc": "+1 to stamina regen.",
       "perk.witchercraft.griffinschool.name": "Griffin School",
@@ -10919,7 +10933,7 @@
       "gui.witchercraft.drowner_gui.label_drowner": "Drowner",
       "item.witchercraft.white_raffards_decoction": "White Raffards Decoction",
       "item.witchercraft.rebis": "Rebis",
-      "gui.witchercraft.character_gui.label_crit_damage": "Crit Damage",
+      "gui.witchercraft.character_gui.label_crit_damage": "Precise Hit Damage",
       "item.witchercraft.hanged_mans_venom": "Hanged Mans Venom",
       "gui.witchercraft.rotfiend_gui.label_rotfiend": "Rotfiend",
       "item.witchercraft.necrophage_oil": "Necrophage Oil",
@@ -11068,11 +11082,12 @@
       "effect.witchercraft.crippled": "Crippled",
       "effect.witchercraft.maimed": "Maimed",
       "effect.witchercraft.muscle_memory_active": "Muscle Memory",
+      "effect.witchercraft.bloody_rage_active": "Bloody Rage",
       "gui.witchercraft.character_gui.label_passivehealthregen": "HealthRegen",
       "gui.witchercraft.character_gui.label_staminaregen": "StaminaRegen",
       "gui.witchercraft.player_stats_overlay.label_staminaregen": "StaminaRegen",
       "gui.witchercraft.player_stats_overlay.label_movementspeed": "MovementSpeed",
-      "gui.witchercraft.player_stats_overlay.label_critdamage": "CritDamage",
+      "gui.witchercraft.player_stats_overlay.label_critdamage": "Precise Hit Damage",
       "gui.witchercraft.player_stats_overlay.label_attackspeed": "AttackSpeed",
       "gui.witchercraft.player_stats_overlay.label_health": "Health",
       "gui.witchercraft.player_stats_overlay.label_healthregen": "HealthRegen",
@@ -11082,7 +11097,7 @@
       "gui.witchercraft.player_stats_overlay.label_additionaldamgeflat": "AdditionalDamge",
       "attribute.witchercraft.life_steal": "Life Steal",
       "attribute.witchercraft.potion_duration": "Potion Duration",
-      "attribute.witchercraft.crit_damage": "Crit Damage",
+      "attribute.witchercraft.crit_damage": "Precise Hit Damage",
       "attribute.witchercraft.increased_damage": "Increased Damage",
       "attribute.witchercraft.additional_damage": "Additional Damage",
       "attribute.witchercraft.toxicity_overdose_threshold": "Toxicity Overdose Threshold",
@@ -11735,7 +11750,7 @@
             "name": "CombatPerks",
             "children": [
               {
-                "name": "Anatomical Knowledge",
+                "name": "Bloody Rage",
                 "children": []
               },
               {

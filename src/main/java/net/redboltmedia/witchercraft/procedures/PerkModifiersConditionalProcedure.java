@@ -71,6 +71,18 @@ public class PerkModifiersConditionalProcedure {
 						_entity.removeEffect(WitchercraftModMobEffects.MUSCLE_MEMORY_ACTIVE);
 				}
 			}
+			if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkBloodyRage
+					&& (entity instanceof LivingEntity _livEnt ? _livEnt.getHealth() : -1) < (entity instanceof LivingEntity _livEnt ? _livEnt.getMaxHealth() : -1) * 0.3) {
+				if (!(entity instanceof LivingEntity _livEnt23 && _livEnt23.hasEffect(WitchercraftModMobEffects.BLOODY_RAGE_ACTIVE))) {
+					if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
+						_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.BLOODY_RAGE_ACTIVE, -1, 0, true, true));
+				}
+			} else {
+				if (entity instanceof LivingEntity _livEnt24 && _livEnt24.hasEffect(WitchercraftModMobEffects.BLOODY_RAGE_ACTIVE)) {
+					if (entity instanceof LivingEntity _entity)
+						_entity.removeEffect(WitchercraftModMobEffects.BLOODY_RAGE_ACTIVE);
+				}
+			}
 		}
 	}
 }

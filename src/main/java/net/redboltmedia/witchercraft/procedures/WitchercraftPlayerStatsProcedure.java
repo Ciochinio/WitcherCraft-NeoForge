@@ -27,7 +27,7 @@ public class WitchercraftPlayerStatsProcedure {
 					Component.literal(("Attack Speed" + (entity instanceof LivingEntity _livingEntity6 && _livingEntity6.getAttributes().hasAttribute(Attributes.ATTACK_SPEED) ? _livingEntity6.getAttribute(Attributes.ATTACK_SPEED).getValue() : 0))),
 					false);
 		if (entity instanceof ServerPlayer _player)
-			_player.sendSystemMessage(Component.literal(("Crit Damage"
+			_player.sendSystemMessage(Component.literal(("Precise Hit Damage"
 					+ ((entity instanceof LivingEntity _livingEntity10 && _livingEntity10.getAttributes().hasAttribute(WitchercraftModAttributes.CRIT_DAMAGE) ? _livingEntity10.getAttribute(WitchercraftModAttributes.CRIT_DAMAGE).getValue() : 0)
 							+ "%"))),
 					false);

@@ -57,8 +57,6 @@ public class WitchercraftMeleeCritProcedure {
 				}
 			}
 			if (critBonus > 0) {
-				if (event instanceof CriticalHitEvent _event)
-					_event.setCriticalHit(true);
 				if (event instanceof CriticalHitEvent _event) {
 					_event.setDamageMultiplier(1);
 				}

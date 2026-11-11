@@ -59,7 +59,7 @@ together:
 
 - **A build you commit to.** The skill tree is capped, the School sets pull in different
   directions, and combat runs on stats you invest in. You can't have all of it. A Sign mage,
-  an alchemy bruiser, and a crit swordsman are all real builds, and they don't play alike.
+  an alchemy bruiser, and a precision swordsman are all real builds, and they don't play alike.
 
 - **Content that grows one entry at a time.** Every Sign, potion, oil, monster, perk, and
   armor set is a self-contained piece of content. New ones drop in without touching the
@@ -88,7 +88,7 @@ power, and you can raise that ceiling through the Alchemy tree.
 #### A Custom Combat Model
 
 WitcherCraft runs its own damage math instead of vanilla's: flat bonus damage, percent
-increased damage, fast and strong attacks, crits you earn by setting the target up, life steal, an
+increased damage, fast and strong attacks, Precise hits you earn by setting the target up, life steal, an
 execute, and debuffs and Venom on the target. Nothing in it is a dice roll.
 Oils feed extra damage into that math when they match the target's category.
 
@@ -101,7 +101,7 @@ the equip slots themselves open with your level, so what you slot is what matter
 #### Witcher School Armor
 
 Six full armor sets, one per Witcher School. Wear a complete set and its School Effect kicks
-in, each leaning toward a different playstyle: crit damage, Sign intensity, survivability, oil
+in, each leaning toward a different playstyle: Precise Hit Damage, Sign intensity, survivability, oil
 strength, and so on.
 
 #### A Living Bestiary
@@ -464,7 +464,7 @@ close to the edge.
 ## 5. Combat and the Damage Model
 
 WitcherCraft doesn't leave combat to vanilla's math. When you land a melee hit, the mod takes
-your weapon's base damage and runs it through its own model, so every witcher stat - crits,
+your weapon's base damage and runs it through its own model, so every witcher stat - Precise hits,
 life steal, oils, perks - actually changes the number that lands.
 
 Nothing in the model is random. There is no crit chance, no dodge chance and no instant-kill
@@ -477,10 +477,10 @@ On a melee hit, the weapon's base damage is combined with your stats:
 
 ```
 hit         = (base + AdditionalDamage + oil bonus) x (1 + IncreasedDamage% + hit bonus% + taken%)
-strong      = hit x (1 + 50% + crit bonus) (see Fast and strong attacks, Crits)
-fast        = hit x (1 + crit bonus)
+strong      = hit x (1 + 50% + precise bonus) (see Fast and strong attacks, Precise hits)
+fast        = hit x (1 + precise bonus)
 life steal  = damage dealt x LifeSteal%    (damage actually dealt, after armor, capped at the target's health)
-arrow       = vanilla damage x (1 + arrow bonus%) x (1 + crit bonus)
+arrow       = vanilla damage x (1 + arrow bonus% + taken bonus%)
 crippled    = anything a Crippled entity deals x 0.8, after the steps above, before armor
 ```
 
@@ -495,14 +495,14 @@ crippled    = anything a Crippled entity deals x 0.8, after the steps above, bef
 - **Arrow bonus** - extra % on a fully drawn arrow or any crossbow bolt, from bow perks (Cold
   Blood). The melee stats never touch arrows.
 - All percentages are **added together** before multiplying, so stacking more of them grows damage
-  linearly. Only the crit multiplies on top.
-- **Crit Damage** - the bonus a crit adds (see [Crits](#crits)).
+  linearly. Only the Precise hit multiplies on top.
+- **Precise Hit Damage** - the bonus a Precise hit adds (see [Precise hits](#precise-hits)).
 - **Life Steal** - the percentage of damage actually dealt, after the target's armor, that returns
   to you as health. It can't steal more than the target had left, so overkill hits and Executes
   heal only for the health they actually took. An Execute heals as the normal hit would have.
 
 The witcher stats apply to **melee only**. Signs scale with [Sign Intensity](#sign-intensity),
-bombs will get their own scaling, and arrows keep vanilla damage, changed only by crits and by
+bombs will get their own scaling, and arrows keep vanilla damage, changed only by Precise hits and by
 bow perks through the arrow bonus. The result is the hit itself - it is changed in place, lands once, and keeps you as the
 attacker, so kill credit, XP and loot work normally.
 
@@ -514,8 +514,8 @@ builds on fast and strong attacks, without any new key.
 ```
                       on the ground (charged)    jumping (charged)
 no condition          fast attack  x1.0          strong attack  x1.5
-condition true        fast crit    x1+CD         strong crit    x1.5+CD
-uncharged (spam)      no type - never triggers a perk, never crits
+condition true        Precise fast attack    x1+CD         Precise strong attack    x1.5+CD
+uncharged (spam)      no type - never triggers a perk, never a Precise hit
 ```
 
 - **Fast attack** - a fully charged hit from the ground. Vanilla's sweep only happens on these, so
@@ -524,7 +524,7 @@ uncharged (spam)      no type - never triggers a perk, never crits
   for everyone from the start. One target, more damage, and the jump is its commitment. Vanilla
   still shows its crit stars on it, but in WitcherCraft terms it is a strong attack, **not a crit**.
 - **Uncharged hits have no type**, so spam-clicking can't build streaks or stacks.
-- The type is about *how* you swing; a crit (below) is a separate layer that can land on either
+- The type is about *how* you swing; a Precise hit (below) is a separate layer that can land on either
   type. A thunderstorm with Thunderbolt doesn't turn fast attacks into strong ones.
 - Attack speed is not changed for strong attacks. If they turn out too spammable, the fix is a
   short recovery after a strong attack, not a global attack-speed change.
@@ -572,40 +572,26 @@ Counterattack armed:          [shield, burning]
 
 Built so far: the Three Strikes streak, the strong charges (Strength Training, Crushing Blows) and the Counterattack shield. The icons are first drafts.
 
-### Crits
+### Precise hits
 
-**"Crit" always means a condition crit**: a fully charged swing (or a fully drawn arrow, or any
-crossbow bolt) while a crit condition is true. Spam-clicking never crits. A crit adds your **Crit
-Damage**, which starts at **50%** (provisional) and is raised by perks and gear. On a strong attack
-it adds on top of the strong attack's own +50%.
+A **Precise hit** is a fully charged **melee** swing while a **condition** is true; arrows never get one. It adds your **Precise Hit Damage** (starts at **50%**). Spam-clicking never lands
+one. It is deliberately not called a crit: in Minecraft the crit is the jump attack, which here is the
+strong attack.
 
 ```
                           multiplier
 fast attack               x1.0
-strong attack             x1.5    1 + 50%
-fast crit                 x1.5    1 + Crit Damage (50%)
-strong crit               x2.0    1 + 50% + Crit Damage
+strong attack (jump)      x1.5    1 + 50%
+Precise fast attack       x1.5    1 + Precise Hit Damage (50%)
+Precise strong attack     x2.0    1 + 50% + Precise Hit Damage
 ```
 
-- Several conditions at once still count as one crit.
-- The base kit has no crits. **Conditions come from perks, potions and set effects** - buying
-  conditions is what a crit build is.
-- A fully drawn arrow keeps vanilla's own bonus, and Crit Damage applies only when a condition is
-  true. Every crossbow bolt counts as fully drawn.
-- **How a crit looks** - so you can tell your condition fired, as opposed to a plain strong attack:
+- Several conditions at once still count as one Precise hit.
+- The base kit has none. **Conditions come from perks, potions and set effects.**
+- Look: a strong attack shows vanilla's crit stars and sound; a Precise hit shows blue sparks and a
+  sharper crit sound (a Precise strong attack shows both).
 
-  ```
-  fast attack     nothing extra
-  strong attack   vanilla crit stars           + vanilla crit sound
-  fast crit       blue enchanted-hit sparks    + crit sound, higher pitch
-  strong crit     vanilla stars + blue sparks  + crit sound, higher pitch
-  crit arrow      blue sparks at the impact point
-  ```
-
-  *Not built yet* - today a crit shows vanilla's stars and sound.
-
-Crit conditions:
-
+Conditions:
 | Condition | Source |
 |---|---|
 | A thunderstorm | **Thunderbolt** potion |
@@ -617,9 +603,9 @@ Crit conditions:
 | Target hasn't noticed you | bow perk, not assigned yet |
 | Within **3** seconds of a kill | **Katakan** decoction |
 
-A venomed target is deliberately **not** a condition - Toxic Shock already rewards critting a
-venomed target (see [Venom](#venom)), and venom granting crits as well would make that loop free.
-Maimed is guarded differently: it only makes **melee** hits crit, so the bow can't set itself up; cashing it in always needs the swap to the sword.
+A venomed target is deliberately **not** a condition - Toxic Shock already rewards a Precise hit on a
+venomed target (see [Venom](#venom)), and venom granting Precise hits as well would make that loop free.
+Maimed is guarded differently: it only makes **melee** hits Precise, so the bow can't set itself up; cashing it in always needs the swap to the sword.
 
 ### Blocking and parrying
 
@@ -709,7 +695,7 @@ bonus applies the moment its source does and disappears the moment the source do
 recalculation step in between and nothing to fall out of sync. A few current examples:
 
 - **Water Hag Decoction** adds **40%** increased damage while you're at full health.
-- **Thunderbolt** turns every charged hit into a crit during a thunderstorm.
+- **Thunderbolt** turns every charged hit into a Precise hit during a thunderstorm.
 
 Combat perks that depend on the moment of the hit are the exception: they are worked out when the
 hit lands and show in the hit bonus, not on the character screen. **Flood of Anger** is one: it
@@ -721,7 +707,7 @@ The character screen surfaces the full stat line:
 |------|--------------|
 | Additional Damage | Flat melee damage added before multipliers |
 | Increased Damage | Percentage multiplier on total melee damage |
-| Crit Damage | The bonus a crit adds |
+| Precise Hit Damage | The bonus a Precise hit adds |
 | Life Steal | Percent of melee damage dealt healed back |
 | Oil Damage | Scales the bonus from a correctly matched oil |
 | Sign Intensity | Strength of every Sign |
@@ -777,13 +763,13 @@ targets are never affected):
 
 | Debuff | From | Effect | Lasts |
 |---|---|---|---|
-| **Crippled** | Crippling Strikes (fast crit) | Deals **-20%** damage | **3 s**, refreshed, doesn't stack |
+| **Crippled** | Crippling Strikes (Precise fast attack) | Deals **-20%** damage | **3 s**, refreshed, doesn't stack |
 | **Sundered** | Sunder Armor (strong attack) | Takes **+10%** damage per stack, up to **3** | **8 s**, each stack restarts it |
-| **Maimed** | Maiming Shot (fully drawn arrow or bolt) | Your next **2** charged melee hits on it are crits; arrows never crit from it | **4 s**, or until the 2 hits are spent; every shot refreshes it |
+| **Maimed** | Maiming Shot (fully drawn arrow or bolt) | Your next **2** charged melee hits on it are Precise hits; arrows never get it | **4 s**, or until the 2 hits are spent; every shot refreshes it |
 
 Crippled is defensive, so it never overlaps with Sundered: Sunder Armor makes the target take
 more, Crippling Strikes makes it deal less. The -20% covers everything the Crippled entity deals
-(melee, arrows, explosions, spells), against anyone, and is applied after crits and before armor.
+(melee, arrows, explosions, spells), against anyone, and is applied after Precise hits and before armor.
 Bosses are not special-cased. A slow was tried first and dropped: in Minecraft a melee mob's only
 threat is reaching you, so a slow on top of knockback locked mobs in place.
 
@@ -803,7 +789,7 @@ Golden Oriole does not cure Venom.
 - **Delivered through oils.** Oiled hits apply Venom through an Alchemy perk line, adapted from
   The Witcher 3:
   - **Poisoned Blades** - oiled hits apply Venom.
-  - **Toxic Shock** - a crit on a venomed target consumes the Venom for a burst of extra damage,
+  - **Toxic Shock** - a Precise hit on a venomed target consumes the Venom for a burst of extra damage,
     a share of the hit. Once every **5** seconds.
   - **Debilitating Poison** - venomed targets deal less damage.
   - **Potent Sting** - extra damage with an oiled blade, doubled against targets immune to Venom,
@@ -1066,7 +1052,7 @@ The leggings add the tunic's chain hem with hanging gold points, dark teal and o
 laced panels behind the thighs, and round bronze knee cops; the boots are knee-high olive leather
 with a studded top band, buckled straps behind, and metal toe caps.
 
-The Feline set is the crit fighter's light armor, modelled closely on the Witcher 3 original: a navy
+The Feline set is the precision fighter's light armor, modelled closely on the Witcher 3 original: a navy
 padded jacket covered in a grid of silver studs, cream sheepskin lapels around a chain-mail collar,
 two short buckled straps closing the chest, and a red-brown sword strap that crosses the chest and
 the back. Two belts of interlocking steel and ochre triangles, buckled on the left and the lower one
@@ -1098,7 +1084,7 @@ School at a time, so the set you wear is a commitment that should match how you'
 | School | Set effect |
 |--------|-----------|
 | **Wolven** | Balanced - modest combat and Sign bonuses, the generalist set |
-| **Feline** | The glass-cannon crit set. *Rework pending* - was +**50%** crit damage, which does nothing without a crit condition |
+| **Feline** | The glass-cannon Precise-hit set. *Rework pending* - was +**50%** Precise Hit Damage, which does nothing without a condition |
 | **Griffin** | +**20%** Sign Intensity and reduced Sign cooldown - the Sign set |
 | **Ursine** | +**20%** maximum health - the survivability set |
 | **Viper** | Stronger oils - raises the Oil Damage that scales matched-oil hits |
@@ -1454,7 +1440,7 @@ drinking any potion also heals **10%** of max health.
 |--------|----------|--------|
 | **Swallow** | +**25** | Passive health regeneration |
 | **Petri's Philter** | +**20** | +**20** Sign Intensity |
-| **Thunderbolt** | +**25** | +**20%** increased damage; during a thunderstorm every charged hit is a condition crit |
+| **Thunderbolt** | +**25** | +**20%** increased damage; during a thunderstorm every charged hit is a Precise hit |
 | **Full Moon** | +**25** | +**4** maximum health (2 hearts) |
 | **Blizzard** | +**15** | +**55%** attack speed. *Rework pending* - its +**5** dodge chance is cut |
 | **Black Blood** | +**20** | Reflects **15%** of damage taken from Necrophages and Vampires back at the attacker |
@@ -1475,7 +1461,7 @@ Every decoction costs **50** Toxicity.
 | Decoction | Effect |
 |-----------|--------|
 | **Ekimmara** | +**10%** life steal |
-| **Katakan** | Condition crits for **3** seconds after a kill. *Not built yet* - the old +**10** crit chance is removed, so it currently does nothing |
+| **Katakan** | Precise hits for **3** seconds after a kill. *Not built yet* - the old +**10** crit chance is removed, so it currently does nothing |
 | **Foglet** | +**25** Sign Intensity while raining |
 | **Leshen** | *Rework pending* - was +**20** reflect damage, which is cut |
 | **Wyvern** | Increased damage builds +**1%** per hit landed in combat, up to +**10%**; resets when you leave combat |
@@ -1548,7 +1534,7 @@ Reflexes (slow-motion aiming and headshots). The old **Defence** perk (+4 max he
 | **Muscle Memory** | While no attacker has hurt you for **3 s**, +**20%** attack speed (faster recharge for every swing). Shown as the **Muscle Memory** status effect (faint ambient particles, no expiry). Only health damage from an attacker breaks it: blocked, Quen'd and dodged hits don't, and neither do fall, fire, drowning or poison | Built - reworked from the 3 buffed fast hits, which re-armed instantly and cluttered the combat line |
 | **Flood of Anger** | +**10%** melee damage for each monster within **5** blocks after the first, up to +**30%** (4 monsters). Any living Monster counts, idle zombified piglins and endermen too; slimes, magma cubes, ghasts, phantoms, shulkers and hoglins are not Monsters in vanilla and don't. Counted when the hit lands; every melee hit, charged or not | Built |
 | **Three Strikes** | Every **4th** typed hit of the same type in a row deals +**50%**. The streak resets after **4 s** without a typed hit. While equipped, three slots of the streak's attack icon on the [combat line](#the-combat-line) show the combo. On the 3rd hit they collapse into one burning icon and the ready chime plays: the next hit is the strike. A hit that spends another perk's charge does not count toward the streak | Built - replaces Precise Blows |
-| **Crippling Strikes** | A fast crit **Cripples** the target: it deals -**20%** damage for **3 s**; another fast crit restarts it, no stacking. Main target only | Built |
+| **Crippling Strikes** | A Precise fast attack **Cripples** the target: it deals -**20%** damage for **3 s**; another Precise fast attack restarts it, no stacking. Main target only | Built |
 | **Fleet Footed** | +**15%** movement speed | Built |
 
 *Strong*
@@ -1556,7 +1542,7 @@ Reflexes (slow-motion aiming and headshots). The old **Defence** perk (+4 max he
 | Perk | Effect | Status |
 |------|--------|--------|
 | **Strength Training** | A fast attack charges the next strong attack within **4 s** with +**30%**. Each fast attack restarts the 4 s; it doesn't stack | Built |
-| **Crushing Blows** | A strong crit charges the next **2** strong attacks within **6 s** with +**40%**. Strong attacks that spend the charge can't re-charge it, and they don't count for Three Strikes | Built |
+| **Crushing Blows** | A Precise strong attack charges the next **2** strong attacks within **6 s** with +**40%**. Strong attacks that spend the charge can't re-charge it, and they don't count for Three Strikes | Built |
 | **Sunder Armor** | Each strong attack adds a **Sundered** stack: +**10%** damage taken per stack, up to **3**, for **8 s**; each stack restarts the 8 s. Main target only. The extra damage taken applies to your arrows and bolts too, added to their arrow bonus (Cold Blood) | Built |
 | **Undying** | When killed, restore to **50%** health. Once every **15** minutes | Built |
 | **Deadly Precision** | [Execute](#execute): a strong attack kills a target below **20%** health, with a heavy mace smash. Bosses and players are immune | Built |
@@ -1565,16 +1551,16 @@ Reflexes (slow-motion aiming and headshots). The old **Defence** perk (+4 max he
 
 Ranged is a **tool for the sword build**, not a build of its own: the bow perks make your bow matter
 inside a sword fight (openers, set-ups, finishers), the way the crossbow is a utility for Geralt.
-Arrows take crits, the arrow bonus (Cold Blood) and the target's damage-taken bonuses (Sundered),
-but not Increased Damage, Additional Damage or oils: those are sword stats.
+Arrows take only the arrow bonus (Cold Blood) and the target's damage-taken bonuses (Sundered).
+Precise hits, Increased Damage, Additional Damage and oils are sword stats.
 
 | Perk | Effect | Status |
 |------|--------|--------|
-| **Counterattack** | Unlocks the whole [blocking and parrying](#blocking-and-parrying) moveset: sword blocking, the perfect parry (sword or shield), stagger and the incoming-attack indicator. A perfect parry of a melee hit also makes your next charged attack, fast or strong, within **3 s** deal +**50%**. One charge; another perfect parry refreshes it. Uncharged hits don't spend it; the spending hit resets the Three Strikes streak. Meant as a root node (no prerequisites), with Arrow Deflection after it. Tooltip has a grey how-to line | Built - slot 107; tree icons are placeholder copies of the old Defence art |
-| **Arrow Deflection** | Lets you block with a sword. An arrow, crossbow bolt or trident coming at your front that reaches you within **0.5 s** of [raising your block](#blocking-and-parrying) (sword or shield; the 1 s re-raise lockout applies) is caught and flies back at the shooter at full-bow speed, with the damage it would have dealt you. Raise when you hear the shot. A block held longer is a plain block and returns nothing. During the window the catch zone is your body grown by **1** block on every side, front half only, so near misses are caught too; shots from behind still hit. The return **homes** hard (turns **30%** toward the shooter each tick, up to **3 s**; a visible curve is fine). With no shooter (dead, gone, dispenser) it flies along your crosshair. A catch plays the parry clang and sparks, then a bow shot. It counts as your shot and can't be picked up; a returned trident loses its enchantments; piercing arrows can't be caught (as in vanilla). With a sword this makes arrows 100% blocked instead of 50%. Works without Counterattack equipped (Counterattack is only its tree prerequisite). Tooltip has a grey how-to line | Built - slot 112 (was Razor Focus); icons are copies of the Razor Focus art, originals in `textures/screens/_unused/` |
-| **Cold Blood** | Fully drawn arrows and crossbow bolts deal +**25%** when **fired** while no hostile is within **5** blocks of you (a sphere). Decided at the release, so the target itself, or a mob that walks up during the flight, doesn't cancel it. "Fully drawn" is vanilla's crit flag: a bow at full draw; a player's crossbow bolts always count. Hostile = vanilla's Enemy type (monsters, slimes, ghasts, phantoms, hoglins, shulkers), so animals, villagers and players don't count; neutral endermen and zombified piglins do. Applied after the crit, multiplicative. Arrows sent back by Arrow Deflection aren't crits and never get it | Built - replaces the old +5 Additional Damage, which only ever reached melee |
-| **Bloody Rage** | +**40%** damage on melee hits while you are below **30%** health. Taken from Witcher 1: the tree's frame is Witcher 3, but perks may come from the whole saga when they add a decision | *Not built* - replaces Anatomical Knowledge |
-| **Maiming Shot** | The bow as the sword's crit opener: a fully drawn arrow or crossbow bolt that hits **Maims** the target. While Maimed, your next **2** charged **melee** hits on it are crits, for up to **4 s**. Every shot refreshes it (back to 2 hits and 4 s). Arrows never crit from Maimed, so the bow can't set itself up: the payoff always needs the swap to the sword. Maimed crits trigger crit perks (Crippling Strikes, Crushing Blows) like any crit. Tooltip has a grey how-to line | Built - slot 103 (was Crippling Shot); icons are copies of the Crippling Shot art, originals in `textures/screens/_unused/` |
+| **Counterattack** | Unlocks blocking and parrying: sword block, perfect parry vs melee (staggers the attacker), the incoming-attack indicator. A perfect parry makes your next charged attack within **3 s** deal +**50%**. Root node | Built |
+| **Arrow Deflection** | Unlocks sword blocking. An arrow, bolt or trident blocked within **0.5 s** of raising the block (catch zone 1 block around you, front only) flies back homing on the shooter, with the damage it would have dealt you | Built |
+| **Cold Blood** | Fully drawn arrows and bolts fired with no hostile within **5** blocks deal +**25%** | Built |
+| **Bloody Rage** | +**40%** melee damage while below **30%** health (Witcher 1) | Built |
+| **Maiming Shot** | A fully drawn arrow or bolt **Maims** the target: your next **2** charged melee hits on it within **4 s** are Precise hits. Arrows never benefit | Built |
 
 **Signs**
 

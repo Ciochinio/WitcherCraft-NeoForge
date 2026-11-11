@@ -6,6 +6,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
 
 import java.util.Comparator;
@@ -66,6 +67,14 @@ public class WitchercraftHitBonusProcedure {
 			}
 			sourceentity.getPersistentData().putString("witchercraftHitBonusLog", ((sourceentity.getPersistentData().getStringOr("witchercraftHitBonusLog", "")) + "Counterattack +50"));
 			bonus = bonus + 50;
+		}
+		if (sourceentity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkBloodyRage
+				&& (sourceentity instanceof LivingEntity _livEnt ? _livEnt.getHealth() : -1) < (sourceentity instanceof LivingEntity _livEnt ? _livEnt.getMaxHealth() : -1) * 0.3) {
+			if (bonus > 0) {
+				sourceentity.getPersistentData().putString("witchercraftHitBonusLog", ((sourceentity.getPersistentData().getStringOr("witchercraftHitBonusLog", "")) + ", "));
+			}
+			sourceentity.getPersistentData().putString("witchercraftHitBonusLog", ((sourceentity.getPersistentData().getStringOr("witchercraftHitBonusLog", "")) + "Bloody Rage +40"));
+			bonus = bonus + 40;
 		}
 		if (bonus > 0) {
 			sourceentity.getPersistentData().putString("witchercraftHitBonusLog", (" (" + (sourceentity.getPersistentData().getStringOr("witchercraftHitBonusLog", "")) + ")"));

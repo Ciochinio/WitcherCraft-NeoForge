@@ -6,7 +6,7 @@ public class AllPerksProcedure {
 	public static void execute(Entity entity) {
 		if (entity == null)
 			return;
-		AnatomicalKnowledgeEffectProcedure.execute(entity);
+		BloodyRageEffectProcedure.execute(entity);
 		ColdBloodEffectProcedure.execute(entity);
 		MaimingShotEffectProcedure.execute(entity);
 		CripplingStrikesEffectProcedure.execute(entity);
