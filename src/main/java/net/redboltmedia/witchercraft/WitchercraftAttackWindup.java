@@ -139,7 +139,7 @@ public final class WitchercraftAttackWindup {
 	 */
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public static void staggerOnBlock(LivingShieldBlockEvent event) {
-		if (!event.getBlocked() || event.getBlockedDamage() <= 0 || !(event.getEntity() instanceof Player player) || !(player.level() instanceof ServerLevel level) || !WitchercraftSwordBlock.hasParry(player))
+		if (!event.getBlocked() || event.getBlockedDamage() <= 0 || !(event.getEntity() instanceof Player player) || !(player.level() instanceof ServerLevel level) || !WitchercraftSwordBlock.hasCounterattack(player))
 			return;
 		if (!(event.getDamageSource().getEntity() instanceof Mob mob) || event.getDamageSource().getDirectEntity() != mob)
 			return;
@@ -176,7 +176,7 @@ public final class WitchercraftAttackWindup {
 		trace(event.getEntity(), (perfect ? "PERFECT PARRY " : "blocked ") + Math.round(event.getBlockedDamage() * 100) / 100.0 + " of " + Math.round(event.getDamageContainer().getNewDamage() * 100) / 100.0);
 	}
 
-	private static void trace(Entity whom, String text) {
+	static void trace(Entity whom, String text) {
 		if (whom instanceof ServerPlayer player && player.hasEffect(WitchercraftModMobEffects.DEV_LOG))
 			player.sendSystemMessage(Component.literal("\u00A77[" + player.tickCount + "] " + text), false);
 	}

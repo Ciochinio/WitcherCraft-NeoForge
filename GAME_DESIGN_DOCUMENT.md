@@ -624,11 +624,15 @@ re-arm Maiming Shot.
 
 ### Blocking and parrying
 
-Everything in this section except the mob wind-up and bracing belongs to the **Counterattack** perk
-(a root node of the Combat tree, so it can be the first point you spend). Without it a shield is
-plain vanilla and a sword doesn't block, and there is no incoming-attack indicator. That is on
-purpose: reading the perk is where you learn blocking exists, so the crosshair cue only appears once
-you know what it means. The perk's tooltip carries a grey how-to line.
+Everything in this section except the mob wind-up and bracing belongs to two perks. **Counterattack**
+(a root node of the Combat tree, so it can be the first point you spend) covers melee: sword
+blocking, the perfect parry of melee hits, stagger and the incoming-attack indicator. **Arrow
+Deflection** (after it in the tree) covers projectiles: sword blocking, and an arrow, bolt or
+trident that reaches you within **0.5 s** of raising your block flies back. Each works on its own when equipped; with only
+Arrow Deflection, a melee hit inside the window is a plain block. With neither, a shield is plain vanilla, a sword
+doesn't block and there is no indicator. That is on purpose: reading the perk is where you learn
+blocking exists, so the crosshair cue only appears once you know what it means. Both tooltips carry a
+grey how-to line.
 
 Witchers parry with the sword, so a sword blocks like in old Minecraft: **right-click with a sword
 and an empty off-hand**. With anything in the off-hand (a shield, the chain hook, a bomb, a torch),
@@ -672,7 +676,13 @@ right-click uses that item instead, so the chain hook's pull-into-slash combo is
   earlier. Spam-clicking still blocks (50% with a sword) but never parries. A successful parry is never
   punished, so chaining parries against a group works.
 - Perks react to the perfect parry, not to the block: [Counterattack](#perks) arms on a perfect melee
-  parry, Arrow Deflection will send a perfectly parried arrow back.
+  parry. Arrow Deflection uses a wider **0.5 s** window from the raise, because an arrow reaches you in
+  0.35 s from 10 blocks (0.7 s from 20), too fast to time 0.25 s against, and is barely visible at
+  night. The cue is the shoot sound: raise when you hear the shot. A first version returned every
+  blocked arrow with no timing, and holding right-click made skeletons kill themselves; the window
+  keeps a held block passive (it blocks, nothing comes back). 0.5 s with soft homing was tried next
+  and was too hard while also fighting, with many misses; 0.75 s with strong homing then felt too long,
+  so it is 0.5 s with strong homing.
 - A server option (`combat.swordBlocking`, on by default) turns sword blocking off for packs whose
   combat mod uses right-click on swords. Parrying, and the parry perks, then work with shields only.
 - Every perk can carry an optional grey how-to line under its tooltip description (lang key
@@ -1557,7 +1567,7 @@ Reflexes (slow-motion aiming and headshots). The old **Defence** perk (+4 max he
 | Perk | Effect | Status |
 |------|--------|--------|
 | **Counterattack** | Unlocks the whole [blocking and parrying](#blocking-and-parrying) moveset: sword blocking, the perfect parry (sword or shield), stagger and the incoming-attack indicator. A perfect parry of a melee hit also makes your next charged attack, fast or strong, within **3 s** deal +**50%**. One charge; another perfect parry refreshes it. Uncharged hits don't spend it; the spending hit resets the Three Strikes streak. Meant as a root node (no prerequisites), with Arrow Deflection after it. Tooltip has a grey how-to line | Built - slot 107; tree icons are placeholder copies of the old Defence art |
-| **Arrow Deflection** | An arrow, bolt or trident blocked within **0.5 s** of the shield going up flies back at the shooter for the damage it would have dealt. It counts as your shot and can't be picked up | *Not built* - new, replaces Razor Focus |
+| **Arrow Deflection** | Lets you block with a sword. An arrow, crossbow bolt or trident coming at your front that reaches you within **0.5 s** of [raising your block](#blocking-and-parrying) (sword or shield; the 1 s re-raise lockout applies) is caught and flies back at the shooter at full-bow speed, with the damage it would have dealt you. Raise when you hear the shot. A block held longer is a plain block and returns nothing. During the window the catch zone is your body grown by **1** block on every side, front half only, so near misses are caught too; shots from behind still hit. The return **homes** hard (turns **30%** toward the shooter each tick, up to **3 s**; a visible curve is fine). With no shooter (dead, gone, dispenser) it flies along your crosshair. A catch plays the parry clang and sparks, then a bow shot. It counts as your shot and can't be picked up; a returned trident loses its enchantments; piercing arrows can't be caught (as in vanilla). With a sword this makes arrows 100% blocked instead of 50%. Works without Counterattack equipped (Counterattack is only its tree prerequisite). Tooltip has a grey how-to line | Built - slot 112 (was Razor Focus); icons are copies of the Razor Focus art, originals in `textures/screens/_unused/` |
 | **Cold Blood** | Fully drawn arrows and crossbow bolts deal +**25%** while no hostile is within **5** blocks of you | *Not built* - today +**5** Additional Damage while no enemy is near |
 | **Bloody Rage** | +**40%** damage on melee hits while you are below **30%** health. Taken from Witcher 1: the tree's frame is Witcher 3, but perks may come from the whole saga when they add a decision | *Not built* - replaces Anatomical Knowledge |
 | **Maiming Shot** | After a melee crit, your next fully drawn arrow or bolt within **5 s** **Maims** the target for **4 s**: a crit condition. Crits that only happened because of Maimed don't re-arm it | *Not built* - replaces Crippling Shot |

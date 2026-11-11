@@ -53,7 +53,7 @@ public class DevClearProcedure {
 			_vars.witchercraftPerksAnatomicalKnowledge = false;
 			_vars.witchercraftPerksCripplingShot = false;
 			_vars.witchercraftPerksFloodOfAnger = false;
-			_vars.witchercraftPerksRazorFocus = false;
+			_vars.witchercraftPerksArrowDeflection = false;
 			_vars.witchercraftPerksUndying = false;
 			_vars.witchercraftPerksCombatSkillPointsUsed = 0;
 			_vars.witchercraftPerksAlchemySkillPointsUsed = 0;

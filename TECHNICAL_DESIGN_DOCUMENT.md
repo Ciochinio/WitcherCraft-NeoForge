@@ -550,8 +550,8 @@ character sheet - the attributes are syncable, so the client already has the val
 
 ### 2.6 Known limitations
 
-- **Perks and effects left empty by the stat cut.** Katakan, Leshen, Deadly Precision, Razor Focus and
-  Anatomical Knowledge currently do nothing; Blizzard keeps only its attack speed. They wait for the
+- **Perks and effects left empty by the stat cut.** Katakan, Leshen and Anatomical Knowledge currently do
+  nothing (Deadly Precision is now Execute, Razor Focus became Arrow Deflection); Blizzard keeps only its attack speed. They wait for the
   perk rework (GDD 5 marks them "Rework pending").
 - **Five element files use unicode escapes and a BOM** (`AltQuenCast`, `QuenActiveShieldAura`,
   `QuenActiveShieldTick`, `SignCastHold`, `SignCastHoldCost`). They store `<` as a
@@ -698,10 +698,10 @@ changes here:
   `LivingShieldBlockEvent` handler turns a caught hit within 5 ticks (`PERFECT_WINDOW_TICKS`) of the window start into a full block,
   stamps `witchercraftPerfectParryTick` and plays the clang (`block.anvil.land` 0.45/1.9) and crit sparks.
   The server option lives in `WorldMapServerConfig` (`combat.swordBlocking`, the de facto server config).
-  Perk gate: `WitchercraftSwordBlock.hasParry(player)` reads the synced `witchercraftEquippedPerkCounterattack`.
-  Without it the sword component is not added (and is removed on the next right-click), `onUseStart` writes window
-  start 0 (no perfect parry, shields stay vanilla), `WitchercraftAttackWindup.staggerOnBlock` returns early, and
-  the Blockly seam `WitchercraftParryIndicatorEnabled` returns the same variable, so no indicator is sent.
+  Perk gate: `WitchercraftSwordBlock.canParry(player)` (Counterattack or Arrow Deflection equipped, synced
+  variables). Without it the sword component is not added (and is removed on the next right-click) and `onUseStart`
+  writes window start 0 (no perfect parry, shields stay vanilla). Stagger (`staggerOnBlock`) and the indicator (the
+  Blockly seam `WitchercraftParryIndicatorEnabled`) need Counterattack itself.
   Perk tooltips (`PerkPage.perkTooltip`) append an empty line and the grey, wrapped `perk.witchercraft.<slug>.usage`
   text when that lang key exists (`PerkRegistry.usageKey`); like every hand-added key it lives in both
   `en_us.json` and the workspace `language_map`.
@@ -742,7 +742,30 @@ changes here:
   player and plays the ready chime itself (`WitchercraftReadyChime` plays at `sourceentity`, which on this trigger is
   the attacker). `WitchercraftHitBonus` adds +50 on a typed hit within 60 ticks; `WitchercraftOnFastHit` /
   `WitchercraftOnStrongHit` zero the stamp and the streak; `WitchercraftComboLine` draws the burning shield (sig 1000).
-  Arrow Deflection will hang off the same trigger.
+  Arrow Deflection is Java (`WitchercraftSwordBlock`), see below.
+- *Arrow Deflection (slot 112, was Razor Focus):* `ArrowDeflectionEffect` (`~/Character Abilities/CombatPerks/Arrow Deflection`),
+  player variables `witchercraftPerksArrowDeflection` / `witchercraftEquippedPerkArrowDeflection` (renamed, so an old
+  learned Razor Focus reads as not learned), calls in `AllPerks` and `DevClear`, icons `textures/screens/arrowdeflection_*.png`.
+  Gating in `WitchercraftSwordBlock`: `canParry` (either perk) adds the sword component and opens the perfect window.
+  `onBlock`: a melee hit is perfect only inside the window with `hasCounterattack`; a blocked `AbstractArrow` with
+  `hasArrowDeflection` inside `PROJECTILE_WINDOW_TICKS` 10 of the window start (`inProjectileWindow`, same start
+  and re-raise lockout as the perfect window) is fully blocked and queued as a `Deflect` (arrow, player, shooter,
+  original damage); later in a held block it's a plain block.
+  Vanilla reverses a fully blocked arrow at 20% speed after the hurt call returns, so `ServerTickEvent.Post` makes
+  that return shot. Most shots never get there: `ServerTickEvent.Pre`, before entities move, takes every player who
+  `isBlocking()` with Arrow Deflection inside the projectile window, grows the hitbox by `CATCH_MARGIN` 1.0, and catches each nearby
+  `AbstractArrow` that is approaching, in the front half (look vs arrow, horizontal) and whose segment for this tick
+  (`position` to `position + deltaMovement`) starts in or clips the zone; skipped: owner is the player (returned
+  shots), pierce > 0 (vanilla can't block those), resting arrows. Its damage is ceil(speed x baseDamage), with
+  `baseDamage` read by reflection (no getter; 2.0 if that fails). `launchBack`: from 0.6 in front of the eyes,
+  `shoot` at `RETURN_SPEED` 3.0 with no spread at the shooter's middle (live, same level, within 64) or along the
+  look vector, `setBaseDamage(damage / 3.0)`, and a `Homing` entry. `steerHoming` (start of each tick) re-shoots
+  every tracked shot at 3.0 along `normalize(v) x 0.7 + toTarget x 0.3` (`HOMING_STEER`) until it's gone, stops, its
+  target dies or `HOMING_TICKS` 60 pass; re-shooting at full speed also cancels drag and drop, so the damage stays the
+  blocked amount. DevLog traces `caught`, `blocked`, `returned to ... for N`. A trident's damage flag
+  (`dealtDamage`) is private and set on its first hit, so a fresh `ThrownTrident` is spawned from the item with
+  `ENCHANTMENTS` removed (no loyalty return) and the old one is discarded. Owner = player, then `pickup = DISALLOWED`
+  (setOwner would flip it to ALLOWED). `staggerOnBlock` now checks `hasCounterattack`.
 - *Counterattack perk (slot 107):* `CounterattackEffect` (`~/Character Abilities/CombatPerks/Counterattack`), player
   variables `witchercraftPerksCounterattack` / `witchercraftEquippedPerkCounterattack`, calls in `AllPerks` and
   `DevClear`, icons `textures/screens/counterattack_*.png`.

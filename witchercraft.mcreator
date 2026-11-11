@@ -3981,14 +3981,14 @@
       "path": "~/Character Abilities/CombatPerks/Flood of Anger"
     },
     {
-      "name": "RazorFocusEffect",
+      "name": "ArrowDeflectionEffect",
       "type": "procedure",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "razor_focus_effect",
+      "registry_name": "arrow_deflection_effect",
       "metadata": {
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/RazorFocusEffectProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/ArrowDeflectionEffectProcedure.java"
         ],
         "dependencies": [
           {
@@ -3997,7 +3997,7 @@
           }
         ]
       },
-      "path": "~/Character Abilities/CombatPerks/Razor Focus"
+      "path": "~/Character Abilities/CombatPerks/Arrow Deflection"
     },
     {
       "name": "UndyingEffect",
@@ -10028,7 +10028,7 @@
       "value": "false"
     },
     {
-      "name": "witchercraftEquippedPerkRazorFocus",
+      "name": "witchercraftEquippedPerkArrowDeflection",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
@@ -10484,7 +10484,7 @@
       "value": "false"
     },
     {
-      "name": "witchercraftPerksRazorFocus",
+      "name": "witchercraftPerksArrowDeflection",
       "type": "logic",
       "scope": "player_persistent",
       "value": "false"
@@ -10804,8 +10804,9 @@
       "perk.witchercraft.musclememory.desc": "While you have not taken damage for 3 s: +20% attack speed.",
       "perk.witchercraft.threestrikes.name": "Three Strikes",
       "perk.witchercraft.threestrikes.desc": "Every 4th charged hit of the same type in a row deals +50% damage. The streak resets after 4 s without a charged hit.",
-      "perk.witchercraft.razorfocus.name": "Razor Focus",
-      "perk.witchercraft.razorfocus.desc": "Add 10% chance to dodge attack.",
+      "perk.witchercraft.arrowdeflection.name": "Arrow Deflection",
+      "perk.witchercraft.arrowdeflection.desc": "Lets you block with a sword. An arrow, bolt or trident that reaches you within 0.5 s of raising your block, even one that would just miss you, flies back at the shooter with the damage it would have dealt you.",
+      "perk.witchercraft.arrowdeflection.usage": "Right-click with a sword (empty off-hand) or a shield to block. Face the shooter and raise it when you hear the shot.",
       "perk.witchercraft.strengthtraining.name": "Strength Training",
       "perk.witchercraft.strengthtraining.desc": "A fast attack charges your next strong attack within 4 s: it deals +30% damage.",
       "perk.witchercraft.sunderarmor.name": "Sunder Armor",
@@ -11732,7 +11733,7 @@
                 "children": []
               },
               {
-                "name": "Razor Focus",
+                "name": "Arrow Deflection",
                 "children": []
               },
               {

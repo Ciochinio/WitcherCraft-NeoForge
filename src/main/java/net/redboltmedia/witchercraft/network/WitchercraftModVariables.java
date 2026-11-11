@@ -98,7 +98,7 @@ public class WitchercraftModVariables {
 		clone.witchercraftEquippedPerkFloodOfAnger = original.witchercraftEquippedPerkFloodOfAnger;
 		clone.witchercraftEquippedPerkMuscleMemory = original.witchercraftEquippedPerkMuscleMemory;
 		clone.witchercraftEquippedPerkThreeStrikes = original.witchercraftEquippedPerkThreeStrikes;
-		clone.witchercraftEquippedPerkRazorFocus = original.witchercraftEquippedPerkRazorFocus;
+		clone.witchercraftEquippedPerkArrowDeflection = original.witchercraftEquippedPerkArrowDeflection;
 		clone.witchercraftEquippedPerkStrengthTraining = original.witchercraftEquippedPerkStrengthTraining;
 		clone.witchercraftEquippedPerkSunderArmor = original.witchercraftEquippedPerkSunderArmor;
 		clone.witchercraftEquippedPerkUndying = original.witchercraftEquippedPerkUndying;
@@ -174,7 +174,7 @@ public class WitchercraftModVariables {
 		clone.witchercraftPerksAnatomicalKnowledge = original.witchercraftPerksAnatomicalKnowledge;
 		clone.witchercraftPerksCripplingShot = original.witchercraftPerksCripplingShot;
 		clone.witchercraftPerksFloodOfAnger = original.witchercraftPerksFloodOfAnger;
-		clone.witchercraftPerksRazorFocus = original.witchercraftPerksRazorFocus;
+		clone.witchercraftPerksArrowDeflection = original.witchercraftPerksArrowDeflection;
 		clone.witchercraftPerksUndying = original.witchercraftPerksUndying;
 		clone.witchercraftPlayerLevel = original.witchercraftPlayerLevel;
 		clone.witchercraftMedallion = original.witchercraftMedallion;
@@ -229,7 +229,7 @@ public class WitchercraftModVariables {
 		public boolean witchercraftEquippedPerkFloodOfAnger = false;
 		public boolean witchercraftEquippedPerkMuscleMemory = false;
 		public boolean witchercraftEquippedPerkThreeStrikes = false;
-		public boolean witchercraftEquippedPerkRazorFocus = false;
+		public boolean witchercraftEquippedPerkArrowDeflection = false;
 		public boolean witchercraftEquippedPerkStrengthTraining = false;
 		public boolean witchercraftEquippedPerkSunderArmor = false;
 		public boolean witchercraftEquippedPerkUndying = false;
@@ -305,7 +305,7 @@ public class WitchercraftModVariables {
 		public boolean witchercraftPerksAnatomicalKnowledge = false;
 		public boolean witchercraftPerksCripplingShot = false;
 		public boolean witchercraftPerksFloodOfAnger = false;
-		public boolean witchercraftPerksRazorFocus = false;
+		public boolean witchercraftPerksArrowDeflection = false;
 		public boolean witchercraftPerksUndying = false;
 		public double witchercraftPlayerLevel = 1;
 		public double witchercraftMedallion = 0;
@@ -356,7 +356,7 @@ public class WitchercraftModVariables {
 			output.putBoolean("witchercraftEquippedPerkFloodOfAnger", witchercraftEquippedPerkFloodOfAnger);
 			output.putBoolean("witchercraftEquippedPerkMuscleMemory", witchercraftEquippedPerkMuscleMemory);
 			output.putBoolean("witchercraftEquippedPerkThreeStrikes", witchercraftEquippedPerkThreeStrikes);
-			output.putBoolean("witchercraftEquippedPerkRazorFocus", witchercraftEquippedPerkRazorFocus);
+			output.putBoolean("witchercraftEquippedPerkArrowDeflection", witchercraftEquippedPerkArrowDeflection);
 			output.putBoolean("witchercraftEquippedPerkStrengthTraining", witchercraftEquippedPerkStrengthTraining);
 			output.putBoolean("witchercraftEquippedPerkSunderArmor", witchercraftEquippedPerkSunderArmor);
 			output.putBoolean("witchercraftEquippedPerkUndying", witchercraftEquippedPerkUndying);
@@ -432,7 +432,7 @@ public class WitchercraftModVariables {
 			output.putBoolean("witchercraftPerksAnatomicalKnowledge", witchercraftPerksAnatomicalKnowledge);
 			output.putBoolean("witchercraftPerksCripplingShot", witchercraftPerksCripplingShot);
 			output.putBoolean("witchercraftPerksFloodOfAnger", witchercraftPerksFloodOfAnger);
-			output.putBoolean("witchercraftPerksRazorFocus", witchercraftPerksRazorFocus);
+			output.putBoolean("witchercraftPerksArrowDeflection", witchercraftPerksArrowDeflection);
 			output.putBoolean("witchercraftPerksUndying", witchercraftPerksUndying);
 			output.putDouble("witchercraftPlayerLevel", witchercraftPlayerLevel);
 			output.putDouble("witchercraftMedallion", witchercraftMedallion);
@@ -484,7 +484,7 @@ public class WitchercraftModVariables {
 			witchercraftEquippedPerkFloodOfAnger = input.getBooleanOr("witchercraftEquippedPerkFloodOfAnger", false);
 			witchercraftEquippedPerkMuscleMemory = input.getBooleanOr("witchercraftEquippedPerkMuscleMemory", false);
 			witchercraftEquippedPerkThreeStrikes = input.getBooleanOr("witchercraftEquippedPerkThreeStrikes", false);
-			witchercraftEquippedPerkRazorFocus = input.getBooleanOr("witchercraftEquippedPerkRazorFocus", false);
+			witchercraftEquippedPerkArrowDeflection = input.getBooleanOr("witchercraftEquippedPerkArrowDeflection", false);
 			witchercraftEquippedPerkStrengthTraining = input.getBooleanOr("witchercraftEquippedPerkStrengthTraining", false);
 			witchercraftEquippedPerkSunderArmor = input.getBooleanOr("witchercraftEquippedPerkSunderArmor", false);
 			witchercraftEquippedPerkUndying = input.getBooleanOr("witchercraftEquippedPerkUndying", false);
@@ -560,7 +560,7 @@ public class WitchercraftModVariables {
 			witchercraftPerksAnatomicalKnowledge = input.getBooleanOr("witchercraftPerksAnatomicalKnowledge", false);
 			witchercraftPerksCripplingShot = input.getBooleanOr("witchercraftPerksCripplingShot", false);
 			witchercraftPerksFloodOfAnger = input.getBooleanOr("witchercraftPerksFloodOfAnger", false);
-			witchercraftPerksRazorFocus = input.getBooleanOr("witchercraftPerksRazorFocus", false);
+			witchercraftPerksArrowDeflection = input.getBooleanOr("witchercraftPerksArrowDeflection", false);
 			witchercraftPerksUndying = input.getBooleanOr("witchercraftPerksUndying", false);
 			witchercraftPlayerLevel = input.getDoubleOr("witchercraftPlayerLevel", 0);
 			witchercraftMedallion = input.getDoubleOr("witchercraftMedallion", 0);
