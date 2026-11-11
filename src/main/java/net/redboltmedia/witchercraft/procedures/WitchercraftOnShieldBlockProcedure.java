@@ -23,18 +23,19 @@ public class WitchercraftOnShieldBlockProcedure {
 	@SubscribeEvent
 	public static void whenEntityBlocksWithShield(LivingShieldBlockEvent event) {
 		if (event.getEntity() != null) {
-			execute(event, event.getEntity().level(), event.getEntity());
+			execute(event, event.getEntity().level(), event.getEntity(), event.getDamageSource().getDirectEntity(), event.getDamageSource().getEntity());
 		}
 	}
 
-	public static void execute(LevelAccessor world, Entity entity) {
-		execute(null, world, entity);
+	public static void execute(LevelAccessor world, Entity entity, Entity immediatesourceentity, Entity sourceentity) {
+		execute(null, world, entity, immediatesourceentity, sourceentity);
 	}
 
-	private static void execute(@Nullable Event event, LevelAccessor world, Entity entity) {
-		if (entity == null)
+	private static void execute(@Nullable Event event, LevelAccessor world, Entity entity, Entity immediatesourceentity, Entity sourceentity) {
+		if (entity == null || immediatesourceentity == null || sourceentity == null)
 			return;
-		if (entity instanceof Player && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkCounterattack) {
+		if (entity instanceof Player && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkCounterattack
+				&& (entity.getPersistentData().getDoubleOr("witchercraftPerfectParryTick", 0) == entity.tickCount && sourceentity == immediatesourceentity)) {
 			if (!(entity.getPersistentData().getDoubleOr("witchercraftCounterattackTick", 0) > 0 && (entity.tickCount - entity.getPersistentData().getDoubleOr("witchercraftCounterattackTick", 0) >= 0
 					&& entity.tickCount - entity.getPersistentData().getDoubleOr("witchercraftCounterattackTick", 0) <= 60))) {
 				if (world instanceof Level _level) {

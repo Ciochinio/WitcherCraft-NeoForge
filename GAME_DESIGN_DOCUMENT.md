@@ -622,6 +622,64 @@ venomed target (see [Venom](#venom)), and venom granting crits as well would mak
 Maimed is guarded the same way: a crit that only happened because the target was Maimed does not
 re-arm Maiming Shot.
 
+### Blocking and parrying
+
+Everything in this section except the mob wind-up and bracing belongs to the **Counterattack** perk
+(a root node of the Combat tree, so it can be the first point you spend). Without it a shield is
+plain vanilla and a sword doesn't block, and there is no incoming-attack indicator. That is on
+purpose: reading the perk is where you learn blocking exists, so the crosshair cue only appears once
+you know what it means. The perk's tooltip carries a grey how-to line.
+
+Witchers parry with the sword, so a sword blocks like in old Minecraft: **right-click with a sword
+and an empty off-hand**. With anything in the off-hand (a shield, the chain hook, a bomb, a torch),
+right-click uses that item instead, so the chain hook's pull-into-slash combo is untouched.
+
+| | Shield | Sword |
+|---|---|---|
+| Held block | **100%** from the front, no delay (vanilla's 0.25 s raise is removed) | **50%** from the front, melee and arrows, no delay |
+| Perfect parry | **100%** | **100%** |
+| Durability | per vanilla | **1** per blocked hit |
+| Axes | disable it | disable it |
+
+- **Perfect parry:** a hit that lands in the first **0.25 s** after you raise the block is a perfect
+  parry: fully blocked, with a metallic clang and sparks. Shields and swords share this timing, which is
+  why the shield's raise delay is gone; the shield pays for its 100% hold with your off-hand instead.
+- **Mob wind-up:** vanilla melee mobs deal damage the instant they swing, so there is nothing to react
+  to. Mobs in the `witchercraft:telegraphed_attackers` tag (the vanilla melee mobs, ghouls and alghouls)
+  swing first and strike about **0.4 s** later, swinging again as the hit lands. Stepping out of reach
+  during the wind-up dodges the hit. A winding-up mob is **braced**: your hits don't knock it back, so
+  hitting into a wind-up trades blows instead of pushing it out of reach. That gives each answer a
+  price: hit = trade, step back = safe but you lose ground, block or parry = safe and you win tempo
+  (below). A glint and whoosh on the mob were tried and dropped (you only had to
+  watch the light), and animation alone was unreadable in first person, so the tell is on the crosshair:
+- **Incoming-attack indicator:** each mob winding up on you puts a small red tick around the crosshair, on
+  the side it attacks from (ahead = above, right = right, behind = below). The tick closes in over the
+  0.4 s onto a dim target mark just outside the crosshair and covers it exactly as the hit lands. For its
+  last 0.3 s it turns bright yellow: raising a sword or shield now is a perfect parry. Raising when the tick
+  *appears* is too early, and raising on contact is the last possible moment, so aim for the bright stretch. While
+  you're out of the mob's reach the tick is grey (the strike will miss) and turns red again if you step
+  back in; a grey tick landing means you dodged it. With several attackers each tick closes on its own clock. Arrows get no indicator; their flight is the tell. It's base for now; whether it
+  becomes a perk (or a perk that trades it away for damage) is open, and the seam
+  `WitchercraftParryIndicatorEnabled` is there for that. Server option `combat.attackWindup`,
+  on while we test; whether it ships on is still open.
+- **Stagger:** blocking a mob's melee hit staggers that mob: it can't hit you (or any player) for
+  **0.5 s** after a normal block, **1 s** after a perfect parry. It still swings, at air. A perfect parry
+  also knocks it back a little (**0.3**, a plain hit is 0.4), which is the visible "parried" moment and
+  leaves it close enough to punish. Mobs attack about once a second, so a parry skips roughly one attack:
+  your free window for a charged or strong hit. The base parry pays in tempo; damage on the riposte is
+  Counterattack's job.
+- **No spam:** a raise opens a perfect window only if your previous raise started at least **1 s**
+  earlier. Spam-clicking still blocks (50% with a sword) but never parries. A successful parry is never
+  punished, so chaining parries against a group works.
+- Perks react to the perfect parry, not to the block: [Counterattack](#perks) arms on a perfect melee
+  parry, Arrow Deflection will send a perfectly parried arrow back.
+- A server option (`combat.swordBlocking`, on by default) turns sword blocking off for packs whose
+  combat mod uses right-click on swords. Parrying, and the parry perks, then work with shields only.
+- Every perk can carry an optional grey how-to line under its tooltip description (lang key
+  `perk.witchercraft.<name>.usage`).
+
+All values provisional.
+
 ### Execute
 
 The pinnacle of the strong-attack line, carried by **Deadly Precision**: a **strong attack** on a
@@ -1498,7 +1556,7 @@ Reflexes (slow-motion aiming and headshots). The old **Defence** perk (+4 max he
 
 | Perk | Effect | Status |
 |------|--------|--------|
-| **Counterattack** | After you block a hit with a shield (melee or projectile), your next charged attack, fast or strong, within **3 s** deals +**50%**. One charge; blocking again refreshes it. Uncharged hits don't spend it; the spending hit resets the Three Strikes streak | Built - new perk in slot 107; tree icons are placeholder copies of the old Defence art |
+| **Counterattack** | Unlocks the whole [blocking and parrying](#blocking-and-parrying) moveset: sword blocking, the perfect parry (sword or shield), stagger and the incoming-attack indicator. A perfect parry of a melee hit also makes your next charged attack, fast or strong, within **3 s** deal +**50%**. One charge; another perfect parry refreshes it. Uncharged hits don't spend it; the spending hit resets the Three Strikes streak. Meant as a root node (no prerequisites), with Arrow Deflection after it. Tooltip has a grey how-to line | Built - slot 107; tree icons are placeholder copies of the old Defence art |
 | **Arrow Deflection** | An arrow, bolt or trident blocked within **0.5 s** of the shield going up flies back at the shooter for the damage it would have dealt. It counts as your shot and can't be picked up | *Not built* - new, replaces Razor Focus |
 | **Cold Blood** | Fully drawn arrows and crossbow bolts deal +**25%** while no hostile is within **5** blocks of you | *Not built* - today +**5** Additional Damage while no enemy is near |
 | **Bloody Rage** | +**40%** damage on melee hits while you are below **30%** health. Taken from Witcher 1: the tree's frame is Witcher 3, but perks may come from the whole saga when they add a decision | *Not built* - replaces Anatomical Knowledge |

@@ -46,6 +46,12 @@ public final class PerkRegistry {
 		return slug.isEmpty() ? "" : "perk.witchercraft." + slug + ".desc";
 	}
 
+	/** Optional how-to-use line ("perk.witchercraft.<slug>.usage"), shown grey under the description when the key exists. */
+	public static String usageKey(int id) {
+		String slug = slug(id);
+		return slug.isEmpty() ? "" : "perk.witchercraft." + slug + ".usage";
+	}
+
 	/**
 	 * Spaced display-name fallback derived from {@link #name}, e.g. "RazorFocus"
 	 * -> "Razor Focus". Passed as the translatable fallback text so a missing/lost

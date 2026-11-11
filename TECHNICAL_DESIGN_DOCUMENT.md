@@ -688,8 +688,57 @@ changes here:
   last hurt is 60+ ticks old (infinite duration so the HUD icon never blinks; ambient + particles on,
   because vanilla ties the HUD icon to the particle flag) and removes it otherwise;
   `WitchercraftAfterDamage` also removes it the moment you are hurt.
+- *Sword blocking and the perfect parry* are the locked code element `WitchercraftSwordBlock` (`~/Admin/Calc`):
+  on a main-hand right-click of an `#minecraft:swords` item it adds a `blocks_attacks` component to that stack
+  (0 s delay, 50% within 90 degrees, 1 durability per block, bypassed by `#bypasses_shield`) when the off-hand is
+  empty and `WorldMapServerConfig.swordBlocking()` is on, and removes it otherwise, so vanilla does the rest
+  (use, pose, block, axe disable). Items that block by default are left alone. `LivingEntityUseItemEvent.Start`
+  on any blocking item opens a perfect window (NBT `witchercraftParryWindowStart` = tick + block delay) unless
+  the previous raise (`witchercraftParryRaiseTick`) was under 20 ticks ago. Its HIGH-priority
+  `LivingShieldBlockEvent` handler turns a caught hit within 5 ticks (`PERFECT_WINDOW_TICKS`) of the window start into a full block,
+  stamps `witchercraftPerfectParryTick` and plays the clang (`block.anvil.land` 0.45/1.9) and crit sparks.
+  The server option lives in `WorldMapServerConfig` (`combat.swordBlocking`, the de facto server config).
+  Perk gate: `WitchercraftSwordBlock.hasParry(player)` reads the synced `witchercraftEquippedPerkCounterattack`.
+  Without it the sword component is not added (and is removed on the next right-click), `onUseStart` writes window
+  start 0 (no perfect parry, shields stay vanilla), `WitchercraftAttackWindup.staggerOnBlock` returns early, and
+  the Blockly seam `WitchercraftParryIndicatorEnabled` returns the same variable, so no indicator is sent.
+  Perk tooltips (`PerkPage.perkTooltip`) append an empty line and the grey, wrapped `perk.witchercraft.<slug>.usage`
+  text when that lang key exists (`PerkRegistry.usageKey`); like every hand-added key it lives in both
+  `en_us.json` and the workspace `language_map`.
+  A LOWEST `ModifyDefaultComponentsEvent` handler (`noRaiseDelay`) rebuilds `blocks_attacks` with
+  `block_delay_seconds` 0 on every item whose default has a delay (vanilla shield, modded shields), so the window
+  start equals the press for all blocking items. Default components are fixed at startup, so this ignores the
+  world options.
+- *Mob attack wind-up* is the locked code element `WitchercraftAttackWindup` (`~/Admin/Calc`). A HIGHEST-priority
+  `LivingIncomingDamageEvent` handler cancels a direct melee hit on a player from a mob in the entity tag
+  `witchercraft:telegraphed_attackers` (workspace `tag_elements`), so the vanilla swing becomes the only tell, and
+  remembers the attack. `ServerTickEvent.Post` makes it 8 ticks later through `mob.doHurtTarget` if both are alive and the
+  target is still in `isWithinMeleeAttackRange`, swinging again first (a vanilla swing lasts 6 ticks, so the
+  first one is over by then); a static flag keeps that hit from being delayed again. Option `combat.attackWindup`.
+  While a mob is in `PENDING` a `LivingKnockBackEvent` handler cancels all knockback on it (bracing; server side
+  only, the map is server-thread). Stagger: a LOWEST `LivingShieldBlockEvent` handler (`staggerOnBlock`) puts a
+  blocked melee attacker (any `Mob`, direct source) into a weak `STAGGERED` map with an end game time,
+  `BLOCK_STAGGER_TICKS` 10 or `PARRY_STAGGER_TICKS` 20 when `witchercraftPerfectParryTick` equals this tick, and on
+  a perfect parry calls `mob.knockback(PARRY_KNOCKBACK 0.3, ...)` away from the player. The strike's `PENDING`
+  entry is removed before `doHurtTarget`, so bracing doesn't eat that push. The HIGHEST incoming-damage handler
+  cancels any direct melee hit on a player from a staggered mob before the wind-up logic, independent of
+  `combat.attackWindup`; the vanilla goal has already reset its cooldown, so the attack is lost.
+  With `DevLog` it also prints a hit trace for the player being hit (grey, stamped with their `tickCount`):
+  wind-ups, strikes, misses, every incoming hit with its source, and every block (`PERFECT PARRY` or `blocked`).
+  On each wind-up it also sends `WitchercraftParryIndicatorMessage` (mob id, ticks; locked code element) to the
+  target when the Blockly seam `WitchercraftParryIndicatorEnabled(entity)` returns true (true for everyone today;
+  return a perk variable there to gate it). The client keeps the entries in
+  `WitchercraftParryIndicatorMessage.INCOMING`, and `WitchercraftHud.drawIncoming` draws one 4x4 red tick per entry
+  on the crosshair layer: angle from the attacker's direction relative to the view yaw, radius closing from 20 to
+  10 px over the wind-up onto a dim 4x4 outline mark at the end radius (kept outside the 7 px crosshair arms). The
+  tick switches to the bright window colours once `elapsed >= ticks - WitchercraftSwordBlock.PERFECT_WINDOW_TICKS`,
+  i.e. while a press (sword or shield, neither has a raise delay) would be a perfect parry. It is grey while `mob.isWithinMeleeAttackRange(player)` is
+  false on client positions (the same test the server makes at the strike). Client time starts on packet arrival, so on a remote server
+  the whole cue runs about one round trip late against the server's window.
 - *Shield blocks* use MCreator's own `entity_blocks` trigger (NeoForge `LivingShieldBlockEvent`), so no bridge
-  is needed. `WitchercraftOnShieldBlock` (`~/Admin/Calc`) stamps `witchercraftCounterattackTick` on the blocking
+  is needed. `WitchercraftOnShieldBlock` (`~/Admin/Calc`) arms Counterattack only when
+  `witchercraftPerfectParryTick` equals this tick and the attacker is the direct source (melee): it stamps
+  `witchercraftCounterattackTick` on the blocking
   player and plays the ready chime itself (`WitchercraftReadyChime` plays at `sourceentity`, which on this trigger is
   the attacker). `WitchercraftHitBonus` adds +50 on a typed hit within 60 ticks; `WitchercraftOnFastHit` /
   `WitchercraftOnStrongHit` zero the stamp and the streak; `WitchercraftComboLine` draws the burning shield (sig 1000).

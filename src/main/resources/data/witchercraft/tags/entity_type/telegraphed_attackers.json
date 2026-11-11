@@ -1,0 +1,30 @@
+{
+  "replace": false,
+  "values": [
+    "witchercraft:alghoul",
+    "stray",
+    "cave_spider",
+    "skeleton",
+    "drowned",
+    "zombie_villager",
+    "vindicator",
+    "zombified_piglin",
+    "zoglin",
+    "piglin_brute",
+    "polar_bear",
+    "wither_skeleton",
+    "wolf",
+    "witchercraft:ghoul",
+    "spider",
+    "bogged",
+    "endermite",
+    "husk",
+    "piglin",
+    "iron_golem",
+    "silverfish",
+    "zombie",
+    "hoglin",
+    "enderman",
+    "ravager"
+  ]
+}

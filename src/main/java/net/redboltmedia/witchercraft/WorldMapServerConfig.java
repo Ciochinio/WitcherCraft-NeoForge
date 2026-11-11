@@ -36,6 +36,8 @@ public final class WorldMapServerConfig {
 	private static final boolean DEFAULT_BLOCK_TRAVEL_IN_COMBAT = true;
 	private static final boolean DEFAULT_BLOCK_TRAVEL_NEAR_MONSTERS = true;
 	private static final AlchemyKnowledge.Mode DEFAULT_ALCHEMY_RECIPE_KNOWLEDGE = AlchemyKnowledge.Mode.DISCOVERY;
+	private static final boolean DEFAULT_SWORD_BLOCKING = true;
+	private static final boolean DEFAULT_ATTACK_WINDUP = true;
 	public static final int HARD_MAX_TRAVEL_XP = 100_000;
 	public static final int HARD_MAX_PLAYER_SIGN_LIMIT = 100_000;
 	public static final int HARD_MAX_CAPTURES_PER_TICK = 32;
@@ -70,6 +72,8 @@ public final class WorldMapServerConfig {
 	private static final ModConfigSpec.BooleanValue BLOCK_TRAVEL_IN_COMBAT;
 	private static final ModConfigSpec.BooleanValue BLOCK_TRAVEL_NEAR_MONSTERS;
 	private static final ModConfigSpec.EnumValue<AlchemyKnowledge.Mode> ALCHEMY_RECIPE_KNOWLEDGE;
+	private static final ModConfigSpec.BooleanValue SWORD_BLOCKING;
+	private static final ModConfigSpec.BooleanValue ATTACK_WINDUP;
 
 	static {
 		ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
@@ -117,6 +121,13 @@ public final class WorldMapServerConfig {
 			.translation("witchercraft.configuration.alchemy").push("alchemy");
 		ALCHEMY_RECIPE_KNOWLEDGE = alchemyOption(builder, "recipe_knowledge", "How much of the alchemy recipe list players see. DISCOVERY: known recipes only, learned from starters, manuscripts, and successful brews. SHOW_LOCKED: also every unknown recipe as a locked entry showing only its result. ALL_KNOWN: every recipe from the start; players' real progress is kept for switching back.")
 			.defineEnum("recipeKnowledge", DEFAULT_ALCHEMY_RECIPE_KNOWLEDGE);
+		builder.pop();
+		builder.comment("Per-world rules for combat.")
+			.translation("witchercraft.configuration.combat").push("combat");
+		SWORD_BLOCKING = builder.comment("Right-click with a sword and an empty off-hand to block (50%, a perfect parry blocks 100%). Turn off for packs whose combat mod uses right-click on swords. Parry perks then work with shields only.")
+			.translation("witchercraft.configuration.combat.sword_blocking").define("swordBlocking", DEFAULT_SWORD_BLOCKING);
+		ATTACK_WINDUP = builder.comment("Mobs in the witchercraft:telegraphed_attackers tag swing first and hit about 0.4 s later, with a whoosh and a glint, so their attacks can be read and parried. Off: vanilla instant hits.")
+			.translation("witchercraft.configuration.combat.attack_windup").define("attackWindup", DEFAULT_ATTACK_WINDUP);
 		builder.pop();
 		SPEC = builder.build();
 	}
@@ -191,6 +202,8 @@ public final class WorldMapServerConfig {
 	public static int maximumXpCost() { return loaded() ? MAXIMUM_XP_COST.getAsInt() : DEFAULT_MAXIMUM_XP_COST; }
 	public static boolean blockTravelInCombat() { return loaded() ? BLOCK_TRAVEL_IN_COMBAT.getAsBoolean() : DEFAULT_BLOCK_TRAVEL_IN_COMBAT; }
 	public static boolean blockTravelNearMonsters() { return loaded() ? BLOCK_TRAVEL_NEAR_MONSTERS.getAsBoolean() : DEFAULT_BLOCK_TRAVEL_NEAR_MONSTERS; }
+	public static boolean attackWindup() { return loaded() ? ATTACK_WINDUP.getAsBoolean() : DEFAULT_ATTACK_WINDUP; }
+	public static boolean swordBlocking() { return loaded() ? SWORD_BLOCKING.getAsBoolean() : DEFAULT_SWORD_BLOCKING; }
 	public static AlchemyKnowledge.Mode alchemyRecipeKnowledge() { return loaded() ? ALCHEMY_RECIPE_KNOWLEDGE.get() : DEFAULT_ALCHEMY_RECIPE_KNOWLEDGE; }
 	public static boolean sharedSignDiscovery() { return loaded() ? SHARED_SIGN_DISCOVERY.getAsBoolean() : DEFAULT_SHARED_SIGN_DISCOVERY; }
 	/** Empty means each player's own game language. Synced to clients with the rest of the server config. */

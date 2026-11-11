@@ -37,6 +37,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Entity;
@@ -205,10 +206,63 @@ public class WitchercraftHud {
 			graphics.text(minecraft.font, line, -minecraft.font.width(line) / 2, 0, -1, true);
 			graphics.pose().popMatrix();
 		}
+		drawIncoming(graphics, minecraft, player, event.getPartialTick().getGameTimeDeltaPartialTick(false));
 		if (isExecutable(player, minecraft.crosshairPickEntity))
 			graphics.blit(RenderPipelines.GUI_TEXTURED, EXECUTE_MARKER, (graphics.guiWidth() - EXECUTE_MARKER_SIZE) / 2, (graphics.guiHeight() - EXECUTE_MARKER_SIZE) / 2, 0, 0, EXECUTE_MARKER_SIZE, EXECUTE_MARKER_SIZE, EXECUTE_MARKER_SIZE, EXECUTE_MARKER_SIZE);
 	}
 
+	/**
+	 * Incoming-attack indicator (GDD 5, Blocking and parrying): one red tick per mob winding up an attack on
+	 * this player (WitchercraftParryIndicatorMessage), on the side the attacker is on (ahead = above the
+	 * crosshair, right = right, behind = below). It closes from INCOMING_R_START onto a dim target mark at
+	 * INCOMING_R_END, covering it exactly as the hit lands, and turns bright while a sword raised now would be a
+	 * perfect parry. INCOMING_R_END stays outside the vanilla crosshair arms (7 px), or the landing hides in them.
+	 */
+	private static final float INCOMING_R_START = 20f;
+	private static final float INCOMING_R_END = 10f;
+	private static final int INCOMING_COLOR = 0xFFE8302A;
+	private static final int INCOMING_EDGE = 0xFF5A0806;
+	private static final int INCOMING_WINDOW_COLOR = 0xFFFFF0A0;
+	private static final int INCOMING_WINDOW_EDGE = 0xFF8A3A08;
+	private static final int INCOMING_MARK = 0x90701010;
+	private static final int INCOMING_MISS_COLOR = 0xFF8A8A8A;
+	private static final int INCOMING_MISS_EDGE = 0xFF2E2E2E;
+
+	private static void drawIncoming(GuiGraphicsExtractor graphics, Minecraft minecraft, Player player, float partialTick) {
+		java.util.List<WitchercraftParryIndicatorMessage.Incoming> incoming = WitchercraftParryIndicatorMessage.INCOMING;
+		if (incoming.isEmpty() || minecraft.level == null)
+			return;
+		long now = minecraft.level.getGameTime();
+		incoming.removeIf(in -> now - in.start() > in.ticks() + 1 || minecraft.level.getEntity(in.mobId()) == null);
+		int cx = (graphics.guiWidth() - 1) / 2;
+		int cy = (graphics.guiHeight() - 1) / 2;
+		float viewYaw = player.getViewYRot(partialTick);
+		for (WitchercraftParryIndicatorMessage.Incoming in : incoming) {
+			Entity mob = minecraft.level.getEntity(in.mobId());
+			long elapsed = now - in.start();
+			float progress = Math.min(1f, (elapsed + partialTick) / Math.max(1, in.ticks()));
+			double dx = mob.getX() - player.getX();
+			double dz = mob.getZ() - player.getZ();
+			double rel = Math.toRadians(net.minecraft.util.Mth.wrapDegrees(Math.toDegrees(Math.atan2(-dx, dz)) - viewYaw));
+			float sin = (float) Math.sin(rel);
+			float cos = (float) Math.cos(rel);
+			int mx = cx + Math.round(sin * INCOMING_R_END);
+			int my = cy - Math.round(cos * INCOMING_R_END);
+			graphics.fill(mx - 2, my - 2, mx + 2, my - 1, INCOMING_MARK);
+			graphics.fill(mx - 2, my + 1, mx + 2, my + 2, INCOMING_MARK);
+			graphics.fill(mx - 2, my - 1, mx - 1, my + 1, INCOMING_MARK);
+			graphics.fill(mx + 1, my - 1, mx + 2, my + 1, INCOMING_MARK);
+			// Sword timing: the block is active on the press, so a press this many ticks before the hit or later is perfect.
+			boolean window = elapsed >= in.ticks() - WitchercraftSwordBlock.PERFECT_WINDOW_TICKS;
+			// the same reach test the server makes when the strike is due (WitchercraftAttackWindup), on client positions
+			boolean miss = mob instanceof Mob m && !m.isWithinMeleeAttackRange(player);
+			float r = INCOMING_R_START + (INCOMING_R_END - INCOMING_R_START) * progress;
+			int x = cx + Math.round(sin * r);
+			int y = cy - Math.round(cos * r);
+			graphics.fill(x - 2, y - 2, x + 2, y + 2, miss ? INCOMING_MISS_EDGE : window ? INCOMING_WINDOW_EDGE : INCOMING_EDGE);
+			graphics.fill(x - 1, y - 1, x + 1, y + 1, miss ? INCOMING_MISS_COLOR : window ? INCOMING_WINDOW_COLOR : INCOMING_COLOR);
+		}
+	}
 	/**
 	 * Execute marker: four red diagonal ticks around the crosshair, turning it into an 8-point reticle, while
 	 * the entity under it would die to a strong attack (GDD 5, Execute). Mirrors the check in WitchercraftDamageCalculator; keep the two in step.

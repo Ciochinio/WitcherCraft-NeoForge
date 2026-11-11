@@ -9587,6 +9587,14 @@
             "type": "entity"
           },
           {
+            "name": "sourceentity",
+            "type": "entity"
+          },
+          {
+            "name": "immediatesourceentity",
+            "type": "entity"
+          },
+          {
             "name": "world",
             "type": "world"
           }
@@ -9641,6 +9649,65 @@
       "metadata": {
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/WitchercraftAfterDamageBridge.java"
+        ]
+      },
+      "path": "~/Admin/Calc"
+    },
+    {
+      "name": "WitchercraftSwordBlock",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "witchercraft_sword_block",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WitchercraftSwordBlock.java"
+        ]
+      },
+      "path": "~/Admin/Calc"
+    },
+    {
+      "name": "WitchercraftAttackWindup",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "witchercraft_attack_windup",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WitchercraftAttackWindup.java"
+        ]
+      },
+      "path": "~/Admin/Calc"
+    },
+    {
+      "name": "WitchercraftParryIndicatorEnabled",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "witchercraft_parry_indicator_enabled",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftParryIndicatorEnabledProcedure.java"
+        ],
+        "return_type": "logic"
+      },
+      "path": "~/Admin/Calc"
+    },
+    {
+      "name": "WitchercraftParryIndicatorMessage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "witchercraft_parry_indicator_message",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WitchercraftParryIndicatorMessage.java"
         ]
       },
       "path": "~/Admin/Calc"
@@ -10598,6 +10665,33 @@
     }
   ],
   "tag_elements": {
+    "ENTITIES:mod:telegraphed_attackers": [
+      "EntityZombie",
+      "EntityHusk",
+      "EntityDrowned",
+      "EntityZombieVillager",
+      "EntityPigZombie",
+      "EntityPiglin",
+      "EntityPiglinBrute",
+      "EntitySkeleton",
+      "EntityStray",
+      "EntityWitherSkeleton",
+      "EntityBogged",
+      "EntityVindicator",
+      "EntitySpider",
+      "EntityCaveSpider",
+      "EntitySilverfish",
+      "EntityEndermite",
+      "EntityEnderman",
+      "EntityWolf",
+      "EntityPolarBear",
+      "EntityHoglin",
+      "EntityZoglin",
+      "EntityIronGolem",
+      "EntityRavager",
+      "CUSTOM:Alghoul",
+      "CUSTOM:Ghoul"
+    ],
     "ENTITIES:mod:execute_immune": [
       "EntityDragon",
       "EntityWither",
@@ -10694,7 +10788,8 @@
       "perk.witchercraft.cripplingshot.name": "Crippling Shot",
       "perk.witchercraft.cripplingshot.desc": "If main hand weapon ranged, add 50% to crit damage.",
       "perk.witchercraft.counterattack.name": "Counterattack",
-      "perk.witchercraft.counterattack.desc": "After a shield block, your next charged attack within 3 s deals +50% damage.",
+      "perk.witchercraft.counterattack.desc": "Lets you block with a sword and parry. A perfect parry staggers the attacker for 1 s and makes your next charged attack within 3 s deal +50% damage.",
+      "perk.witchercraft.counterattack.usage": "Right-click with a sword (empty off-hand) or a shield to block. When a melee attack is coming, a mark closes on your crosshair: block while it\u0027s yellow to parry.",
       "perk.witchercraft.cripplingstrikes.name": "Crippling Strikes",
       "perk.witchercraft.cripplingstrikes.desc": "Fast crits cripple the target: it deals 20% less damage for 3 s.",
       "perk.witchercraft.crushingblows.name": "Crushing Blows",
@@ -10801,6 +10896,9 @@
       "gui.witchercraft.alchemy.brew": "Brew",
       "gui.witchercraft.alchemy.show_recipes": "Show recipes",
       "gui.witchercraft.alchemy.hide_recipes": "Hide recipes",
+      "witchercraft.configuration.combat": "Combat",
+      "witchercraft.configuration.combat.sword_blocking": "Sword blocking",
+      "witchercraft.configuration.combat.attack_windup": "Mob attack wind-up",
       "witchercraft.configuration.alchemy": "Alchemy",
       "witchercraft.configuration.alchemy.recipe_book_open": "Show recipe book",
       "witchercraft.configuration.inventory": "Inventory",

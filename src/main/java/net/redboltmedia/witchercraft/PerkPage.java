@@ -261,6 +261,12 @@ public class PerkPage implements GuiPage {
 		List<Component> lines = new ArrayList<>(3);
 		lines.add(name);
 		lines.addAll(wrapToWidth(desc, TOOLTIP_WRAP_WIDTH));
+		String usageKey = PerkRegistry.usageKey(perkId);
+		if (net.minecraft.locale.Language.getInstance().has(usageKey)) {
+			lines.add(Component.empty());
+			for (Component line : wrapToWidth(Component.translatable(usageKey), TOOLTIP_WRAP_WIDTH))
+				lines.add(line.copy().withStyle(net.minecraft.ChatFormatting.GRAY));
+		}
 		return lines;
 	}
 
