@@ -186,7 +186,6 @@ public class WitchercraftModVariables {
 		clone.witchercraftPerksSignsSkillPointsUsed = original.witchercraftPerksSignsSkillPointsUsed;
 		if (!event.isWasDeath()) {
 			clone.witchercraftToxicity = original.witchercraftToxicity;
-			clone.witchercraftEnemyNearby = original.witchercraftEnemyNearby;
 			clone.witchercraftQuenShield = original.witchercraftQuenShield;
 			clone.witchercraftQuenShieldMax = original.witchercraftQuenShieldMax;
 			clone.witchercraftComboLine = original.witchercraftComboLine;
@@ -316,7 +315,6 @@ public class WitchercraftModVariables {
 		public double witchercraftPerksCombatSkillPointsUsed = 0;
 		public double witchercraftPerksAlchemySkillPointsUsed = 0;
 		public double witchercraftPerksSignsSkillPointsUsed = 0;
-		public boolean witchercraftEnemyNearby = false;
 		public double witchercraftQuenShield = 0;
 		public double witchercraftQuenShieldMax = 0;
 		public String witchercraftComboLine = "";
@@ -443,7 +441,6 @@ public class WitchercraftModVariables {
 			output.putDouble("witchercraftPerksCombatSkillPointsUsed", witchercraftPerksCombatSkillPointsUsed);
 			output.putDouble("witchercraftPerksAlchemySkillPointsUsed", witchercraftPerksAlchemySkillPointsUsed);
 			output.putDouble("witchercraftPerksSignsSkillPointsUsed", witchercraftPerksSignsSkillPointsUsed);
-			output.putBoolean("witchercraftEnemyNearby", witchercraftEnemyNearby);
 			output.putDouble("witchercraftQuenShield", witchercraftQuenShield);
 			output.putDouble("witchercraftQuenShieldMax", witchercraftQuenShieldMax);
 			output.putString("witchercraftComboLine", witchercraftComboLine);
@@ -571,7 +568,6 @@ public class WitchercraftModVariables {
 			witchercraftPerksCombatSkillPointsUsed = input.getDoubleOr("witchercraftPerksCombatSkillPointsUsed", 0);
 			witchercraftPerksAlchemySkillPointsUsed = input.getDoubleOr("witchercraftPerksAlchemySkillPointsUsed", 0);
 			witchercraftPerksSignsSkillPointsUsed = input.getDoubleOr("witchercraftPerksSignsSkillPointsUsed", 0);
-			witchercraftEnemyNearby = input.getBooleanOr("witchercraftEnemyNearby", false);
 			witchercraftQuenShield = input.getDoubleOr("witchercraftQuenShield", 0);
 			witchercraftQuenShieldMax = input.getDoubleOr("witchercraftQuenShieldMax", 0);
 			witchercraftComboLine = input.getStringOr("witchercraftComboLine", "");

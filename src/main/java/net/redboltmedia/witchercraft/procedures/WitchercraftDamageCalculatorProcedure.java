@@ -135,11 +135,14 @@ public class WitchercraftDamageCalculatorProcedure {
 							: 0) * 0.01;
 					hit = amount * (1 + critBonus);
 				}
+				hitBonus = WitchercraftArrowBonusProcedure.execute(immediatesourceentity, sourceentity);
+				takenBonus = WitchercraftDamageTakenBonusProcedure.execute(entity);
+				hit = hit * (1 + (hitBonus + takenBonus) * 0.01);
 				hit = hit * dealtMult;
 				if (event instanceof LivingIncomingDamageEvent _event) {
 					_event.setAmount((float) hit);
 				}
-				WitchercraftDamageLogProcedure.execute(sourceentity, 2, amount, hit, critBonus, 0, 0, 0, 0, 0);
+				WitchercraftDamageLogProcedure.execute(sourceentity, 2, amount, hit, critBonus, 0, hitBonus, takenBonus, 0, 0);
 			}
 		} else {
 			if (dealtMult < 1) {

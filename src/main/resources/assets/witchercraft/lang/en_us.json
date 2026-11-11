@@ -2,7 +2,7 @@
   "perk.witchercraft.anatomicalknowledge.name": "Anatomical Knowledge",
   "perk.witchercraft.anatomicalknowledge.desc": "If main hand weapon ranged, add 10% to crit rate.",
   "perk.witchercraft.coldblood.name": "Cold Blood",
-  "perk.witchercraft.coldblood.desc": "If no one nearby (5 blocks) add +5 to damage.",
+  "perk.witchercraft.coldblood.desc": "Fully drawn arrows and crossbow bolts deal +25% damage when fired with no hostile within 5 blocks of you.",
   "perk.witchercraft.cripplingshot.name": "Crippling Shot",
   "perk.witchercraft.cripplingshot.desc": "If main hand weapon ranged, add 50% to crit damage.",
   "perk.witchercraft.counterattack.name": "Counterattack",

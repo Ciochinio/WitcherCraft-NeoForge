@@ -5141,41 +5141,6 @@
       "path": "~/Admin/EnemyNearby"
     },
     {
-      "name": "EnemyNearbyDetection",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "enemy_nearby_detection",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "x",
-            "type": "number"
-          },
-          {
-            "name": "y",
-            "type": "number"
-          },
-          {
-            "name": "z",
-            "type": "number"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/EnemyNearbyDetectionProcedure.java"
-        ]
-      },
-      "path": "~/Admin/EnemyNearby"
-    },
-    {
       "name": "UndyingCooldown",
       "type": "potioneffect",
       "compiles": true,
@@ -9856,6 +9821,43 @@
       "path": "~/Admin/Calc"
     },
     {
+      "name": "WitchercraftArrowBonus",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "witchercraft_arrow_bonus",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "immediatesourceentity",
+            "type": "entity"
+          },
+          {
+            "name": "sourceentity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftArrowBonusProcedure.java"
+        ],
+        "return_type": "number"
+      },
+      "path": "~/Admin/Calc"
+    },
+    {
+      "name": "WitchercraftCalmShot",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "witchercraft_calm_shot",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WitchercraftCalmShot.java"
+        ]
+      },
+      "path": "~/Admin/Calc"
+    },
+    {
       "name": "WitchercraftDamageTakenBonus",
       "type": "procedure",
       "compiles": true,
@@ -10550,12 +10552,6 @@
       "value": "0"
     },
     {
-      "name": "witchercraftEnemyNearby",
-      "type": "logic",
-      "scope": "player_lifetime",
-      "value": "false"
-    },
-    {
       "name": "witchercraftQuenShield",
       "type": "number",
       "scope": "player_lifetime",
@@ -10784,7 +10780,7 @@
       "perk.witchercraft.anatomicalknowledge.name": "Anatomical Knowledge",
       "perk.witchercraft.anatomicalknowledge.desc": "If main hand weapon ranged, add 10% to crit rate.",
       "perk.witchercraft.coldblood.name": "Cold Blood",
-      "perk.witchercraft.coldblood.desc": "If no one nearby (5 blocks) add +5 to damage.",
+      "perk.witchercraft.coldblood.desc": "Fully drawn arrows and crossbow bolts deal +25% damage when fired with no hostile within 5 blocks of you.",
       "perk.witchercraft.cripplingshot.name": "Crippling Shot",
       "perk.witchercraft.cripplingshot.desc": "If main hand weapon ranged, add 50% to crit damage.",
       "perk.witchercraft.counterattack.name": "Counterattack",

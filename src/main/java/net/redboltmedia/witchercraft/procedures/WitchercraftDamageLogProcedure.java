@@ -75,6 +75,12 @@ public class WitchercraftDamageLogProcedure {
 				r = Math.round(critShown * 100 * 1000);
 				if (sourceentity instanceof ServerPlayer _player)
 					_player.sendSystemMessage(Component.literal(("crit +" + r / 1000 + "%")), false);
+				r = Math.round(hitBonus * 1000);
+				if (sourceentity instanceof ServerPlayer _player)
+					_player.sendSystemMessage(Component.literal(("arrow bonus +" + r / 1000 + "%")), false);
+				r = Math.round(takenBonus * 1000);
+				if (sourceentity instanceof ServerPlayer _player)
+					_player.sendSystemMessage(Component.literal(("taken +" + r / 1000 + "%")), false);
 				r = Math.round(hit * 1000);
 				if (sourceentity instanceof ServerPlayer _player)
 					_player.sendSystemMessage(Component.literal(("= " + r / 1000)), false);
