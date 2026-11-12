@@ -30,27 +30,28 @@ public class QuenBlockProcedure {
 	@SubscribeEvent
 	public static void onEntityAttacked(LivingIncomingDamageEvent event) {
 		if (event.getEntity() != null) {
-			execute(event, event.getEntity().level(), event.getSource(), event.getEntity(), event.getSource().getEntity(), event.getAmount());
+			execute(event, event.getEntity().level(), event.getSource(), event.getEntity(), event.getAmount());
 		}
 	}
 
-	public static void execute(LevelAccessor world, DamageSource damagesource, Entity entity, Entity sourceentity, double amount) {
-		execute(null, world, damagesource, entity, sourceentity, amount);
+	public static void execute(LevelAccessor world, DamageSource damagesource, Entity entity, double amount) {
+		execute(null, world, damagesource, entity, amount);
 	}
 
-	private static void execute(@Nullable Event event, LevelAccessor world, DamageSource damagesource, Entity entity, Entity sourceentity, double amount) {
-		if (damagesource == null || entity == null || sourceentity == null)
+	private static void execute(@Nullable Event event, LevelAccessor world, DamageSource damagesource, Entity entity, double amount) {
+		if (damagesource == null || entity == null)
 			return;
 		double overflow = 0;
 		if ((entity instanceof LivingEntity _livEnt0 && _livEnt0.hasEffect(WitchercraftModMobEffects.QUEN_EFFECT) || entity instanceof LivingEntity _livEnt1 && _livEnt1.hasEffect(WitchercraftModMobEffects.QUEN_ACTIVE_SHIELD))
 				&& entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftQuenShield > 0
 				&& !(damagesource.is(TagKey.create(Registries.DAMAGE_TYPE, Identifier.parse("minecraft:is_fall"))) || damagesource.is(TagKey.create(Registries.DAMAGE_TYPE, Identifier.parse("minecraft:is_freezing")))
 						|| damagesource.is(TagKey.create(Registries.DAMAGE_TYPE, Identifier.parse("minecraft:is_drowning"))) || damagesource.is(TagKey.create(Registries.DAMAGE_TYPE, Identifier.parse("minecraft:bypasses_invulnerability")))
-						|| damagesource.is(DamageTypes.STARVE))) {
+						|| damagesource.is(DamageTypes.STARVE) || damagesource.is(DamageTypes.IN_WALL) || damagesource.is(DamageTypes.FLY_INTO_WALL))) {
 			if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftQuenShield >= amount) {
 				if (event instanceof ICancellableEvent _cancellable) {
 					_cancellable.setCanceled(true);
 				}
+				WitchercraftQuenBubbleHitProcedure.execute(damagesource, entity);
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 					_vars.witchercraftQuenShield = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftQuenShield - amount;
@@ -59,9 +60,11 @@ public class QuenBlockProcedure {
 				if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftQuenShield <= 0) {
 					if (entity instanceof LivingEntity _entity)
 						_entity.removeEffect(WitchercraftModMobEffects.QUEN_EFFECT);
+					WitchercraftPlaySoundAtProcedure.execute(entity, "item.shield.break", 1);
+					WitchercraftPlaySoundAtProcedure.execute(entity, "block.glass.break", 0.7);
 				}
-				if (sourceentity instanceof Mob || sourceentity instanceof Player) {
-					entity.push((Mth.clamp((entity.getX() - sourceentity.getX()) * 0.4, -0.5, 0.5)), 0.15, (Mth.clamp((entity.getZ() - sourceentity.getZ()) * 0.4, -0.5, 0.5)));
+				if (damagesource.getEntity() instanceof Mob || damagesource.getEntity() instanceof Player) {
+					entity.push((Mth.clamp((entity.getX() - damagesource.getEntity().getX()) * 0.4, -0.5, 0.5)), 0.15, (Mth.clamp((entity.getZ() - damagesource.getEntity().getZ()) * 0.4, -0.5, 0.5)));
 					WitchercraftPlaySoundAtProcedure.execute(entity, "item.shield.block", 1);
 				}
 			} else {
@@ -76,6 +79,8 @@ public class QuenBlockProcedure {
 				if (event instanceof LivingIncomingDamageEvent _event) {
 					_event.setAmount((float) overflow);
 				}
+				WitchercraftPlaySoundAtProcedure.execute(entity, "item.shield.break", 1);
+				WitchercraftPlaySoundAtProcedure.execute(entity, "block.glass.break", 0.7);
 			}
 		}
 	}

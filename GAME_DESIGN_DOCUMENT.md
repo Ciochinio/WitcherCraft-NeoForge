@@ -170,7 +170,8 @@ Two things gate a cast, and a third governs the ones you hold:
   - **Fire Stream 4/second**, **Active Shield 2/second** - and falling to the stamina minimum
   ends the hold on its own with "not enough stamina hold." A held Sign is bounded by your bar
   rather than by a timer, so keeping one up is a live decision about what you won't be able to
-  cast afterwards.
+  cast afterwards. While the Sign key is down you can still swing, but right-click does nothing (no
+  eating, drinking, bows or blocking), so a hold can't be refuelled mid-cast.
 
 If a Sign can't find anything to act on, it refunds its cost where that makes sense - Axii, for
 instance, gives it back when there's no target.
@@ -218,18 +219,20 @@ everything in a **35** degree cone out to **7** blocks wherever you aim, up and 
 on hit, then a **5 s** burn at **2** per second (about **11** a cast), all scaled by Sign Intensity
 (+**50** Intensity = x**1.5**). Fire-immune mobs shrug it off; blocks never catch fire.
 
-**Quen** is the defensive Sign. Casting it grants a pool of absorption (**base 8**, scaling with
-Sign Intensity) that eats incoming damage until it's spent or the **10-second** timer runs out -
+**Quen** is the defensive Sign. Casting it grants a pool of absorption (flat **8** x Sign Intensity,
++**50** Intensity = **12**; max health doesn't affect it) that eats incoming damage until it's spent or the **10-second** timer runs out -
 whichever comes first. It absorbs virtually everything (melee, projectiles, fire and burning,
-explosions, magic) but deliberately lets fall, freezing, drowning, starvation, and the void
-through untouched, since a magic ward shouldn't cushion a fall. A hit bigger than what's left
+explosions, magic) but deliberately lets fall, freezing, drowning, starvation, suffocation,
+elytra wall crashes and the void through untouched, since a magic ward shouldn't cushion a fall. A hit bigger than what's left
 partially drains the shield and lets the rest through as real damage, same as an absorption
 effect - so the shield doesn't just "not work" on a big hit, it softens it. While it's up, a
 row of yellow shield bubbles appears above your health, one bubble per **2** points absorbed and a
 small bubble for an odd leftover, emptying as the pool is eaten, and a single particle
 orbits the caster with a slight vertical bob; both cut out the moment the shield breaks or expires,
-with a clear "Quen broke!" message so there's no ambiguity about whether it's still up. A gold
-action-bar readout of the exact remaining pool runs alongside the bar as a debugging aid. It's what you throw
+with a clear "Quen broke!" message so there's no ambiguity about whether it's still up. Casting (and raising Active Shield) plays a
+spell-cast sound, absorbed hits clang like a shield block and throw amber sparks on the side facing the
+attacker, and a shield shattered by a hit (base or
+Active Shield) breaks with a shield crack over low glass; running out or letting go is silent. It's what you throw
 up before a hit you can't dodge.
 
 **Yrden** is the crowd-control Sign. It lays a ring on the ground; enemies inside it are slowed
@@ -258,8 +261,9 @@ Because the alternates sit behind perks, they double as build payoffs: go deep i
 tree and you don't just get stronger Signs, you get ones that do something new.
 
 **Active Shield** is the one built out in full so far, and it inverts how Quen is played. Hold
-the Sign key and the shield goes up small - **2** points of absorption - then adds **2** more
-every second you keep it raised, scaling with Sign Intensity the way the base Sign does. It
+the Sign key and the shield goes up at half a base Quen - **4** points of absorption - then adds **2**
+more every second you keep it raised (matching base Quen after 2 s), all x Sign Intensity like the base
+Sign. It
 draws on the same shield pool as normal Quen and reads on the same bubble HUD, so raising it
 while a normal Quen is still up tops that shield up instead of throwing it away. Blocking is
 identical to the base Sign: hits eat into the pool, which then charges back up, and a hit
@@ -268,7 +272,11 @@ bigger than what's left shatters it and lets the remainder through. What bounds 
 that keeps getting stronger as long as you can pay for it, where base Quen is a fixed buffer
 you throw up and forget. Let go, run dry, or eat a hit bigger than the pool and it drops with an "Active Shield
 down" message. A shattered shield ends the hold outright rather than popping straight back up,
-so recovering from a break costs you a fresh press of the key.
+so recovering from a break costs you a fresh press of the key. While it's up you sit in a slowly turning, low-poly
+amber shell sunk into the ground (shimmering faces, brighter as the pool grows) that flashes on every
+absorbed hit, fades in when raised and vanishes the moment it drops; other players see
+it too. In first person the screen edges glow amber instead, and the edge facing the attacker flashes on
+a hit.
 
 ---
 

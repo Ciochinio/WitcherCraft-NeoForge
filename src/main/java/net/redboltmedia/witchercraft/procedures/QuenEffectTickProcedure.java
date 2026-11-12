@@ -7,7 +7,6 @@ public class QuenEffectTickProcedure {
 	public static void execute(LevelAccessor world, Entity entity) {
 		if (entity == null)
 			return;
-		QuenActiveTickProcedure.execute(entity);
 		QuenAuraProcedure.execute(world, entity);
 	}
 }

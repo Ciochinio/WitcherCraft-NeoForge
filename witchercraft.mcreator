@@ -3458,25 +3458,6 @@
       "path": "~/Signs/Quen/Quen Text"
     },
     {
-      "name": "QuenActiveTick",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": true,
-      "registry_name": "quen_active_tick",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/QuenActiveTickProcedure.java"
-        ]
-      },
-      "path": "~/Signs/Quen/Quen Text"
-    },
-    {
       "name": "QuenBlock",
       "type": "procedure",
       "compiles": true,
@@ -3493,10 +3474,6 @@
             "type": "entity"
           },
           {
-            "name": "sourceentity",
-            "type": "entity"
-          },
-          {
             "name": "amount",
             "type": "number"
           },
@@ -3510,6 +3487,101 @@
         ]
       },
       "path": "~/Signs/Quen/DefQuen"
+    },
+    {
+      "name": "SignHoldBlockUseItem",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "sign_hold_block_use_item",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/SignHoldBlockUseItemProcedure.java"
+        ]
+      },
+      "path": "~/Signs/SignCast"
+    },
+    {
+      "name": "SignHoldBlockRightClickItem",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "sign_hold_block_right_click_item",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/SignHoldBlockRightClickItemProcedure.java"
+        ]
+      },
+      "path": "~/Signs/SignCast"
+    },
+    {
+      "name": "SignHoldBlockRightClickBlock",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "sign_hold_block_right_click_block",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/SignHoldBlockRightClickBlockProcedure.java"
+        ]
+      },
+      "path": "~/Signs/SignCast"
+    },
+    {
+      "name": "SignHoldBlockRightClickEntity",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "sign_hold_block_right_click_entity",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "sourceentity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/SignHoldBlockRightClickEntityProcedure.java"
+        ]
+      },
+      "path": "~/Signs/SignCast"
+    },
+    {
+      "name": "WitchercraftStopUsingItem",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "witchercraft_stop_using_item",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftStopUsingItemProcedure.java"
+        ]
+      },
+      "path": "~/Signs/SignCast"
     },
     {
       "name": "WitchercraftPlaySoundAt",
@@ -7778,6 +7850,55 @@
       "path": "~/Signs/Quen/AltQuen"
     },
     {
+      "name": "WitchercraftQuenBubbleHit",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "witchercraft_quen_bubble_hit",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "damagesource",
+            "type": "damagesource"
+          },
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftQuenBubbleHitProcedure.java"
+        ]
+      },
+      "path": "~/Signs/Quen/AltQuen"
+    },
+    {
+      "name": "WitchercraftQuenBubbleMessage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "witchercraft_quen_bubble_message",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WitchercraftQuenBubbleMessage.java"
+        ]
+      },
+      "path": "~/Signs/Quen/AltQuen"
+    },
+    {
+      "name": "WitchercraftQuenBubbleClient",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "witchercraft_quen_bubble_client",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WitchercraftQuenBubbleClient.java"
+        ]
+      },
+      "path": "~/Signs/Quen/AltQuen"
+    },
+    {
       "name": "QuenActiveShieldTick",
       "type": "procedure",
       "compiles": true,
@@ -7796,29 +7917,6 @@
         ],
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/procedures/QuenActiveShieldTickProcedure.java"
-        ]
-      },
-      "path": "~/Signs/Quen/AltQuen"
-    },
-    {
-      "name": "QuenActiveShieldAura",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "quen_active_shield_aura",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/QuenActiveShieldAuraProcedure.java"
         ]
       },
       "path": "~/Signs/Quen/AltQuen"

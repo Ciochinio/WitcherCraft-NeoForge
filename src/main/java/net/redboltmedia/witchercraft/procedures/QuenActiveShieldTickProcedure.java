@@ -11,9 +11,6 @@ public class QuenActiveShieldTickProcedure {
 			return;
 		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftQuenShield <= 0) {
 			QuenActiveShieldEndProcedure.execute(entity);
-		} else {
-			QuenActiveTickProcedure.execute(entity);
-			QuenActiveShieldAuraProcedure.execute(world, entity);
 		}
 	}
 }

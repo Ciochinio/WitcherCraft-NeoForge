@@ -15,19 +15,20 @@ public class AltQuenCastProcedure {
 		if (!(entity instanceof LivingEntity _livEnt0 && _livEnt0.hasEffect(WitchercraftModMobEffects.QUEN_ACTIVE_SHIELD))) {
 			if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
 				_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.QUEN_ACTIVE_SHIELD, 5, 0));
+			WitchercraftPlaySoundAtProcedure.execute(entity, "entity.illusioner.cast_spell", 1.2);
 			if (entity instanceof LivingEntity _entity)
 				_entity.removeEffect(WitchercraftModMobEffects.QUEN_EFFECT);
-			if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftQuenShield < 2) {
+			if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftQuenShield < 4 * (1 + (entity instanceof LivingEntity _livingEntityS1 && _livingEntityS1.getAttributes().hasAttribute(WitchercraftModAttributes.SIGN_INTENSITY) ? _livingEntityS1.getAttribute(WitchercraftModAttributes.SIGN_INTENSITY).getValue() : 0) * 0.01)) {
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-					_vars.witchercraftQuenShield = 2;
+					_vars.witchercraftQuenShield = 4 * (1 + (entity instanceof LivingEntity _livingEntityS2 && _livingEntityS2.getAttributes().hasAttribute(WitchercraftModAttributes.SIGN_INTENSITY) ? _livingEntityS2.getAttribute(WitchercraftModAttributes.SIGN_INTENSITY).getValue() : 0) * 0.01);
 					_vars.markSyncDirty();
 				}
 			}
 		}
 		if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
 			_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.QUEN_ACTIVE_SHIELD, 5, 0));
-		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftSignKeyHoldTime % 20 == 0) {
+		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftSignKeyHoldTime % 20 == 0 && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftQuenShield > 0) {
 			{
 				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 				_vars.witchercraftQuenShield = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftQuenShield + 2 * (1

@@ -552,8 +552,8 @@ character sheet - the attributes are syncable, so the client already has the val
 - **Perks and effects left empty by the stat cut.** Katakan and Leshen currently do
   nothing (Deadly Precision is now Execute, Razor Focus became Arrow Deflection, Anatomical Knowledge became Bloody Rage); Blizzard keeps only its attack speed. They wait for the
   perk rework (GDD 5 marks them "Rework pending").
-- **Five element files use unicode escapes and a BOM** (`AltQuenCast`, `QuenActiveShieldAura`,
-  `QuenActiveShieldTick`, `SignCastHold`, `SignCastHoldCost`). They store `<` as a
+- **Four element files use unicode escapes** (`AltQuenCast`, `QuenActiveShieldTick`, `SignCastHold`,
+  `SignCastHoldCost`). They store `<` as a
   literal escape sequence rather than the character, so ordinary text search and replace will not
   match them. MCreator reads them fine; only tooling is affected.
 - **Armour is no longer tracked.** The old `witchercraftArmor` variable was written and never read,
@@ -3656,11 +3656,48 @@ not equipped) and `SignCastKeyRelease` (alternates, picked by hold time over 20 
 effect lives in its own `<Sign>Cast` / `Alt<Sign>Cast` procedure (`~/Signs/<Sign>`). The debug chat
 line each cast prints ("AARD", "ALT AARD", ...) is intentional for now and is removed by hand later.
 
+While `SignHold` is on the player (Sign key down, from `SignCastKeyPress` to release), right-click is
+cancelled on both sides by `SignHoldBlockUseItem` (item use start: food, potions, bows, shields),
+`SignHoldBlockRightClickItem`, `SignHoldBlockRightClickBlock` and `SignHoldBlockRightClickEntity`
+(`~/Signs/SignCast`). `SignCastKeyPress` also calls the locked `WitchercraftStopUsingItem` right after
+adding `SignHold`, so a use started before the press is stopped (server-side; syncs via entity flags).
+Attacking is not blocked.
+
 Sign sounds go through the locked procedure `WitchercraftPlaySoundAt(entity, sound, pitch)` (`~/Signs`):
 volume 1, `PLAYERS`, at the caster's exact position + 1. Don't use MCreator's play-sound block for a
 sound centred on the caster: it snaps to the block centre, up to 0.7 blocks to one side, and the
 sound pans left or right depending on where you face. Used by Aard, Igni, Firestream and Quen's
-absorb sound (`QuenBlock`, `item.shield.block` 1).
+Quen: `QuenCast` and the first tick of `AltQuenCast` play `entity.illusioner.cast_spell` 1.2; `QuenBlock`
+plays `item.shield.block` 1 on an absorbed hit from a mob or player, and `item.shield.break` 1 +
+`block.glass.break` 0.7 when a hit empties the pool. Timing out (`QuenBroke`), releasing Active Shield
+and the +2/s charge are silent.
+
+`QuenBlock` (`LivingIncomingDamageEvent`) reads the attacker through the damage source's "get entity"
+block instead of the `sourceentity` dependency: MCreator returns early when any entity dependency is
+null, which let all sourceless damage (burning, lava, poison, wither, cactus) bypass Quen.
+Pass-through list: tags `is_fall`, `is_freezing`, `is_drowning`, `bypasses_invulnerability`, plus
+types `starve`, `in_wall`, `fly_into_wall`. The gold "Quen: N" action-bar readout (`QuenActiveTick`)
+was removed; the element is in `trash/`. `QuenCast` sets the pool to `8 * (1 + SignIntensity * 0.01)`
+(was 40% of max health, which made Full Moon, Green mutagen and Survival Instinct grow Quen).
+**Active Shield bubble.** `WitchercraftQuenBubbleMessage` (locked code, `~/Signs/Quen/AltQuen`, clientbound
+`entityId, pool`) is sent from a server player tick to the player and everyone tracking them on every
+up/down change and every 5 ticks while up (effects and player variables only sync to their owner).
+`WitchercraftQuenBubbleClient` (locked code, `SubmitCustomGeometryEvent`) draws a geodesic shell (icosahedron split
+once, 80 faces, radius 1.4, centred at 50% of the player's height so its bottom sinks into the ground) with
+`entityTranslucentEmissive(textures/entities/quen_bubble.png)`: plain white texture, colour and alpha per
+vertex. Each face is a flat fill (rim glow from the angle to the camera); an optional frame band per face
+exists but is off (`EDGE_ALPHA` 0, `FACE_INSET` 1); per-face shimmer, slow turn, x pool up to 16, 4-tick fade in, gone instantly on drop (`FADE_OUT_TICKS` 0). Own shell is
+hidden in first person; a `CAMERA_OVERLAYS` GUI pass draws an amber screen-edge glow instead. Absorbed hits:
+`QuenBlock` calls the locked `WitchercraftQuenBubbleHit(damagesource, entity)`, which spawns 14 `WAX_ON`
+sparks on the side facing the attacker (at the bubble surface for Active Shield, 0.6 from the body for base
+Quen, random side when the damage has no position) and, for Active Shield, sends the message with
+`hit` + the horizontal direction to the attacker; the shell flashes (x2.5, 6 ticks) and in first person the
+edge on the attacker's side flashes. A bubble that hears nothing for 20 ticks is dropped. Tuning = constants at the
+top of the client class. The render type discards alpha under 0.1, so faint parts vanish first. The old
+12-glyph ring (`QuenActiveShieldAura`) is in `trash/`; the `QuenHoldParticles` particle type is unused.
+`AltQuenCast` raises the pool to at least `4 * (1 + SignIntensity * 0.01)` on the first hold tick (was a flat 2),
+and only adds its +2/s recharge while the pool is above 0, so a hit that empties the Active
+Shield on a recharge tick can't refill it before `QuenActiveShieldTick` ends the hold.
 
 **Casting pose: tried and removed (parked by the user).** A third-person off-hand "reach out" pose
 was built and taken out again; its three locked files are in `trash/` (`WitchercraftCastPose`,

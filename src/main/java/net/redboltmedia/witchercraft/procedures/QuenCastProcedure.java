@@ -18,7 +18,7 @@ public class QuenCastProcedure {
 			_player.sendSystemMessage(Component.literal("QUEN"), false);
 		{
 			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-			_vars.witchercraftQuenShieldMax = (entity instanceof LivingEntity _livEnt ? _livEnt.getMaxHealth() : -1) * 0.4
+			_vars.witchercraftQuenShieldMax = 8
 					* (1 + (entity instanceof LivingEntity _livingEntity2 && _livingEntity2.getAttributes().hasAttribute(WitchercraftModAttributes.SIGN_INTENSITY) ? _livingEntity2.getAttribute(WitchercraftModAttributes.SIGN_INTENSITY).getValue() : 0)
 							* 0.01);
 			_vars.witchercraftQuenShield = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftQuenShieldMax;
@@ -26,5 +26,6 @@ public class QuenCastProcedure {
 		}
 		if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
 			_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.QUEN_EFFECT, 200, 0));
+		WitchercraftPlaySoundAtProcedure.execute(entity, "entity.illusioner.cast_spell", 1.2);
 	}
 }
