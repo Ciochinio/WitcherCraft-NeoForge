@@ -3655,6 +3655,31 @@ Casting runs through `SignCastKeyPress` (tap Signs, and the base form when the a
 not equipped) and `SignCastKeyRelease` (alternates, picked by hold time over 20 ticks). Each Sign's
 effect lives in its own `<Sign>Cast` / `Alt<Sign>Cast` procedure (`~/Signs/<Sign>`). The debug chat
 line each cast prints ("AARD", "ALT AARD", ...) is intentional for now and is removed by hand later.
+The keybind runs the press/release procedures on the client as well as on the server (MCreator calls
+`pressAction` locally too), so anything a cast draws with client-only calls is seen by the caster only.
+
+**Yrden trap.** `YrdenCast` stores the trap in player variables `witchercraftYrdenX/Y/Z` (cast position)
+and `witchercraftYrdenTicks` (`200 * (1 + SignIntensity * 0.01)`, player_lifetime, so death clears it),
+spawns the purple puff and plays `entity.evoker.prepare_summon` 1.3 through `WitchercraftPlaySoundAt`.
+`YrdenTrapTick` (player tick, server only) counts the ticks down and, while
+above 0, gives every living non-player, non-own-pet entity within 3.5 blocks horizontally and from 7
+below to 5 above the trap (matching the client's ground search) `YrdenTrapped` for 20 ticks (hidden; -30% movement speed,
+ADD_MULTIPLIED_TOTAL). The look is rendered, not particles: `WitchercraftYrdenTrapMessage` (locked
+code, `~/Signs/Yrden`, clientbound `ownerId, x, y, z, up`) is sent from a server player tick to the
+caster and trackers when the trap goes up, moves or ends and every 10 ticks while up;
+`WitchercraftYrdenTrapClient` (locked code, `SubmitCustomGeometryEvent`) draws, at each of the 7
+original glyph offsets, a camera-facing purple pillar (`textures/entities/yrden_pillar.png`, soft-edged
+white, fades upward) and the glyph (`textures/particle/yrden.png`) lying flat with its top pointing
+outward (`GLYPH_FLAT` false = upright, facing the camera; the user runs it false). Each spot snaps to the
+top of the highest solid block with free space above in its column, from 4 above to 6 below the trap,
+and is skipped if none. Every block column whose centre is inside the 3.5 radius gets a flat purple tile
+on its ground top (stronger in the outer 1 block) and on each side face that drops to a lower neighbour
+column (down to its ground, at most 3 blocks), and a client tick spawns 2 `REVERSE_PORTAL` motes per
+tick from random ground spots inside. 4-tick fade in, gone instantly on end, dropped after 30 ticks of silence. `YrdenParticles` is no
+longer used by base Yrden (Alt Yrden still spawns it client-side).
+`YrdenTrapEndOnTravel` zeroes the ticks on a dimension change. `WitchercraftCritCondition` now takes
+the target (`entity`) and returns true when it has `YrdenTrapped`, which makes charged melee hits on it
+Precise. Recasting overwrites the variables, so one trap per player.
 
 While `SignHold` is on the player (Sign key down, from `SignCastKeyPress` to release), right-click is
 cancelled on both sides by `SignHoldBlockUseItem` (item use start: food, potions, bows, shields),

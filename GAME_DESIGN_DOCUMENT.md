@@ -235,9 +235,9 @@ attacker, and a shield shattered by a hit (base or
 Active Shield) breaks with a shield crack over low glass; running out or letting go is silent. It's what you throw
 up before a hit you can't dodge.
 
-**Yrden** is the crowd-control Sign. It lays a ring on the ground; enemies inside it are slowed
-and held while you reposition or focus someone down. Best against fast enemies and in
-chokepoints.
+**Yrden** lays a trap at your feet: a **3.5**-block ring of purple-lit ground with rising motes, marked by
+7 glowing glyphs each over a pillar of light, for **10 s** x Sign Intensity, one per player (recasting moves it). Mobs inside move **30%** slower and your charged melee hits on them are
+Precise hits; both last **1 s** after they leave. Players and your pets are ignored.
 
 **Axii** is the single-target lock. It fires at whatever you're aiming at, and if there's an
 enemy there it charms them, freezing them in place so you can hit them freely or peel one off.
@@ -600,7 +600,6 @@ Precise strong attack     x2.0    1 + 50% + Precise Hit Damage
 ```
 
 - Several conditions at once still count as one Precise hit.
-- The base kit has none. **Conditions come from perks, potions and set effects.**
 - Look: a strong attack shows vanilla's crit stars and sound; a Precise hit shows blue sparks and a
   sharper crit sound (a Precise strong attack shows both).
 
@@ -608,7 +607,7 @@ Conditions:
 | Condition | Source |
 |---|---|
 | A thunderstorm | **Thunderbolt** potion |
-| Target slowed by Yrden | perk |
+| Target inside a Yrden trap | **Yrden** |
 | Target charmed by Axii | perk |
 | Target burning | perk |
 | Target Maimed (melee hits only, next **2** charged hits) | **Maiming Shot** perk |

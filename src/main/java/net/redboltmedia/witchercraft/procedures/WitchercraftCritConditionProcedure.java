@@ -8,9 +8,10 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
 
 public class WitchercraftCritConditionProcedure {
-	public static boolean execute(LevelAccessor world, Entity sourceentity) {
-		if (sourceentity == null)
+	public static boolean execute(LevelAccessor world, Entity entity, Entity sourceentity) {
+		if (entity == null || sourceentity == null)
 			return false;
-		return sourceentity instanceof LivingEntity _livEnt0 && _livEnt0.hasEffect(WitchercraftModMobEffects.THUNDERBOLT_EFFECT) && world instanceof Level _lvl1 && _lvl1.isThundering();
+		return sourceentity instanceof LivingEntity _livEnt0 && _livEnt0.hasEffect(WitchercraftModMobEffects.THUNDERBOLT_EFFECT) && world instanceof Level _lvl1 && _lvl1.isThundering()
+				|| entity instanceof LivingEntity _livEnt2 && _livEnt2.hasEffect(WitchercraftModMobEffects.YRDEN_TRAPPED);
 	}
 }

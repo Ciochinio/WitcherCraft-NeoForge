@@ -188,6 +188,10 @@ public class WitchercraftModVariables {
 			clone.witchercraftToxicity = original.witchercraftToxicity;
 			clone.witchercraftQuenShield = original.witchercraftQuenShield;
 			clone.witchercraftQuenShieldMax = original.witchercraftQuenShieldMax;
+			clone.witchercraftYrdenX = original.witchercraftYrdenX;
+			clone.witchercraftYrdenY = original.witchercraftYrdenY;
+			clone.witchercraftYrdenZ = original.witchercraftYrdenZ;
+			clone.witchercraftYrdenTicks = original.witchercraftYrdenTicks;
 			clone.witchercraftComboLine = original.witchercraftComboLine;
 			clone.witchercraftWyvernDecoctionHit = original.witchercraftWyvernDecoctionHit;
 			clone.witchercraftSuccubusDecoctionTick = original.witchercraftSuccubusDecoctionTick;
@@ -317,6 +321,10 @@ public class WitchercraftModVariables {
 		public double witchercraftPerksSignsSkillPointsUsed = 0;
 		public double witchercraftQuenShield = 0;
 		public double witchercraftQuenShieldMax = 0;
+		public double witchercraftYrdenX = 0;
+		public double witchercraftYrdenY = 0;
+		public double witchercraftYrdenZ = 0;
+		public double witchercraftYrdenTicks = 0;
 		public String witchercraftComboLine = "";
 		public double witchercraftWyvernDecoctionHit = 0;
 		public double witchercraftSuccubusDecoctionTick = 0;
@@ -443,6 +451,10 @@ public class WitchercraftModVariables {
 			output.putDouble("witchercraftPerksSignsSkillPointsUsed", witchercraftPerksSignsSkillPointsUsed);
 			output.putDouble("witchercraftQuenShield", witchercraftQuenShield);
 			output.putDouble("witchercraftQuenShieldMax", witchercraftQuenShieldMax);
+			output.putDouble("witchercraftYrdenX", witchercraftYrdenX);
+			output.putDouble("witchercraftYrdenY", witchercraftYrdenY);
+			output.putDouble("witchercraftYrdenZ", witchercraftYrdenZ);
+			output.putDouble("witchercraftYrdenTicks", witchercraftYrdenTicks);
 			output.putString("witchercraftComboLine", witchercraftComboLine);
 			output.putDouble("witchercraftWyvernDecoctionHit", witchercraftWyvernDecoctionHit);
 			output.putDouble("witchercraftSuccubusDecoctionTick", witchercraftSuccubusDecoctionTick);
@@ -570,6 +582,10 @@ public class WitchercraftModVariables {
 			witchercraftPerksSignsSkillPointsUsed = input.getDoubleOr("witchercraftPerksSignsSkillPointsUsed", 0);
 			witchercraftQuenShield = input.getDoubleOr("witchercraftQuenShield", 0);
 			witchercraftQuenShieldMax = input.getDoubleOr("witchercraftQuenShieldMax", 0);
+			witchercraftYrdenX = input.getDoubleOr("witchercraftYrdenX", 0);
+			witchercraftYrdenY = input.getDoubleOr("witchercraftYrdenY", 0);
+			witchercraftYrdenZ = input.getDoubleOr("witchercraftYrdenZ", 0);
+			witchercraftYrdenTicks = input.getDoubleOr("witchercraftYrdenTicks", 0);
 			witchercraftComboLine = input.getStringOr("witchercraftComboLine", "");
 			witchercraftWyvernDecoctionHit = input.getDoubleOr("witchercraftWyvernDecoctionHit", 0);
 			witchercraftSuccubusDecoctionTick = input.getDoubleOr("witchercraftSuccubusDecoctionTick", 0);

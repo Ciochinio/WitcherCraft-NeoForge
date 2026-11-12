@@ -3316,6 +3316,87 @@
       "path": "~/Signs/Igni"
     },
     {
+      "name": "YrdenTrapped",
+      "type": "potioneffect",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "yrden_trapped",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/potion/YrdenTrappedMobEffect.java"
+        ]
+      },
+      "path": "~/Signs/Yrden"
+    },
+    {
+      "name": "WitchercraftYrdenTrapMessage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "witchercraft_yrden_trap_message",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WitchercraftYrdenTrapMessage.java"
+        ]
+      },
+      "path": "~/Signs/Yrden"
+    },
+    {
+      "name": "WitchercraftYrdenTrapClient",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "witchercraft_yrden_trap_client",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WitchercraftYrdenTrapClient.java"
+        ]
+      },
+      "path": "~/Signs/Yrden"
+    },
+    {
+      "name": "YrdenTrapTick",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "yrden_trap_tick",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/YrdenTrapTickProcedure.java"
+        ]
+      },
+      "path": "~/Signs/Yrden"
+    },
+    {
+      "name": "YrdenTrapEndOnTravel",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "yrden_trap_end_on_travel",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/YrdenTrapEndOnTravelProcedure.java"
+        ]
+      },
+      "path": "~/Signs/Yrden"
+    },
+    {
       "name": "YrdenCast",
       "type": "procedure",
       "compiles": true,
@@ -9598,6 +9679,10 @@
       "metadata": {
         "dependencies": [
           {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
             "name": "sourceentity",
             "type": "entity"
           },
@@ -10878,6 +10963,30 @@
       "value": "0"
     },
     {
+      "name": "witchercraftYrdenX",
+      "type": "number",
+      "scope": "player_lifetime",
+      "value": "0"
+    },
+    {
+      "name": "witchercraftYrdenY",
+      "type": "number",
+      "scope": "player_lifetime",
+      "value": "0"
+    },
+    {
+      "name": "witchercraftYrdenZ",
+      "type": "number",
+      "scope": "player_lifetime",
+      "value": "0"
+    },
+    {
+      "name": "witchercraftYrdenTicks",
+      "type": "number",
+      "scope": "player_lifetime",
+      "value": "0"
+    },
+    {
       "name": "witchercraftComboLine",
       "type": "string",
       "scope": "player_lifetime",
@@ -11339,6 +11448,7 @@
       "effect.witchercraft.sundered": "Sundered",
       "effect.witchercraft.crippled": "Crippled",
       "effect.witchercraft.maimed": "Maimed",
+      "effect.witchercraft.yrden_trapped": "Yrden",
       "effect.witchercraft.igni_burn": "Igni Burn",
       "effect.witchercraft.muscle_memory_active": "Muscle Memory",
       "effect.witchercraft.bloody_rage_active": "Bloody Rage",
