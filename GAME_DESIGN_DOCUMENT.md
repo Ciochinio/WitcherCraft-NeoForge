@@ -208,7 +208,9 @@ Each Sign owns one job.
 | **Axii** | Crowd control | A targeted charm that freezes a single enemy in place; refunds its cost when there's no target. |
 
 **Aard** is the panic button. A burst of force in the direction you're facing that throws
-nearby enemies back and buys room when you're swarmed.
+nearby enemies back and buys room when you're swarmed. It needs line of sight, leaves your pets,
+items and XP alone (boats and flying arrows do get thrown), and pushed mobs can't walk for **1 s**. It reads as a burst of dust and blue sparks with a deep
+knockback thump.
 
 **Igni** is your main damage Sign. A dense stream of fire straight ahead that pierces through
 enemies instead of stopping at the first, setting them alight. Best when they're lined up.
@@ -597,7 +599,6 @@ Conditions:
 | A thunderstorm | **Thunderbolt** potion |
 | Target slowed by Yrden | perk |
 | Target charmed by Axii | perk |
-| Target knocked back by Aard, within about **1** second | perk |
 | Target burning | perk |
 | Target Maimed (melee hits only, next **2** charged hits) | **Maiming Shot** perk |
 | Target hasn't noticed you | bow perk, not assigned yet |

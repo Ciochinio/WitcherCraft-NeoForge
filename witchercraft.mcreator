@@ -3459,6 +3459,30 @@
       "path": "~/Signs/Quen/DefQuen"
     },
     {
+      "name": "WitchercraftCanSee",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "witchercraft_can_see",
+      "metadata": {
+        "return_type": "logic",
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "target",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftCanSeeProcedure.java"
+        ]
+      },
+      "path": "~/Signs/Aard"
+    },
+    {
       "name": "AardCast",
       "type": "procedure",
       "compiles": true,

@@ -22,6 +22,7 @@ Anything marked **tunable** is a value you are expected to change. Anything desc
 7. [Custom armor models](#7-custom-armor-models)
 8. [Chain Hook](#8-chain-hook)
 9. [Custom weapon models](#9-custom-weapon-models)
+10. [Signs](#10-signs)
 
 ---
 
@@ -3642,3 +3643,51 @@ repo. The `.bbmodel` is now the source of truth.
   most likely to need adjustment.
 - In the inventory slot a realistic longsword is thin; a flat GUI sprite (`guiTexture`) is the
   fallback if the 3D icon reads poorly.
+
+---
+
+## 10. Signs
+
+Casting runs through `SignCastKeyPress` (tap Signs, and the base form when the alternate's perk is
+not equipped) and `SignCastKeyRelease` (alternates, picked by hold time over 20 ticks). Each Sign's
+effect lives in its own `<Sign>Cast` / `Alt<Sign>Cast` procedure (`~/Signs/<Sign>`). The debug chat
+line each cast prints ("AARD", "ALT AARD", ...) is intentional for now and is removed by hand later.
+
+### 10.1 Aard
+
+| Element | Kind, MCreator path | Does |
+|---|---|---|
+| `AardCast` | Blockly, `~/Signs/Aard` | Cone push: every entity in a 5-block cube around the caster, push scaled by `coneFactor` (full straight ahead, 0 at 60 degrees off the facing direction), force 1.5, lift 0.45. Facing is the yaw (`-sin(yaw)`, `cos(yaw)`), not the look vector: the look vector tilts with pitch and collapses when looking straight down, which left the cone with no direction. |
+| `AltAardCast` | Blockly, `~/Signs/Aard` | Far-Reaching Aard: same filter, radial, sets velocity (1.5 out, 0.4 up) instead of adding to it. |
+| `WitchercraftCanSee` | locked procedure, `~/Signs/Aard` | `LivingEntity.hasLineOfSight(target)`: one eye-to-eye ray, stopped by collider blocks (glass too), not by fluids. MCreator has no line-of-sight block. |
+
+Target filter (both casts): not a player, not a dropped item, not an XP orb, not a `TamableAnimal`
+owned by the caster, and visible per `WitchercraftCanSee`. Boats, minecarts and in-flight arrows are
+pushed on purpose. Arrows stuck in the ground are in the filter but do not move (vanilla ignores
+velocity on grounded arrows).
+
+Every living entity actually pushed (`coneFactor > 0` for the base cast) gets hidden Slowness 255
+for **20** ticks (tunable). Slowness only scales walking speed, so the knockback flight is unchanged;
+the mob mostly lands with about half a second left before it walks back in.
+
+Look and sound (all tunable): the caster swings the main hand and plays
+`entity.player.attack.knockback` at volume 1, pitch 0.7 (picked by ear; its long tail fades out
+well). The wind charge burst was tried and dropped. Base Aard sends
+100 `POOF` puffs from knee-to-waist height (y + 0.4-0.9), each at a random angle inside the 120
+degree cone, flying level (dy -0.05..0.08), speed `(0.2 + 0.6 * fanPower) * random(0.7-1)`. `POOF`
+has friction 0.9, so a puff travels about 10x its start speed: it leaves with the stars and the
+thrown mobs and stops around 8 blocks straight ahead, less toward the edges, then drifts up and
+fades. `CLOUD` was tried and dropped: its friction is 0.96, so it can only reach that far by moving
+slowly and trailed behind the push. Particles here have no collision, so never tilt them down -
+they sink through the ground. Then the cone-width indicator: 41 crit-magic stars evenly across the full 120 degrees (3
+degree steps), each at speed `0.8 + 2.2 * fanPower`, where `fanPower` is the same falloff the push
+uses at that angle. The fan is long straight ahead and short at the edges, so its shape shows where
+Aard actually throws. Alt Aard: 120 `POOF` puffs at random angles all around, same height and level flight, speed
+`0.75 * random(0.7-1)`, and an even
+ring of 60 crit-magic stars at speed 3 (the radial push is equal all around). `GUST` swirls were tried
+and dropped: a line of them reads as a straight push.
+
+Known limitations: owned horses and other non-`TamableAnimal` mounts are still pushed; a mob whose
+eyes are behind a block is not pushed even if its body shows; the range is a cube, not a sphere.
+The `WitchercraftCanSee` call passes `target` as an explicit procedure input from Blockly - verify it
+shows as a normal call block when the workspace is next opened in MCreator.
