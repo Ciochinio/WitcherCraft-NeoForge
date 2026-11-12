@@ -3257,7 +3257,60 @@
           {
             "name": "entity",
             "type": "entity"
+          },
+          {
+            "name": "world",
+            "type": "world"
           }
+        ]
+      },
+      "path": "~/Signs/Igni"
+    },
+    {
+      "name": "WitchercraftIgniHurtCooldown",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "witchercraft_igni_hurt_cooldown",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WitchercraftIgniHurtCooldown.java"
+        ]
+      },
+      "path": "~/Signs/Igni"
+    },
+    {
+      "name": "IgniBurn",
+      "type": "potioneffect",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "igni_burn",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/potion/IgniBurnMobEffect.java"
+        ]
+      },
+      "path": "~/Signs/Igni"
+    },
+    {
+      "name": "IgniBurnDamage",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "igni_burn_damage",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "damagesource",
+            "type": "damagesource"
+          },
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/IgniBurnDamageProcedure.java"
         ]
       },
       "path": "~/Signs/Igni"
@@ -3457,6 +3510,33 @@
         ]
       },
       "path": "~/Signs/Quen/DefQuen"
+    },
+    {
+      "name": "WitchercraftPlaySoundAt",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "witchercraft_play_sound_at",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "sound",
+            "type": "string"
+          },
+          {
+            "name": "pitch",
+            "type": "number"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftPlaySoundAtProcedure.java"
+        ]
+      },
+      "path": "~/Signs"
     },
     {
       "name": "WitchercraftCanSee",
@@ -7595,6 +7675,10 @@
           {
             "name": "entity",
             "type": "entity"
+          },
+          {
+            "name": "world",
+            "type": "world"
           }
         ],
         "files": [
@@ -11157,6 +11241,7 @@
       "effect.witchercraft.sundered": "Sundered",
       "effect.witchercraft.crippled": "Crippled",
       "effect.witchercraft.maimed": "Maimed",
+      "effect.witchercraft.igni_burn": "Igni Burn",
       "effect.witchercraft.muscle_memory_active": "Muscle Memory",
       "effect.witchercraft.bloody_rage_active": "Bloody Rage",
       "gui.witchercraft.character_gui.label_passivehealthregen": "HealthRegen",

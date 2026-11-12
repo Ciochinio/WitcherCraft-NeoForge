@@ -213,7 +213,10 @@ items and XP alone (boats and flying arrows do get thrown), and pushed mobs can'
 knockback thump.
 
 **Igni** is your main damage Sign. A dense stream of fire straight ahead that pierces through
-enemies instead of stopping at the first, setting them alight. Best when they're lined up.
+enemies instead of stopping at the first, setting them alight. Best when they're lined up. It hits
+everything in a **35** degree cone out to **7** blocks wherever you aim, up and down too: **1** damage
+on hit, then a **5 s** burn at **2** per second (about **11** a cast), all scaled by Sign Intensity
+(+**50** Intensity = x**1.5**). Fire-immune mobs shrug it off; blocks never catch fire.
 
 **Quen** is the defensive Sign. Casting it grants a pool of absorption (**base 8**, scaling with
 Sign Intensity) that eats incoming damage until it's spent or the **10-second** timer runs out -
@@ -246,7 +249,7 @@ a Sign plays rather than just pushing its numbers, and they're still being final
 | Base Sign | Alternate | Change in behavior |
 |-----------|-----------|--------------------|
 | Aard | **Far-Reaching Aard** | Widens Aard from a frontal cone into a full 360-degree radial blast, shoving every nearby enemy away from the caster at once to clear space on all sides. |
-| Igni | **Fire Stream** | An enhanced, sustained flame projection. |
+| Igni | **Fire Stream** | Held: a straight jet of fire up to **8** blocks that stops at walls. Everything in the line takes **1** every **0.5 s** and keeps an Igni burn (**2**/s, **5 s** after you let go), all x Sign Intensity; about **4**/s while held. |
 | Quen | **Active Shield** | A held, channeled shield that starts small and charges the longer you keep it raised, paid for in stamina, instead of the fire-and-forget timed pool. |
 | Yrden | **Magic Trap** | An upgraded trap variant of the Yrden zone. |
 | Axii | **Alternate Axii** | An upgraded charm; like base Axii, it refunds its cost when it finds no target. |

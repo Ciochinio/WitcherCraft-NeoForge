@@ -30,6 +30,8 @@ public class AardCastProcedure {
 	public static void execute(LevelAccessor world, double x, double y, double z, Entity entity) {
 		if (entity == null)
 			return;
+		if (entity instanceof LivingEntity _entity)
+			_entity.swing(InteractionHand.MAIN_HAND, true);
 		double toMobX = 0;
 		double toMobZ = 0;
 		double toMobDist = 0;
@@ -49,15 +51,7 @@ public class AardCastProcedure {
 		lookLen = Mth.clamp(Math.sqrt(Math.pow((-1 * Math.sin(entity.getYRot() * 0.0174532925)), 2) + Math.pow(Math.cos(entity.getYRot() * 0.0174532925), 2)), 0.001, 100);
 		lookX = (-1 * Math.sin(entity.getYRot() * 0.0174532925)) / lookLen;
 		lookZ = Math.cos(entity.getYRot() * 0.0174532925) / lookLen;
-		if (entity instanceof LivingEntity _entity)
-			_entity.swing(InteractionHand.MAIN_HAND, true);
-		if (world instanceof Level _level) {
-			if (!_level.isClientSide()) {
-				_level.playSound(null, BlockPos.containing(x, y + 1, z), BuiltInRegistries.SOUND_EVENT.getValue(Identifier.parse("entity.player.attack.knockback")), SoundSource.PLAYERS, 1, (float) 0.7);
-			} else {
-				_level.playLocalSound(x, (y + 1), z, BuiltInRegistries.SOUND_EVENT.getValue(Identifier.parse("entity.player.attack.knockback")), SoundSource.PLAYERS, 1, (float) 0.7, false);
-			}
-		}
+		WitchercraftPlaySoundAtProcedure.execute(entity, "entity.player.attack.knockback", 0.7);
 		for (int _i1 = 0; _i1 < 100; _i1++) {
 			arcAngle = Mth.nextDouble(RandomSource.create(), -1.0471975512, 1.0471975512);
 			dirX = lookX * Math.cos(arcAngle) - lookZ * Math.sin(arcAngle);

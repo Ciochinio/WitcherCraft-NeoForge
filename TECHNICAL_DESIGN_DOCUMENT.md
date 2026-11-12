@@ -644,6 +644,9 @@ oil and % damage are crit too.
 
 **Melee** means the attacker is also the direct source (`sourceentity == immediatesourceentity`)
 and the damage is not thorns. Only entities with the witcher attributes (players) get any of it.
+Damage tagged `minecraft:is_fire` from a player skips both the melee and the arrow branch (only
+Crippled's `dealtMult` applies): Igni builds its hit as `in_fire` caused by the player, which would
+otherwise look like melee (cause == direct) and pick up oils, Precise hits and Three Strikes.
 
 **Locked helpers.** The two `Is*` procedures and the bridge are `locked_code`: MCreator keeps the
 hand-written Java. Their blocks are placeholders with a comment saying so. If MCreator ever reorders
@@ -3653,6 +3656,19 @@ not equipped) and `SignCastKeyRelease` (alternates, picked by hold time over 20 
 effect lives in its own `<Sign>Cast` / `Alt<Sign>Cast` procedure (`~/Signs/<Sign>`). The debug chat
 line each cast prints ("AARD", "ALT AARD", ...) is intentional for now and is removed by hand later.
 
+Sign sounds go through the locked procedure `WitchercraftPlaySoundAt(entity, sound, pitch)` (`~/Signs`):
+volume 1, `PLAYERS`, at the caster's exact position + 1. Don't use MCreator's play-sound block for a
+sound centred on the caster: it snaps to the block centre, up to 0.7 blocks to one side, and the
+sound pans left or right depending on where you face. Used by Aard, Igni, Firestream and Quen's
+absorb sound (`QuenBlock`, `item.shield.block` 1).
+
+**Casting pose: tried and removed (parked by the user).** A third-person off-hand "reach out" pose
+was built and taken out again; its three locked files are in `trash/` (`WitchercraftCastPose`,
+`WitchercraftCastPoseMessage`, `WitchercraftCastPoseClient`). It froze the vanilla off-hand swing at
+`attackTime = 0.2` through an avatar render-state modifier, synced by a small clientbound message. A
+proper custom `HumanoidModel.ArmPose` would need an `enumextensions.json` declared in
+`neoforge.mods.toml`, and MCreator regenerates both (it only emits them for raider mobs).
+
 ### 10.1 Aard
 
 | Element | Kind, MCreator path | Does |
@@ -3670,7 +3686,7 @@ Every living entity actually pushed (`coneFactor > 0` for the base cast) gets hi
 for **20** ticks (tunable). Slowness only scales walking speed, so the knockback flight is unchanged;
 the mob mostly lands with about half a second left before it walks back in.
 
-Look and sound (all tunable): the caster swings the main hand and plays
+Look and sound (all tunable): the caster swings the main hand and Aard plays
 `entity.player.attack.knockback` at volume 1, pitch 0.7 (picked by ear; its long tail fades out
 well). The wind charge burst was tried and dropped. Base Aard sends
 100 `POOF` puffs from knee-to-waist height (y + 0.4-0.9), each at a random angle inside the 120
@@ -3691,3 +3707,64 @@ Known limitations: owned horses and other non-`TamableAnimal` mounts are still p
 eyes are behind a block is not pushed even if its body shows; the range is a cube, not a sphere.
 The `WitchercraftCanSee` call passes `target` as an explicit procedure input from Blockly - verify it
 shows as a normal call block when the workspace is next opened in MCreator.
+
+### 10.2 Igni
+
+| Element | Kind, MCreator path | Does |
+|---|---|---|
+| `IgniCast` | Blockly, `~/Signs/Igni` | Visual: 70 `IgniParticles` bolts (damage 0, no owner, speed 4, inaccuracy 45, gone after about 2 ticks), purely cosmetic. Vanilla inaccuracy is a gaussian of `0.0075 * inaccuracy` per axis, so 45 puts most flames within about 35 degrees - keep the cone angle and the inaccuracy in step. Tried and dropped (user): a flat fan like Aard's, both as a flat random spread (read as a rectangle) and as Aard's falloff fan in fire - a flat shape can't look right while tilting up and down with the aim. | Sound `entity.ghast.shoot` pitch 0.8. Effect: a 3D cone check, see below. Dependencies are now `entity, world`. |
+| `IgniBurn` | potion effect, `~/Signs/Igni` | Hidden HARMFUL marker (no HUD/inventory display, own placeholder icon `igni_burn.png`), 100 ticks. "This mob is burning from Igni" - the hook for the later Precise-hit condition and the burn perks. |
+| `IgniBurnDamage` | Blockly, `~/Signs/Igni`, entity-attacked trigger | While the target has `IgniBurn`, each `on_fire` tick deals the target's NBT `witchercraftIgniBurnDps` instead of vanilla's 1. |
+
+Cone: apex 1 block behind the caster's eyes (eye = feet + 1.5) along the full look vector, pitch
+included, so mobs on walls and ledges count. A living, non-player, not-own-pet, visible
+(`WitchercraftCanSee`) entity whose body centre (feet + half height) is within 8 of the apex and within
+35 degrees of the look (`dot >= 0.819 * dist`) is hit. Pushing the apex back keeps a mob that hugs you
+in the cone even when it is a bit off-centre.
+
+Per target, with `intensity = 1 + Sign Intensity / 100`: `in_fire` damage `1 * intensity` caused by the
+caster (aggro, kill credit), `igniteForSeconds(5)`, `IgniBurn` for 100 ticks, NBT
+`witchercraftIgniBurnDps = 2 * intensity`. Vanilla burns every 20 ticks, so a cast is about
+`1 + 5 * 2 = 11` damage at 0 Intensity. Recasting restarts everything; nothing stacks. Fire-immune mobs
+ignore all `is_fire` damage and never ignite, so they take nothing.
+
+Why the burn boosts the vanilla tick instead of dealing its own damage: a second damage source every
+second would land inside the 10-tick hurt cooldown of the vanilla fire tick and be mostly swallowed.
+
+Known limitations: water or rain puts the fire out and the burn stops, but the hidden `IgniBurn` marker
+stays for its 100 ticks (harmless; anything reading it must also check the target is on fire). A
+mob that dies to the burn more than 5 s after the hit may drop no XP (vanilla's "hurt by a player"
+memory is 100 ticks). Blocks are never set on fire.
+
+Hurt cooldown: `WitchercraftIgniHurtCooldown` (locked code element, `~/Signs/Igni`) listens to
+`LivingDamageEvent.Post` and sets the target's `invulnerableTime` to 0 after Igni fire damage
+(`in_fire` caused by a player, or `on_fire` while the target has `IgniBurn`). Vanilla gives every hit a
+half-second window in which a new hit only deals what it exceeds the last one by; without the reset a
+sword swing on a burning mob would lose the 2-4 burn damage, and Firestream's pulses would swallow the
+burn ticks. Blockly can't touch `invulnerableTime`. Fire damage has no knockback in vanilla
+(`#minecraft:no_knockback` lists `in_fire` and `on_fire`), so neither Igni nor Firestream pushes mobs.
+
+### 10.3 Firestream
+
+| Element | Kind, MCreator path | Does |
+|---|---|---|
+| `AltIgniCast` | Blockly, `~/Signs/Igni` | Called every tick by `SignCastHold` while the key is held past 20 ticks with the Firestream perk. Dependencies `entity, world`. |
+
+Each tick: if the last streamed tick (player NBT `witchercraftFirestreamTick`) is more than 1 tick ago,
+the stream just started - play `entity.ghast.shoot` 0.8 through `WitchercraftPlaySoundAt` (the roaring
+loop sound is not chosen yet). The "ALT IGNI" debug line still prints every tick. The beam length is
+the distance from the eyes to the centre of the first solid block on the look ray (raytrace
+`COLLIDER`, so grass and flowers don't stop it), minus 0.5, clamped to 0.5-8. Visual: the original
+look, one burning `IgniParticles` bolt per tick (speed 4, inaccuracy 10). The bolt being on fire is
+what makes the stream look thick (the entity renders the fire overlay), and as a side effect a bolt
+that hits TNT, a campfire or a candle lights it, like a flaming arrow. A particle jet (flames laid along
+the beam, fast thin flames, embers, wall and mob bursts) was tried and dropped by the user: too thin,
+too many stray particles. The beam only decides damage.
+
+Every 10 ticks of hold time (`witchercraftSignKeyHoldTime % 10 == 0`, so the first pulse lands about
+0.5 s into the stream): each living, non-player, not-own-pet, visible entity whose body centre lies
+along the look ray (`0 < t <= beamLen + 0.5`) within `0.6 + width / 2` of the line gets exactly Igni's
+hit: `in_fire` `1 * intensity`, ignite 5 s, `IgniBurn` 100 ticks,
+`witchercraftIgniBurnDps = 2 * intensity`. With the hurt-cooldown reset both the pulses (2/s) and the
+burn ticks (2/s) land: about 4/s while held, then 5 s of burn. Upkeep is the shared held-Sign upkeep
+(GDD: 4 stamina per second).

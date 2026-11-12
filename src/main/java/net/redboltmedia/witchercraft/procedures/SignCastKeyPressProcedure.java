@@ -60,7 +60,7 @@ public class SignCastKeyPressProcedure {
 						if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
 							_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.SIGN_COOLDOWN, 40, 0));
 					} else if (entity instanceof LivingEntity _livEnt14 && _livEnt14.hasEffect(WitchercraftModMobEffects.IGNI_SIGN) && !entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkFirestream) {
-						IgniCastProcedure.execute(entity);
+						IgniCastProcedure.execute(world, entity);
 						SignCostProcedure.execute(entity);
 						if (entity instanceof LivingEntity _entity)
 							_entity.removeEffect(WitchercraftModMobEffects.SIGN_HOLD);

@@ -247,6 +247,7 @@
   "effect.witchercraft.sundered": "Sundered",
   "effect.witchercraft.crippled": "Crippled",
   "effect.witchercraft.maimed": "Maimed",
+  "effect.witchercraft.igni_burn": "Igni Burn",
   "effect.witchercraft.muscle_memory_active": "Muscle Memory",
   "effect.witchercraft.bloody_rage_active": "Bloody Rage",
   "gui.witchercraft.character_gui.label_passivehealthregen": "HealthRegen",

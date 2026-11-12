@@ -30,21 +30,15 @@ public class AltAardCastProcedure {
 	public static void execute(LevelAccessor world, double x, double y, double z, Entity entity) {
 		if (entity == null)
 			return;
+		if (entity instanceof LivingEntity _entity)
+			_entity.swing(InteractionHand.MAIN_HAND, true);
 		double dx = 0;
 		double dz = 0;
 		double dh = 0;
 		double ang = 0;
 		if (entity instanceof ServerPlayer _player)
 			_player.sendSystemMessage(Component.literal("ALT AARD"), false);
-		if (entity instanceof LivingEntity _entity)
-			_entity.swing(InteractionHand.MAIN_HAND, true);
-		if (world instanceof Level _level) {
-			if (!_level.isClientSide()) {
-				_level.playSound(null, BlockPos.containing(x, y + 1, z), BuiltInRegistries.SOUND_EVENT.getValue(Identifier.parse("entity.player.attack.knockback")), SoundSource.PLAYERS, 1, (float) 0.7);
-			} else {
-				_level.playLocalSound(x, (y + 1), z, BuiltInRegistries.SOUND_EVENT.getValue(Identifier.parse("entity.player.attack.knockback")), SoundSource.PLAYERS, 1, (float) 0.7, false);
-			}
-		}
+		WitchercraftPlaySoundAtProcedure.execute(entity, "entity.player.attack.knockback", 0.7);
 		for (int _i1 = 0; _i1 < 120; _i1++) {
 			ang = Mth.nextDouble(RandomSource.create(), 0, 6.2831853072);
 			if (world instanceof ServerLevel _level)
