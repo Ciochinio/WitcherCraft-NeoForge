@@ -44,16 +44,22 @@ public class YrdenTrapTickProcedure {
 			double tx = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftYrdenX;
 			double ty = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftYrdenY;
 			double tz = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftYrdenZ;
-			{
-				final Vec3 _center = new Vec3(tx, (ty - 1), tz);
-				for (Entity entityiterator : world.getEntitiesOfClass(Entity.class, new AABB(_center, _center).inflate(12 / 2d), e -> true).stream().sorted(Comparator.comparingDouble(_entcnd -> _entcnd.distanceToSqr(_center)))
-						.toList()) {
-					if (!(entityiterator instanceof Player) && !(entityiterator instanceof TamableAnimal _tamIsTamedBy && entity instanceof LivingEntity _livEnt && _tamIsTamedBy.isOwnedBy(_livEnt))
-							&& Math.sqrt((entityiterator.getX() - tx) * (entityiterator.getX() - tx) + (entityiterator.getZ() - tz) * (entityiterator.getZ() - tz)) <= 3.5 && entityiterator.getY() >= ty - 7
-							&& entityiterator.getY() <= ty + 5) {
-						if (entityiterator instanceof LivingEntity _entity && !_entity.level().isClientSide())
-							_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.YRDEN_TRAPPED, 20, 0, false, false));
+			if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftYrdenMode == 0) {
+				{
+					final Vec3 _center = new Vec3(tx, (ty - 1), tz);
+					for (Entity entityiterator : world.getEntitiesOfClass(Entity.class, new AABB(_center, _center).inflate(12 / 2d), e -> true).stream().sorted(Comparator.comparingDouble(_entcnd -> _entcnd.distanceToSqr(_center)))
+							.toList()) {
+						if (!(entityiterator instanceof Player) && !(entityiterator instanceof TamableAnimal _tamIsTamedBy && entity instanceof LivingEntity _livEnt && _tamIsTamedBy.isOwnedBy(_livEnt))
+								&& Math.sqrt((entityiterator.getX() - tx) * (entityiterator.getX() - tx) + (entityiterator.getZ() - tz) * (entityiterator.getZ() - tz)) <= 3.5 && entityiterator.getY() >= ty - 7
+								&& entityiterator.getY() <= ty + 5) {
+							if (entityiterator instanceof LivingEntity _entity && !_entity.level().isClientSide())
+								_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.YRDEN_TRAPPED, 20, 0, false, false));
+						}
 					}
+				}
+			} else {
+				if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftYrdenTicks % 40 < 1) {
+					WitchercraftYrdenTurretShootProcedure.execute(entity);
 				}
 			}
 		}

@@ -41,6 +41,11 @@ public class YrdenCastProcedure {
 							* 0.01);
 			_vars.markSyncDirty();
 		}
+		{
+			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+			_vars.witchercraftYrdenMode = 0;
+			_vars.markSyncDirty();
+		}
 		WitchercraftPlaySoundAtProcedure.execute(entity, "entity.evoker.prepare_summon", 1.3);
 	}
 }

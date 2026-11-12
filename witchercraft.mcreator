@@ -3316,6 +3316,19 @@
       "path": "~/Signs/Igni"
     },
     {
+      "name": "YrdenZapped",
+      "type": "potioneffect",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "yrden_zapped",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/potion/YrdenZappedMobEffect.java"
+        ]
+      },
+      "path": "~/Signs/Yrden"
+    },
+    {
       "name": "YrdenTrapped",
       "type": "potioneffect",
       "compiles": true,
@@ -3350,6 +3363,25 @@
       "metadata": {
         "files": [
           "src/main/java/net/redboltmedia/witchercraft/WitchercraftYrdenTrapClient.java"
+        ]
+      },
+      "path": "~/Signs/Yrden"
+    },
+    {
+      "name": "WitchercraftYrdenTurretShoot",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "witchercraft_yrden_turret_shoot",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftYrdenTurretShootProcedure.java"
         ]
       },
       "path": "~/Signs/Yrden"
@@ -10987,6 +11019,18 @@
       "value": "0"
     },
     {
+      "name": "witchercraftYrdenMode",
+      "type": "number",
+      "scope": "player_lifetime",
+      "value": "0"
+    },
+    {
+      "name": "witchercraftYrdenShots",
+      "type": "number",
+      "scope": "player_lifetime",
+      "value": "0"
+    },
+    {
       "name": "witchercraftComboLine",
       "type": "string",
       "scope": "player_lifetime",
@@ -11448,7 +11492,8 @@
       "effect.witchercraft.sundered": "Sundered",
       "effect.witchercraft.crippled": "Crippled",
       "effect.witchercraft.maimed": "Maimed",
-      "effect.witchercraft.yrden_trapped": "Yrden",
+      "effect.witchercraft.yrden_zapped": "Yrden Zap",
+        "effect.witchercraft.yrden_trapped": "Yrden",
       "effect.witchercraft.igni_burn": "Igni Burn",
       "effect.witchercraft.muscle_memory_active": "Muscle Memory",
       "effect.witchercraft.bloody_rage_active": "Bloody Rage",

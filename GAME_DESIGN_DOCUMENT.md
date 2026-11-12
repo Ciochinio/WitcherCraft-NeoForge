@@ -254,7 +254,7 @@ a Sign plays rather than just pushing its numbers, and they're still being final
 | Aard | **Far-Reaching Aard** | Widens Aard from a frontal cone into a full 360-degree radial blast, shoving every nearby enemy away from the caster at once to clear space on all sides. |
 | Igni | **Fire Stream** | Held: a straight jet of fire up to **8** blocks that stops at walls. Everything in the line takes **1** every **0.5 s** and keeps an Igni burn (**2**/s, **5 s** after you let go), all x Sign Intensity; about **4**/s while held. |
 | Quen | **Active Shield** | A held, channeled shield that starts small and charges the longer you keep it raised, paid for in stamina, instead of the fire-and-forget timed pool. |
-| Yrden | **Magic Trap** | An upgraded trap variant of the Yrden zone. |
+| Yrden | **Magic Trap** | Held: a single glyph at your feet that zaps the nearest hostile mob it can see within **8** blocks every **2 s** for **2** magic damage (**3** at +50 Intensity); a zapped mob is **10%** slower and takes Precise hits for **2 s**; **8** shots or **20 s**. Replaces your Yrden trap. |
 | Axii | **Alternate Axii** | An upgraded charm; like base Axii, it refunds its cost when it finds no target. |
 
 Because the alternates sit behind perks, they double as build payoffs: go deep into the Signs
@@ -607,7 +607,7 @@ Conditions:
 | Condition | Source |
 |---|---|
 | A thunderstorm | **Thunderbolt** potion |
-| Target inside a Yrden trap | **Yrden** |
+| Target inside a Yrden trap, or zapped by Magic Trap | **Yrden** |
 | Target charmed by Axii | perk |
 | Target burning | perk |
 | Target Maimed (melee hits only, next **2** charged hits) | **Maiming Shot** perk |

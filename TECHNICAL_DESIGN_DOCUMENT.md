@@ -3676,7 +3676,20 @@ and is skipped if none. Every block column whose centre is inside the 3.5 radius
 on its ground top (stronger in the outer 1 block) and on each side face that drops to a lower neighbour
 column (down to its ground, at most 3 blocks), and a client tick spawns 2 `REVERSE_PORTAL` motes per
 tick from random ground spots inside. 4-tick fade in, gone instantly on end, dropped after 30 ticks of silence. `YrdenParticles` is no
-longer used by base Yrden (Alt Yrden still spawns it client-side).
+longer used by Yrden.
+
+**Magic Trap (alt Yrden) turret.** `AltYrdenCast` reuses the trap variables: X/Y/Z = cast position,
+`witchercraftYrdenTicks` 400, `witchercraftYrdenMode` 1 (`YrdenCast` sets 0), `witchercraftYrdenShots` 8, so
+either form replaces the other. In mode 1 `YrdenTrapTick` skips the slow area and every 40 ticks calls the
+locked `WitchercraftYrdenTurretShoot(entity)`: nearest `Enemy` within 8 blocks of the glyph point (ground +
+0.6) with a clear block line, `INDIRECT_MAGIC` damage (direct null, causing = caster) of
+`2 * (1 + SignIntensity * 0.01)`, hurt cooldown cleared, `YrdenZapped` 40 ticks (hidden effect, -10% speed,
+also a Precise condition in `WitchercraftCritCondition`), WITCH + ELECTRIC_SPARK particles,
+`entity.evoker.cast_spell` 1.5 at the glyph (placeholder: the ALT YRDEN debug line says CHANGE ZAP SOUND), one shot spent (the last ends the turret; no target = no shot spent), and a
+`WitchercraftYrdenTrapMessage` with `shotTarget` so clients draw a 4-tick jagged bolt (purple glow + white
+core, re-jagged each tick). The message now also carries `mode`: the client draws one glyph and pillar at
+the cast position, no ground tint (`TURRET_GROUND` false) and 1 mote per tick. `WitchercraftDamageCalculator` skips its
+melee/arrow branches for `INDIRECT_MAGIC` (also stops player-thrown harming potions getting arrow bonuses).
 `YrdenTrapEndOnTravel` zeroes the ticks on a dimension change. `WitchercraftCritCondition` now takes
 the target (`entity`) and returns true when it has `YrdenTrapped`, which makes charged melee hits on it
 Precise. Recasting overwrites the variables, so one trap per player.

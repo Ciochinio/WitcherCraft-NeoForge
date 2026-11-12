@@ -87,15 +87,35 @@ public class WitchercraftYrdenTrapClient {
 	private static final int MOTES_PER_TICK = 2;
 	private static final double MOTE_SPEED = 0.03;
 
+	/** Magic Trap (turret): one glyph at the cast position, a smaller tint and fewer motes. */
+	private static final double[][] TURRET_SPOTS = {{0, 0}};
+	private static final double TURRET_RADIUS = 1.5;
+	/** Ground tint around the turret glyph (off: the turret is a single point, not an area). */
+	private static final boolean TURRET_GROUND = false;
+	private static final int TURRET_MOTES_PER_TICK = 1;
+
+	/** Turret bolt: start height above the glyph's ground, zig-zag segments and sideways jitter, ribbon widths. */
+	private static final double BOLT_START_HEIGHT = 0.6;
+	private static final int BOLT_SEGMENTS = 8;
+	private static final double BOLT_JITTER = 0.25;
+	private static final float BOLT_GLOW_WIDTH = 0.2F;
+	private static final float BOLT_CORE_WIDTH = 0.06F;
+	private static final float BOLT_GLOW_ALPHA = 0.6F;
+
+	private static double radius(WitchercraftYrdenTrapMessage.Trap trap) {
+		return trap.mode == 1 ? TURRET_RADIUS : RADIUS;
+	}
+
 	@SubscribeEvent
 	public static void onSubmit(SubmitCustomGeometryEvent event) {
 		Map<Integer, WitchercraftYrdenTrapMessage.Trap> traps = WitchercraftYrdenTrapMessage.TRAPS;
 		Minecraft mc = Minecraft.getInstance();
-		if (traps.isEmpty() || mc.level == null)
+		if ((traps.isEmpty() && WitchercraftYrdenTrapMessage.BOLTS.isEmpty()) || mc.level == null)
 			return;
 		long gameTime = mc.level.getGameTime();
 		float now = gameTime + mc.getDeltaTracker().getGameTimeDeltaPartialTick(false);
 		Vec3 cam = event.getLevelRenderState().cameraRenderState.pos;
+		bolts(event, mc, cam, now);
 		Iterator<WitchercraftYrdenTrapMessage.Trap> it = traps.values().iterator();
 		while (it.hasNext()) {
 			WitchercraftYrdenTrapMessage.Trap trap = it.next();
@@ -104,16 +124,17 @@ public class WitchercraftYrdenTrapClient {
 				continue;
 			}
 			float alpha = Mth.clamp((now - trap.upSince) / FADE_IN_TICKS, 0.0F, 1.0F);
-			if (GROUND_ALPHA > 0.0F || GROUND_EDGE_ALPHA > 0.0F)
-				ground(event, mc.level, trap, cam, alpha * (1.0F + PULSE * Mth.sin(now * PULSE_SPEED * 0.5F)));
-			for (int i = 0; i < SPOTS.length; i++) {
-				double sx = trap.x + SPOTS[i][0];
-				double sz = trap.z + SPOTS[i][1];
+			if ((trap.mode == 0 || TURRET_GROUND) && (GROUND_ALPHA > 0.0F || GROUND_EDGE_ALPHA > 0.0F))
+				ground(event, mc.level, trap, cam, alpha * (1.0F + PULSE * Mth.sin(now * PULSE_SPEED * 0.5F)), radius(trap));
+			double[][] spots = trap.mode == 1 ? TURRET_SPOTS : SPOTS;
+			for (int i = 0; i < spots.length; i++) {
+				double sx = trap.x + spots[i][0];
+				double sz = trap.z + spots[i][1];
 				double gy = groundY(mc.level, sx, trap.y, sz);
 				if (Double.isNaN(gy))
 					continue;
 				float pulse = alpha * (1.0F + PULSE * Mth.sin(now * PULSE_SPEED + i * 1.7F));
-				double ox = SPOTS[i][0], oz = SPOTS[i][1];
+				double ox = spots[i][0], oz = spots[i][1];
 				double ol = Math.sqrt(ox * ox + oz * oz);
 				float outX = ol < 1.0E-4 ? 0 : (float) (ox / ol), outZ = ol < 1.0E-4 ? 1 : (float) (oz / ol);
 				// Horizontal direction to the camera, for the pillar (and an upright glyph) to face it.
@@ -134,9 +155,9 @@ public class WitchercraftYrdenTrapClient {
 	 * each side face that drops down to a lower neighbouring column (to its ground, or SIDE_MAX_DROP if it has
 	 * none in range), so steps and slopes are tinted on their sides too.
 	 */
-	private static void ground(SubmitCustomGeometryEvent event, Level level, WitchercraftYrdenTrapMessage.Trap trap, Vec3 cam, float alpha) {
-		int x0 = Mth.floor(trap.x - RADIUS), x1 = Mth.floor(trap.x + RADIUS);
-		int z0 = Mth.floor(trap.z - RADIUS), z1 = Mth.floor(trap.z + RADIUS);
+	private static void ground(SubmitCustomGeometryEvent event, Level level, WitchercraftYrdenTrapMessage.Trap trap, Vec3 cam, float alpha, double radius) {
+		int x0 = Mth.floor(trap.x - radius), x1 = Mth.floor(trap.x + radius);
+		int z0 = Mth.floor(trap.z - radius), z1 = Mth.floor(trap.z + radius);
 		// Ground heights for the trap's columns plus a one-block border, so every side can see its neighbour.
 		int w = x1 - x0 + 3, l = z1 - z0 + 3;
 		double[][] heights = new double[w][l];
@@ -151,13 +172,13 @@ public class WitchercraftYrdenTrapClient {
 				for (int bz = z0; bz <= z1; bz++) {
 					double dx = bx + 0.5 - trap.x, dz = bz + 0.5 - trap.z;
 					double d = Math.sqrt(dx * dx + dz * dz);
-					if (d > RADIUS)
+					if (d > radius)
 						continue;
 					int i = bx - x0 + 1, j = bz - z0 + 1;
 					double gy = heights[i][j];
 					if (Double.isNaN(gy))
 						continue;
-					float edge = (float) Mth.clamp((d - (RADIUS - GROUND_EDGE_WIDTH)) / GROUND_EDGE_WIDTH, 0.0, 1.0);
+					float edge = (float) Mth.clamp((d - (radius - GROUND_EDGE_WIDTH)) / GROUND_EDGE_WIDTH, 0.0, 1.0);
 					int a = alphaByte((GROUND_ALPHA + GROUND_EDGE_ALPHA * edge) * alpha);
 					float y = (float) gy + GROUND_LIFT;
 					vertex(buffer, pose, bx, y, bz, 0, 0, RED, GREEN, BLUE, a);
@@ -201,6 +222,75 @@ public class WitchercraftYrdenTrapClient {
 		poseStack.popPose();
 	}
 
+	/**
+	 * Turret bolts: a jagged ribbon from the glyph to the target's middle, a wide purple glow under a thin white
+	 * core, re-jagged every tick so it crackles, for BOLT_TICKS.
+	 */
+	private static void bolts(SubmitCustomGeometryEvent event, Minecraft mc, Vec3 cam, float now) {
+		java.util.List<WitchercraftYrdenTrapMessage.Bolt> list = WitchercraftYrdenTrapMessage.BOLTS;
+		if (list.isEmpty())
+			return;
+		float partial = mc.getDeltaTracker().getGameTimeDeltaPartialTick(false);
+		Iterator<WitchercraftYrdenTrapMessage.Bolt> it = list.iterator();
+		while (it.hasNext()) {
+			WitchercraftYrdenTrapMessage.Bolt bolt = it.next();
+			float age = now - bolt.time;
+			if (age > WitchercraftYrdenTrapMessage.BOLT_TICKS || age < -1) {
+				it.remove();
+				continue;
+			}
+			net.minecraft.world.entity.Entity target = mc.level.getEntity(bolt.targetId);
+			if (target == null)
+				continue;
+			double gy = groundY(mc.level, bolt.x, bolt.y, bolt.z);
+			Vec3 from = new Vec3(bolt.x, (Double.isNaN(gy) ? bolt.y : gy) + BOLT_START_HEIGHT, bolt.z);
+			Vec3 to = target.getPosition(partial).add(0, target.getBbHeight() * 0.5, 0);
+			Vec3 dir = to.subtract(from);
+			double len = dir.length();
+			if (len < 1.0E-3)
+				continue;
+			Vec3 axis = dir.scale(1.0 / len);
+			Vec3 side1 = axis.cross(new Vec3(0, 1, 0));
+			if (side1.lengthSqr() < 1.0E-6)
+				side1 = new Vec3(1, 0, 0);
+			side1 = side1.normalize();
+			Vec3 side2 = axis.cross(side1).normalize();
+			java.util.Random rnd = new java.util.Random(bolt.time * 31 + (long) Math.floor(now));
+			Vec3[] pts = new Vec3[BOLT_SEGMENTS + 1];
+			for (int i = 0; i <= BOLT_SEGMENTS; i++) {
+				double t = (double) i / BOLT_SEGMENTS;
+				double j = (i == 0 || i == BOLT_SEGMENTS) ? 0 : BOLT_JITTER;
+				pts[i] = from.add(dir.scale(t)).add(side1.scale((rnd.nextDouble() * 2 - 1) * j)).add(side2.scale((rnd.nextDouble() * 2 - 1) * j));
+			}
+			float fade = 1.0F - Mth.clamp(age / WitchercraftYrdenTrapMessage.BOLT_TICKS, 0.0F, 1.0F);
+			PoseStack poseStack = event.getPoseStack();
+			poseStack.pushPose();
+			poseStack.translate(-cam.x, -cam.y, -cam.z);
+			event.getSubmitNodeCollector().submitCustomGeometry(poseStack, GROUND_RENDER, (pose, buffer) -> {
+				ribbon(buffer, pose, pts, cam, BOLT_GLOW_WIDTH, RED, GREEN, BLUE, alphaByte(BOLT_GLOW_ALPHA * fade));
+				ribbon(buffer, pose, pts, cam, BOLT_CORE_WIDTH, 255, 240, 255, alphaByte(fade));
+			});
+			poseStack.popPose();
+		}
+	}
+
+	/** A camera-facing strip along the points. */
+	private static void ribbon(VertexConsumer buffer, PoseStack.Pose pose, Vec3[] pts, Vec3 cam, float width, int r, int g, int b, int a) {
+		for (int i = 0; i < pts.length - 1; i++) {
+			Vec3 p0 = pts[i], p1 = pts[i + 1];
+			Vec3 seg = p1.subtract(p0);
+			Vec3 toCam = cam.subtract(p0.add(p1).scale(0.5));
+			Vec3 side = seg.cross(toCam);
+			if (side.lengthSqr() < 1.0E-8)
+				continue;
+			side = side.normalize().scale(width / 2.0);
+			vertex(buffer, pose, (float) (p0.x - side.x), (float) (p0.y - side.y), (float) (p0.z - side.z), 0, 0, r, g, b, a);
+			vertex(buffer, pose, (float) (p0.x + side.x), (float) (p0.y + side.y), (float) (p0.z + side.z), 1, 0, r, g, b, a);
+			vertex(buffer, pose, (float) (p1.x + side.x), (float) (p1.y + side.y), (float) (p1.z + side.z), 1, 1, r, g, b, a);
+			vertex(buffer, pose, (float) (p1.x - side.x), (float) (p1.y - side.y), (float) (p1.z - side.z), 0, 1, r, g, b, a);
+		}
+	}
+
 	/** Bottom of a side face next to a neighbour whose ground is at {@code neighbour} (NaN = none in range). */
 	private static float sideLow(double neighbour, double top) {
 		if (Double.isNaN(neighbour))
@@ -214,9 +304,10 @@ public class WitchercraftYrdenTrapClient {
 		if (mc.level == null || mc.isPaused() || MOTES_PER_TICK <= 0 || WitchercraftYrdenTrapMessage.TRAPS.isEmpty())
 			return;
 		for (WitchercraftYrdenTrapMessage.Trap trap : WitchercraftYrdenTrapMessage.TRAPS.values()) {
-			for (int i = 0; i < MOTES_PER_TICK; i++) {
+			int count = trap.mode == 1 ? TURRET_MOTES_PER_TICK : MOTES_PER_TICK;
+			for (int i = 0; i < count; i++) {
 				double a = mc.level.getRandom().nextDouble() * Math.PI * 2;
-				double r = Math.sqrt(mc.level.getRandom().nextDouble()) * RADIUS;
+				double r = Math.sqrt(mc.level.getRandom().nextDouble()) * radius(trap);
 				double x = trap.x + Math.cos(a) * r, z = trap.z + Math.sin(a) * r;
 				double gy = groundY(mc.level, x, trap.y, z);
 				if (!Double.isNaN(gy))

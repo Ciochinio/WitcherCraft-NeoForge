@@ -1,13 +1,12 @@
 package net.redboltmedia.witchercraft.procedures;
 
-import net.redboltmedia.witchercraft.init.WitchercraftModParticleTypes;
+import net.redboltmedia.witchercraft.network.WitchercraftModVariables;
 
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.network.chat.Component;
-import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.particles.ParticleTypes;
 
 public class AltYrdenCastProcedure {
@@ -15,17 +14,39 @@ public class AltYrdenCastProcedure {
 		if (entity == null)
 			return;
 		if (entity instanceof ServerPlayer _player)
-			_player.sendSystemMessage(Component.literal("ALT YRDEN"), false);
+			_player.sendSystemMessage(Component.literal("ALT YRDEN - CHANGE ZAP SOUND"), false);
 		if (world instanceof ServerLevel _level)
 			_level.sendParticles(ParticleTypes.WITCH, x, y, z, 300, 2, 0.05, 2, 0.002);
-		for (int _i1 = 0; _i1 < 5; _i1++) {
-			world.addParticle((SimpleParticleType) (WitchercraftModParticleTypes.YRDEN_PARTICLES.get()), (x + 0), (y + 0.5), (z - 3), 0, 1, 0);
-			world.addParticle((SimpleParticleType) (WitchercraftModParticleTypes.YRDEN_PARTICLES.get()), (x - 2), (y + 0.5), (z - 2), 0, 1, 0);
-			world.addParticle((SimpleParticleType) (WitchercraftModParticleTypes.YRDEN_PARTICLES.get()), (x - 2.5), (y + 0.5), (z + 0), 0, 1, 0);
-			world.addParticle((SimpleParticleType) (WitchercraftModParticleTypes.YRDEN_PARTICLES.get()), (x - 1.5), (y + 0.5), (z + 2), 0, 1, 0);
-			world.addParticle((SimpleParticleType) (WitchercraftModParticleTypes.YRDEN_PARTICLES.get()), (x + 1.5), (y + 0.5), (z + 2), 0, 1, 0);
-			world.addParticle((SimpleParticleType) (WitchercraftModParticleTypes.YRDEN_PARTICLES.get()), (x + 2.5), (y + 0.5), (z + 0), 0, 1, 0);
-			world.addParticle((SimpleParticleType) (WitchercraftModParticleTypes.YRDEN_PARTICLES.get()), (x + 2), (y + 0.5), (z - 2), 0, 1, 0);
+		{
+			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+			_vars.witchercraftYrdenX = x;
+			_vars.markSyncDirty();
 		}
+		{
+			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+			_vars.witchercraftYrdenY = y;
+			_vars.markSyncDirty();
+		}
+		{
+			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+			_vars.witchercraftYrdenZ = z;
+			_vars.markSyncDirty();
+		}
+		{
+			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+			_vars.witchercraftYrdenTicks = 400;
+			_vars.markSyncDirty();
+		}
+		{
+			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+			_vars.witchercraftYrdenMode = 1;
+			_vars.markSyncDirty();
+		}
+		{
+			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+			_vars.witchercraftYrdenShots = 8;
+			_vars.markSyncDirty();
+		}
+		WitchercraftPlaySoundAtProcedure.execute(entity, "entity.evoker.prepare_summon", 1.3);
 	}
 }

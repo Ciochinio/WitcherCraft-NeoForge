@@ -57,7 +57,7 @@ public class WitchercraftDamageCalculatorProcedure {
 			dealtMult = 0.8;
 		}
 		if (sourceentity instanceof LivingEntity _livingEntity0 && _livingEntity0.getAttributes().hasAttribute(WitchercraftModAttributes.ADDITIONAL_DAMAGE)
-				&& !damagesource.is(TagKey.create(Registries.DAMAGE_TYPE, Identifier.parse("minecraft:is_fire")))) {
+				&& !damagesource.is(TagKey.create(Registries.DAMAGE_TYPE, Identifier.parse("minecraft:is_fire"))) && !damagesource.is(DamageTypes.INDIRECT_MAGIC)) {
 			if (sourceentity == immediatesourceentity && !damagesource.is(DamageTypes.THORNS)) {
 				critBonus = 0;
 				hitType = 0;
