@@ -3464,6 +3464,120 @@
       "path": "~/Signs/Yrden"
     },
     {
+      "name": "AxiiCharmed",
+      "type": "potioneffect",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "axii_charmed",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/potion/AxiiCharmedMobEffect.java"
+        ]
+      },
+      "path": "~/Signs/Axii"
+    },
+    {
+      "name": "AxiiStunned",
+      "type": "potioneffect",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "axii_stunned",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/potion/AxiiStunnedMobEffect.java"
+        ]
+      },
+      "path": "~/Signs/Axii"
+    },
+    {
+      "name": "WitchercraftAxiiAim",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "witchercraft_axii_aim",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WitchercraftAxiiAim.java"
+        ]
+      },
+      "path": "~/Signs/Axii"
+    },
+    {
+      "name": "WitchercraftAxiiMarkerClient",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "witchercraft_axii_marker_client",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WitchercraftAxiiMarkerClient.java"
+        ]
+      },
+      "path": "~/Signs/Axii"
+    },
+    {
+      "name": "WitchercraftAxiiCharm",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "witchercraft_axii_charm",
+      "metadata": {
+        "return_type": "logic",
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftAxiiCharmProcedure.java"
+        ]
+      },
+      "path": "~/Signs/Axii"
+    },
+    {
+      "name": "AxiiStunnedNoAttack",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "axii_stunned_no_attack",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "sourceentity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/AxiiStunnedNoAttackProcedure.java"
+        ]
+      },
+      "path": "~/Signs/Axii"
+    },
+    {
+      "name": "AxiiCharmedTick",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "axii_charmed_tick",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/AxiiCharmedTickProcedure.java"
+        ]
+      },
+      "path": "~/Signs/Axii"
+    },
+    {
       "name": "AxiiCast",
       "type": "procedure",
       "compiles": true,
@@ -8205,29 +8319,6 @@
       "path": "~/Admin"
     },
     {
-      "name": "AxiiGlow",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "axii_glow",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/AxiiGlowProcedure.java"
-        ]
-      },
-      "path": "~/Signs/Axii"
-    },
-    {
       "name": "SignCastHold",
       "type": "procedure",
       "compiles": true,
@@ -11155,6 +11246,11 @@
       "CUSTOM:Alghoul",
       "CUSTOM:Ghoul"
     ],
+    "ENTITIES:mod:axii_immune": [
+      "EntityDragon",
+      "EntityWither",
+      "EntityWarden"
+    ],
     "ENTITIES:mod:execute_immune": [
       "EntityDragon",
       "EntityWither",
@@ -11493,7 +11589,9 @@
       "effect.witchercraft.crippled": "Crippled",
       "effect.witchercraft.maimed": "Maimed",
       "effect.witchercraft.yrden_zapped": "Yrden Zap",
-        "effect.witchercraft.yrden_trapped": "Yrden",
+      "effect.witchercraft.axii_charmed": "Axii",
+      "effect.witchercraft.axii_stunned": "Axii Stun",
+      "effect.witchercraft.yrden_trapped": "Yrden",
       "effect.witchercraft.igni_burn": "Igni Burn",
       "effect.witchercraft.muscle_memory_active": "Muscle Memory",
       "effect.witchercraft.bloody_rage_active": "Bloody Rage",

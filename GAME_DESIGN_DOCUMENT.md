@@ -239,9 +239,10 @@ up before a hit you can't dodge.
 7 glowing glyphs each over a pillar of light, for **10 s** x Sign Intensity, one per player (recasting moves it). Mobs inside move **30%** slower and your charged melee hits on them are
 Precise hits; both last **1 s** after they leave. Players and your pets are ignored.
 
-**Axii** is the single-target lock. It fires at whatever you're aiming at, and if there's an
-enemy there it charms them, freezing them in place so you can hit them freely or peel one off.
-Aim at nothing and it tells you so and hands your stamina back.
+**Axii** charms the first mob in your line of sight within **16** blocks (hold the key to aim: the Axii glyph
+floats over the target; release to cast). For **4 s** x Sign Intensity it can't move or hurt anyone, green sparkles float at its
+head, and your charged melee hits on it are Precise hits. Mobs in `#witchercraft:axii_immune` (Ender Dragon, Wither, Warden
+to start) only get the Precise part. Players and your pets can't be targeted. No target: stamina refunded.
 
 ### Alternate Signs
 
@@ -608,7 +609,7 @@ Conditions:
 |---|---|
 | A thunderstorm | **Thunderbolt** potion |
 | Target inside a Yrden trap, or zapped by Magic Trap | **Yrden** |
-| Target charmed by Axii | perk |
+| Target charmed by Axii | **Axii** |
 | Target burning | perk |
 | Target Maimed (melee hits only, next **2** charged hits) | **Maiming Shot** perk |
 | Target hasn't noticed you | bow perk, not assigned yet |

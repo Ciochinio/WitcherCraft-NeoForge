@@ -3678,6 +3678,19 @@ column (down to its ground, at most 3 blocks), and a client tick spawns 2 `REVER
 tick from random ground spots inside. 4-tick fade in, gone instantly on end, dropped after 30 ticks of silence. `YrdenParticles` is no
 longer used by Yrden.
 
+**Axii.** `AxiiCast` (on key release) asks the locked `WitchercraftAxiiCharm(entity)` (returns logic) and refunds
+via `AxiiRefund` when it returns false. The aim is the locked `WitchercraftAxiiAim.target(player, partialTick)`
+(`~/Signs/Axii`): look line up to 16 blocks, cut at the first block (COLLIDER), first `Mob` whose box inflated
+by 0.3 the line crosses; no own pets (players aren't `Mob`). A successful cast plays `entity.illusioner.prepare_mirror` 1. The charm gives `AxiiCharmed` (hidden, no
+modifiers, a Precise condition in `WitchercraftCritCondition`; its `onActiveTick` `AxiiCharmedTick` puts 2
+`HAPPY_VILLAGER` particles at 90% of the mob's height every 4 ticks) for `80 * (1 + SignIntensity * 0.01)` ticks and,
+unless the mob is in `#witchercraft:axii_immune` (MCreator tag `ENTITIES:mod:axii_immune`, seeded with the
+Dragon, Wither and Warden), `AxiiStunned` for the same time (hidden, -100% movement speed). `AxiiStunnedNoAttack`
+(entity attacked) cancels any damage whose attacker has `AxiiStunned`. `WitchercraftAxiiMarkerClient` (locked
+code) draws `textures/mob_effect/axii.png` over the aimed mob, camera-facing, turning and bobbing, while the
+local player has the Axii Sign selected and `witchercraftSignKeyHoldTime` is not 0. The old Glowing preview
+(`AxiiGlow`) is in `trash/`.
+
 **Magic Trap (alt Yrden) turret.** `AltYrdenCast` reuses the trap variables: X/Y/Z = cast position,
 `witchercraftYrdenTicks` 400, `witchercraftYrdenMode` 1 (`YrdenCast` sets 0), `witchercraftYrdenShots` 8, so
 either form replaces the other. In mode 1 `YrdenTrapTick` skips the slow area and every 40 ticks calls the

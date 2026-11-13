@@ -46,8 +46,10 @@ public class WitchercraftModMobEffects {
 	public static final DeferredHolder<MobEffect, MobEffect> AARD_SIGN = REGISTRY.register("aard_sign", AardSignMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> QUEN_SIGN = REGISTRY.register("quen_sign", QuenSignMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> IGNI_BURN = REGISTRY.register("igni_burn", IgniBurnMobEffect::new);
-	public static final DeferredHolder<MobEffect, MobEffect> YRDEN_TRAPPED = REGISTRY.register("yrden_trapped", YrdenTrappedMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> YRDEN_ZAPPED = REGISTRY.register("yrden_zapped", YrdenZappedMobEffect::new);
+	public static final DeferredHolder<MobEffect, MobEffect> YRDEN_TRAPPED = REGISTRY.register("yrden_trapped", YrdenTrappedMobEffect::new);
+	public static final DeferredHolder<MobEffect, MobEffect> AXII_CHARMED = REGISTRY.register("axii_charmed", AxiiCharmedMobEffect::new);
+	public static final DeferredHolder<MobEffect, MobEffect> AXII_STUNNED = REGISTRY.register("axii_stunned", AxiiStunnedMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> DEV_LOG = REGISTRY.register("dev_log", DevLogMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> SUNDERED = REGISTRY.register("sundered", SunderedMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> CRIPPLED = REGISTRY.register("crippled", CrippledMobEffect::new);
