@@ -3691,6 +3691,21 @@ code) draws `textures/mob_effect/axii.png` over the aimed mob, camera-facing, tu
 local player has the Axii Sign selected and `witchercraftSignKeyHoldTime` is not 0. The old Glowing preview
 (`AxiiGlow`) is in `trash/`.
 
+**Alt Axii (Puppet).** `AltAxiiCast` (key release after a 1 s hold, Delusion perk, double cost) asks the locked
+`WitchercraftAxiiPuppet(entity)` (returns logic, same aim) and calls `AltAxiiRefund` twice when it returns false.
+Placeholder sound `entity.illusioner.prepare_mirror` 1, debug chat "ALT AXII - CHANGE SOUND". Every target gets
+`AxiiCharmed` for 160 x (1 + Intensity/100) ticks; targets outside `#witchercraft:axii_immune` lose any
+`AxiiStunned` and get `AxiiPuppet` (hidden, no modifiers) for the same time. One puppet per player: the puppet's
+entity id is kept in the player's persistent data (`witchercraftAxiiPuppet`) and a new puppet strips `AxiiPuppet`
+and `AxiiCharmed` from the old one. The behaviour is the locked code element `WitchercraftAxiiPuppetEvents`:
+`EntityTickEvent.Post` keeps the puppet's target on the nearest `Enemy` within 16 blocks (re-picked only when the
+current one is gone, out of range or not an `Enemy`), and with none around stops navigation and refreshes a
+6-tick `AxiiStunned`; `LivingChangeTargetEvent` cancels any target that isn't an `Enemy`; `LivingIncomingDamageEvent`
+cancels the puppet's damage to anything that isn't an `Enemy`; `LivingDamageEvent.Post` removes `AxiiPuppet` and
+`AxiiCharmed` when a player damages it (after the hit, so `CriticalHitEvent` already counted it as Precise). The
+tick runs from the entity tick, not the effect tick, because adding or removing effects inside an effect tick
+changes the map vanilla is iterating. Brain-AI mobs (piglins, hoglins, wardens) ignore `setTarget` and won't fight.
+
 **Magic Trap (alt Yrden) turret.** `AltYrdenCast` reuses the trap variables: X/Y/Z = cast position,
 `witchercraftYrdenTicks` 400, `witchercraftYrdenMode` 1 (`YrdenCast` sets 0), `witchercraftYrdenShots` 8, so
 either form replaces the other. In mode 1 `YrdenTrapTick` skips the slow area and every 40 ticks calls the

@@ -76,6 +76,7 @@ public class WitchercraftModMobEffects {
 	public static final DeferredHolder<MobEffect, MobEffect> GRAVE_HAG_DECOCTION_EFFECT = REGISTRY.register("grave_hag_decoction_effect", GraveHagDecoctionEffectMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> BLINDNESS = REGISTRY.register("blindness", BlindnessMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> SIGN_COOLDOWN = REGISTRY.register("sign_cooldown", SignCooldownMobEffect::new);
+	public static final DeferredHolder<MobEffect, MobEffect> AXII_PUPPET = REGISTRY.register("axii_puppet", AxiiPuppetMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> QUEN_ACTIVE_SHIELD = REGISTRY.register("quen_active_shield", QuenActiveShieldMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> SIGN_HOLD = REGISTRY.register("sign_hold", SignHoldMobEffect::new);
 	public static final DeferredHolder<MobEffect, MobEffect> QUEN_EFFECT = REGISTRY.register("quen_effect", QuenEffectMobEffect::new);

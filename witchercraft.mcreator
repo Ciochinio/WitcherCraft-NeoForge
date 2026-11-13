@@ -8022,6 +8022,52 @@
       "path": "~/Signs/Yrden"
     },
     {
+      "name": "AxiiPuppet",
+      "type": "potioneffect",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "axii_puppet",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/potion/AxiiPuppetMobEffect.java"
+        ]
+      },
+      "path": "~/Signs/Axii"
+    },
+    {
+      "name": "WitchercraftAxiiPuppet",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "witchercraft_axii_puppet",
+      "metadata": {
+        "return_type": "logic",
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ],
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftAxiiPuppetProcedure.java"
+        ]
+      },
+      "path": "~/Signs/Axii"
+    },
+    {
+      "name": "WitchercraftAxiiPuppetEvents",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "witchercraft_axii_puppet_events",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WitchercraftAxiiPuppetEvents.java"
+        ]
+      },
+      "path": "~/Signs/Axii"
+    },
+    {
       "name": "AltAxiiCast",
       "type": "procedure",
       "compiles": true,
@@ -11591,6 +11637,7 @@
       "effect.witchercraft.yrden_zapped": "Yrden Zap",
       "effect.witchercraft.axii_charmed": "Axii",
       "effect.witchercraft.axii_stunned": "Axii Stun",
+      "effect.witchercraft.axii_puppet": "Axii Puppet",
       "effect.witchercraft.yrden_trapped": "Yrden",
       "effect.witchercraft.igni_burn": "Igni Burn",
       "effect.witchercraft.muscle_memory_active": "Muscle Memory",
