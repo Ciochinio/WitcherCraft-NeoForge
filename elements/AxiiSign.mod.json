@@ -11,7 +11,7 @@
     "isInstant": true,
     "mobEffectCategory": "BENEFICIAL",
     "renderStatusInInventory": false,
-    "renderStatusInHUD": true,
+    "renderStatusInHUD": false,
     "isCuredbyHoney": false,
     "modifiers": []
   }

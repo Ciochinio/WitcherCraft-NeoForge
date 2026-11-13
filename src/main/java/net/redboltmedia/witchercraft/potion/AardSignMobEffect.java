@@ -31,6 +31,11 @@ public class AardSignMobEffect extends InstantenousMobEffect {
 			public boolean renderInventoryText(MobEffectInstance instance, AbstractContainerScreen<?> screen, GuiGraphicsExtractor guiGraphics, int x, int y, int blitOffset) {
 				return false;
 			}
+
+			@Override
+			public boolean isVisibleInGui(MobEffectInstance effect) {
+				return false;
+			}
 		}, WitchercraftModMobEffects.AARD_SIGN.get());
 	}
 }

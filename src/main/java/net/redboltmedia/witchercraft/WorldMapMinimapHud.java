@@ -8,9 +8,11 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
+import net.neoforged.neoforge.client.extensions.common.IClientMobEffectExtensions;
 
 /**
  * Player-centered HUD view over the same authorized terrain cache used by the full-screen world map.
@@ -37,7 +39,7 @@ public final class WorldMapMinimapHud {
 			return;
 
 		GuiGraphicsExtractor graphics = event.getGuiGraphics();
-		int size = Math.min(WorldMapClientConfig.minimapSize(), Math.min(graphics.guiWidth() - 2 * MARGIN, graphics.guiHeight() - 2 * MARGIN));
+		int size = size(graphics);
 		if (size < 32)
 			return;
 
@@ -46,7 +48,8 @@ public final class WorldMapMinimapHud {
 			case TOP_RIGHT, BOTTOM_RIGHT -> graphics.guiWidth() - MARGIN - size;
 		};
 		int y = switch (WorldMapClientConfig.minimapCorner()) {
-			case TOP_LEFT, TOP_RIGHT -> MARGIN;
+			case TOP_LEFT -> MARGIN;
+			case TOP_RIGHT -> topRightY(minecraft);
 			case BOTTOM_LEFT, BOTTOM_RIGHT -> graphics.guiHeight() - MARGIN - size;
 		};
 		int inset = Math.min((int)Math.round(size * WorldMapClientConfig.minimapViewportInset() / 64.0), (size - 32) / 2);
@@ -80,6 +83,48 @@ public final class WorldMapMinimapHud {
 		return minecraft.player != null && minecraft.level != null && minecraft.screen == null && !minecraft.options.hideGui
 			&& minecraft.player.level().dimension().equals(Level.OVERWORLD)
 			&& WorldMapClientConfig.minimapEnabled() && WorldMapServerConfig.minimapEnabled();
+	}
+
+	private static int size(GuiGraphicsExtractor graphics) {
+		return Math.min(WorldMapClientConfig.minimapSize(), Math.min(graphics.guiWidth() - 2 * MARGIN, graphics.guiHeight() - 2 * MARGIN));
+	}
+
+	// A top-right map sits below vanilla's status effect rows (good row at y 1, bad row at y 27, 24 tall) and slides
+	// when a row appears or goes. The effect icons themselves are left to vanilla.
+	private static final int EFFECT_ROW_STEP = 26;
+	private static final int EFFECTS_GAP = 2;
+	/** Slide speed: share of the remaining distance covered per second (exponential ease-out). */
+	private static final float SLIDE_RATE = 12.0F;
+	private static float slideY = Float.NaN;
+	private static long slideLastNanos;
+
+	private static int topRightY(Minecraft minecraft) {
+		int target = MARGIN;
+		boolean good = false, bad = false;
+		for (MobEffectInstance effect : minecraft.player.getActiveEffects()) {
+			if (!effect.showIcon() || !IClientMobEffectExtensions.of(effect).isVisibleInGui(effect))
+				continue;
+			if (effect.getEffect().value().isBeneficial())
+				good = true;
+			else
+				bad = true;
+		}
+		if (bad)
+			target = 2 * EFFECT_ROW_STEP + EFFECTS_GAP - 1;
+		else if (good)
+			target = EFFECT_ROW_STEP + EFFECTS_GAP - 1;
+		target = Math.max(MARGIN, target);
+		long now = System.nanoTime();
+		float seconds = (now - slideLastNanos) / 1.0E9F;
+		slideLastNanos = now;
+		// first frame, or back after a pause (screen open, other dimension): snap instead of sliding from a stale spot
+		if (Float.isNaN(slideY) || seconds > 0.5F)
+			slideY = target;
+		else
+			slideY += (target - slideY) * Math.min(1.0F, seconds * SLIDE_RATE);
+		if (Math.abs(target - slideY) < 0.5F)
+			slideY = target;
+		return Math.round(slideY);
 	}
 
 	private static void drawSquareFrame(GuiGraphicsExtractor graphics, int x, int y, int size) {

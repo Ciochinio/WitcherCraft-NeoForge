@@ -4900,6 +4900,19 @@
       "path": "~/HUD"
     },
     {
+      "name": "WitchercraftSignHud",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "witchercraft_sign_hud",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WitchercraftSignHud.java"
+        ]
+      },
+      "path": "~/HUD"
+    },
+    {
       "name": "MedallionShow",
       "type": "procedure",
       "compiles": true,

@@ -28,6 +28,15 @@ Anything marked **tunable** is a value you are expected to change. Anything desc
 
 ## 1. GUI and HUD
 
+**Sign slot.** `WitchercraftSignHud` (locked code, `~/HUD`) draws the selected sign after `VanillaGuiLayers.HOTBAR`
+in vanilla's offhand slot frame (`hud/hotbar_offhand_right` / `_left`, 29x24) on the main-hand side, with the
+sign effect's own 18 px icon (`Gui.getMobEffectSprite`). The selected sign is whichever of `AARD_SIGN`,
+`IGNI_SIGN`, `YRDEN_SIGN`, `QUEN_SIGN`, `AXII_SIGN` the player has; none, no slot. With the attack indicator on
+Hotbar (drawn on the same side) the slot moves 26 further out. Hidden in spectator and with F1. The five sign
+effect elements have "render status in HUD" (and in inventory) off, so MCreator generates `isVisibleInGui` false
+and they leave the top-right icons. NeoForge allows one client extension per effect, so a second registration
+from code crashes on startup: change these through the element flags only.
+
 ### 1.1 What the system is for
 
 WitcherCraft adds resources that vanilla Minecraft has no way to display: the Quen shield pool and
@@ -2159,6 +2168,14 @@ same address from appearing.
 `RenderGuiEvent.Post` only with a live Overworld player, visible HUD, no active screen, an enabled map system,
 server minimap permission, and the client minimap toggle. Suppressing it while a screen is open prevents its
 player-centered request bounds from competing in the same frame with `MapPage` pan and zoom state.
+
+A `TOP_RIGHT` map sits below vanilla's status effect rows instead of over them (the Xaero's Minimap approach;
+the effect icons are left entirely to vanilla). Its top is 8 with no icons showing, 27 when only the good row
+(y 1) shows and 53 when the bad row (y 27) shows; rows count only effects with `showIcon()` and NeoForge
+`isVisibleInGui`, the same filter vanilla uses. The y eases toward that target at 12 x the remaining distance per
+second (real time), and snaps after a pause of over 0.5 s (screen open, other dimension) or on the first frame.
+An earlier version shifted the effect layer below the map instead; dropped because a long good row ran into the
+middle of the screen.
 
 The configured minimap size is the outer frame rectangle. `minimap_frame_square.png` is a transparent 64 by
 64 texture drawn over all map contents. `viewportInset` is expressed in texels of that source texture and

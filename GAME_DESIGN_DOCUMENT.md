@@ -1231,6 +1231,8 @@ The left column is defensive state and the right column is the alchemy resource.
 convention any future bar should follow. Both bars place themselves relative to whatever vanilla has
 already drawn, so they stay correct with any amount of armor, absorption, or bonus max health.
 
+Your **selected sign** shows in a slot beside the hotbar, mirroring the offhand slot (on the main-hand side).
+
 Between them hangs the **witcher medallion**, dead centre, in the gap the vanilla HUD leaves empty.
 It is not a bar and it does not fill or drain - it is the instrument every witcher carries, and it
 does what it does in the books: it **shakes when there are monsters near you**. The shake tightens
@@ -1333,6 +1335,8 @@ be removed before release.
 - A square map in a screen corner, always centred on you, showing the same explored terrain, waypoints, and points
   of interest as the full map.
 - You choose whether it shows, its corner, size, and zoom, and whether north stays up or the map turns with you.
+- In the top-right corner the map sits below the status effect icons, sliding down or up as rows of effects come
+  and go.
 - When your navigation target is off the minimap, an arrow on its edge points toward it. Reaching the target clears
   it; the distance that counts as arriving is a setting, and zero turns that off.
 - It hides outside the Overworld, when the HUD is hidden (F1), and while a menu is open.
