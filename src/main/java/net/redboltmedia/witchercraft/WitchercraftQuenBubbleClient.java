@@ -23,15 +23,18 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Draws the Active Shield (alt Quen) bubble for each player WitchercraftQuenBubbleMessage reports as
- * shielded: a smooth sphere made of quads (rings x slices) wrapped in a tiled pixel-glass texture
- * (textures/entities/quen_bubble_glass.png, tinted amber). It brightens towards the silhouette (rim glow),
- * turns in steps of exactly one texture pixel so the glass slides pixel by pixel, brightens as the pool grows
- * and flashes as a whole on every absorbed hit. Quen symbols (textures/entities/quen_bubble_symbol.png) glow on the
- * surface and turn, pulse and flash with it. In first person your own bubble is hidden and the screen edges
- * glow instead; the edge facing the attacker flashes on a hit. All tuning lives in the constants below.
+ * shielded: a low-poly geodesic shell (icosahedron split once, 80 faces) of pixel glass
+ * (textures/entities/quen_bubble_glass.png, tinted amber, each face its own random spot of the tile at 16 px per
+ * block), with a glowing Quen symbol (textures/entities/quen_bubble_symbol.png) on the middle face of each of the 20
+ * icosahedron faces. Faces brighten towards the silhouette (rim glow), each face shimmers on its own
+ * slow cycle, the shell turns slowly, the whole thing brightens as the pool grows and flashes on every
+ * absorbed hit. In first person your own shell is hidden and the screen edges glow instead; the edge
+ * facing the attacker flashes on a hit. All tuning lives in the constants below.
  *
  * HAND-MAINTAINED: locked code element.
  */
@@ -39,66 +42,55 @@ import java.util.Map;
 public class WitchercraftQuenBubbleClient {
 	private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "textures/entities/quen_bubble_glass.png");
 	private static final RenderType RENDER_TYPE = RenderTypes.entityTranslucentEmissive(TEXTURE);
-	/** Glow layer: the spider-eyes render type adds its colour to the screen, so what's behind gets brighter, not tinted. */
-	private static final RenderType GLOW_RENDER_TYPE = RenderTypes.eyes(Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "textures/entities/quen_bubble.png"));
-	/** Quen symbols on the surface, additive like the glow layer, so the PNG's clear pixels must stay black. */
-	private static final RenderType SYMBOL_RENDER_TYPE = RenderTypes.eyes(Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "textures/entities/quen_bubble_symbol.png"));
+	// energySwirl (the charged creeper aura) is the vanilla type that truly adds light; eyes() only alpha-blends and
+	// greys out a bright sky. Additive: clear pixels must stay black, brightness goes in RGB, alpha stays 255 (it cuts
+	// fragments under 0.1), and it back-face culls.
+	private static final RenderType SYMBOL_RENDER_TYPE = RenderTypes.energySwirl(Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "textures/entities/quen_bubble_symbol.png"), 0.0F, 0.0F);
 	private static final int FULL_BRIGHT = 0xF000F0;
 
 	/** Centred low on the body so its bottom sinks into the ground. */
-	private static final float RADIUS = 1.4F;
+	private static final float RADIUS = 1.25F;
 	/** Centre height as a share of the player's height. Hit particles in WitchercraftQuenBubbleHit mirror both. */
 	private static final float CENTRE_HEIGHT = 0.5F;
 	private static final int RED = 255;
 	private static final int GREEN = 215;
 	private static final int BLUE = 140;
 	/**
-	 * Opacity facing the camera and at the silhouette. Multiplied by the texture's own alpha, and the render type
-	 * discards anything under 0.1, so at a low pool only the lighter patches and glints of the pane survive in the
-	 * middle and the glass fills in as the pool grows.
+	 * Face opacity facing the camera and at the silhouette. Multiplied by the glass texture's own alpha, and the
+	 * render type discards anything under 0.1, so at a low pool only the lighter patches and glints survive.
 	 */
 	private static final float ALPHA_CENTER = 0.6F;
 	private static final float ALPHA_RIM = 0.95F;
-	/** Pool at which the bubble reaches full brightness, and the brightness share it starts at. */
+	/** The 32 px glass tile covers this many blocks (2 = Minecraft's 16 px per block). Each face shows its own spot of it. */
+	private static final float TILE_BLOCKS = 2.0F;
+	/** Symbols: one on the middle face of each of the 20 icosahedron faces. Width in blocks, lift off the face, brightness. */
+	private static final float SYMBOL_SIZE = 0.3F;
+	private static final float SYMBOL_LIFT = 0.02F;
+	private static final float SYMBOL_BRIGHTNESS = 0.9F;
+	/** Frame edges: opacity (0 = no frame), and how far in from each corner the face fill starts (1 = no frame). */
+	private static final float EDGE_ALPHA = 0.0F;
+	private static final float FACE_INSET = 1.0F;
+	/** Pool at which the shell reaches full brightness, and the brightness share it starts at. */
 	private static final float FULL_POOL = 16.0F;
 	private static final float MIN_STRENGTH = 0.5F;
-	/** Sphere detail: slices around and rings top to bottom. Must divide evenly by the tile counts below. */
-	private static final int SLICES = 24;
-	private static final int RINGS = 16;
-	/** How many times the glass tile repeats around and top to bottom (about block-sized pixels at RADIUS 1.4). */
-	private static final int TILES_AROUND = 4;
-	private static final int TILES_DOWN = 2;
-	private static final int TEXTURE_PIXELS = 32;
-	/** Turn: one texture pixel every this many ticks. */
-	private static final float TURN_STEP_TICKS = 5.0F;
-	/** Glow layer: size relative to the glass, and brightness facing the camera and at the silhouette. */
-	private static final float GLOW_SCALE = 0.97F;
-	private static final float GLOW_CENTER = 0.12F;
-	private static final float GLOW_RIM = 0.65F;
-	/** Glow pulse: how much the brightness swings either way, and ticks per breath. */
-	private static final float PULSE = 0.15F;
-	private static final float PULSE_TICKS = 40.0F;
+	/** Per-face shimmer: amount and speed (radians per tick). */
+	private static final float SHIMMER = 0.35F;
+	private static final float SHIMMER_SPEED = 0.12F;
+	/** Slow turn of the whole shell, degrees per tick. */
+	private static final float TURN_SPEED = 0.6F;
 	/** Hit flash: extra brightness at the moment of the hit, and how long it takes to die out. */
 	private static final float FLASH_BOOST = 1.5F;
 	private static final float FLASH_TICKS = 6.0F;
-	/**
-	 * Symbols: how many (spread evenly over the whole sphere), width in blocks, how far outside the glass they sit,
-	 * and brightness. Only the side facing the camera is drawn, fading out towards the silhouette.
-	 */
-	private static final int SYMBOL_COUNT = 20;
-	private static final float SYMBOL_SIZE = 0.3F;
-	private static final float SYMBOL_LIFT = 1.01F;
-	private static final float SYMBOL_BRIGHTNESS = 0.9F;
 
 	/** First-person screen-edge glow: depth as a share of screen height, opacity, and hit flash opacity. */
 	private static final float EDGE_GLOW_DEPTH = 0.16F;
 	private static final float EDGE_GLOW_ALPHA = 0.3F;
 	private static final float EDGE_GLOW_FLASH = 0.5F;
 
-	/** Grid points of the unit sphere, [ring][slice][xyz], ring 0 at the top. */
-	private static final float[][][] GRID = buildSphere();
-	/** Per symbol: [centre direction, right, up], each a unit xyz on the unit sphere. */
-	private static final float[][][] SYMBOLS = buildSymbols();
+	/** Face corners of the geodesic shell on the unit sphere, 3 x 3 floats per face. Every 4th face (index % 4 == 3) is the middle one of its icosahedron face. */
+	private static final List<float[][]> FACES = buildGeodesic();
+	/** Per face: the three corner UVs, a random spot of the glass tile laid flat on the face. */
+	private static final float[][][] FACE_UVS = buildFaceUvs();
 
 	@SubscribeEvent
 	public static void onSubmit(SubmitCustomGeometryEvent event) {
@@ -127,17 +119,15 @@ public class WitchercraftQuenBubbleClient {
 			if (alpha <= 0.0F)
 				continue;
 			Vec3 centre = entity.getPosition(partial).add(0.0, entity.getBbHeight() * CENTRE_HEIGHT, 0.0);
-			float turn = (float) Math.floor(now / TURN_STEP_TICKS) * (Mth.TWO_PI / (TILES_AROUND * TEXTURE_PIXELS));
-			// Camera in the bubble's own turned frame, for the rim glow.
+			float turn = now * TURN_SPEED * Mth.DEG_TO_RAD;
+			// Camera in the shell's own turned frame, for the per-face rim glow.
 			Vec3 eye = cam.subtract(centre).yRot(-turn);
 			PoseStack poseStack = event.getPoseStack();
 			poseStack.pushPose();
 			poseStack.translate(centre.x - cam.x, centre.y - cam.y, centre.z - cam.z);
 			poseStack.mulPose(com.mojang.math.Axis.YP.rotation(turn));
-			event.getSubmitNodeCollector().submitCustomGeometry(poseStack, RENDER_TYPE, (pose, buffer) -> shell(buffer, pose, eye, alpha));
-			float glow = alpha * (1.0F + PULSE * Mth.sin(now * Mth.TWO_PI / PULSE_TICKS));
-			event.getSubmitNodeCollector().submitCustomGeometry(poseStack, GLOW_RENDER_TYPE, (pose, buffer) -> glow(buffer, pose, eye, glow));
-			event.getSubmitNodeCollector().submitCustomGeometry(poseStack, SYMBOL_RENDER_TYPE, (pose, buffer) -> symbols(buffer, pose, eye, glow));
+			event.getSubmitNodeCollector().submitCustomGeometry(poseStack, RENDER_TYPE, (pose, buffer) -> shell(buffer, pose, eye, alpha, now));
+			event.getSubmitNodeCollector().submitCustomGeometry(poseStack, SYMBOL_RENDER_TYPE, (pose, buffer) -> symbols(buffer, pose, eye, alpha, now));
 			poseStack.popPose();
 		}
 	}
@@ -152,107 +142,115 @@ public class WitchercraftQuenBubbleClient {
 		return Mth.clamp(1.0F - (now - bubble.hitTime) / FLASH_TICKS, 0.0F, 1.0F);
 	}
 
-	private static void shell(VertexConsumer buffer, PoseStack.Pose pose, Vec3 eye, float alpha) {
-		int[][] a = new int[RINGS + 1][SLICES + 1];
-		for (int r = 0; r <= RINGS; r++) {
-			for (int s = 0; s <= SLICES; s++) {
-				float[] n = GRID[r][s];
-				Vec3 toEye = eye.subtract(n[0] * RADIUS, n[1] * RADIUS, n[2] * RADIUS);
-				double len = toEye.length();
-				float facing = len < 1.0E-4 ? 1.0F : (float) Math.abs((n[0] * toEye.x + n[1] * toEye.y + n[2] * toEye.z) / len);
-				float edge = (1.0F - facing) * (1.0F - facing);
-				a[r][s] = alphaByte((ALPHA_CENTER + (ALPHA_RIM - ALPHA_CENTER) * edge) * alpha);
+	private static void shell(VertexConsumer buffer, PoseStack.Pose pose, Vec3 eye, float alpha, float now) {
+		for (int f = 0; f < FACES.size(); f++) {
+			float[][] c = FACES.get(f);
+			float cx = (c[0][0] + c[1][0] + c[2][0]) / 3.0F;
+			float cy = (c[0][1] + c[1][1] + c[2][1]) / 3.0F;
+			float cz = (c[0][2] + c[1][2] + c[2][2]) / 3.0F;
+			float nl = Mth.sqrt(cx * cx + cy * cy + cz * cz);
+			float nx = cx / nl, ny = cy / nl, nz = cz / nl;
+			Vec3 toEye = eye.subtract(cx * RADIUS, cy * RADIUS, cz * RADIUS);
+			double len = toEye.length();
+			float facing = len < 1.0E-4 ? 1.0F : (float) Math.abs((nx * toEye.x + ny * toEye.y + nz * toEye.z) / len);
+			float edge = (1.0F - facing) * (1.0F - facing);
+			float shimmer = 1.0F + SHIMMER * Mth.sin(now * SHIMMER_SPEED + f * 2.399F);
+			int fillA = alphaByte((ALPHA_CENTER + (ALPHA_RIM - ALPHA_CENTER) * edge) * alpha * shimmer);
+			int edgeA = alphaByte(EDGE_ALPHA * alpha * shimmer);
+			float[][] p = new float[3][3];
+			float[][] q = new float[3][3];
+			for (int i = 0; i < 3; i++) {
+				for (int k = 0; k < 3; k++)
+					p[i][k] = c[i][k] * RADIUS;
+				q[i][0] = (cx + (c[i][0] - cx) * FACE_INSET) * RADIUS;
+				q[i][1] = (cy + (c[i][1] - cy) * FACE_INSET) * RADIUS;
+				q[i][2] = (cz + (c[i][2] - cz) * FACE_INSET) * RADIUS;
 			}
-		}
-		// Each quad gets its own slice of one tile (UVs stay inside 0..1), so no texture repeat is needed.
-		int slicesPerTile = SLICES / TILES_AROUND, ringsPerTile = RINGS / TILES_DOWN;
-		for (int r = 0; r < RINGS; r++) {
-			float v0 = (float) (r % ringsPerTile) / ringsPerTile, v1 = (float) (r % ringsPerTile + 1) / ringsPerTile;
-			for (int s = 0; s < SLICES; s++) {
-				float u0 = (float) (s % slicesPerTile) / slicesPerTile, u1 = (float) (s % slicesPerTile + 1) / slicesPerTile;
-				vertex(buffer, pose, GRID[r][s], u0, v0, a[r][s]);
-				vertex(buffer, pose, GRID[r + 1][s], u0, v1, a[r + 1][s]);
-				vertex(buffer, pose, GRID[r + 1][s + 1], u1, v1, a[r + 1][s + 1]);
-				vertex(buffer, pose, GRID[r][s + 1], u1, v0, a[r][s + 1]);
-			}
-		}
-	}
-
-	/** Additive: brightness is carried in the colour, so it's scaled into RGB rather than alpha. */
-	private static void glow(VertexConsumer buffer, PoseStack.Pose pose, Vec3 eye, float strength) {
-		float[][] b = new float[RINGS + 1][SLICES + 1];
-		float radius = RADIUS * GLOW_SCALE;
-		for (int r = 0; r <= RINGS; r++) {
-			for (int s = 0; s <= SLICES; s++) {
-				float[] n = GRID[r][s];
-				Vec3 toEye = eye.subtract(n[0] * radius, n[1] * radius, n[2] * radius);
-				double len = toEye.length();
-				float facing = len < 1.0E-4 ? 1.0F : (float) Math.abs((n[0] * toEye.x + n[1] * toEye.y + n[2] * toEye.z) / len);
-				float edge = (1.0F - facing) * (1.0F - facing);
-				b[r][s] = Mth.clamp((GLOW_CENTER + (GLOW_RIM - GLOW_CENTER) * edge) * strength, 0.0F, 1.0F);
-			}
-		}
-		for (int r = 0; r < RINGS; r++) {
-			for (int s = 0; s < SLICES; s++) {
-				glowVertex(buffer, pose, GRID[r][s], radius, 0, 0, b[r][s]);
-				glowVertex(buffer, pose, GRID[r + 1][s], radius, 0, 1, b[r + 1][s]);
-				glowVertex(buffer, pose, GRID[r + 1][s + 1], radius, 1, 1, b[r + 1][s + 1]);
-				glowVertex(buffer, pose, GRID[r][s + 1], radius, 1, 0, b[r][s + 1]);
+			float[][] uv = FACE_UVS[f];
+			// The fill as a quad with its last corner doubled (the render type draws quads).
+			vertex(buffer, pose, q[0], nx, ny, nz, fillA, uv[0]);
+			vertex(buffer, pose, q[1], nx, ny, nz, fillA, uv[1]);
+			vertex(buffer, pose, q[2], nx, ny, nz, fillA, uv[2]);
+			vertex(buffer, pose, q[2], nx, ny, nz, fillA, uv[2]);
+			if (EDGE_ALPHA <= 0.0F || FACE_INSET >= 1.0F)
+				continue;
+			for (int i = 0; i < 3; i++) {
+				int j = (i + 1) % 3;
+				vertex(buffer, pose, p[i], nx, ny, nz, edgeA, uv[i]);
+				vertex(buffer, pose, p[j], nx, ny, nz, edgeA, uv[j]);
+				vertex(buffer, pose, q[j], nx, ny, nz, edgeA, uv[j]);
+				vertex(buffer, pose, q[i], nx, ny, nz, edgeA, uv[i]);
 			}
 		}
 	}
 
-	private static void symbols(VertexConsumer buffer, PoseStack.Pose pose, Vec3 eye, float strength) {
-		float centre = RADIUS * SYMBOL_LIFT, half = SYMBOL_SIZE / 2.0F;
-		for (float[][] sym : SYMBOLS) {
-			float[] n = sym[0], r = sym[1], u = sym[2];
-			Vec3 toEye = eye.subtract(n[0] * centre, n[1] * centre, n[2] * centre);
+	/** Only the outside of faces turned towards the camera, fading out at the silhouette; shimmer with their face. */
+	private static void symbols(VertexConsumer buffer, PoseStack.Pose pose, Vec3 eye, float strength, float now) {
+		float half = SYMBOL_SIZE / 2.0F;
+		for (int f = 3; f < FACES.size(); f += 4) {
+			float[][] c = FACES.get(f);
+			float[] n = unit(new float[] { c[0][0] + c[1][0] + c[2][0], c[0][1] + c[1][1] + c[2][1], c[0][2] + c[1][2] + c[2][2] });
+			// the face plane sits a bit inside the sphere: centroid of the flat triangle, not the unit direction
+			float[] centre = new float[3];
+			for (int a = 0; a < 3; a++)
+				centre[a] = (c[0][a] + c[1][a] + c[2][a]) / 3.0F * RADIUS + n[a] * SYMBOL_LIFT;
+			Vec3 toEye = eye.subtract(centre[0], centre[1], centre[2]);
 			double len = toEye.length();
 			float facing = len < 1.0E-4 ? 0.0F : (float) ((n[0] * toEye.x + n[1] * toEye.y + n[2] * toEye.z) / len);
 			if (facing <= 0.0F)
 				continue;
-			float b = Mth.clamp(SYMBOL_BRIGHTNESS * strength * facing, 0.0F, 1.0F);
-			int c = (int) (255 * b);
-			float cx = n[0] * centre, cy = n[1] * centre, cz = n[2] * centre;
-			symbolVertex(buffer, pose, cx - (r[0] + u[0]) * half, cy - (r[1] + u[1]) * half, cz - (r[2] + u[2]) * half, 0, 1, c, n);
-			symbolVertex(buffer, pose, cx + (r[0] - u[0]) * half, cy + (r[1] - u[1]) * half, cz + (r[2] - u[2]) * half, 1, 1, c, n);
-			symbolVertex(buffer, pose, cx + (r[0] + u[0]) * half, cy + (r[1] + u[1]) * half, cz + (r[2] + u[2]) * half, 1, 0, c, n);
-			symbolVertex(buffer, pose, cx - (r[0] - u[0]) * half, cy - (r[1] - u[1]) * half, cz - (r[2] - u[2]) * half, 0, 0, c, n);
+			// upright: the shell's up projected onto the face (a polar face falls back to x)
+			float[] up = { -n[1] * n[0], 1.0F - n[1] * n[1], -n[1] * n[2] };
+			float ul = Mth.sqrt(up[0] * up[0] + up[1] * up[1] + up[2] * up[2]);
+			up = ul < 1.0E-3F ? new float[] { 1, 0, 0 } : new float[] { up[0] / ul, up[1] / ul, up[2] / ul };
+			// right = up x n, so it reads unmirrored from outside
+			float[] r = { up[1] * n[2] - up[2] * n[1], up[2] * n[0] - up[0] * n[2], up[0] * n[1] - up[1] * n[0] };
+			float shimmer = 1.0F + SHIMMER * Mth.sin(now * SHIMMER_SPEED + f * 2.399F);
+			int b = Math.round(255.0F * Mth.clamp(SYMBOL_BRIGHTNESS * strength * shimmer * facing, 0.0F, 1.0F));
+			float[][] offs = { { -half, -half, 0, 1 }, { half, -half, 1, 1 }, { half, half, 1, 0 }, { -half, half, 0, 0 } };
+			for (float[] o : offs)
+				buffer.addVertex(pose, centre[0] + r[0] * o[0] + up[0] * o[1], centre[1] + r[1] * o[0] + up[1] * o[1], centre[2] + r[2] * o[0] + up[2] * o[1]).setColor(b, b, b, 255).setUv(o[2], o[3])
+						.setOverlay(OverlayTexture.NO_OVERLAY).setLight(FULL_BRIGHT).setNormal(pose, n[0], n[1], n[2]);
 		}
-	}
-
-	private static void symbolVertex(VertexConsumer buffer, PoseStack.Pose pose, float x, float y, float z, float u, float v, int c, float[] n) {
-		buffer.addVertex(pose, x, y, z).setColor(c, c, c, c).setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(FULL_BRIGHT).setNormal(pose, n[0], n[1], n[2]);
-	}
-
-	/** Golden-angle spiral: even spacing over the sphere with no rows and no bunching at the poles. Each symbol stands upright (its top towards the bubble's top). */
-	private static float[][][] buildSymbols() {
-		float[][][] out = new float[SYMBOL_COUNT][][];
-		float golden = (float) (Math.PI * (3.0 - Math.sqrt(5.0)));
-		for (int i = 0; i < SYMBOL_COUNT; i++) {
-			float y = 1.0F - 2.0F * (i + 0.5F) / SYMBOL_COUNT;
-			float ring = Mth.sqrt(1.0F - y * y);
-			float[] n = { Mth.cos(i * golden) * ring, y, Mth.sin(i * golden) * ring };
-			// right = worldUp x n, up = n x right
-			float rx = n[2], rz = -n[0];
-			float rl = Mth.sqrt(rx * rx + rz * rz);
-			float[] r = rl < 1.0E-4 ? new float[] { 1, 0, 0 } : new float[] { rx / rl, 0, rz / rl };
-			float[] u = { n[1] * r[2] - n[2] * r[1], n[2] * r[0] - n[0] * r[2], n[0] * r[1] - n[1] * r[0] };
-			out[i] = new float[][] { n, r, u };
-		}
-		return out;
-	}
-
-	private static void glowVertex(VertexConsumer buffer, PoseStack.Pose pose, float[] n, float radius, float u, float v, float b) {
-		buffer.addVertex(pose, n[0] * radius, n[1] * radius, n[2] * radius).setColor((int) (RED * b), (int) (GREEN * b), (int) (BLUE * b), alphaByte(b)).setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(FULL_BRIGHT).setNormal(pose, n[0], n[1], n[2]);
 	}
 
 	private static int alphaByte(float a) {
 		return (int) (Mth.clamp(a, 0.0F, 1.0F) * 255.0F);
 	}
 
-	private static void vertex(VertexConsumer buffer, PoseStack.Pose pose, float[] n, float u, float v, int alpha) {
-		buffer.addVertex(pose, n[0] * RADIUS, n[1] * RADIUS, n[2] * RADIUS).setColor(RED, GREEN, BLUE, alpha).setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(FULL_BRIGHT).setNormal(pose, n[0], n[1], n[2]);
+	private static void vertex(VertexConsumer buffer, PoseStack.Pose pose, float[] p, float nx, float ny, float nz, int alpha, float[] uv) {
+		buffer.addVertex(pose, p[0], p[1], p[2]).setColor(RED, GREEN, BLUE, alpha).setUv(uv[0], uv[1]).setOverlay(OverlayTexture.NO_OVERLAY).setLight(FULL_BRIGHT).setNormal(pose, nx, ny, nz);
+	}
+
+	/**
+	 * Lays the glass tile flat on each face at TILE_BLOCKS per tile (in the face's own plane, so pixels stay square)
+	 * and slides it to a fixed random spot per face, so neighbouring faces don't line up. UVs stay in 0..1.
+	 */
+	private static float[][][] buildFaceUvs() {
+		float[][][] out = new float[FACES.size()][3][2];
+		java.util.Random rnd = new java.util.Random(0x51E7D);
+		for (int f = 0; f < FACES.size(); f++) {
+			float[][] c = FACES.get(f);
+			float[] e1 = unit(new float[] { c[1][0] - c[0][0], c[1][1] - c[0][1], c[1][2] - c[0][2] });
+			float[] n = unit(new float[] { c[0][0] + c[1][0] + c[2][0], c[0][1] + c[1][1] + c[2][1], c[0][2] + c[1][2] + c[2][2] });
+			float[] e2 = { n[1] * e1[2] - n[2] * e1[1], n[2] * e1[0] - n[0] * e1[2], n[0] * e1[1] - n[1] * e1[0] };
+			float[][] uv = new float[3][2];
+			float minU = Float.MAX_VALUE, minV = Float.MAX_VALUE, maxU = -Float.MAX_VALUE, maxV = -Float.MAX_VALUE;
+			for (int i = 0; i < 3; i++) {
+				float dx = (c[i][0] - c[0][0]) * RADIUS, dy = (c[i][1] - c[0][1]) * RADIUS, dz = (c[i][2] - c[0][2]) * RADIUS;
+				uv[i][0] = (dx * e1[0] + dy * e1[1] + dz * e1[2]) / TILE_BLOCKS;
+				uv[i][1] = (dx * e2[0] + dy * e2[1] + dz * e2[2]) / TILE_BLOCKS;
+				minU = Math.min(minU, uv[i][0]);
+				maxU = Math.max(maxU, uv[i][0]);
+				minV = Math.min(minV, uv[i][1]);
+				maxV = Math.max(maxV, uv[i][1]);
+			}
+			float offU = rnd.nextFloat() * Math.max(0.0F, 1.0F - (maxU - minU)) - minU;
+			float offV = rnd.nextFloat() * Math.max(0.0F, 1.0F - (maxV - minV)) - minV;
+			for (int i = 0; i < 3; i++)
+				out[f][i] = new float[] { uv[i][0] + offU, uv[i][1] + offV };
+		}
+		return out;
 	}
 
 	@SubscribeEvent
@@ -302,15 +300,30 @@ public class WitchercraftQuenBubbleClient {
 		return (alphaByte(a) << 24) | (RED << 16) | (GREEN << 8) | BLUE;
 	}
 
-	private static float[][][] buildSphere() {
-		float[][][] g = new float[RINGS + 1][SLICES + 1][];
-		for (int r = 0; r <= RINGS; r++) {
-			float lat = Mth.PI * r / RINGS;
-			for (int s = 0; s <= SLICES; s++) {
-				float lon = Mth.TWO_PI * s / SLICES;
-				g[r][s] = new float[]{Mth.sin(lat) * Mth.cos(lon), Mth.cos(lat), Mth.sin(lat) * Mth.sin(lon)};
-			}
+	/** Icosahedron with every face split into 4, corners pushed out to the unit sphere: 80 faces. */
+	private static List<float[][]> buildGeodesic() {
+		float t = (1.0F + Mth.sqrt(5.0F)) / 2.0F;
+		float[][] v = {{-1, t, 0}, {1, t, 0}, {-1, -t, 0}, {1, -t, 0}, {0, -1, t}, {0, 1, t}, {0, -1, -t}, {0, 1, -t}, {t, 0, -1}, {t, 0, 1}, {-t, 0, -1}, {-t, 0, 1}};
+		int[][] ico = {{0, 11, 5}, {0, 5, 1}, {0, 1, 7}, {0, 7, 10}, {0, 10, 11}, {1, 5, 9}, {5, 11, 4}, {11, 10, 2}, {10, 7, 6}, {7, 1, 8}, {3, 9, 4}, {3, 4, 2}, {3, 2, 6}, {3, 6, 8}, {3, 8, 9}, {4, 9, 5},
+				{2, 4, 11}, {6, 2, 10}, {8, 6, 7}, {9, 8, 1}};
+		List<float[][]> out = new ArrayList<>();
+		for (int[] f : ico) {
+			float[] a = unit(v[f[0]]), b = unit(v[f[1]]), c = unit(v[f[2]]);
+			float[] ab = unit(mid(a, b)), bc = unit(mid(b, c)), ca = unit(mid(c, a));
+			out.add(new float[][]{a, ab, ca});
+			out.add(new float[][]{ab, b, bc});
+			out.add(new float[][]{ca, bc, c});
+			out.add(new float[][]{ab, bc, ca});
 		}
-		return g;
+		return out;
+	}
+
+	private static float[] mid(float[] a, float[] b) {
+		return new float[]{(a[0] + b[0]) / 2.0F, (a[1] + b[1]) / 2.0F, (a[2] + b[2]) / 2.0F};
+	}
+
+	private static float[] unit(float[] a) {
+		float l = Mth.sqrt(a[0] * a[0] + a[1] * a[1] + a[2] * a[2]);
+		return new float[]{a[0] / l, a[1] / l, a[2] / l};
 	}
 }

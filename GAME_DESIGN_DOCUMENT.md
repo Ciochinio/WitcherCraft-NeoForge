@@ -277,8 +277,8 @@ bigger than what's left shatters it and lets the remainder through. What bounds 
 that keeps getting stronger as long as you can pay for it, where base Quen is a fixed buffer
 you throw up and forget. Let go, run dry, or eat a hit bigger than the pool and it drops with an "Active Shield
 down" message. A shattered shield ends the hold outright rather than popping straight back up,
-so recovering from a break costs you a fresh press of the key. While it's up you sit in a slowly turning, round
-glowing gold glass bubble sunk into the ground, dotted all over with bright Quen symbols (softly pulsing, brighter as the pool grows) that flashes on every
+so recovering from a break costs you a fresh press of the key. While it's up you sit in a slowly turning, low-poly
+amber glass shell sunk into the ground, marked with glowing Quen symbols (shimmering faces, brighter as the pool grows), that flashes on every
 absorbed hit, fades in when raised and vanishes the moment it drops; other players see
 it too. In first person the screen edges glow amber instead, and the edge facing the attacker flashes on
 a hit.

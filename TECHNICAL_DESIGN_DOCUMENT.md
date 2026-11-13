@@ -3791,20 +3791,16 @@ was removed; the element is in `trash/`. `QuenCast` sets the pool to `8 * (1 + S
 **Active Shield bubble.** `WitchercraftQuenBubbleMessage` (locked code, `~/Signs/Quen/AltQuen`, clientbound
 `entityId, pool`) is sent from a server player tick to the player and everyone tracking them on every
 up/down change and every 5 ticks while up (effects and player variables only sync to their owner).
-`WitchercraftQuenBubbleClient` (locked code, `SubmitCustomGeometryEvent`) draws a quad sphere (24 slices x 16 rings,
-radius 1.4, centred at 50% of the player's height so its bottom sinks into the ground) with
-`entityTranslucentEmissive(textures/entities/quen_bubble_glass.png)`: a seamless 32 px white glass tile (faint
-grainy pane, a few lighter wavy patches, four short diagonal glints, no frame lines), tinted pale gold
-(255, 215, 140) per vertex, repeated 4 times around and 2 times down. Each quad maps its own slice of one tile, so
-UVs stay inside 0..1 and no texture repeat is needed. Alpha per vertex: 0.6 facing the camera to 0.95 at the
-silhouette, times pool strength and the texture alpha, so with the render type's 0.1 cutout a low pool shows only
-the patches and glints in the middle and the glass fills in as the pool grows. The earlier gridded 16 px tile is in
-`trash/` as `quen_bubble_glass_grid.png`. A second sphere at 0.97 of the radius is drawn with `RenderTypes.eyes`
-(additive, the spider-eyes glow; plain white `quen_bubble.png`) so the scene behind the bubble is brightened
-rather than tinted: gold scaled into RGB from 0.12 facing the camera to 0.65 at the silhouette, times pool strength
-and hit flash, breathing +-15% over 40 ticks. It turns one texture pixel every 5 ticks
-(so the glass slides pixel by pixel), x pool up to 16, whole-bubble hit flash, 4-tick fade in, gone instantly on
-drop (`FADE_OUT_TICKS` 0). The plain white `quen_bubble.png` is still used by the Yrden ground tint. Own shell is
+`WitchercraftQuenBubbleClient` (locked code, `SubmitCustomGeometryEvent`) draws a geodesic shell (icosahedron split
+once, 80 faces, radius 1.25, centred at 50% of the player's height so its bottom sinks into the ground) with
+`entityTranslucentEmissive(textures/entities/quen_bubble_glass.png)`: the seamless 32 px glass tile, tinted pale
+gold (255, 215, 140), laid flat on each face at 16 px per block and slid to a fixed random spot per face (seeded),
+so neighbouring faces don't line up; UVs stay in 0..1. Alpha 0.6 facing the camera to 0.95 at the silhouette, times
+pool strength, shimmer and the texture alpha (0.1 cutout). Symbols: `quen_bubble_symbol.png` on the middle face of
+each of the 20 icosahedron faces (every 4th face of the split), 0.3 blocks, 0.02 off the face, upright towards the
+shell's top, drawn with `RenderTypes.energySwirl` (additive) only when the face's outside is turned to the camera;
+brightness 0.9 x strength x the face's shimmer x facing. They turn with the shell. Each face is a flat fill (rim glow from the angle to the camera); an optional frame band per face
+exists but is off (`EDGE_ALPHA` 0, `FACE_INSET` 1); per-face shimmer, slow turn, x pool up to 16, 4-tick fade in, gone instantly on drop (`FADE_OUT_TICKS` 0). Own shell is
 hidden in first person; a `CAMERA_OVERLAYS` GUI pass draws an amber screen-edge glow instead. Absorbed hits:
 `QuenAbsorb` calls the locked `WitchercraftQuenBubbleHit(damagesource, entity)`, which spawns 14 `WAX_ON`
 sparks on the side facing the attacker (at the bubble surface for Active Shield, 0.6 from the body for base
@@ -3813,12 +3809,12 @@ Quen, random side when the damage has no position) and, for Active Shield, sends
 edge on the attacker's side flashes. A bubble that hears nothing for 20 ticks is dropped. Tuning = constants at the
 top of the client class. The render type discards alpha under 0.1, so faint parts vanish first. The old
 12-glyph ring (`QuenActiveShieldAura`) is in `trash/`, and so is the unused `QuenHoldParticles` particle element (texture kept).
-Symbol layer: `SYMBOL_COUNT` 20 quads of `textures/entities/quen_bubble_symbol.png` (16 px, own art, clear pixels
-black because it is drawn with `RenderTypes.eyes`, additive) placed on a golden-angle spiral (even spread, no
-rows, no bunching at the poles) at 1.01 x radius, 0.3 blocks wide, upright towards the bubble's top. They sit in
-the turned frame, so they step with the glass. Only symbols facing the camera are drawn, brightness 0.9 x the glow
-strength (pool, pulse, hit flash) x how directly they face the camera, so they fade out at the silhouette instead of
-popping.
+Shapes tried after this one and dropped (2026-11-13), then back to this shell with their glass and symbols added:
+a smooth quad sphere in pixel glass with a glow layer and Quen symbols (commit `f42ae5c`), a "block sphere" of 0.25
+cubes, a ring of 8 standing 2.5-block panes, and 4 orbiting glass shields. The round ones read as a hamster ball,
+the others looked worse. The gridded glass tile is still in `trash/` (`quen_bubble_glass_grid.png`). Lesson for any glow layer: `RenderTypes.eyes()` only alpha-blends and greys out a
+bright sky; `RenderTypes.energySwirl(texture, 0, 0)` is the vanilla type that truly adds light (back-face culled,
+0.1 alpha cutout, so brightness goes in RGB with alpha 255).
 **Normal Quen glyph.** The old per-tick server particle (`QuenAura` sending `QuenParticles`, a 1-tick particle
 re-spawned every tick) lagged behind a moving player; both elements are in `trash/` (registry entries in
 `trash/registry/`, particle textures kept) and so are the generated `WitchercraftModParticles` /

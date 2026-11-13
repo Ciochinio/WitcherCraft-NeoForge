@@ -18,7 +18,7 @@ import net.minecraft.core.particles.ParticleTypes;
 // WitchercraftQuenBubbleClient to flash the bubble and the first-person screen edge.
 public class WitchercraftQuenBubbleHitProcedure {
 	/** Where the sparks appear: the bubble's surface for Active Shield (mirrors WitchercraftQuenBubbleClient), close to the body for base Quen. */
-	private static final double BUBBLE_RADIUS = 1.4;
+	private static final double BUBBLE_RADIUS = 1.25;
 	private static final double BUBBLE_CENTRE_HEIGHT = 0.5;
 	private static final double BASE_RADIUS = 0.6;
 	private static final int SPARKS = 14;
