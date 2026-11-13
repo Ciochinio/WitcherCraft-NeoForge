@@ -42,12 +42,16 @@ public class SignCastHoldProcedure {
 				if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftSignKeyHoldTime % 20 == 0) {
 					SignCastHoldCostTickProcedure.execute(entity);
 				}
+				if (entity instanceof LivingEntity _livEnt5 && _livEnt5.hasEffect(WitchercraftModMobEffects.AARD_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkFarReachingAard
+						|| entity instanceof LivingEntity _livEnt6 && _livEnt6.hasEffect(WitchercraftModMobEffects.YRDEN_SIGN) && entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftEquippedPerkMagicTrap) {
+					SignCastKeyReleaseProcedure.execute(world, x, y, z, entity);
+				}
 			} else {
 				SignCastKeyReleaseProcedure.execute(world, x, y, z, entity);
 				if (entity instanceof LivingEntity _entity)
 					_entity.removeEffect(WitchercraftModMobEffects.SIGN_HOLD);
 				if (entity instanceof ServerPlayer _player)
-					_player.sendSystemMessage(Component.literal("Not enough stamina hold "), true);
+					_player.sendSystemMessage(Component.literal("Not enough stamina hold"), true);
 			}
 		}
 	}

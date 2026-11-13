@@ -6,6 +6,7 @@ import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
+import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.bus.api.SubscribeEvent;
 
@@ -21,6 +22,7 @@ import net.minecraft.world.effect.MobEffectInstance;
  * - each tick the puppet fights the nearest other hostile (Enemy) within 16 blocks; with none around it stands frozen
  * - it can't pick or hurt anything that isn't a hostile mob (players, pets, villagers)
  * - any player's hit ends it; the end runs after the damage, so that hit is still a Precise hit
+ * - when it ends (timer, hit, replaced) the fight it started is called off: see endFight
  * Driven from the entity tick rather than the effect tick: adding/removing effects inside an effect tick
  * mutates the effect map vanilla is iterating.
  *
@@ -30,6 +32,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 public class WitchercraftAxiiPuppetEvents {
 	private static final double RANGE = 16;
 	private static final int IDLE_STUN_TICKS = 6;
+	private static final double END_RANGE = 24;
 
 	@SubscribeEvent
 	public static void onTick(EntityTickEvent.Post event) {
@@ -72,6 +75,35 @@ public class WitchercraftAxiiPuppetEvents {
 			return;
 		victim.removeEffect(WitchercraftModMobEffects.AXII_PUPPET);
 		victim.removeEffect(WitchercraftModMobEffects.AXII_CHARMED);
+	}
+
+	@SubscribeEvent
+	public static void onEffectRemoved(MobEffectEvent.Remove event) {
+		if (event.getEffect().value() == WitchercraftModMobEffects.AXII_PUPPET.get())
+			endFight(event.getEntity());
+	}
+
+	@SubscribeEvent
+	public static void onEffectExpired(MobEffectEvent.Expired event) {
+		if (event.getEffectInstance() != null && event.getEffectInstance().getEffect().value() == WitchercraftModMobEffects.AXII_PUPPET.get())
+			endFight(event.getEntity());
+	}
+
+	// Without this the fight outlives the spell: the mobs it hit keep their grudge (hurt-by memory, alerted packs)
+	// until one side dies, so the duration and Intensity scaling stop mattering.
+	private static void endFight(LivingEntity ex) {
+		if (ex.level().isClientSide())
+			return;
+		if (ex instanceof Mob mob && !(mob.getTarget() instanceof Player))
+			mob.setTarget(null);
+		if (!(ex.getLastHurtByMob() instanceof Player))
+			ex.setLastHurtByMob(null);
+		for (Mob other : ex.level().getEntitiesOfClass(Mob.class, ex.getBoundingBox().inflate(END_RANGE), e -> e != ex)) {
+			if (other.getTarget() == ex)
+				other.setTarget(null);
+			if (other.getLastHurtByMob() == ex)
+				other.setLastHurtByMob(null);
+		}
 	}
 
 	private static boolean isFoe(Mob puppet, LivingEntity e) {

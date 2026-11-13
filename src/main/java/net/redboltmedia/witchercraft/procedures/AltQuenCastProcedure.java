@@ -15,7 +15,7 @@ public class AltQuenCastProcedure {
 		if (!(entity instanceof LivingEntity _livEnt0 && _livEnt0.hasEffect(WitchercraftModMobEffects.QUEN_ACTIVE_SHIELD))) {
 			if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
 				_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.QUEN_ACTIVE_SHIELD, 5, 0));
-			WitchercraftPlaySoundAtProcedure.execute(entity, "entity.illusioner.cast_spell", 1.2);
+			WitchercraftSignPlaySoundProcedure.execute(entity, "entity.illusioner.cast_spell", 1.2);
 			if (entity instanceof LivingEntity _entity)
 				_entity.removeEffect(WitchercraftModMobEffects.QUEN_EFFECT);
 			if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftQuenShield < 4 * (1 + (entity instanceof LivingEntity _livingEntityS1 && _livingEntityS1.getAttributes().hasAttribute(WitchercraftModAttributes.SIGN_INTENSITY) ? _livingEntityS1.getAttribute(WitchercraftModAttributes.SIGN_INTENSITY).getValue() : 0) * 0.01)) {

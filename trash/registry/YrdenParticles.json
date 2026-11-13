@@ -1,0 +1,14 @@
+{
+    "name":  "YrdenParticles",
+    "type":  "particle",
+    "compiles":  true,
+    "locked_code":  false,
+    "registry_name":  "yrden_particles",
+    "metadata":  {
+                     "files":  [
+                                   "src/main/java/net/redboltmedia/witchercraft/client/particle/YrdenParticlesParticle.java",
+                                   "src/main/resources/assets/witchercraft/particles/yrden_particles.json"
+                               ]
+                 },
+    "path":  "~/Signs/Yrden"
+}

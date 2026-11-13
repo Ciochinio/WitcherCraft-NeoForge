@@ -51,7 +51,7 @@ public class AardCastProcedure {
 		lookLen = Mth.clamp(Math.sqrt(Math.pow((-1 * Math.sin(entity.getYRot() * 0.0174532925)), 2) + Math.pow(Math.cos(entity.getYRot() * 0.0174532925), 2)), 0.001, 100);
 		lookX = (-1 * Math.sin(entity.getYRot() * 0.0174532925)) / lookLen;
 		lookZ = Math.cos(entity.getYRot() * 0.0174532925) / lookLen;
-		WitchercraftPlaySoundAtProcedure.execute(entity, "entity.player.attack.knockback", 0.7);
+		WitchercraftSignPlaySoundProcedure.execute(entity, "entity.player.attack.knockback", 0.7);
 		for (int _i1 = 0; _i1 < 100; _i1++) {
 			arcAngle = Mth.nextDouble(RandomSource.create(), -1.0471975512, 1.0471975512);
 			dirX = lookX * Math.cos(arcAngle) - lookZ * Math.sin(arcAngle);
@@ -74,7 +74,7 @@ public class AardCastProcedure {
 			final Vec3 _center = new Vec3(x, y, z);
 			for (Entity entityiterator : world.getEntitiesOfClass(Entity.class, new AABB(_center, _center).inflate(10 / 2d), e -> true).stream().sorted(Comparator.comparingDouble(_entcnd -> _entcnd.distanceToSqr(_center))).toList()) {
 				if (!(entityiterator instanceof Player) && !(entityiterator instanceof ItemEntity) && !(entityiterator instanceof ExperienceOrb)
-							&& !(entityiterator instanceof TamableAnimal _tamIsTamedBy && entity instanceof LivingEntity _livEnt && _tamIsTamedBy.isOwnedBy(_livEnt)) && WitchercraftCanSeeProcedure.execute(entity, entityiterator)) {
+							&& !(entityiterator instanceof TamableAnimal _tamIsTamedBy && entity instanceof LivingEntity _livEnt && _tamIsTamedBy.isOwnedBy(_livEnt)) && WitchercraftSignCanSeeProcedure.execute(entity, entityiterator)) {
 					toMobX = entityiterator.getX() - entity.getX();
 					toMobZ = entityiterator.getZ() - entity.getZ();
 					toMobDist = Mth.clamp(Math.sqrt(Math.pow(toMobX, 2) + Math.pow(toMobZ, 2)), 0.5, 100);

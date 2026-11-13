@@ -47,6 +47,6 @@ public class AltYrdenCastProcedure {
 			_vars.witchercraftYrdenShots = 8;
 			_vars.markSyncDirty();
 		}
-		WitchercraftPlaySoundAtProcedure.execute(entity, "entity.evoker.prepare_summon", 1.3);
+		WitchercraftSignPlaySoundProcedure.execute(entity, "entity.evoker.prepare_summon", 1.3);
 	}
 }

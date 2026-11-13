@@ -26,6 +26,6 @@ public class QuenCastProcedure {
 		}
 		if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
 			_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.QUEN_EFFECT, 200, 0));
-		WitchercraftPlaySoundAtProcedure.execute(entity, "entity.illusioner.cast_spell", 1.2);
+		WitchercraftSignPlaySoundProcedure.execute(entity, "entity.illusioner.cast_spell", 1.2);
 	}
 }

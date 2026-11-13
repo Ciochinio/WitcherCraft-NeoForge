@@ -1,0 +1,14 @@
+{
+    "name":  "QuenHoldParticles",
+    "type":  "particle",
+    "compiles":  true,
+    "locked_code":  false,
+    "registry_name":  "quen_hold_particles",
+    "metadata":  {
+                     "files":  [
+                                   "src/main/resources/assets/witchercraft/particles/quen_hold_particles.json",
+                                   "src/main/java/net/redboltmedia/witchercraft/client/particle/QuenHoldParticlesParticle.java"
+                               ]
+                 },
+    "path":  "~/Signs/Quen/AltQuen"
+}

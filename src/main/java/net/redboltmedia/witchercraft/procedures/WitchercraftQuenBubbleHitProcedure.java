@@ -13,7 +13,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.core.particles.ParticleTypes;
 
-// Locked: feedback for a hit Quen absorbed, called from QuenBlock. Sparks at the impact point (the side
+// Locked: feedback for a hit Quen absorbed, called from QuenAbsorb. Sparks at the impact point (the side
 // facing the attacker) for base Quen and Active Shield; for Active Shield also tells
 // WitchercraftQuenBubbleClient to flash the bubble and the first-person screen edge.
 public class WitchercraftQuenBubbleHitProcedure {

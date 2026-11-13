@@ -26,7 +26,7 @@ import net.minecraft.core.registries.Registries;
 import javax.annotation.Nullable;
 
 @EventBusSubscriber
-public class QuenBlockProcedure {
+public class QuenAbsorbProcedure {
 	@SubscribeEvent
 	public static void onEntityAttacked(LivingIncomingDamageEvent event) {
 		if (event.getEntity() != null) {
@@ -60,12 +60,12 @@ public class QuenBlockProcedure {
 				if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftQuenShield <= 0) {
 					if (entity instanceof LivingEntity _entity)
 						_entity.removeEffect(WitchercraftModMobEffects.QUEN_EFFECT);
-					WitchercraftPlaySoundAtProcedure.execute(entity, "item.shield.break", 1);
-					WitchercraftPlaySoundAtProcedure.execute(entity, "block.glass.break", 0.7);
+					WitchercraftSignPlaySoundProcedure.execute(entity, "item.shield.break", 1);
+					WitchercraftSignPlaySoundProcedure.execute(entity, "block.glass.break", 0.7);
 				}
 				if (damagesource.getEntity() instanceof Mob || damagesource.getEntity() instanceof Player) {
 					entity.push((Mth.clamp((entity.getX() - damagesource.getEntity().getX()) * 0.4, -0.5, 0.5)), 0.15, (Mth.clamp((entity.getZ() - damagesource.getEntity().getZ()) * 0.4, -0.5, 0.5)));
-					WitchercraftPlaySoundAtProcedure.execute(entity, "item.shield.block", 1);
+					WitchercraftSignPlaySoundProcedure.execute(entity, "item.shield.block", 1);
 				}
 			} else {
 				overflow =amount - entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftQuenShield;
@@ -79,8 +79,8 @@ public class QuenBlockProcedure {
 				if (event instanceof LivingIncomingDamageEvent _event) {
 					_event.setAmount((float) overflow);
 				}
-				WitchercraftPlaySoundAtProcedure.execute(entity, "item.shield.break", 1);
-				WitchercraftPlaySoundAtProcedure.execute(entity, "block.glass.break", 0.7);
+				WitchercraftSignPlaySoundProcedure.execute(entity, "item.shield.break", 1);
+				WitchercraftSignPlaySoundProcedure.execute(entity, "block.glass.break", 0.7);
 			}
 		}
 	}

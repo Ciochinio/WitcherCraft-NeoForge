@@ -36,10 +36,12 @@ public class SignCastHoldCostProcedure {
 				SignCost = SignCost + 2;
 			}
 		}
-		{
-			WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
-			_vars.witchercraftSignHoldCostPerSecond = SignCost;
-			_vars.markSyncDirty();
+		if (entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftSignHoldCostPerSecond != SignCost) {
+			{
+				WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
+				_vars.witchercraftSignHoldCostPerSecond = SignCost;
+				_vars.markSyncDirty();
+			}
 		}
 		return new java.text.DecimalFormat("##.##").format(entity.getData(WitchercraftModVariables.PLAYER_VARIABLES).witchercraftSignHoldCostPerSecond);
 	}

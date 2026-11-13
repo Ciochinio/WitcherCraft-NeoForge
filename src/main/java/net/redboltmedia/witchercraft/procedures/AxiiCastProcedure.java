@@ -12,7 +12,7 @@ public class AxiiCastProcedure {
 		if (WitchercraftAxiiCharmProcedure.execute(entity)) {
 			if (entity instanceof ServerPlayer _player)
 				_player.sendSystemMessage(Component.literal("AXII"), false);
-			WitchercraftPlaySoundAtProcedure.execute(entity, "entity.illusioner.prepare_mirror", 1);
+			WitchercraftSignPlaySoundProcedure.execute(entity, "entity.illusioner.prepare_mirror", 1);
 		} else {
 			if (entity instanceof ServerPlayer _player)
 				_player.sendSystemMessage(Component.literal("NO ENEMIES DETECTED"), false);

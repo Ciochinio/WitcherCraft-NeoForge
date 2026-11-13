@@ -28,7 +28,7 @@ import java.util.HashMap;
  * CLIENTBOUND: a player's Active Shield (alt Quen) pool, sent to that player and everyone tracking them so
  * WitchercraftQuenBubbleClient can draw the bubble. Effects and player variables only sync to their owner,
  * so other players would never see the bubble without this. pool 0 = shield down. hit = an absorbed hit
- * (sent by WitchercraftQuenBubbleHit from QuenBlock), dx/dz = horizontal direction to the attacker or 0.
+ * (sent by WitchercraftQuenBubbleHit from QuenAbsorb), dx/dz = horizontal direction to the attacker or 0.
  *
  * Sent on every up/down change and every KEEPALIVE_TICKS while up (pool updates and players who start
  * tracking mid-hold). The client drops a bubble that hears nothing for STALE_TICKS.

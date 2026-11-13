@@ -58,7 +58,7 @@ public class IgniCastProcedure {
 		}
 		if (entity instanceof ServerPlayer _player)
 			_player.sendSystemMessage(Component.literal("IGNI"), false);
-		WitchercraftPlaySoundAtProcedure.execute(entity, "entity.ghast.shoot", 0.8);
+		WitchercraftSignPlaySoundProcedure.execute(entity, "entity.ghast.shoot", 0.8);
 		intensity = 1 + (entity instanceof LivingEntity _livingEntity0 && _livingEntity0.getAttributes().hasAttribute(WitchercraftModAttributes.SIGN_INTENSITY) ? _livingEntity0.getAttribute(WitchercraftModAttributes.SIGN_INTENSITY).getValue() : 0) * 0.01;
 		lookX = entity.getLookAngle().x;
 		lookY = entity.getLookAngle().y;
@@ -70,7 +70,7 @@ public class IgniCastProcedure {
 			final Vec3 _center = new Vec3((entity.getX()), (entity.getY() + 1), (entity.getZ()));
 			for (Entity entityiterator : world.getEntitiesOfClass(Entity.class, new AABB(_center, _center).inflate(16 / 2d), e -> true).stream().sorted(Comparator.comparingDouble(_entcnd -> _entcnd.distanceToSqr(_center))).toList()) {
 				if (entityiterator instanceof LivingEntity && !(entityiterator instanceof Player)
-						&& !(entityiterator instanceof TamableAnimal _tamIsTamedBy && entity instanceof LivingEntity _livEnt && _tamIsTamedBy.isOwnedBy(_livEnt)) && WitchercraftCanSeeProcedure.execute(entity, entityiterator)) {
+						&& !(entityiterator instanceof TamableAnimal _tamIsTamedBy && entity instanceof LivingEntity _livEnt && _tamIsTamedBy.isOwnedBy(_livEnt)) && WitchercraftSignCanSeeProcedure.execute(entity, entityiterator)) {
 					vX = entityiterator.getX() - apexX;
 					vY = (entityiterator.getY() + entityiterator.getBbHeight() / 2) - apexY;
 					vZ = entityiterator.getZ() - apexZ;

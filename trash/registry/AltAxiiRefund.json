@@ -1,0 +1,19 @@
+{
+    "name":  "AltAxiiRefund",
+    "type":  "procedure",
+    "compiles":  true,
+    "locked_code":  false,
+    "registry_name":  "alt_axii_refund",
+    "metadata":  {
+                     "dependencies":  [
+                                          {
+                                              "name":  "entity",
+                                              "type":  "entity"
+                                          }
+                                      ],
+                     "files":  [
+                                   "src/main/java/net/redboltmedia/witchercraft/procedures/AltAxiiRefundProcedure.java"
+                               ]
+                 },
+    "path":  "~/Signs/Axii"
+}

@@ -31,8 +31,7 @@ public class SignCastKeyPressProcedure {
 			}
 			if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide())
 				_entity.addEffect(new MobEffectInstance(WitchercraftModMobEffects.SIGN_HOLD, 10000, 0));
-			WitchercraftStopUsingItemProcedure.execute(entity);
-			if (!(entity instanceof LivingEntity _livEnt3 && _livEnt3.hasEffect(WitchercraftModMobEffects.SIGN_COOLDOWN))) {
+			WitchercraftSignStopUsingItemProcedure.execute(entity);
 				{
 					WitchercraftModVariables.PlayerVariables _vars = entity.getData(WitchercraftModVariables.PLAYER_VARIABLES);
 					_vars.witchercraftSignKeyHold = true;
@@ -74,7 +73,6 @@ public class SignCastKeyPressProcedure {
 					if (entity instanceof LivingEntity _entity)
 						_entity.removeEffect(WitchercraftModMobEffects.SIGN_HOLD);
 				}
-			}
 		}
 	}
 }

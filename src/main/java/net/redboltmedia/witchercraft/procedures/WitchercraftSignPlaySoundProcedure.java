@@ -8,7 +8,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 
 // Locked: MCreator's play-sound block snaps to the block centre (BlockPos), which puts a sound cast on
 // yourself up to 0.7 blocks to one side, so it pans left or right depending on where you face.
-public class WitchercraftPlaySoundAtProcedure {
+public class WitchercraftSignPlaySoundProcedure {
 	public static void execute(Entity entity, String sound, double pitch) {
 		if (entity == null || sound == null)
 			return;

@@ -173,8 +173,12 @@ Two things gate a cast, and a third governs the ones you hold:
   cast afterwards. While the Sign key is down you can still swing, but right-click does nothing (no
   eating, drinking, bows or blocking), so a hold can't be refuelled mid-cast.
 
+- **Alternates.** Tap the key for the base Sign; hold it **1 s** for the alternate. Far-Reaching Aard
+  and Magic Trap fire on their own at **1 s**; Puppet fires when you let go. These cost double and
+  need more than **8** stamina.
+
 If a Sign can't find anything to act on, it refunds its cost where that makes sense - Axii, for
-instance, gives it back when there's no target.
+instance, gives it back (stamina and cooldown) when there's no target.
 
 ### Sign Intensity
 
@@ -255,8 +259,8 @@ a Sign plays rather than just pushing its numbers, and they're still being final
 | Aard | **Far-Reaching Aard** | Widens Aard from a frontal cone into a full 360-degree radial blast, shoving every nearby enemy away from the caster at once to clear space on all sides. |
 | Igni | **Fire Stream** | Held: a straight jet of fire up to **8** blocks that stops at walls. Everything in the line takes **1** every **0.5 s** and keeps an Igni burn (**2**/s, **5 s** after you let go), all x Sign Intensity; about **4**/s while held. |
 | Quen | **Active Shield** | A held, channeled shield that starts small and charges the longer you keep it raised, paid for in stamina, instead of the fire-and-forget timed pool. |
-| Yrden | **Magic Trap** | Held: a single glyph at your feet that zaps the nearest hostile mob it can see within **8** blocks every **2 s** for **2** magic damage (**3** at +50 Intensity); a zapped mob is **10%** slower and takes Precise hits for **2 s**; **8** shots or **20 s**. Replaces your Yrden trap. |
-| Axii | **Puppet** | Same aim as Axii. For **8 s** x Sign Intensity the target fights the nearest other hostile mob within **16** blocks (frozen if there is none), can't hurt players, pets or villagers, and takes Precise hits; any player's hit ends it. One puppet at a time. `#witchercraft:axii_immune` mobs only get the Precise part. No target: stamina refunded. |
+| Yrden | **Magic Trap** | A single glyph at your feet that zaps the nearest hostile mob it can see within **8** blocks every **2 s** for **2** magic damage (**3** at +50 Intensity); a zapped mob is **10%** slower and takes Precise hits for **2 s**; **8** shots or **20 s**. Replaces your Yrden trap. |
+| Axii | **Puppet** | Same aim as Axii. For **8 s** x Sign Intensity the target fights the nearest other hostile mob within **16** blocks (frozen if there is none), can't hurt players, pets or villagers, and takes Precise hits; any player's hit ends it. When it ends, the fight it started stops. One puppet at a time. `#witchercraft:axii_immune` mobs only get the Precise part. No target: stamina refunded. |
 
 Because the alternates sit behind perks, they double as build payoffs: go deep into the Signs
 tree and you don't just get stronger Signs, you get ones that do something new.
@@ -273,8 +277,8 @@ bigger than what's left shatters it and lets the remainder through. What bounds 
 that keeps getting stronger as long as you can pay for it, where base Quen is a fixed buffer
 you throw up and forget. Let go, run dry, or eat a hit bigger than the pool and it drops with an "Active Shield
 down" message. A shattered shield ends the hold outright rather than popping straight back up,
-so recovering from a break costs you a fresh press of the key. While it's up you sit in a slowly turning, low-poly
-amber shell sunk into the ground (shimmering faces, brighter as the pool grows) that flashes on every
+so recovering from a break costs you a fresh press of the key. While it's up you sit in a slowly turning, round
+glowing gold glass bubble sunk into the ground (softly pulsing, brighter as the pool grows) that flashes on every
 absorbed hit, fades in when raised and vanishes the moment it drops; other players see
 it too. In first person the screen edges glow amber instead, and the edge facing the attacker flashes on
 a hit.

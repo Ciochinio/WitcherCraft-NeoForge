@@ -25,7 +25,7 @@ public class QuenBrokeProcedure {
 			return;
 		if (entity instanceof ServerPlayer _player)
 			_player.sendSystemMessage(Component.literal("Quen broke!").withStyle(ChatFormatting.RED), true);
-		// Clear the pool here rather than only in QuenBlock. QuenBlock zeroes it when the
+		// Clear the pool here rather than only in QuenAbsorb. QuenAbsorb zeroes it when the
 		// shield is drained by hits, but a shield that times out with damage left keeps a
 		// stale value, which leaves the HUD bar on screen after the effect is gone.
 		{

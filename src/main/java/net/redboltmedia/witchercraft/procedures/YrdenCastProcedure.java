@@ -46,6 +46,6 @@ public class YrdenCastProcedure {
 			_vars.witchercraftYrdenMode = 0;
 			_vars.markSyncDirty();
 		}
-		WitchercraftPlaySoundAtProcedure.execute(entity, "entity.evoker.prepare_summon", 1.3);
+		WitchercraftSignPlaySoundProcedure.execute(entity, "entity.evoker.prepare_summon", 1.3);
 	}
 }

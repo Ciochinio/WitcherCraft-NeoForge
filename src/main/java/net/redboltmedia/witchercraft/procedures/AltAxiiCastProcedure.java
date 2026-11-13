@@ -12,12 +12,12 @@ public class AltAxiiCastProcedure {
 		if (WitchercraftAxiiPuppetProcedure.execute(entity)) {
 			if (entity instanceof ServerPlayer _player)
 				_player.sendSystemMessage(Component.literal("ALT AXII - CHANGE SOUND"), false);
-			WitchercraftPlaySoundAtProcedure.execute(entity, "entity.illusioner.prepare_mirror", 1);
+			WitchercraftSignPlaySoundProcedure.execute(entity, "entity.illusioner.prepare_mirror", 1);
 		} else {
 			if (entity instanceof ServerPlayer _player)
 				_player.sendSystemMessage(Component.literal("NO ENEMIES DETECTED"), false);
-			AltAxiiRefundProcedure.execute(entity);
-			AltAxiiRefundProcedure.execute(entity);
+			AxiiRefundProcedure.execute(world, entity);
+			AxiiRefundProcedure.execute(world, entity);
 		}
 	}
 }

@@ -173,12 +173,12 @@ Supporting state:
   of the cast formula, and because empty sockets would need it. Nothing clears it, and a stale value
   is harmless.
 - `witchercraftQuenShield` **must be zero whenever no shield is up**, because that is the entire
-  visibility condition. `QuenBlock` zeroes it when hits drain the pool, but a shield that *times out*
+  visibility condition. `QuenAbsorb` zeroes it when hits drain the pool, but a shield that *times out*
   with damage still on it would otherwise keep a stale value and leave the bar on screen. So
   [QuenBroke](../elements/QuenBroke.mod.json) also clears it. That procedure is the right home
   because `WitchercraftModMobEffects.expireEffects` dispatches it from both `MobEffectEvent.Remove`
   (shattered) and `MobEffectEvent.Expired` (timed out), so it covers every way the shield can end.
-  Note that this is a state fix, not a display fix: gameplay was never wrong, since `QuenBlock`
+  Note that this is a state fix, not a display fix: gameplay was never wrong, since `QuenAbsorb`
   independently gates on `hasEffect(QUEN_EFFECT)`.
 - `witchercraftToxicityOverdoseThreshold` already exists and is initialised to **70** by
   `WitchercraftPlayerBaseStats`. It is `0` before that runs, which is why `ToxicityHudOverdose`
@@ -3660,7 +3660,7 @@ The keybind runs the press/release procedures on the client as well as on the se
 
 **Yrden trap.** `YrdenCast` stores the trap in player variables `witchercraftYrdenX/Y/Z` (cast position)
 and `witchercraftYrdenTicks` (`200 * (1 + SignIntensity * 0.01)`, player_lifetime, so death clears it),
-spawns the purple puff and plays `entity.evoker.prepare_summon` 1.3 through `WitchercraftPlaySoundAt`.
+spawns the purple puff and plays `entity.evoker.prepare_summon` 1.3 through `WitchercraftSignPlaySound`.
 `YrdenTrapTick` (player tick, server only) counts the ticks down and, while
 above 0, gives every living non-player, non-own-pet entity within 3.5 blocks horizontally and from 7
 below to 5 above the trap (matching the client's ground search) `YrdenTrapped` for 20 ticks (hidden; -30% movement speed,
@@ -3675,8 +3675,8 @@ top of the highest solid block with free space above in its column, from 4 above
 and is skipped if none. Every block column whose centre is inside the 3.5 radius gets a flat purple tile
 on its ground top (stronger in the outer 1 block) and on each side face that drops to a lower neighbour
 column (down to its ground, at most 3 blocks), and a client tick spawns 2 `REVERSE_PORTAL` motes per
-tick from random ground spots inside. 4-tick fade in, gone instantly on end, dropped after 30 ticks of silence. `YrdenParticles` is no
-longer used by Yrden.
+tick from random ground spots inside. 4-tick fade in, gone instantly on end, dropped after 30 ticks of silence. The old `YrdenParticles`
+particle element is in `trash/` (texture kept).
 
 **Axii.** `AxiiCast` (on key release) asks the locked `WitchercraftAxiiCharm(entity)` (returns logic) and refunds
 via `AxiiRefund` when it returns false. The aim is the locked `WitchercraftAxiiAim.target(player, partialTick)`
@@ -3692,7 +3692,9 @@ local player has the Axii Sign selected and `witchercraftSignKeyHoldTime` is not
 (`AxiiGlow`) is in `trash/`.
 
 **Alt Axii (Puppet).** `AltAxiiCast` (key release after a 1 s hold, Delusion perk, double cost) asks the locked
-`WitchercraftAxiiPuppet(entity)` (returns logic, same aim) and calls `AltAxiiRefund` twice when it returns false.
+`WitchercraftAxiiPuppet(entity)` (returns logic, same aim) and calls `AxiiRefund` twice when it returns false
+(`AltAxiiRefund` is in `trash/`). `AxiiRefund` gives back what `SignCost` took (2 with Luck, else 4) and clears
+`SignCooldown` one tick later, after the release has added it, so an empty cast costs neither.
 Placeholder sound `entity.illusioner.prepare_mirror` 1, debug chat "ALT AXII - CHANGE SOUND". Every target gets
 `AxiiCharmed` for 160 x (1 + Intensity/100) ticks; targets outside `#witchercraft:axii_immune` lose any
 `AxiiStunned` and get `AxiiPuppet` (hidden, no modifiers) for the same time. One puppet per player: the puppet's
@@ -3705,6 +3707,9 @@ cancels the puppet's damage to anything that isn't an `Enemy`; `LivingDamageEven
 `AxiiCharmed` when a player damages it (after the hit, so `CriticalHitEvent` already counted it as Precise). The
 tick runs from the entity tick, not the effect tick, because adding or removing effects inside an effect tick
 changes the map vanilla is iterating. Brain-AI mobs (piglins, hoglins, wardens) ignore `setTarget` and won't fight.
+When `AxiiPuppet` is removed or expires (`MobEffectEvent.Remove`/`Expired`) `endFight` calls the fight off: the
+ex-puppet drops its target and hurt-by memory (unless it's a player), and every `Mob` within 24 blocks targeting
+it or remembering it as its attacker drops that too. Without it the infight lasts until one side dies.
 
 **Magic Trap (alt Yrden) turret.** `AltYrdenCast` reuses the trap variables: X/Y/Z = cast position,
 `witchercraftYrdenTicks` 400, `witchercraftYrdenMode` 1 (`YrdenCast` sets 0), `witchercraftYrdenShots` 8, so
@@ -3725,20 +3730,31 @@ Precise. Recasting overwrites the variables, so one trap per player.
 While `SignHold` is on the player (Sign key down, from `SignCastKeyPress` to release), right-click is
 cancelled on both sides by `SignHoldBlockUseItem` (item use start: food, potions, bows, shields),
 `SignHoldBlockRightClickItem`, `SignHoldBlockRightClickBlock` and `SignHoldBlockRightClickEntity`
-(`~/Signs/SignCast`). `SignCastKeyPress` also calls the locked `WitchercraftStopUsingItem` right after
+(`~/Signs/SignCast`). `SignCastKeyPress` also calls the locked `WitchercraftSignStopUsingItem` right after
 adding `SignHold`, so a use started before the press is stopped (server-side; syncs via entity flags).
 Attacking is not blocked.
 
-Sign sounds go through the locked procedure `WitchercraftPlaySoundAt(entity, sound, pitch)` (`~/Signs`):
+Cast flow (`~/Signs/SignCast`). `SignCastKeyPress` casts base Aard, Igni, Quen and Yrden on the spot when the
+player lacks that Sign's alt perk (stamina > 4, `SignCost`, 40-tick `SignCooldown`). `SignCastKeyRelease` does
+the rest: base Axii (stamina > 4), and for Signs with their alt perk a tap (hold time <= 20) casts the base form
+(stamina > 4) and a hold (> 20) casts Alt Aard, Alt Yrden or Alt Axii (stamina > 8, `SignCost` twice); the
+cooldown that a press-cast added is what stops a second cast on release. Every cast is cast, then cost, then a
+level-0 cooldown. `SignCastHold` (player tick) drives Alt Igni and Alt Quen while held, bills upkeep every 20
+ticks through `SignCastHoldCostTick`, and for Alt Aard and Alt Yrden calls `SignCastKeyRelease` itself as soon
+as the hold passes 20 ticks, so those fire without letting go (the real release then finds the cooldown and only
+resets). `SignCastHoldCost` only writes `witchercraftSignHoldCostPerSecond` when the value changes: every write
+marks the player variables dirty and re-sends all of them that tick.
+
+Sign sounds go through the locked procedure `WitchercraftSignPlaySound(entity, sound, pitch)` (`~/Signs`):
 volume 1, `PLAYERS`, at the caster's exact position + 1. Don't use MCreator's play-sound block for a
 sound centred on the caster: it snaps to the block centre, up to 0.7 blocks to one side, and the
 sound pans left or right depending on where you face. Used by Aard, Igni, Firestream and Quen's
-Quen: `QuenCast` and the first tick of `AltQuenCast` play `entity.illusioner.cast_spell` 1.2; `QuenBlock`
+Quen: `QuenCast` and the first tick of `AltQuenCast` play `entity.illusioner.cast_spell` 1.2; `QuenAbsorb`
 plays `item.shield.block` 1 on an absorbed hit from a mob or player, and `item.shield.break` 1 +
 `block.glass.break` 0.7 when a hit empties the pool. Timing out (`QuenBroke`), releasing Active Shield
 and the +2/s charge are silent.
 
-`QuenBlock` (`LivingIncomingDamageEvent`) reads the attacker through the damage source's "get entity"
+`QuenAbsorb` (`LivingIncomingDamageEvent`) reads the attacker through the damage source's "get entity"
 block instead of the `sourceentity` dependency: MCreator returns early when any entity dependency is
 null, which let all sourceless damage (burning, lava, poison, wither, cactus) bypass Quen.
 Pass-through list: tags `is_fall`, `is_freezing`, `is_drowning`, `bypasses_invulnerability`, plus
@@ -3748,19 +3764,28 @@ was removed; the element is in `trash/`. `QuenCast` sets the pool to `8 * (1 + S
 **Active Shield bubble.** `WitchercraftQuenBubbleMessage` (locked code, `~/Signs/Quen/AltQuen`, clientbound
 `entityId, pool`) is sent from a server player tick to the player and everyone tracking them on every
 up/down change and every 5 ticks while up (effects and player variables only sync to their owner).
-`WitchercraftQuenBubbleClient` (locked code, `SubmitCustomGeometryEvent`) draws a geodesic shell (icosahedron split
-once, 80 faces, radius 1.4, centred at 50% of the player's height so its bottom sinks into the ground) with
-`entityTranslucentEmissive(textures/entities/quen_bubble.png)`: plain white texture, colour and alpha per
-vertex. Each face is a flat fill (rim glow from the angle to the camera); an optional frame band per face
-exists but is off (`EDGE_ALPHA` 0, `FACE_INSET` 1); per-face shimmer, slow turn, x pool up to 16, 4-tick fade in, gone instantly on drop (`FADE_OUT_TICKS` 0). Own shell is
+`WitchercraftQuenBubbleClient` (locked code, `SubmitCustomGeometryEvent`) draws a quad sphere (24 slices x 16 rings,
+radius 1.4, centred at 50% of the player's height so its bottom sinks into the ground) with
+`entityTranslucentEmissive(textures/entities/quen_bubble_glass.png)`: a seamless 32 px white glass tile (faint
+grainy pane, a few lighter wavy patches, four short diagonal glints, no frame lines), tinted pale gold
+(255, 215, 140) per vertex, repeated 4 times around and 2 times down. Each quad maps its own slice of one tile, so
+UVs stay inside 0..1 and no texture repeat is needed. Alpha per vertex: 0.6 facing the camera to 0.95 at the
+silhouette, times pool strength and the texture alpha, so with the render type's 0.1 cutout a low pool shows only
+the patches and glints in the middle and the glass fills in as the pool grows. The earlier gridded 16 px tile is in
+`trash/` as `quen_bubble_glass_grid.png`. A second sphere at 0.97 of the radius is drawn with `RenderTypes.eyes`
+(additive, the spider-eyes glow; plain white `quen_bubble.png`) so the scene behind the bubble is brightened
+rather than tinted: gold scaled into RGB from 0.12 facing the camera to 0.65 at the silhouette, times pool strength
+and hit flash, breathing +-15% over 40 ticks. It turns one texture pixel every 5 ticks
+(so the glass slides pixel by pixel), x pool up to 16, whole-bubble hit flash, 4-tick fade in, gone instantly on
+drop (`FADE_OUT_TICKS` 0). The plain white `quen_bubble.png` is still used by the Yrden ground tint. Own shell is
 hidden in first person; a `CAMERA_OVERLAYS` GUI pass draws an amber screen-edge glow instead. Absorbed hits:
-`QuenBlock` calls the locked `WitchercraftQuenBubbleHit(damagesource, entity)`, which spawns 14 `WAX_ON`
+`QuenAbsorb` calls the locked `WitchercraftQuenBubbleHit(damagesource, entity)`, which spawns 14 `WAX_ON`
 sparks on the side facing the attacker (at the bubble surface for Active Shield, 0.6 from the body for base
 Quen, random side when the damage has no position) and, for Active Shield, sends the message with
 `hit` + the horizontal direction to the attacker; the shell flashes (x2.5, 6 ticks) and in first person the
 edge on the attacker's side flashes. A bubble that hears nothing for 20 ticks is dropped. Tuning = constants at the
 top of the client class. The render type discards alpha under 0.1, so faint parts vanish first. The old
-12-glyph ring (`QuenActiveShieldAura`) is in `trash/`; the `QuenHoldParticles` particle type is unused.
+12-glyph ring (`QuenActiveShieldAura`) is in `trash/`, and so is the unused `QuenHoldParticles` particle element (texture kept).
 `AltQuenCast` raises the pool to at least `4 * (1 + SignIntensity * 0.01)` on the first hold tick (was a flat 2),
 and only adds its +2/s recharge while the pool is above 0, so a hit that empties the Active
 Shield on a recharge tick can't refill it before `QuenActiveShieldTick` ends the hold.
@@ -3778,10 +3803,10 @@ proper custom `HumanoidModel.ArmPose` would need an `enumextensions.json` declar
 |---|---|---|
 | `AardCast` | Blockly, `~/Signs/Aard` | Cone push: every entity in a 5-block cube around the caster, push scaled by `coneFactor` (full straight ahead, 0 at 60 degrees off the facing direction), force 1.5, lift 0.45. Facing is the yaw (`-sin(yaw)`, `cos(yaw)`), not the look vector: the look vector tilts with pitch and collapses when looking straight down, which left the cone with no direction. |
 | `AltAardCast` | Blockly, `~/Signs/Aard` | Far-Reaching Aard: same filter, radial, sets velocity (1.5 out, 0.4 up) instead of adding to it. |
-| `WitchercraftCanSee` | locked procedure, `~/Signs/Aard` | `LivingEntity.hasLineOfSight(target)`: one eye-to-eye ray, stopped by collider blocks (glass too), not by fluids. MCreator has no line-of-sight block. |
+| `WitchercraftSignCanSee` | locked procedure, `~/Signs` | `LivingEntity.hasLineOfSight(target)`: one eye-to-eye ray, stopped by collider blocks (glass too), not by fluids. MCreator has no line-of-sight block. |
 
 Target filter (both casts): not a player, not a dropped item, not an XP orb, not a `TamableAnimal`
-owned by the caster, and visible per `WitchercraftCanSee`. Boats, minecarts and in-flight arrows are
+owned by the caster, and visible per `WitchercraftSignCanSee`. Boats, minecarts and in-flight arrows are
 pushed on purpose. Arrows stuck in the ground are in the filter but do not move (vanilla ignores
 velocity on grounded arrows).
 
@@ -3808,7 +3833,7 @@ and dropped: a line of them reads as a straight push.
 
 Known limitations: owned horses and other non-`TamableAnimal` mounts are still pushed; a mob whose
 eyes are behind a block is not pushed even if its body shows; the range is a cube, not a sphere.
-The `WitchercraftCanSee` call passes `target` as an explicit procedure input from Blockly - verify it
+The `WitchercraftSignCanSee` call passes `target` as an explicit procedure input from Blockly - verify it
 shows as a normal call block when the workspace is next opened in MCreator.
 
 ### 10.2 Igni
@@ -3821,7 +3846,7 @@ shows as a normal call block when the workspace is next opened in MCreator.
 
 Cone: apex 1 block behind the caster's eyes (eye = feet + 1.5) along the full look vector, pitch
 included, so mobs on walls and ledges count. A living, non-player, not-own-pet, visible
-(`WitchercraftCanSee`) entity whose body centre (feet + half height) is within 8 of the apex and within
+(`WitchercraftSignCanSee`) entity whose body centre (feet + half height) is within 8 of the apex and within
 35 degrees of the look (`dot >= 0.819 * dist`) is hit. Pushing the apex back keeps a mob that hugs you
 in the cone even when it is a bit off-centre.
 
@@ -3854,7 +3879,7 @@ burn ticks. Blockly can't touch `invulnerableTime`. Fire damage has no knockback
 | `AltIgniCast` | Blockly, `~/Signs/Igni` | Called every tick by `SignCastHold` while the key is held past 20 ticks with the Firestream perk. Dependencies `entity, world`. |
 
 Each tick: if the last streamed tick (player NBT `witchercraftFirestreamTick`) is more than 1 tick ago,
-the stream just started - play `entity.ghast.shoot` 0.8 through `WitchercraftPlaySoundAt` (the roaring
+the stream just started - play `entity.ghast.shoot` 0.8 through `WitchercraftSignPlaySound` (the roaring
 loop sound is not chosen yet). The "ALT IGNI" debug line still prints every tick. The beam length is
 the distance from the eyes to the centre of the first solid block on the look ray (raytrace
 `COLLIDER`, so grass and flowers don't stop it), minus 0.5, clamped to 0.5-8. Visual: the original

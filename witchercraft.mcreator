@@ -3682,14 +3682,14 @@
           "src/main/java/net/redboltmedia/witchercraft/procedures/QuenBrokeProcedure.java"
         ]
       },
-      "path": "~/Signs/Quen/Quen Text"
+      "path": "~/Signs/Quen/DefQuen"
     },
     {
-      "name": "QuenBlock",
+      "name": "QuenAbsorb",
       "type": "procedure",
       "compiles": true,
       "locked_code": false,
-      "registry_name": "quen_block",
+      "registry_name": "quen_absorb",
       "metadata": {
         "dependencies": [
           {
@@ -3710,7 +3710,7 @@
           }
         ],
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/QuenBlockProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/QuenAbsorbProcedure.java"
         ]
       },
       "path": "~/Signs/Quen/DefQuen"
@@ -3792,11 +3792,11 @@
       "path": "~/Signs/SignCast"
     },
     {
-      "name": "WitchercraftStopUsingItem",
+      "name": "WitchercraftSignStopUsingItem",
       "type": "procedure",
       "compiles": true,
       "locked_code": true,
-      "registry_name": "witchercraft_stop_using_item",
+      "registry_name": "witchercraft_sign_stop_using_item",
       "metadata": {
         "dependencies": [
           {
@@ -3805,17 +3805,17 @@
           }
         ],
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftStopUsingItemProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftSignStopUsingItemProcedure.java"
         ]
       },
       "path": "~/Signs/SignCast"
     },
     {
-      "name": "WitchercraftPlaySoundAt",
+      "name": "WitchercraftSignPlaySound",
       "type": "procedure",
       "compiles": true,
       "locked_code": true,
-      "registry_name": "witchercraft_play_sound_at",
+      "registry_name": "witchercraft_sign_play_sound",
       "metadata": {
         "dependencies": [
           {
@@ -3832,17 +3832,17 @@
           }
         ],
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftPlaySoundAtProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftSignPlaySoundProcedure.java"
         ]
       },
       "path": "~/Signs"
     },
     {
-      "name": "WitchercraftCanSee",
+      "name": "WitchercraftSignCanSee",
       "type": "procedure",
       "compiles": true,
       "locked_code": true,
-      "registry_name": "witchercraft_can_see",
+      "registry_name": "witchercraft_sign_can_see",
       "metadata": {
         "return_type": "logic",
         "dependencies": [
@@ -3856,10 +3856,10 @@
           }
         ],
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftCanSeeProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/procedures/WitchercraftSignCanSeeProcedure.java"
         ]
       },
-      "path": "~/Signs/Aard"
+      "path": "~/Signs"
     },
     {
       "name": "AardCast",
@@ -4229,7 +4229,8 @@
             "type": "entity"
           }
         ]
-      }
+      },
+      "path": "~/Character Abilities/CombatPerks/Counterattack"
     },
     {
       "name": "StrengthTrainingEffect",
@@ -7824,20 +7825,6 @@
       "path": "~/Alchemy"
     },
     {
-      "name": "YrdenParticles",
-      "type": "particle",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "yrden_particles",
-      "metadata": {
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/client/particle/YrdenParticlesParticle.java",
-          "src/main/resources/assets/witchercraft/particles/yrden_particles.json"
-        ]
-      },
-      "path": "~/Signs/Yrden"
-    },
-    {
       "name": "ToxicityTickStart",
       "type": "procedure",
       "compiles": true,
@@ -8323,25 +8310,6 @@
       "path": "~/Signs/Axii"
     },
     {
-      "name": "AltAxiiRefund",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "alt_axii_refund",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ],
-        "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/AltAxiiRefundProcedure.java"
-        ]
-      },
-      "path": "~/Signs/Axii"
-    },
-    {
       "name": "TimeTick",
       "type": "procedure",
       "compiles": true,
@@ -8533,20 +8501,6 @@
         ]
       },
       "path": "~/Signs/Aard"
-    },
-    {
-      "name": "QuenHoldParticles",
-      "type": "particle",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "quen_hold_particles",
-      "metadata": {
-        "files": [
-          "src/main/resources/assets/witchercraft/particles/quen_hold_particles.json",
-          "src/main/java/net/redboltmedia/witchercraft/client/particle/QuenHoldParticlesParticle.java"
-        ]
-      },
-      "path": "~/Signs/Quen/AltQuen"
     },
     {
       "name": "QuenParticles",
@@ -12363,6 +12317,10 @@
               {
                 "name": "Undying",
                 "children": []
+              },
+              {
+                "name": "Counterattack",
+                "children": []
               }
             ]
           },
@@ -12562,10 +12520,6 @@
               },
               {
                 "name": "DefQuen",
-                "children": []
-              },
-              {
-                "name": "Quen Text",
                 "children": []
               }
             ]
