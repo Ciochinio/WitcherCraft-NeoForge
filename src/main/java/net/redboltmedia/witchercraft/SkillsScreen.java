@@ -166,9 +166,18 @@ public class SkillsScreen extends AbstractContainerScreen<SkillsMenu> {
 	}
 
 	@Override
+	public boolean mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
+		if (page.mouseDragged(contentX(), contentY(), contentW(), contentH(), event.x(), event.y(), event.button(), dragX, dragY))
+			return true;
+		return super.mouseDragged(event, dragX, dragY);
+	}
+
+	@Override
 	public boolean mouseReleased(MouseButtonEvent event) {
+		// the page drops a dragged perk here, so it hears the release first
+		boolean perkDrop = page.mouseReleased(contentX(), contentY(), contentW(), contentH(), event.x(), event.y(), event.button());
 		// the release of a navbar or perk click must not reach the container logic
-		if (swallowRelease) {
+		if (swallowRelease || perkDrop) {
 			swallowRelease = false;
 			return true;
 		}

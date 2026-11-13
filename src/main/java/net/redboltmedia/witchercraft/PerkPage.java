@@ -72,8 +72,15 @@ public class PerkPage implements GuiPage {
 
 	private final String pageId;
 
-	// Client-only selection: the perk id currently "held" (0 = nothing).
+	// Client-only selection: the perk id currently "held" by click-then-click (0 = nothing).
 	private int heldPerk = 0;
+	// Left-button press on a learned node or an equipped slot. It becomes a drag once the mouse moves
+	// DRAG_START px; released before that, it counts as a click (node = hold, slot = unequip).
+	private static final double DRAG_START = 3.0;
+	private int pressPerk = 0;
+	private int pressSlot = -1; // -1 = pressed on the tree
+	private double pressX, pressY;
+	private boolean dragging = false;
 	// Active sub-tab: tree branch colour (1 red / 2 green / 3 blue / 4 neutral),
 	// or TAB_MUTAGENS.
 	private int activeBranch = 1;
@@ -156,7 +163,7 @@ public class PerkPage implements GuiPage {
 				PerkTree.POINTS_X, PerkTree.POINTS_Y, PerkTree.POINTS_SCALE, PerkEquipLayout.STATUS_POINTS);
 		Component hint = mutagensShown()
 				? tt("gui.witchercraft.shell.skills.mutagen_instructions", "Drag a mutagen into a socket")
-				: tt("gui.witchercraft.shell.skills.instructions", "R-click=learn  L-click learned=hold");
+				: tt("gui.witchercraft.shell.skills.instructions", "R-click=learn  Drag=equip");
 		drawScaledText(g, hint, PerkTree.HINT_X, PerkTree.HINT_Y, PerkTree.HINT_SCALE, PerkEquipLayout.STATUS_TEXT);
 
 		// the Mutagens tab leaves the tree area to the inventory slots SkillsScreen draws
@@ -169,22 +176,27 @@ public class PerkPage implements GuiPage {
 			int sx = PerkEquipLayout.SLOT_X[i];
 			int sy = PerkEquipLayout.SLOT_Y[i];
 			int cur = PerkEquipVars.getPerkSocket(entity, i);
+			// a perk dragged out of its slot is drawn on the cursor, not in the slot
+			if (dragging && pressSlot == i)
+				cur = 0;
 			// a slot below its witcher level shows the lock glyph and the level it
 			// opens at (a perk already in it after a level reset still shows)
 			if (cur <= 0 && !PerkEquipVars.isSlotUnlocked(entity, i)) {
 				drawLockedSlot(g, sx, sy, PerkEquipVars.slotUnlockLevel(i));
 				continue;
 			}
-			// while holding, EVERY open slot is a legal target (empty = place,
-			// occupied = swap, evicting the occupant back to the pool).
-			boolean validTarget = heldPerk != 0 && PerkEquipVars.isSlotUnlocked(entity, i);
+			// while carrying, EVERY open slot is a legal target (empty = place,
+			// occupied = replace from the tree, swap from another slot).
+			boolean validTarget = carried() != 0 && PerkEquipVars.isSlotUnlocked(entity, i);
 			if (cur > 0) {
 				int c = PerkRegistry.tint(PerkRegistry.color(cur));
-				drawCell(g, sx, sy, PerkEquipLayout.SLOT_SIZE, validTarget ? PerkEquipLayout.TARGET_BORDER : c, withAlpha(c, 0x55));
+				drawCell(g, sx, sy, PerkEquipLayout.SLOT_SIZE, c, withAlpha(c, 0x55));
 				drawPerkIcon(g, cur, sx, sy, ICON_EQUIPPED); // socketed = equipped
 			} else {
-				drawCell(g, sx, sy, PerkEquipLayout.SLOT_SIZE, validTarget ? PerkEquipLayout.TARGET_BORDER : PerkEquipLayout.CELL_BORDER, PerkEquipLayout.CELL_INNER);
+				drawCell(g, sx, sy, PerkEquipLayout.SLOT_SIZE, PerkEquipLayout.CELL_BORDER, PerkEquipLayout.CELL_INNER);
 			}
+			if (validTarget)
+				drawThinOutline(g, sx, sy, PerkEquipLayout.SLOT_SIZE, PerkEquipLayout.TARGET_BORDER);
 		}
 
 		// mutagen sockets: the frame, tinted by the socketed mutagen's type. The
@@ -208,6 +220,13 @@ public class PerkPage implements GuiPage {
 		}
 		for (int gi = 0; gi < PerkEquipVars.MUTAGEN_GROUPS; gi++)
 			drawBonus(g, entity, gi);
+
+		// the carried perk follows the cursor, and no tooltip covers it
+		int carried = carried();
+		if (carried != 0) {
+			drawPerkIcon(g, carried, mouseX - ox - CELL / 2, mouseY - oy - CELL / 2, ICON_EQUIPPED);
+			return;
+		}
 
 		// tooltips - stored, not drawn here (the screen renders them last).
 		// Hit-test in perk-local coords.
@@ -497,6 +516,19 @@ public class PerkPage implements GuiPage {
 		drawRect(g, x, y, size, size, border, inner);
 	}
 
+	/** A half-GUI-pixel outline over the outer edge of a cell (a 1 px fill can't be thinner without scaling). */
+	private void drawThinOutline(GuiGraphicsExtractor g, int x, int y, int size, int col) {
+		int s = size * 2;
+		g.pose().pushMatrix();
+		g.pose().translate(ox + x, oy + y);
+		g.pose().scale(0.5F, 0.5F);
+		g.fill(0, 0, s, 1, col);
+		g.fill(0, s - 1, s, s, col);
+		g.fill(0, 1, 1, s - 1, col);
+		g.fill(s - 1, 1, s, s - 1, col);
+		g.pose().popMatrix();
+	}
+
 	private void drawRect(GuiGraphicsExtractor g, int x, int y, int w, int h, int border, int inner) {
 		// 1px border as four edges, so a translucent inner never shows the border colour through
 		fill(g, x, y, x + w, y + 1, border);
@@ -533,7 +565,7 @@ public class PerkPage implements GuiPage {
 			}
 			if (nodePerk > 0) {
 				if (PerkCatalog.isLearnedClient(nodePerk))
-					heldPerk = nodePerk;
+					startPress(nodePerk, -1, mouseX, mouseY);
 				return true;
 			}
 			int si = hitSlot(lx, ly);
@@ -542,11 +574,11 @@ public class PerkPage implements GuiPage {
 				if (heldPerk != 0 && !PerkEquipVars.isSlotUnlocked(entity, si)) {
 					return true; // locked slot: keep holding, nothing to send
 				} else if (heldPerk != 0) {
-					// place, or swap: an occupied slot's perk returns to the pool
+					// place: an occupied slot's perk returns to the tree
 					sendAction(1000000 + si * 1000 + heldPerk, entity);
 					heldPerk = 0;
 				} else if (cur != 0) {
-					sendAction(2000000 + si, entity); // remove
+					startPress(cur, si, mouseX, mouseY); // drag it, or click to unequip
 				}
 				return true;
 			}
@@ -561,12 +593,82 @@ public class PerkPage implements GuiPage {
 	}
 
 	@Override
+	public boolean mouseDragged(int x, int y, int w, int h, double mouseX, double mouseY, int button, double dragX, double dragY) {
+		if (button != 0 || pressPerk == 0)
+			return false;
+		if (!dragging && Math.hypot(mouseX - pressX, mouseY - pressY) >= DRAG_START) {
+			dragging = true;
+			heldPerk = 0; // a drag replaces any click-held perk
+		}
+		return true;
+	}
+
+	@Override
+	public boolean mouseReleased(int x, int y, int w, int h, double mouseX, double mouseY, int button) {
+		if (button != 0 || pressPerk == 0)
+			return false;
+		Player entity = player();
+		int perk = pressPerk, from = pressSlot;
+		boolean wasDrag = dragging;
+		clearPress();
+		if (entity == null)
+			return true;
+		if (!wasDrag) {
+			if (from < 0)
+				heldPerk = perk; // click on the tree: hold it for click-then-click
+			else
+				sendAction(2000000 + from, entity); // click on a slot: unequip
+			return true;
+		}
+		int[] o = origin(x, y, w, h);
+		int to = hitSlot((int) mouseX - o[0], (int) mouseY - o[1]);
+		if (to >= 0) {
+			// locked or the same slot: snap back
+			if (to == from || !PerkEquipVars.isSlotUnlocked(entity, to))
+				return true;
+			if (from < 0)
+				sendAction(1000000 + to * 1000 + perk, entity); // tree -> slot: replace
+			else
+				sendAction(6000000 + from * 1000 + to, entity); // slot -> slot: move or swap
+		} else if (from >= 0) {
+			sendAction(2000000 + from, entity); // dragged off its slot: unequip
+		}
+		return true;
+	}
+
+	@Override
 	public boolean keyPressed(int keyCode) {
-		if (keyCode == 256 && heldPerk != 0) { // Esc clears the held perk before closing
+		if (keyCode == 256 && carried() != 0) { // Esc drops the carried perk before closing
 			heldPerk = 0;
+			clearPress();
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public void onHidden() {
+		heldPerk = 0;
+		clearPress();
+	}
+
+	/** The perk on the cursor: the one being dragged, else the click-held one. */
+	private int carried() {
+		return dragging ? pressPerk : heldPerk;
+	}
+
+	private void startPress(int perk, int slot, double mouseX, double mouseY) {
+		pressPerk = perk;
+		pressSlot = slot;
+		pressX = mouseX;
+		pressY = mouseY;
+		dragging = false;
+	}
+
+	private void clearPress() {
+		pressPerk = 0;
+		pressSlot = -1;
+		dragging = false;
 	}
 
 	private void sendAction(int encoded, Player entity) {

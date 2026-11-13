@@ -960,18 +960,19 @@ fullscreen hub - a background image with a top navbar over it - Inventory, Skill
 Map, Glossary - that swaps pages in place without leaving the screen, the way the witcher games
 present their character panels. Each tab also has its own bindable key (unbound by default; set them
 in Controls) so you can jump straight to, say, Skills. **Skills** is
-the progression surface: the four-tab perk tree on the left (right-click a node to learn it,
-left-click a learned one to hold it for equipping), a twelve-slot equip grid on the right, and four
+the progression surface: the four-tab perk tree on the left (right-click a node to learn it, drag
+a learned one onto a slot to equip it), a twelve-slot equip grid on the right, and four
 mutagen sockets that hold real mutagen items (see Mutagens below). Equip slots open with your
 witcher level, one mutagen group (column of three) at a time, at levels **1, 2, 4, 6, 8, 10, 13,
 16, 19, 22, 25, 28**. A slot you haven't reached shows a placeholder lock tile with the level it
 opens at, and its tooltip says so; it can't take a perk. Mutagen sockets are never level-gated:
 only Lesser mutagens drop, and the higher levels are slow to craft, so the item economy already
 paces them. A fifth tab, Mutagens, swaps the
-tree for your inventory so you can drag mutagens into the sockets. Holding a perk, every slot
-lights as a valid target: drop onto an empty slot to equip, or onto an occupied one to swap - the
-displaced perk simply returns to the unequipped pool, so re-arranging a full grid never needs a
-manual unequip first. When a node has more than one connecting line to earlier perks, learning any
+tree for your inventory so you can drag mutagens into the sockets. Carrying a perk, every open slot
+lights as a target. From the tree: drop on an empty slot to equip, or on an occupied one to replace
+it (that perk goes back to the tree). From a slot: drop on another slot to move it (two equipped
+perks swap), or anywhere else to unequip it. A short click works too: click a learned perk, then a
+slot. Nothing is ever left on the cursor or lost; closing the screen just drops what you carry. When a node has more than one connecting line to earlier perks, learning any
 ONE of them is enough - multiple parents are alternative routes into that node, not a checklist you
 have to clear in full, so a tree can branch and re-converge without gating a node behind everything
 that feeds into it. A perk pulled from the tree during balancing (hidden) is simply absent: it can't

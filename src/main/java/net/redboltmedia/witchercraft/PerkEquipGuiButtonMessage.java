@@ -30,6 +30,7 @@ import java.util.Map;
  *   2000000 + slotIdx                 clear perk slot slotIdx
  *   3000000 / 4000000                 retired (mutagen colour cycle, medallion click); ignored
  *   5000000 + perkId                  learn a tree node (prereqs + points enforced)
+ *   6000000 + fromSlot*1000 + toSlot  move an equipped perk to another slot; if that slot is occupied, the two swap
  * The server re-validates every action; it never trusts the client's view.
  */
 @EventBusSubscriber
@@ -61,7 +62,19 @@ public record PerkEquipGuiButtonMessage(int buttonID, int x, int y, int z) imple
 		// security measure to prevent arbitrary chunk generation
 		if (!world.getChunkSource().hasChunk(SectionPos.blockToSectionCoord(x), SectionPos.blockToSectionCoord(z)))
 			return;
-		if (buttonID >= 5000000) { // learn a tree node (perkId), prereqs + points enforced
+		if (buttonID >= 6000000) { // slot to slot: move, or swap with the occupant
+			int a = buttonID - 6000000;
+			int from = a / 1000, to = a % 1000;
+			if (from < 0 || from >= PerkEquipVars.PERK_SLOTS || to < 0 || to >= PerkEquipVars.PERK_SLOTS || from == to)
+				return;
+			int moving = PerkEquipVars.getPerkSocket(entity, from);
+			if (moving <= 0 || !PerkEquipVars.isSlotUnlocked(entity, to))
+				return;
+			int other = PerkEquipVars.getPerkSocket(entity, to);
+			// the occupant only takes the vacated slot if that slot is still open (it can be below level after a reset)
+			PerkEquipVars.setPerkSocket(entity, from, PerkEquipVars.isSlotUnlocked(entity, from) ? Math.max(0, other) : 0);
+			PerkEquipVars.setPerkSocket(entity, to, moving);
+		} else if (buttonID >= 5000000) { // learn a tree node (perkId), prereqs + points enforced
 			tryLearn(entity, buttonID - 5000000);
 		} else if (buttonID >= 3000000) { // retired: mutagen colour cycle and medallion click (mutagens are items now)
 			return;

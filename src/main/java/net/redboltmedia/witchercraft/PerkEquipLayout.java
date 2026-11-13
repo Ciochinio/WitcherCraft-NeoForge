@@ -64,7 +64,7 @@ public final class PerkEquipLayout {
 	public static final int TAB_FADE = 0x66FFFFFF;
 	public static final int CELL_BORDER = 0xFF4A4A52;
 	public static final int CELL_INNER = 0xFF1B1B20;
-	public static final int TARGET_BORDER = 0xFFFFDD55;
+	public static final int TARGET_BORDER = 0xC8C9B98A;
 	public static final int NODE_AVAILABLE_INNER = 0xFF141417;
 	public static final int NODE_LOCKED_BORDER = 0xFF2A2A30;
 	public static final int NODE_LOCKED_INNER = 0xFF121215;

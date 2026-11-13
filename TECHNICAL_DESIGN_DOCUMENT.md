@@ -1113,6 +1113,16 @@ unchanged as the owner of the tree, equip grid and socket frames; what changed i
   tile is the placeholder `textures/screens/perk_slot_locked.png`. A perk already in a slot is still
   drawn and removable even if the slot is below the player's level (only possible after a reset).
   Mutagen sockets are never gated.
+- **Drag to equip.** `PerkPage` records a left press on a learned node or an equipped slot
+  (`pressPerk`, `pressSlot`, -1 = tree) and turns it into a drag after 3 px of movement
+  (`mouseDragged`, forwarded by `SkillsScreen` along with `mouseReleased`, which the page hears before
+  the swallow-release check). On release: tree -> slot sends place `1000000 + slot*1000 + perk`
+  (occupant back to the tree); slot -> slot sends `6000000 + from*1000 + to`, a server move that swaps
+  with the occupant (the occupant only takes the vacated slot if it's still unlocked); slot -> anywhere
+  else sends clear `2000000 + slot`; same or locked slot snaps back. A release without the 3 px move is a
+  click: on a node it sets `heldPerk` (click-then-click, kept as an extra), on a slot it unequips. The
+  carried perk (`carried()`: dragged, else held) is drawn at the cursor with no tooltip, a slot being
+  dragged from is drawn empty, and `onHidden` / Esc drop it. All carry state is client-only.
 
 ### 3.3e The Inventory tab: the vanilla InventoryScreen, decorated
 
