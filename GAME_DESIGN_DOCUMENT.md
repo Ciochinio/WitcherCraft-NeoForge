@@ -208,7 +208,7 @@ Each Sign owns one job.
 |------|------|----------|
 | **Aard** | Displacement | A telekinetic cone that throws enemies away from the caster and staggers a group in front of them. |
 | **Igni** | Area damage | A wide, piercing stream of flame thrown forward that burns everything it passes through. |
-| **Quen** | Defense | A timed shield that absorbs a pool of damage, scaling with Sign Intensity, shown as shield bubbles above your health and marked by a particle spinning around the caster. |
+| **Quen** | Defense | A timed shield that absorbs a pool of damage, scaling with Sign Intensity, shown as shield bubbles above your health and marked by a Quen glyph orbiting the caster. |
 | **Yrden** | Control | A magic trap on the ground that slows and holds enemies caught inside it. |
 | **Axii** | Crowd control | A targeted charm that freezes a single enemy in place; refunds its cost when there's no target. |
 
@@ -231,7 +231,7 @@ elytra wall crashes and the void through untouched, since a magic ward shouldn't
 partially drains the shield and lets the rest through as real damage, same as an absorption
 effect - so the shield doesn't just "not work" on a big hit, it softens it. While it's up, a
 row of yellow shield bubbles appears above your health, one bubble per **2** points absorbed and a
-small bubble for an odd leftover, emptying as the pool is eaten, and a single particle
+small bubble for an odd leftover, emptying as the pool is eaten, and a small 3D Quen glyph
 orbits the caster with a slight vertical bob; both cut out the moment the shield breaks or expires,
 with a clear "Quen broke!" message so there's no ambiguity about whether it's still up. Casting (and raising Active Shield) plays a
 spell-cast sound, absorbed hits clang like a shield block and throw amber sparks on the side facing the
@@ -278,7 +278,7 @@ that keeps getting stronger as long as you can pay for it, where base Quen is a 
 you throw up and forget. Let go, run dry, or eat a hit bigger than the pool and it drops with an "Active Shield
 down" message. A shattered shield ends the hold outright rather than popping straight back up,
 so recovering from a break costs you a fresh press of the key. While it's up you sit in a slowly turning, round
-glowing gold glass bubble sunk into the ground (softly pulsing, brighter as the pool grows) that flashes on every
+glowing gold glass bubble sunk into the ground, dotted all over with bright Quen symbols (softly pulsing, brighter as the pool grows) that flashes on every
 absorbed hit, fades in when raised and vanishes the moment it drops; other players see
 it too. In first person the screen edges glow amber instead, and the edge facing the attacker flashes on
 a hit.

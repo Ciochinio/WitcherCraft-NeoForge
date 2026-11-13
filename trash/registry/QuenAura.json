@@ -1,0 +1,17 @@
+{
+  "name": "QuenAura",
+  "type": "procedure",
+  "compiles": true,
+  "locked_code": false,
+  "registry_name": "quen_aura",
+  "metadata": {
+    "dependencies": [
+      { "name": "entity", "type": "entity" },
+      { "name": "world", "type": "world" }
+    ],
+    "files": [
+      "src/main/java/net/redboltmedia/witchercraft/procedures/QuenAuraProcedure.java"
+    ]
+  },
+  "path": "~/Signs/Quen/DefQuen"
+}

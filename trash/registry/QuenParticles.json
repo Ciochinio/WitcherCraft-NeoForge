@@ -1,0 +1,14 @@
+{
+  "name": "QuenParticles",
+  "type": "particle",
+  "compiles": true,
+  "locked_code": false,
+  "registry_name": "quen_particles",
+  "metadata": {
+    "files": [
+      "src/main/resources/assets/witchercraft/particles/quen_particles.json",
+      "src/main/java/net/redboltmedia/witchercraft/client/particle/QuenParticlesParticle.java"
+    ]
+  },
+  "path": "~/Signs/Quen/DefQuen"
+}

@@ -29,7 +29,8 @@ import java.util.Map;
  * shielded: a smooth sphere made of quads (rings x slices) wrapped in a tiled pixel-glass texture
  * (textures/entities/quen_bubble_glass.png, tinted amber). It brightens towards the silhouette (rim glow),
  * turns in steps of exactly one texture pixel so the glass slides pixel by pixel, brightens as the pool grows
- * and flashes as a whole on every absorbed hit. In first person your own bubble is hidden and the screen edges
+ * and flashes as a whole on every absorbed hit. Quen symbols (textures/entities/quen_bubble_symbol.png) glow on the
+ * surface and turn, pulse and flash with it. In first person your own bubble is hidden and the screen edges
  * glow instead; the edge facing the attacker flashes on a hit. All tuning lives in the constants below.
  *
  * HAND-MAINTAINED: locked code element.
@@ -40,6 +41,8 @@ public class WitchercraftQuenBubbleClient {
 	private static final RenderType RENDER_TYPE = RenderTypes.entityTranslucentEmissive(TEXTURE);
 	/** Glow layer: the spider-eyes render type adds its colour to the screen, so what's behind gets brighter, not tinted. */
 	private static final RenderType GLOW_RENDER_TYPE = RenderTypes.eyes(Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "textures/entities/quen_bubble.png"));
+	/** Quen symbols on the surface, additive like the glow layer, so the PNG's clear pixels must stay black. */
+	private static final RenderType SYMBOL_RENDER_TYPE = RenderTypes.eyes(Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "textures/entities/quen_bubble_symbol.png"));
 	private static final int FULL_BRIGHT = 0xF000F0;
 
 	/** Centred low on the body so its bottom sinks into the ground. */
@@ -78,6 +81,14 @@ public class WitchercraftQuenBubbleClient {
 	/** Hit flash: extra brightness at the moment of the hit, and how long it takes to die out. */
 	private static final float FLASH_BOOST = 1.5F;
 	private static final float FLASH_TICKS = 6.0F;
+	/**
+	 * Symbols: how many (spread evenly over the whole sphere), width in blocks, how far outside the glass they sit,
+	 * and brightness. Only the side facing the camera is drawn, fading out towards the silhouette.
+	 */
+	private static final int SYMBOL_COUNT = 20;
+	private static final float SYMBOL_SIZE = 0.3F;
+	private static final float SYMBOL_LIFT = 1.01F;
+	private static final float SYMBOL_BRIGHTNESS = 0.9F;
 
 	/** First-person screen-edge glow: depth as a share of screen height, opacity, and hit flash opacity. */
 	private static final float EDGE_GLOW_DEPTH = 0.16F;
@@ -86,6 +97,8 @@ public class WitchercraftQuenBubbleClient {
 
 	/** Grid points of the unit sphere, [ring][slice][xyz], ring 0 at the top. */
 	private static final float[][][] GRID = buildSphere();
+	/** Per symbol: [centre direction, right, up], each a unit xyz on the unit sphere. */
+	private static final float[][][] SYMBOLS = buildSymbols();
 
 	@SubscribeEvent
 	public static void onSubmit(SubmitCustomGeometryEvent event) {
@@ -124,6 +137,7 @@ public class WitchercraftQuenBubbleClient {
 			event.getSubmitNodeCollector().submitCustomGeometry(poseStack, RENDER_TYPE, (pose, buffer) -> shell(buffer, pose, eye, alpha));
 			float glow = alpha * (1.0F + PULSE * Mth.sin(now * Mth.TWO_PI / PULSE_TICKS));
 			event.getSubmitNodeCollector().submitCustomGeometry(poseStack, GLOW_RENDER_TYPE, (pose, buffer) -> glow(buffer, pose, eye, glow));
+			event.getSubmitNodeCollector().submitCustomGeometry(poseStack, SYMBOL_RENDER_TYPE, (pose, buffer) -> symbols(buffer, pose, eye, glow));
 			poseStack.popPose();
 		}
 	}
@@ -186,6 +200,47 @@ public class WitchercraftQuenBubbleClient {
 				glowVertex(buffer, pose, GRID[r][s + 1], radius, 1, 0, b[r][s + 1]);
 			}
 		}
+	}
+
+	private static void symbols(VertexConsumer buffer, PoseStack.Pose pose, Vec3 eye, float strength) {
+		float centre = RADIUS * SYMBOL_LIFT, half = SYMBOL_SIZE / 2.0F;
+		for (float[][] sym : SYMBOLS) {
+			float[] n = sym[0], r = sym[1], u = sym[2];
+			Vec3 toEye = eye.subtract(n[0] * centre, n[1] * centre, n[2] * centre);
+			double len = toEye.length();
+			float facing = len < 1.0E-4 ? 0.0F : (float) ((n[0] * toEye.x + n[1] * toEye.y + n[2] * toEye.z) / len);
+			if (facing <= 0.0F)
+				continue;
+			float b = Mth.clamp(SYMBOL_BRIGHTNESS * strength * facing, 0.0F, 1.0F);
+			int c = (int) (255 * b);
+			float cx = n[0] * centre, cy = n[1] * centre, cz = n[2] * centre;
+			symbolVertex(buffer, pose, cx - (r[0] + u[0]) * half, cy - (r[1] + u[1]) * half, cz - (r[2] + u[2]) * half, 0, 1, c, n);
+			symbolVertex(buffer, pose, cx + (r[0] - u[0]) * half, cy + (r[1] - u[1]) * half, cz + (r[2] - u[2]) * half, 1, 1, c, n);
+			symbolVertex(buffer, pose, cx + (r[0] + u[0]) * half, cy + (r[1] + u[1]) * half, cz + (r[2] + u[2]) * half, 1, 0, c, n);
+			symbolVertex(buffer, pose, cx - (r[0] - u[0]) * half, cy - (r[1] - u[1]) * half, cz - (r[2] - u[2]) * half, 0, 0, c, n);
+		}
+	}
+
+	private static void symbolVertex(VertexConsumer buffer, PoseStack.Pose pose, float x, float y, float z, float u, float v, int c, float[] n) {
+		buffer.addVertex(pose, x, y, z).setColor(c, c, c, c).setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(FULL_BRIGHT).setNormal(pose, n[0], n[1], n[2]);
+	}
+
+	/** Golden-angle spiral: even spacing over the sphere with no rows and no bunching at the poles. Each symbol stands upright (its top towards the bubble's top). */
+	private static float[][][] buildSymbols() {
+		float[][][] out = new float[SYMBOL_COUNT][][];
+		float golden = (float) (Math.PI * (3.0 - Math.sqrt(5.0)));
+		for (int i = 0; i < SYMBOL_COUNT; i++) {
+			float y = 1.0F - 2.0F * (i + 0.5F) / SYMBOL_COUNT;
+			float ring = Mth.sqrt(1.0F - y * y);
+			float[] n = { Mth.cos(i * golden) * ring, y, Mth.sin(i * golden) * ring };
+			// right = worldUp x n, up = n x right
+			float rx = n[2], rz = -n[0];
+			float rl = Mth.sqrt(rx * rx + rz * rz);
+			float[] r = rl < 1.0E-4 ? new float[] { 1, 0, 0 } : new float[] { rx / rl, 0, rz / rl };
+			float[] u = { n[1] * r[2] - n[2] * r[1], n[2] * r[0] - n[0] * r[2], n[0] * r[1] - n[1] * r[0] };
+			out[i] = new float[][] { n, r, u };
+		}
+		return out;
 	}
 
 	private static void glowVertex(VertexConsumer buffer, PoseStack.Pose pose, float[] n, float radius, float u, float v, float b) {

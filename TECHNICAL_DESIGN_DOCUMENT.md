@@ -162,7 +162,7 @@ have no dependency, and adding one later would silently break the build.
 
 **The separation is the point.** The locked file contains no tuning values that describe game state -
 only geometry. Everything a designer would want to change lives in ordinary block-based procedures
-that open normally in MCreator. This is the same split as `QuenEffectTick` dispatching to `QuenAura`.
+that open normally in MCreator.
 
 Supporting state:
 
@@ -3796,6 +3796,25 @@ Quen, random side when the damage has no position) and, for Active Shield, sends
 edge on the attacker's side flashes. A bubble that hears nothing for 20 ticks is dropped. Tuning = constants at the
 top of the client class. The render type discards alpha under 0.1, so faint parts vanish first. The old
 12-glyph ring (`QuenActiveShieldAura`) is in `trash/`, and so is the unused `QuenHoldParticles` particle element (texture kept).
+Symbol layer: `SYMBOL_COUNT` 20 quads of `textures/entities/quen_bubble_symbol.png` (16 px, own art, clear pixels
+black because it is drawn with `RenderTypes.eyes`, additive) placed on a golden-angle spiral (even spread, no
+rows, no bunching at the poles) at 1.01 x radius, 0.3 blocks wide, upright towards the bubble's top. They sit in
+the turned frame, so they step with the glass. Only symbols facing the camera are drawn, brightness 0.9 x the glow
+strength (pool, pulse, hit flash) x how directly they face the camera, so they fade out at the silhouette instead of
+popping.
+**Normal Quen glyph.** The old per-tick server particle (`QuenAura` sending `QuenParticles`, a 1-tick particle
+re-spawned every tick) lagged behind a moving player; both elements are in `trash/` (registry entries in
+`trash/registry/`, particle textures kept) and so are the generated `WitchercraftModParticles` /
+`WitchercraftModParticleTypes`, since there are no particle elements left. `QuenEffectTick` is now an empty hook.
+`WitchercraftQuenGlyphMessage` (locked code, `~/Signs/Quen/DefQuen`, clientbound `entityId, up`) is sent from a
+server player tick on every change of `hasEffect(QUEN_EFFECT)` and every 5 ticks while up; the client drops one
+unheard for 20 ticks. `WitchercraftQuenGlyphClient` (locked code, `SubmitCustomGeometryEvent`) draws
+`textures/entities/quen_glyph.png` (16 px, own art) extruded one pixel thick like a dropped item: one full-texture
+quad front and back (the `entityTranslucentEmissive` cutout drops clear pixels) plus an edge face on every opaque
+pixel next to a clear one, at 0.65 brightness so the thickness reads at full bright. The shape is read from the PNG
+once per game launch. Same orbit as the old particle, but from the smoothed position every frame: radius 0.7,
+1 block up, bob 0.3 at 0.2 rad/tick, 0.25 rad/tick around, 0.2 blocks wide, upright and turned to face the camera
+(yaw only; a self-spin was tried and dropped, it looked bad). Visible in first person too, like the particle was.
 `AltQuenCast` raises the pool to at least `4 * (1 + SignIntensity * 0.01)` on the first hold tick (was a flat 2),
 and only adds its +2/s recharge while the pool is above 0, so a hit that empties the Active
 Shield on a recharge tick can't refill it before `QuenActiveShieldTick` ends the hold.

@@ -3643,24 +3643,27 @@
       "path": "~/Signs/Quen/DefQuen"
     },
     {
-      "name": "QuenAura",
-      "type": "procedure",
+      "name": "WitchercraftQuenGlyphMessage",
+      "type": "code",
       "compiles": true,
-      "locked_code": false,
-      "registry_name": "quen_aura",
+      "locked_code": true,
+      "registry_name": "witchercraft_quen_glyph_message",
       "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ],
         "files": [
-          "src/main/java/net/redboltmedia/witchercraft/procedures/QuenAuraProcedure.java"
+          "src/main/java/net/redboltmedia/witchercraft/WitchercraftQuenGlyphMessage.java"
+        ]
+      },
+      "path": "~/Signs/Quen/DefQuen"
+    },
+    {
+      "name": "WitchercraftQuenGlyphClient",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "witchercraft_quen_glyph_client",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WitchercraftQuenGlyphClient.java"
         ]
       },
       "path": "~/Signs/Quen/DefQuen"
@@ -8503,20 +8506,6 @@
       "path": "~/Signs/Aard"
     },
     {
-      "name": "QuenParticles",
-      "type": "particle",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "quen_particles",
-      "metadata": {
-        "files": [
-          "src/main/resources/assets/witchercraft/particles/quen_particles.json",
-          "src/main/java/net/redboltmedia/witchercraft/client/particle/QuenParticlesParticle.java"
-        ]
-      },
-      "path": "~/Signs/Quen/DefQuen"
-    },
-    {
       "name": "QuenEffect",
       "type": "potioneffect",
       "compiles": true,
@@ -11947,8 +11936,6 @@
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModMenus.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModScreens.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModKeyMappings.java",
-      "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModParticles.java",
-      "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModParticleTypes.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModMobEffects.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModBlocks.java",
       "src/main/java/net/redboltmedia/witchercraft/init/WitchercraftModItems.java",
