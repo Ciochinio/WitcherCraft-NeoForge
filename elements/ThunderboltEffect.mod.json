@@ -10,7 +10,7 @@
     },
     "onAddedSound": "",
     "isInstant": false,
-    "mobEffectCategory": "NEUTRAL",
+    "mobEffectCategory": "BENEFICIAL",
     "renderStatusInInventory": true,
     "renderStatusInHUD": true,
     "isCuredbyHoney": false,

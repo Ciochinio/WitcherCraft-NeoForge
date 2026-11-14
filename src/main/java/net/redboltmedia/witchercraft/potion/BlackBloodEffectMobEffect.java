@@ -5,6 +5,6 @@ import net.minecraft.world.effect.MobEffect;
 
 public class BlackBloodEffectMobEffect extends MobEffect {
 	public BlackBloodEffectMobEffect() {
-		super(MobEffectCategory.NEUTRAL, -1);
+		super(MobEffectCategory.BENEFICIAL, -1);
 	}
 }

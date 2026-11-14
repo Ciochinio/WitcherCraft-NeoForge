@@ -207,16 +207,30 @@ public class WitchercraftHud {
 			graphics.pose().popMatrix();
 		}
 		drawIncoming(graphics, minecraft, player, event.getPartialTick().getGameTimeDeltaPartialTick(false));
-		if (isExecutable(player, minecraft.crosshairPickEntity))
+		Entity aimed = minecraft.crosshairPickEntity;
+		if (isExecutable(player, aimed))
 			graphics.blit(RenderPipelines.GUI_TEXTURED, EXECUTE_MARKER, (graphics.guiWidth() - EXECUTE_MARKER_SIZE) / 2, (graphics.guiHeight() - EXECUTE_MARKER_SIZE) / 2, 0, 0, EXECUTE_MARKER_SIZE, EXECUTE_MARKER_SIZE, EXECUTE_MARKER_SIZE, EXECUTE_MARKER_SIZE);
+		// Precise only matters when the hit wouldn't kill outright, so Execute hides it
+		else if (aimed != null && aimed.getId() == WitchercraftPreciseMarkerMessage.preciseTarget)
+			graphics.blit(RenderPipelines.GUI_TEXTURED, PRECISE_MARKER, (graphics.guiWidth() - PRECISE_MARKER_SIZE) / 2, (graphics.guiHeight() - PRECISE_MARKER_SIZE) / 2, 0, 0, PRECISE_MARKER_SIZE, PRECISE_MARKER_SIZE, PRECISE_MARKER_SIZE, PRECISE_MARKER_SIZE);
 	}
+
+	/**
+	 * Precise marker: four short gold strokes, the middle 2 px of each side of a diamond |x|+|y| = 5 around the crosshair, in
+	 * the same spot as the Execute ticks but running across the diagonals where Execute runs along them, while a charged
+	 * melee hit on the entity under it would be a Precise hit. The server decides
+	 * (WitchercraftPreciseMarkerMessage); this only checks the client's own pick is the same entity. Odd size, centred
+	 * like the Execute marker.
+	 */
+	private static final Identifier PRECISE_MARKER = Identifier.parse("witchercraft:textures/screens/precise_marker.png");
+	private static final int PRECISE_MARKER_SIZE = 11;
 
 	/**
 	 * Incoming-attack indicator (GDD 5, Blocking and parrying): one red tick per mob winding up an attack on
 	 * this player (WitchercraftParryIndicatorMessage), on the side the attacker is on (ahead = above the
 	 * crosshair, right = right, behind = below). It closes from INCOMING_R_START onto a dim target mark at
 	 * INCOMING_R_END, covering it exactly as the hit lands, and turns bright while a sword raised now would be a
-	 * perfect parry. INCOMING_R_END stays outside the vanilla crosshair arms (7 px), or the landing hides in them.
+	 * perfect parry. INCOMING_R_END stays outside the vanilla crosshair arms (4 px; the sprite is 15x15 but the plus is 9x9), or the landing hides in them.
 	 */
 	private static final float INCOMING_R_START = 20f;
 	private static final float INCOMING_R_END = 10f;

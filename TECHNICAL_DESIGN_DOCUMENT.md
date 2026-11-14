@@ -601,7 +601,7 @@ and the re-hit had no attacker attached. The new pipeline changes the hit in pla
 | `WitchercraftComboLine` | none `(entity)`, called every tick by `WitchercraftComboLineTick` (player ticks, server only) | Builds the combat line (GDD 5) from the player's charges into the synced player text variable `witchercraftComboLine`; `WitchercraftHud` draws it centred under the crosshair. A number `sig` encodes what is on the line and is kept in NBT (`witchercraftComboSig`), so the variable, and with it the sync packet, is only written when the line actually changes. Running per tick is what makes expired charges vanish without a timer. The icons are font glyphs (see below). |
 | `WitchercraftReadyChime` | none | The single "a charge armed" sound, so every perk uses the same cue. |
 | `WitchercraftAfterDamage` | none (called by the bridge) | Life steal and Black Blood, from the damage that actually reached health. Life steal uses `clamp(amount, 0, witchercraftLifeStealCap)`. `WitchercraftDamageCalculator` stores that cap on the target just before a melee hit lands: the target's health, or on an Execute `clamp(normalHit, 0, health)`, where `normalHit` is the hit before it became 9999 (before armor, so very slightly generous). Also stamps `witchercraftLastHurtTick` on players (Muscle Memory). |
-| `WitchercraftCritCondition` | none, returns logic | The list of crit conditions. Only Thunderbolt in a storm today. |
+| `WitchercraftCritCondition` | none, returns logic | The single list of Precise conditions, used by `WitchercraftMeleeCrit` and by the crosshair marker. Mob sources are effects on the target (`entity`): Yrden Trapped, Yrden Zapped, Axii Charmed, Maimed with `witchercraftMaimedHits` > 0 (moved in from `WitchercraftMeleeCrit`). Player sources are effects on the attacker (`sourceentity`): Thunderbolt while thundering. |
 | `WitchercraftOilMatches` | none, returns logic | Main-hand oil enchantment vs the target's category tag, for all ten oils. |
 | `WitchercraftExecuteEnabled` | none, returns logic | `(sourceentity)`: true while the attacker has Deadly Precision equipped. |
 | `IsFullyChargedAttack` | none, returns logic, **locked** | Attack strength above 0.9. Blockly has no block for it. |
@@ -663,8 +663,19 @@ hand-written Java. Their blocks are placeholders with a comment saying so. If MC
 current order matches the generated `(world, damagesource, entity, sourceentity, amount)`.
 
 **How to change things.**
-- *Add a crit condition:* one more OR branch in `WitchercraftCritCondition`. `entity` is the target,
-  `sourceentity` the attacker. It applies to melee and to fully drawn arrows at once.
+- *Add a crit condition:* one more OR branch in `WitchercraftCritCondition` (Blockly only). `entity` is the target,
+  `sourceentity` the attacker. Only `WitchercraftMeleeCrit` calls it, so it is melee only. The crosshair marker
+  picks it up with no other change.
+- *Precise marker:* `WitchercraftPreciseMarkerMessage` (locked code, `~/HUD`) runs on every server player tick:
+  it picks the living entity under the player's aim within `entityInteractionRange` (block clip, then
+  `ProjectileUtil.getEntityHitResult`), runs `WitchercraftCritCondition` on it, and sends the entity id (or -1) to
+  that player only when it changes. Server side because most conditions are mob effects, and vanilla sends a mob's
+  effects only to its riders. `WitchercraftHud` draws `textures/screens/precise_marker.png` (11x11, four short 2 px gold
+  strokes, the middle of each side of a diamond `|x|+|y| = 5`, no outline (an outlined 13x13 diamond and a full thin
+  one both looked too heavy), so the corners stay open where the vanilla crosshair's 4 px arms point (its
+  sprite is 15x15 but the plus is only 9x9); same spot and stroke style as the Execute ticks, but across the
+  diagonals instead of along them. Drafts tried: blue corner brackets (in `trash/`), gold chevrons outside the arms) centred on the crosshair while `crosshairPickEntity` has that id and the Execute
+  marker is not showing. It ignores attack charge.
 - *Add an oil:* one more OR branch in `WitchercraftOilMatches`.
 - *Move Execute to another perk:* make `WitchercraftExecuteEnabled` return that perk's equipped variable (today Deadly Precision). The 20%
   threshold is in `WitchercraftDamageCalculator`.

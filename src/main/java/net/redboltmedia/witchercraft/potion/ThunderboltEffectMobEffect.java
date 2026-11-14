@@ -10,7 +10,7 @@ import net.minecraft.resources.Identifier;
 
 public class ThunderboltEffectMobEffect extends MobEffect {
 	public ThunderboltEffectMobEffect() {
-		super(MobEffectCategory.NEUTRAL, -1);
+		super(MobEffectCategory.BENEFICIAL, -1);
 		this.addAttributeModifier(WitchercraftModAttributes.INCREASED_DAMAGE, Identifier.fromNamespaceAndPath(WitchercraftMod.MODID, "effect.thunderbolt_effect_0"), 20, AttributeModifier.Operation.ADD_VALUE);
 	}
 }

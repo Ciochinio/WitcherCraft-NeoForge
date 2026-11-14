@@ -4913,6 +4913,19 @@
       "path": "~/HUD"
     },
     {
+      "name": "WitchercraftPreciseMarkerMessage",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "witchercraft_precise_marker_message",
+      "metadata": {
+        "files": [
+          "src/main/java/net/redboltmedia/witchercraft/WitchercraftPreciseMarkerMessage.java"
+        ]
+      },
+      "path": "~/HUD"
+    },
+    {
       "name": "MedallionShow",
       "type": "procedure",
       "compiles": true,

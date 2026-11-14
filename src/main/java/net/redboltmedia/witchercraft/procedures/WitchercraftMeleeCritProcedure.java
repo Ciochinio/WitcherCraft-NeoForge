@@ -35,8 +35,7 @@ public class WitchercraftMeleeCritProcedure {
 			if (isvanillacritical) {
 				critBonus = critBonus + 0.5;
 			}
-			if (IsFullyChargedAttackProcedure.execute(sourceentity) && (WitchercraftCritConditionProcedure.execute(world, entity, sourceentity)
-					|| entity instanceof LivingEntity _livEnt1 && _livEnt1.hasEffect(WitchercraftModMobEffects.MAIMED) && entity.getPersistentData().getDoubleOr("witchercraftMaimedHits", 0) > 0)) {
+			if (IsFullyChargedAttackProcedure.execute(sourceentity) && WitchercraftCritConditionProcedure.execute(world, entity, sourceentity)) {
 				critBonus = critBonus
 						+ (sourceentity instanceof LivingEntity _livingEntity1 && _livingEntity1.getAttributes().hasAttribute(WitchercraftModAttributes.CRIT_DAMAGE) ? _livingEntity1.getAttribute(WitchercraftModAttributes.CRIT_DAMAGE).getValue() : 0)
 								* 0.01;

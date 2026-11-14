@@ -607,6 +607,8 @@ Precise strong attack     x2.0    1 + 50% + Precise Hit Damage
 - Several conditions at once still count as one Precise hit.
 - Look: a strong attack shows vanilla's crit stars and sound; a Precise hit shows blue sparks and a
   sharper crit sound (a Precise strong attack shows both).
+- While you aim at a target in reach that a charged hit would hit Precisely, four short gold strokes frame the
+  crosshair in a diamond. The Execute reticle replaces them when the target could be executed.
 
 Conditions:
 | Condition | Source |
@@ -614,7 +616,6 @@ Conditions:
 | A thunderstorm | **Thunderbolt** potion |
 | Target inside a Yrden trap, or zapped by Magic Trap | **Yrden** |
 | Target charmed by Axii | **Axii** |
-| Target burning | perk |
 | Target Maimed (melee hits only, next **2** charged hits) | **Maiming Shot** perk |
 | Target hasn't noticed you | bow perk, not assigned yet |
 | Within **3** seconds of a kill | **Katakan** decoction |
